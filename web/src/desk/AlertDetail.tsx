@@ -9,6 +9,7 @@ import { DatedBracket } from "../components/DatedBracket";
 import { MapView } from "../components/MapView";
 import { useDemoOnScreen } from "../demo";
 import { CaseFilePanel, Checklist } from "./CaseFile";
+import { OfficerRecordPanel } from "./OfficerRecord";
 
 type Action = { to: string; label: string; two_person: boolean; signer: string; enabled: boolean; blocked_reason: string | null; needs: string[] };
 const REASON_CODES = ["cloud_shadow", "seasonal_water", "transient_object", "crop_cycle", "image_artefact", "other"];
@@ -126,6 +127,8 @@ export function AlertDetail() {
             <h3>{t("detail.actions_title")}</h3>
             <Actions alert={a} onDone={reload} />
           </div>
+
+          <OfficerRecordPanel alert={a} onChange={reload} />
 
           <CaseFilePanel alert={a} onChange={reload} />
 

@@ -230,3 +230,32 @@ scenarios:
     detect: {first_changed: -63, last_clear: -69, day: -50}
     steps:
       - {day: -49, do: close_not_real, by: demo.analyst, cosign: demo.reviewer, reason: Seasonal drawdown of the water edge, code: seasonal_water}
+
+  - key: action_recorded
+    asset: demo-cheruvu-5
+    note: The full path, finished. The officer served notice, held a hearing and recorded an order. The land stays on weekly watch.
+    change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 300, size: [90, 60]}
+    detect: {first_changed: -78, last_clear: -84, day: -72}
+    steps:
+      - {day: -71, do: confirm, by: demo.analyst}
+      - {day: -71, do: assign, by: demo.nodal, to: demo.field1}
+      - {day: -68, do: field, by: demo.field1, outcome: confirmed, stage: soil_dumped}
+      - day: -66
+        do: checklist
+        by: demo.legal
+        items:
+          boundary_confirmed: ["yes", Final notification DEMO/FINAL/005]
+          joint_survey_done: ["yes", DEMO/JS/2026/009]
+          survey_notice_given: ["yes", DEMO/NOTICE/SURVEY/009]
+          no_live_court_matter: ["yes", Demo court register checked]
+          title_permits_reviewed: ["yes", No permit or title claim on record]
+          notice_and_hearing: ["not_applicable", To be done by the officer]
+          construction_dated: ["yes", Change bracket falls after the policy cut-off]
+      - {day: -65, do: pack, by: demo.legal}
+      - {day: -65, do: transition, to: PACK_READY, by: demo.nodal}
+      - {day: -64, do: transition, to: WITH_OFFICER, by: demo.nodal}
+      - day: -40
+        do: officer
+        by: demo.legal
+        record_action: true
+        record: {notice_ref: DEMO/NOTICE/2026/031, notice_date: -60, hearing_date: -50, order_ref: DEMO/ORDER/2026/012, order_date: -45, action_date: -40, action_summary: Fill removed under the demo order; the land stays on weekly watch.}

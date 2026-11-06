@@ -13,8 +13,8 @@ Read this first at the start of every session, then continue from the first unfi
 | M5 Desk | Done | API 197 passed, browser 5 passed | M5 commit |
 | M6 Field app | Done | API 204 passed, browser 8 passed | M6 commit |
 | M7 Evidence pack | Done | API 217 passed, browser 10 passed | M7 commit |
-| M8 Officer record, escalation, monthly page | In progress | | |
-| M9 Demo | Not started | | |
+| M8 Officer record, escalation, monthly page | Done | API 232 passed, browser 13 passed | M8 commit |
+| M9 Demo | In progress | | |
 | **Stop: report to owner** | | | |
 | M2 Detection on Sentinel-2 | Not started | | |
 | M3 Radar and scored backtest | Not started | | |
@@ -128,6 +128,28 @@ Done-check run on 6 Nov 2026 from empty volumes (`docker compose down -v`, then 
   counsel review and absent after), verify-pack catching a changed, missing, added or forged file,
   `lp` exit codes, versioning, and the export log. Browser: 10 passed.
 
+## M8 Officer record, escalation, monthly page: done
+
+- Officer record: `POST /alerts/{id}/officer-record` for the legal or senior officer, with notice,
+  hearing, order and action fields, and an optional step to `ACTION_RECORDED` (which moves on to
+  `POST_ACTION_WATCH`). The desk panel says "The system suggests no outcome. The officer decides."
+- Worker container (`python -m app.worker`): records missed timers every 5 minutes (D-036).
+- Monthly page: `GET /bulletins/{month}` and `/pdf`, worked out from the audit log (D-034, D-035).
+  The desk screen at `/monthly`, which is the senior officer's home, has the five figures against
+  last month, a map of every asset with new and overdue alerts marked, overdue alerts by who must act
+  and the overdue list. Each PDF is stored with its figures in `bulletins`.
+- The demo seed adds a completed path (notice, hearing, order, action recorded) on Demo Cheruvu 5.
+- Done-check:
+  - The overdue list is correct against known due dates in `test_monthly.py`: a closed month is
+    replayed to its own end, and the current month runs to now.
+  - The live demo month gave watched 20, new 2, seen on site 1, actions 1, overdue 4. The overdue
+    list is Demo Kunta 2 (review, 52 days), Demo Cheruvu 9 (Demo Field Officer 2, 13 days),
+    Demo Cheruvu 8 (2 days) and Demo Parcel B (reopened, 1 day).
+  - The live PDF has 1 page (pypdf). Rendered, it fits one A4 page.
+  - The browser test checks the screen's figures equal the API's, and that recording an officer
+    action raises "actions" by 1 and lowers "overdue" by 1.
+- Tests: API 232 passed, browser 13 passed.
+
 ## Stubbed
 
 - Imagery requests are recorded with an estimate. Nothing is ordered (section 3).
@@ -135,7 +157,7 @@ Done-check run on 6 Nov 2026 from empty volumes (`docker compose down -v`, then 
 - Escalation "notify" is an audit event and an overdue flag. No email or SMS.
 - The scheduled worker container that runs escalation comes in M8. The job itself exists and is tested.
 
-- The Monthly page route shows a placeholder until M8.
+- The weekly re-check from space is not scheduled until the pipeline exists (D-036).
 - Telugu strings are drafts awaiting a native speaker's review (D-028).
 - A real phone over the network needs HTTPS, which is not set up (D-032).
 
@@ -150,4 +172,4 @@ Done-check run on 6 Nov 2026 from empty volumes (`docker compose down -v`, then 
 
 ## Next
 
-M8: officer record, the escalation worker container, and the monthly page (screen and one-page PDF).
+M9: demo. Section 14 end to end on one laptop with no internet, using cached tiles and image chips.

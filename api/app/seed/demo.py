@@ -27,7 +27,7 @@ from app.rules import config as rules
 from app.evidence import pack as pack_svc
 from app.services import boundaries as bsvc
 from app.services import field as field_svc
-from app.services import readiness
+from app.services import officer, readiness
 from app.services import ingest as ingest_svc
 from app.seed import demo_render as render
 from app.seed.demo_world import World
@@ -178,6 +178,9 @@ class Seeder:
                     readiness.record(self.db, alert, by, key, status, ref, at=when + dt.timedelta(minutes=n))
             elif do == "pack":
                 pack_svc.build(self.db, alert, by, at=when)
+            elif do == "officer":
+                fields = {k: (self.day(v).date() if k.endswith("_date") else v) for k, v in step["record"].items()}
+                officer.add(self.db, alert, by, fields, record_action=step.get("record_action", False), at=when)
             elif do == "transition":
                 sm.transition(self.db, alert, step["to"], actor=by, reason=step.get("reason"), data=step.get("data", {}), at=when)
             else:

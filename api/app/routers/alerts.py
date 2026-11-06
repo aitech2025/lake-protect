@@ -6,7 +6,9 @@ import math
 from typing import Literal
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from datetime import date as _date
+
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
@@ -321,3 +323,44 @@ def get_field_photo(alert_id: int, check_id: int, n: int, user: User = Depends(c
     chain.record(db, actor_id=user.id, action="view.field_photo", entity="alert", entity_id=alert.id, details={"field_check_id": check_id, "photo": n})
     db.commit()
     return Response(store.get_object(path), media_type="image/png" if path.endswith(".png") else "image/jpeg", headers={"Cache-Control": "private, max-age=3600"})
+
+
+class OfficerRecordIn(BaseModel):
+    """Validated before any write, so a refusal never needs a rollback."""
+
+    model_config = ConfigDict(extra="forbid")
+    notice_ref: str | None = None
+    notice_date: _date | None = None
+    hearing_date: _date | None = None
+    order_ref: str | None = None
+    order_date: _date | None = None
+    action_date: _date | None = None
+    action_summary: str | None = None
+    record_action: bool = False
+
+    @model_validator(mode="after")
+    def needs_a_reference(self):
+        if not any([self.notice_ref, self.order_ref, self.notice_date, self.hearing_date, self.order_date, self.action_date]):
+            raise ValueError("Give at least one notice, hearing, order or action reference")
+        return self
+
+
+@router.post("/{alert_id}/officer-record", status_code=201)
+def post_officer_record(alert_id: int, body: OfficerRecordIn, user: User = Depends(require_roles(Role.legal_officer, Role.senior_officer)), db: Session = Depends(get_db)) -> dict:
+    """Section 9.1: notice, hearing, order and action references. The system suggests no outcome."""
+    from app.services import officer
+
+    alert = alert_view.get_visible(db, alert_id, user)
+    if alert.state != "WITH_OFFICER":  # checked before any write
+        raise HTTPException(409, f"Officer records are added while the alert is with the officer (alert is {alert.state})")
+    with db_guard(db):
+        try:
+            result = officer.add(db, alert, user, body.model_dump(exclude={"record_action"}), record_action=body.record_action)
+        except officer.OfficerRefused as exc:
+            db.rollback()
+            raise HTTPException(exc.status, exc.message) from exc
+        except sm.Refused as exc:
+            db.rollback()
+            raise HTTPException(exc.status, exc.message) from exc
+        db.commit()
+    return result

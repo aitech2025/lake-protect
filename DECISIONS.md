@@ -203,4 +203,27 @@ set up in the prototype.
 - The PDF cannot contain its own hash. `manifest.json` lists the PDF's hash, and the database and
   audit log hold the manifest's hash.
 
+### D-034: How the monthly figures are counted
+Section 9.4 names the figures but not their rules. Applied:
+- **Watched:** assets with a boundary in force by the end of the month.
+- **New alerts:** alerts created in the month, not counting ones the legal check closed straight
+  away (outside the boundary, before the baseline, or authorised).
+- **Seen on site:** alerts that moved from field assignment to `FIELD_CONFIRMED` in the month.
+- **Officer actions recorded:** alerts that reached `ACTION_RECORDED` in the month.
+- **Overdue:** alerts in a timed state past their due date at the end of the month, or now for the
+  current month.
+
+Every figure is worked out by replaying the audit log up to the cut-off, so last month's page shows
+last month's position. Real lakes and demo assets are never mixed on one page.
+
+### D-035: "Overdue by officer" when nobody owns the alert
+Only field assignment names an owner. For the other timed states the page names who must act: review
+is the "Analyst desk", a field-confirmed case awaiting its file is the "Nodal officer (case file)",
+and a case with the officer is the "Officer".
+
+### D-036: The worker does escalation only, for now
+The worker container runs the escalation job every 5 minutes. The weekly re-check from space needs
+the detection pipeline (M2 and M3), so it is not scheduled yet. The reopen logic it would feed
+already exists and is tested at ingest (D-020).
+
 ## Defaults changed

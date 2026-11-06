@@ -9,6 +9,7 @@ import { Login } from "./desk/Login";
 import { Queue } from "./desk/Queue";
 import { Records } from "./desk/Records";
 import { FieldApp } from "./field/FieldApp";
+import { Monthly } from "./bulletin/Monthly";
 
 function RequireUser({ children }: { children: ReactNode }) {
   const { user, ready } = useAuth();
@@ -21,10 +22,6 @@ function Home() {
   return <Navigate to={user ? homeFor(user.role) : "/login"} replace />;
 }
 
-function Later({ what }: { what: string }) {
-  return <div className="page"><h1>{what}</h1><p className="muted">This screen is built in a later milestone.</p></div>;
-}
-
 export function App() {
   return (
     <Routes>
@@ -35,7 +32,7 @@ export function App() {
         <Route path="/assets" element={<Assets />} />
         <Route path="/records" element={<Records />} />
         <Route path="/audit" element={<Audit />} />
-        <Route path="/monthly" element={<Later what="Monthly page" />} />
+        <Route path="/monthly" element={<Monthly />} />
       </Route>
       <Route path="/field/*" element={<RequireUser><FieldApp /></RequireUser>} />
       <Route path="*" element={<Home />} />

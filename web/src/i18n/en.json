@@ -384,5 +384,43 @@
     "evidence": "Evidence reference",
     "checked": "{{name}}, {{date}}",
     "gaps": "Checklist gaps: {{items}}. Sending to the officer needs a logged reason."
+  },
+  "monthly": {
+    "title": "Monthly page: {{month}}",
+    "whole": "Whole month.",
+    "to_date": "Month to date, as of {{date}}.",
+    "compared": "Compared with {{month}}.",
+    "watched": "lakes and parcels watched",
+    "new_alerts": "new alerts",
+    "verified": "seen on site",
+    "action_taken": "officer actions recorded",
+    "overdue": "overdue",
+    "was": "{{n}} in {{month}}",
+    "was_end": "{{n}} at the end of {{month}}",
+    "map_legend": "Blue: lakes. Beige: recovered parcels. Amber dot: new alert this month. Red ring: overdue.",
+    "by_who": "Overdue, by who must act",
+    "list": "Overdue alerts",
+    "days_late": "{{n}} days late",
+    "none": "Nothing is overdue.",
+    "print": "Print one page",
+    "source": "Every figure comes from the system's records with no hand edits.",
+    "dataset_demo": "Demo world",
+    "dataset_real": "Real lakes"
+  },
+  "officer": {
+    "title": "Officer record",
+    "note": "The system suggests no outcome. The officer decides.",
+    "notice_ref": "Notice reference",
+    "notice_date": "Notice date",
+    "hearing_date": "Hearing date",
+    "order_ref": "Order reference",
+    "order_date": "Order date",
+    "action_date": "Action date",
+    "action_summary": "What was done",
+    "save": "Save record",
+    "save_action": "Save and record the action",
+    "saved": "Record saved.",
+    "recorded": "Action recorded. The land stays on weekly watch.",
+    "records": "Officer records"
   }
 }

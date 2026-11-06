@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lake Protect monthly page, {{ label }}</title>
+<style>
+  @font-face { font-family: "Noto Sans"; src: url("{{ fonts.regular }}"); font-weight: 400; }
+  @font-face { font-family: "Noto Sans"; src: url("{{ fonts.bold }}"); font-weight: 700; }
+  @page { size: A4; margin: 14mm 14mm 12mm; }
+  body { font-family: "Noto Sans", sans-serif; font-size: 9.5pt; color: #1c2b33; line-height: 1.35; }
+  .demo { background: #6e3fa3; color: #fff; font-weight: 700; padding: 1.5mm 3mm; margin-bottom: 3mm; font-size: 8.5pt; }
+  h1 { font-size: 17pt; margin: 0; }
+  .sub { color: #4a5a62; margin: 0.5mm 0 4mm; }
+  .counts { display: flex; gap: 3mm; margin-bottom: 4mm; }
+  .count { flex: 1; border-top: 2pt solid #1c2b33; padding-top: 1.5mm; }
+  .count b { display: block; font-size: 20pt; line-height: 1.1; }
+  .count .was { color: #4a5a62; font-size: 8pt; }
+  .count.overdue { border-top-color: #c4402f; }
+  img.map { width: 100%; height: 92mm; object-fit: contain; border: 0.5pt solid #c9d1cc; }
+  .legend { font-size: 8pt; color: #4a5a62; margin: 1mm 0 4mm; }
+  h2 { font-size: 11pt; margin: 3mm 0 1.5mm; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 1mm 1.5mm; border-bottom: 0.5pt solid #c9d1cc; font-size: 8.5pt; }
+  th { color: #4a5a62; font-weight: 400; }
+  .cols { display: flex; gap: 6mm; }
+  .cols > div { flex: 1; }
+  .foot { margin-top: 4mm; font-size: 8pt; color: #4a5a62; }
+</style>
+</head>
+<body>
+{% if dataset == "demo" %}<div class="demo">Demo data: fictional places, people and records. Not a finding.</div>{% endif %}
+<h1>Monthly page: {{ label }}</h1>
+<p class="sub">{% if complete_month %}Whole month.{% else %}Month to date, as of {{ as_of[:10] }}.{% endif %} Compared with {{ last_label }}.</p>
+
+<div class="counts">
+  <div class="count"><b>{{ counts.watched }}</b>lakes and parcels watched<div class="was">{{ last_month.counts.watched }} in {{ last_label }}</div></div>
+  <div class="count"><b>{{ counts.new_alerts }}</b>new alerts<div class="was">{{ last_month.counts.new_alerts }} in {{ last_label }}</div></div>
+  <div class="count"><b>{{ counts.verified }}</b>seen on site<div class="was">{{ last_month.counts.verified }} in {{ last_label }}</div></div>
+  <div class="count"><b>{{ counts.action_taken }}</b>officer actions recorded<div class="was">{{ last_month.counts.action_taken }} in {{ last_label }}</div></div>
+  <div class="count overdue"><b>{{ counts.overdue }}</b>overdue<div class="was">{{ last_month.counts.overdue }} at the end of {{ last_label }}</div></div>
+</div>
+
+<img class="map" src="{{ map_uri }}" alt="Map of watched lakes and parcels">
+<p class="legend">Blue: lakes. Beige: recovered parcels. Amber dot: new alert this month. Red ring: overdue.</p>
+
+<div class="cols">
+  <div>
+    <h2>Overdue, by who must act</h2>
+    <table>
+      {% for r in overdue_by_responsible %}<tr><td>{{ r.responsible }}</td><td>{{ r.count }}</td></tr>{% else %}<tr><td>Nothing is overdue.</td></tr>{% endfor %}
+    </table>
+  </div>
+  <div>
+    <h2>Overdue alerts</h2>
+    <table>
+      <tr><th>Alert</th><th>Place</th><th>Days late</th></tr>
+      {% for o in overdue_shown %}<tr><td>{{ o.code }}</td><td>{{ o.asset_name }}</td><td>{{ o.days_overdue }}</td></tr>{% endfor %}
+      {% if overdue_more %}<tr><td colspan="3">and {{ overdue_more }} more in the desk</td></tr>{% endif %}
+    </table>
+  </div>
+</div>
+<p class="foot">Every figure comes from the system's records with no hand edits. Imagery shows physical change. It does not establish title or legality.</p>
+</body>
+</html>

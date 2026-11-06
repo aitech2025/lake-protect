@@ -1,0 +1,17 @@
+.figures { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.figure { border-top: 3px solid var(--ink); padding-top: 0.5rem; display: grid; gap: 0.1rem; }
+.figure b { font-size: 2.6rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.figure span { font-weight: 600; }
+.figure small { color: var(--ink-2); }
+.figure.late { border-top-color: var(--buffer); }
+.figure.late b { color: var(--buffer); }
+.monthly-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(280px, 2fr); gap: 1.75rem; align-items: start; }
+.monthly-map { margin: 0; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-m); padding: 0.5rem; }
+.monthly-map svg { width: 100%; height: auto; display: block; }
+.who-list, .overdue-list { list-style: none; padding: 0; margin: 0.5rem 0 0; }
+.who-list li { display: flex; justify-content: space-between; padding: 0.45rem 0; border-bottom: 1px solid var(--rule); }
+.overdue-list li { display: grid; grid-template-columns: 1fr auto; gap: 0 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--rule); }
+.overdue-list li .small { grid-column: 1; }
+.overdue-list li b { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+@media (max-width: 1000px) { .figures { grid-template-columns: repeat(2, 1fr); } .monthly-grid { grid-template-columns: 1fr; } }
+@media print { .page-head .btn, .chips { display: none; } }

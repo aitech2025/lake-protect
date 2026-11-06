@@ -54,6 +54,22 @@ services:
       timeout: 5s
       retries: 30
 
+  # One scheduled worker: records missed timers and escalates them (section 6.6).
+  worker:
+    image: lakeprotect-api:dev
+    command: python -m app.worker
+    environment:
+      <<: *api-env
+      LP_WORKER_INTERVAL_SECONDS: "300"
+    volumes:
+      - ./api:/srv/api
+      - ./pipeline:/srv/pipeline
+      - ./data:/srv/data:ro
+      - lp_storage:/var/lp/storage
+    depends_on:
+      api:
+        condition: service_healthy
+
   web:
     build:
       context: ./web
