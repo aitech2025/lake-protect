@@ -88,6 +88,20 @@ scenarios:
       - {day: -44, do: confirm, by: demo.analyst}
       - {day: -44, do: assign, by: demo.nodal, to: demo.field1}
       - {day: -40, do: field, by: demo.field1, outcome: confirmed, stage: land_levelled}
+      - day: -38
+        do: checklist
+        by: demo.legal
+        items:
+          boundary_confirmed: ["yes", Boundary marked on the ground (demo boundary version 1)]
+          joint_survey_done: ["yes", DEMO/JS/2026/014]
+          survey_notice_given: ["yes", DEMO/NOTICE/SURVEY/014]
+          no_live_court_matter: ["yes", Demo court register checked]
+          title_permits_reviewed: ["yes", No permit or title claim on record]
+          notice_and_hearing: ["no", Notice and hearing are for the officer to arrange]
+          construction_dated: ["yes", Change bracket falls after the policy cut-off]
+      - {day: -37, do: pack, by: demo.legal}
+      - {day: -37, do: transition, to: PACK_READY, by: demo.nodal}
+      - {day: -36, do: transition, to: WITH_OFFICER, by: demo.nodal, data: {gap_reason: Notice and hearing are the officer's next step}}
 
   - key: building
     asset: demo-cheruvu-4

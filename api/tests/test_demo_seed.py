@@ -29,7 +29,7 @@ def test_every_section_13_path_is_seeded(db, seeded):
     assert s["legacy"] == "CLOSED_LEGACY"
     assert s["out_of_scope"] == "CLOSED_OUT_OF_SCOPE"
     assert s["awaiting_boundary"] == "AWAITING_BOUNDARY"
-    assert s["full_path"] == "FIELD_CONFIRMED"
+    assert s["full_path"] == "WITH_OFFICER"
     assert s["overdue"] == "ASSIGNED"
     assert s["reopened"] == "TRIAGE"
 

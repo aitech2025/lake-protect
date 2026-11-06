@@ -24,8 +24,10 @@ from sqlalchemy.orm import Session
 from app.enums import AlertState
 from app.models import Alert, Asset, AuthorisedWork, CourtCase, Permit, User
 from app.rules import config as rules
+from app.evidence import pack as pack_svc
 from app.services import boundaries as bsvc
 from app.services import field as field_svc
+from app.services import readiness
 from app.services import ingest as ingest_svc
 from app.seed import demo_render as render
 from app.seed.demo_world import World
@@ -171,6 +173,13 @@ class Seeder:
             elif do == "recheck":
                 body = self._candidate(sc, first_changed=step["first_changed"], last_clear=step["last_clear"], grow=step["grow"])
                 ingest_svc.ingest(self.db, body, at=when)
+            elif do == "checklist":
+                for n, (key, (status, ref)) in enumerate(step["items"].items()):
+                    readiness.record(self.db, alert, by, key, status, ref, at=when + dt.timedelta(minutes=n))
+            elif do == "pack":
+                pack_svc.build(self.db, alert, by, at=when)
+            elif do == "transition":
+                sm.transition(self.db, alert, step["to"], actor=by, reason=step.get("reason"), data=step.get("data", {}), at=when)
             else:
                 raise ValueError(f"Unknown demo step {do}")
 

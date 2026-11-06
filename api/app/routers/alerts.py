@@ -182,19 +182,12 @@ def put_readiness(
     user: User = Depends(require_roles(Role.nodal_officer, Role.legal_officer)),
     db: Session = Depends(get_db),
 ) -> dict:
+    from app.services import readiness
+
     if item_key not in sm.READINESS_KEYS:
         raise HTTPException(422, f"Unknown checklist item {item_key}")
     alert = alert_view.get_visible(db, alert_id, user)
-    item = db.scalar(select(ReadinessItem).where(ReadinessItem.alert_id == alert.id, ReadinessItem.item_key == item_key))
-    before = None if item is None else {"status": item.status, "evidence_ref": item.evidence_ref, "checked_by": item.checked_by}
-    now = utcnow()
-    if item is None:
-        item = ReadinessItem(alert_id=alert.id, item_key=item_key, status=body.status.value, evidence_ref=body.evidence_ref, checked_by=user.id, checked_at=now)
-        db.add(item)
-    else:
-        item.status, item.evidence_ref, item.checked_by, item.checked_at = body.status.value, body.evidence_ref, user.id, now
-    db.flush()
-    chain.record(db, actor_id=user.id, action="readiness.recorded", entity="alert", entity_id=alert.id, details={"item_key": item_key, "before": before, "after": body.model_dump(mode="json")})
+    item = readiness.record(db, alert, user, item_key, body.status.value, body.evidence_ref)
     db.commit()
     return {"item_key": item_key, "status": item.status}
 
@@ -248,3 +241,83 @@ def post_priority_override(alert_id: int, body: OverrideIn, user: User = Depends
     chain.record(db, actor_id=user.id, action="priority.override", entity="alert", entity_id=alert.id, details={"before": before, "after": body.score, "reason": body.reason})
     db.commit()
     return {"priority_score": body.score}
+
+
+# Evidence pack (section 9.3). Single-case downloads only, and every export is logged (section 10).
+PACK_ROLES = (Role.nodal_officer, Role.legal_officer)
+READ_PACK_ROLES = (Role.nodal_officer, Role.legal_officer, Role.senior_officer, Role.auditor, Role.admin, Role.analyst)
+
+
+def _pack(db: Session, alert_id: int, version: int | None):
+    from app.models import EvidencePack
+
+    q = select(EvidencePack).where(EvidencePack.alert_id == alert_id)
+    q = q.where(EvidencePack.version == version) if version else q.order_by(EvidencePack.version.desc()).limit(1)
+    pack = db.scalar(q)
+    if pack is None:
+        raise HTTPException(404, "No evidence pack for this alert yet")
+    return pack
+
+
+@router.post("/{alert_id}/evidence-pack", status_code=201)
+def post_evidence_pack(alert_id: int, user: User = Depends(require_roles(*PACK_ROLES)), db: Session = Depends(get_db)) -> dict:
+    """Generate a new version. An earlier version is never overwritten."""
+    from app.evidence import pack as pack_svc
+
+    alert = alert_view.get_visible(db, alert_id, user)
+    if alert.state not in sm.FIELD_CONFIRMED_OR_LATER:  # checked before any write
+        raise HTTPException(409, f"A pack needs a field-confirmed change (alert is {alert.state})")
+    with db_guard(db):
+        try:
+            pack = pack_svc.build(db, alert, user)
+        except pack_svc.PackRefused as exc:
+            db.rollback()
+            raise HTTPException(409, str(exc)) from exc
+        db.commit()
+    return {"id": pack.id, "version": pack.version, "manifest_sha256": pack.manifest_sha256, "counsel_reviewed": pack.counsel_reviewed}
+
+
+@router.get("/{alert_id}/evidence-pack")
+def get_evidence_pack(alert_id: int, version: int | None = None, user: User = Depends(require_roles(*READ_PACK_ROLES)), db: Session = Depends(get_db)) -> Response:
+    alert = alert_view.get_visible(db, alert_id, user)
+    pack = _pack(db, alert.id, version)
+    chain.record(db, actor_id=user.id, action="export.evidence_pack", entity="alert", entity_id=alert.id, details={"version": pack.version, "file": "zip"})
+    db.commit()
+    name = pack.zip_path.rsplit("/", 1)[-1]
+    return Response(store.get_object(pack.zip_path), media_type="application/zip", headers={"Content-Disposition": f'attachment; filename="{name}"', "X-Manifest-SHA256": pack.manifest_sha256})
+
+
+@router.get("/{alert_id}/evidence-pack/pdf")
+def get_evidence_pdf(alert_id: int, version: int | None = None, user: User = Depends(require_roles(*READ_PACK_ROLES)), db: Session = Depends(get_db)) -> Response:
+    alert = alert_view.get_visible(db, alert_id, user)
+    pack = _pack(db, alert.id, version)
+    chain.record(db, actor_id=user.id, action="export.evidence_pdf", entity="alert", entity_id=alert.id, details={"version": pack.version, "file": "pdf"})
+    db.commit()
+    return Response(store.get_object(pack.pdf_path), media_type="application/pdf", headers={"Content-Disposition": f'inline; filename="{alert.code}-v{pack.version}.pdf"'})
+
+
+@router.get("/{alert_id}/evidence-pack/verify")
+def verify_evidence_pack(alert_id: int, version: int | None = None, user: User = Depends(require_roles(*READ_PACK_ROLES)), db: Session = Depends(get_db)) -> dict:
+    """Run the same check as `lp verify-pack`, against the manifest hash recorded when the pack was made."""
+    from app.evidence.verify import verify
+
+    alert = alert_view.get_visible(db, alert_id, user)
+    pack = _pack(db, alert.id, version)
+    result = verify(store.local_path(pack.zip_path), pack.manifest_sha256)
+    chain.record(db, actor_id=user.id, action="view.evidence_verify", entity="alert", entity_id=alert.id, details={"version": pack.version, "ok": result["ok"]})
+    db.commit()
+    return {"version": pack.version, **result}
+
+
+@router.get("/{alert_id}/field-checks/{check_id}/photos/{n}")
+def get_field_photo(alert_id: int, check_id: int, n: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> Response:
+    from app.models import FieldCheck
+
+    alert = alert_view.get_visible(db, alert_id, user)
+    fc = db.get(FieldCheck, check_id)
+    if fc is None or fc.alert_id != alert.id or not (1 <= n <= len(fc.photo_paths)):
+        raise HTTPException(404, "No such photo")
+    path = fc.photo_paths[n - 1]
+    chain.record(db, actor_id=user.id, action="view.field_photo", entity="alert", entity_id=alert.id, details={"field_check_id": check_id, "photo": n})
+    db.commit()
+    return Response(store.get_object(path), media_type="image/png" if path.endswith(".png") else "image/jpeg", headers={"Cache-Control": "private, max-age=3600"})

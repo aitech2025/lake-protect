@@ -17,6 +17,23 @@ def version() -> None:
     typer.echo(__version__)
 
 
+@app.command("verify-pack")
+def verify_pack(
+    zip_path: str = typer.Argument(..., help="Evidence pack zip."),
+    manifest_sha256: str = typer.Option(None, help="Manifest hash recorded for this pack, to catch a rewritten manifest."),
+) -> None:
+    """Recompute every hash in an evidence pack. Exits 1 if anything changed."""
+    from lake_protect.packverify import verify
+
+    result = verify(zip_path, manifest_sha256)
+    typer.echo(f"manifest sha256: {result['manifest_sha256']}")
+    typer.echo(f"files checked:   {result['files_checked']}")
+    for problem in result["problems"]:
+        typer.echo(f"FAIL  {problem}")
+    typer.echo("PASS  every file matches its hash" if result["ok"] else "FAIL  the pack does not match its manifest")
+    raise typer.Exit(0 if result["ok"] else 1)
+
+
 @app.command("assets-osm")
 def assets_osm(
     search: str = typer.Option("data/case_lake_search.yml", help="Name patterns per case lake."),

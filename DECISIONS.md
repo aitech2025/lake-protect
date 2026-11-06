@@ -186,4 +186,21 @@ the laptop itself, and the browser tests reach the app as `http://localhost` fro
 container's network. Using a real phone over the network would need an HTTPS certificate. None is
 set up in the prototype.
 
+### D-033: Evidence pack details
+- `counsel_reviewed` comes from server configuration (`LP_COUNSEL_REVIEWED_TEMPLATE`, default false).
+  No screen or API call can set it. Until counsel signs off, every pack carries "Draft for counsel
+  review" on the cover and on the certificate.
+- The certificate is structure only: Part A lists the files and their SHA-256 hashes, and Part B has
+  the expert's fields. The statements are "[Wording to be supplied by counsel]". No legal wording
+  was invented. **Open legal question, for counsel (section 15):** the certificate wording, who may
+  sign Part B, and how field checks avoid being a "survey".
+- Field photos are hashed again when a pack is built. A photo that no longer matches its arrival
+  hash stops the pack.
+- Claimant names are left out of the pack (personal data). The pack lists the claim types only.
+- `lp verify-pack` lives in the pipeline package and uses the standard library only. It was written
+  apart from the pack builder, so the check does not share the builder's assumptions. Given the
+  manifest hash recorded in the database, it also catches a manifest rewritten to match an edited file.
+- The PDF cannot contain its own hash. `manifest.json` lists the PDF's hash, and the database and
+  audit log hold the manifest's hash.
+
 ## Defaults changed

@@ -363,5 +363,26 @@
     "sent": "{{code}} sent. Now: {{state}}.",
     "failed": "Not accepted: {{msg}}",
     "step_refused": "Saved as a record. {{msg}}"
+  },
+  "pack": {
+    "title": "Case file",
+    "generate": "Generate evidence pack",
+    "version": "Version {{v}}, {{date}}",
+    "draft": "Certificate is a draft for counsel review",
+    "reviewed": "Counsel reviewed",
+    "open_pdf": "Open PDF",
+    "download": "Download zip",
+    "check": "Check integrity",
+    "ok": "All {{n}} files match their hashes.",
+    "bad": "Does not match: {{problems}}",
+    "none": "No evidence pack yet.",
+    "needs_field": "A pack can be made once the change is confirmed on site.",
+    "made": "Evidence pack version {{v}} generated."
+  },
+  "checklist_ui": {
+    "save": "Save",
+    "evidence": "Evidence reference",
+    "checked": "{{name}}, {{date}}",
+    "gaps": "Checklist gaps: {{items}}. Sending to the officer needs a logged reason."
   }
 }

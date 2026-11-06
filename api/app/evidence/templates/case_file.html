@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Case file {{ alert.code }}</title>
+<style>
+  @font-face { font-family: "Noto Sans"; src: url("{{ fonts.regular }}"); font-weight: 400; }
+  @font-face { font-family: "Noto Sans"; src: url("{{ fonts.bold }}"); font-weight: 700; }
+  @font-face { font-family: "Noto Sans Telugu"; src: url("{{ fonts.te_regular }}"); font-weight: 400; }
+  @font-face { font-family: "Noto Sans Telugu"; src: url("{{ fonts.te_bold }}"); font-weight: 700; }
+  @page { size: A4; margin: 22mm 16mm 18mm 16mm;
+    @bottom-left { content: "Case file {{ alert.code }}, version {{ version }}"; font: 8pt "Noto Sans"; color: #555; }
+    @bottom-right { content: "Page " counter(page) " of " counter(pages); font: 8pt "Noto Sans"; color: #555; } }
+  body { font-family: "Noto Sans", "Noto Sans Telugu", sans-serif; font-size: 9.5pt; color: #1c2b33; line-height: 1.45; }
+  h1 { font-size: 18pt; margin: 0 0 2mm; }
+  h2 { font-size: 12pt; margin: 7mm 0 2mm; padding-bottom: 1mm; border-bottom: 1.5pt solid #1c2b33; break-after: avoid; }
+  h3 { font-size: 10pt; margin: 4mm 0 1mm; }
+  table { width: 100%; border-collapse: collapse; margin: 1mm 0 2mm; }
+  th, td { text-align: left; vertical-align: top; padding: 1.2mm 1.5mm; border-bottom: 0.5pt solid #c9d1cc; }
+  th { width: 34%; color: #4a5a62; font-weight: 400; }
+  table.hashes td { font-size: 7.5pt; word-break: break-all; }
+  table.hashes th { width: auto; font-weight: 700; color: #1c2b33; }
+  .fixed-demo { position: fixed; top: -15mm; left: 0; right: 0; background: #6e3fa3; color: #fff; font-weight: 700; padding: 1.2mm 3mm; font-size: 8.5pt; }
+  .draft { border: 2pt solid #c4402f; color: #8c2c1f; padding: 2.5mm 3mm; font-weight: 700; margin: 3mm 0; }
+  .statement { border: 1.5pt solid #1c2b33; padding: 3mm; font-weight: 700; font-size: 10.5pt; margin: 3mm 0; }
+  .pair { display: flex; gap: 4mm; }
+  .pair figure { margin: 0; width: 50%; }
+  .pair img { width: 100%; image-rendering: pixelated; }
+  figcaption { font-size: 8pt; color: #4a5a62; }
+  .photos img { width: 48%; margin: 0 1% 2mm 0; }
+  .te { font-family: "Noto Sans Telugu", "Noto Sans", sans-serif; }
+  .muted { color: #4a5a62; }
+  .gap { color: #8c2c1f; font-weight: 700; }
+  .cert { break-before: page; }
+  .sign { height: 14mm; border-bottom: 0.75pt solid #1c2b33; }
+</style>
+</head>
+<body>
+{% if alert.is_demo %}<div class="fixed-demo">Demo data: fictional places, people and records. Not a finding.</div>{% endif %}
+
+<h1>Case file {{ alert.code }}</h1>
+<p>{{ asset.name }}{% if asset.name_te %} <span class="te">({{ asset.name_te }})</span>{% endif %}. Evidence pack version {{ version }}, generated {{ generated_at }} by {{ generated_by }}.</p>
+<p class="statement">{{ statement }}</p>
+{% if not counsel_reviewed %}<p class="draft">Draft for counsel review. The section 63(4) certificate in this pack is a template and must not be filed until counsel has reviewed it.</p>{% endif %}
+
+<h2>1. Asset and boundary</h2>
+<table>
+  <tr><th>Asset</th><td>{{ asset.name }} (ID {{ asset.id }}, key {{ asset.asset_key }})</td></tr>
+  <tr><th>Asset group</th><td>{{ asset.cohort_label }}</td></tr>
+  <tr><th>Survey numbers</th><td>{{ asset.survey_numbers | join(", ") or "None recorded" }}</td></tr>
+  <tr><th>Boundary status</th><td>{{ boundary.status_label }} (version {{ boundary.version }}){% if not boundary.confirmed %}. <span class="gap">Not a confirmed boundary.</span>{% endif %}</td></tr>
+  <tr><th>Boundary source</th><td>{{ boundary.source_name }}{% if boundary.source_date %}, dated {{ boundary.source_date }}{% endif %}</td></tr>
+  <tr><th>Notification</th><td>{{ boundary.notification_ref or "None recorded" }}{% if boundary.source_url %}. <a href="{{ boundary.source_url }}">{{ boundary.source_url }}</a>{% endif %}</td></tr>
+  <tr><th>Boundary in force from</th><td>{{ boundary.valid_from }}</td></tr>
+  <tr><th>Where the change is</th><td>{{ legal.zone_label }}</td></tr>
+  <tr><th>Land category</th><td>{{ legal.class_label }}</td></tr>
+</table>
+
+<h2>2. Dated image pair</h2>
+<div class="pair">
+  <figure><img src="{{ chips.before }}" alt="Before"><figcaption>Last clear image, {{ candidate.last_clear_at or "not recorded" }}</figcaption></figure>
+  <figure><img src="{{ chips.after }}" alt="After"><figcaption>First changed image, {{ candidate.first_changed_at }}</figcaption></figure>
+</div>
+<table>
+  <tr><th>Last clear</th><td>{{ candidate.last_clear_at or "Not recorded" }}</td></tr>
+  <tr><th>First changed</th><td>{{ candidate.first_changed_at }}</td></tr>
+  <tr><th>Policy cut-off date</th><td>{{ policy_cutoff }} (configuration; the exact date is to be confirmed by HYDRAA)</td></tr>
+  <tr><th>Change</th><td>{{ candidate.change_label }}, {{ candidate.area_sq_m }} sq m ({{ candidate.area_acres }} acre)</td></tr>
+  <tr><th>Seen by</th><td>{{ candidate.sensor_label }}{% if candidate.sensor_basis == "radar_only" %}. Optical confirmation pending.{% endif %}</td></tr>
+  <tr><th>Resolution</th><td>{{ resolution }}</td></tr>
+</table>
+<h3>Observations used</h3>
+<table class="hashes">
+  <tr><th>Sensor</th><th>Scene</th><th>Captured</th><th>Licence or notice</th></tr>
+  {% for o in observations %}<tr><td>{{ o.sensor }}</td><td>{{ o.scene_id }}</td><td>{{ o.acquired_at }}</td><td>{{ o.licence_notice }}</td></tr>{% endfor %}
+</table>
+
+<h2>3. Processing note</h2>
+<table>
+  <tr><th>Software</th><td>{{ processing.software }}</td></tr>
+  <tr><th>Detection rules</th><td>{{ processing.detection_rules }}</td></tr>
+  <tr><th>Legal check rules</th><td>{{ processing.legal_rules }}</td></tr>
+</table>
+<ol>{% for step in processing.steps %}<li>{{ step }}</li>{% endfor %}</ol>
+
+<h2>4. File hashes (SHA-256)</h2>
+<p class="muted">Every original and derived file in this pack. The zip's manifest.json lists these and the hash of this PDF. Check them with <b>lp verify-pack</b>.</p>
+<table class="hashes">
+  <tr><th>File</th><th>Kind</th><th>SHA-256</th></tr>
+  {% for f in hashed_files %}<tr><td>{{ f.path }}</td><td>{{ f.kind }}</td><td>{{ f.sha256 }}</td></tr>{% endfor %}
+</table>
+
+<h2>5. Field record</h2>
+{% for f in field_checks %}
+<table>
+  <tr><th>Officer</th><td>{{ f.officer }}</td></tr>
+  <tr><th>Outcome</th><td>{{ f.outcome_label }}{% if f.observed_stage %}, {{ f.stage_label }}{% endif %}</td></tr>
+  <tr><th>Observed at</th><td>{{ f.observed_at }} (device clock {{ f.device_time or "not sent" }}; received by the server {{ f.synced_at }})</td></tr>
+  <tr><th>Geotag</th><td>{{ f.lat }}, {{ f.lon }} (accuracy {{ f.gps_accuracy_m }} m), {{ f.distance_to_candidate_m }} m from the change</td></tr>
+  <tr><th>Notes</th><td>{{ f.notes or "None" }}</td></tr>
+</table>
+<div class="photos">{% for p in f.photos %}<img src="{{ p }}" alt="Field photo">{% endfor %}</div>
+{% else %}<p class="gap">No field record yet.</p>{% endfor %}
+
+<h2>6. Case-readiness checklist</h2>
+<p class="muted">The checklist informs the officer. It does not replace the officer's judgement.</p>
+<table>
+  <tr><th>Item</th><td><b>Status, evidence and who checked it</b></td></tr>
+  {% for r in checklist %}<tr><th>{{ r.label }}</th><td>{% if r.status %}<b{% if r.status == "no" %} class="gap"{% endif %}>{{ r.status_label }}</b>{% if r.evidence_ref %}. {{ r.evidence_ref }}{% endif %}. {{ r.checked_by }}, {{ r.checked_at }}{% else %}<span class="gap">Not recorded</span>{% endif %}</td></tr>{% endfor %}
+</table>
+{% if title_claims %}<p>Title claims entered after field confirmation: {{ title_claims | join(", ") }}. Claimant details are held in the system for the legal officer.</p>{% endif %}
+
+<div class="cert">
+<h2>7. Section 63(4) certificate (template)</h2>
+{% include "certificate.html" %}
+</div>
+
+<h2>8. Statement</h2>
+<p class="statement">{{ statement }}</p>
+</body>
+</html>

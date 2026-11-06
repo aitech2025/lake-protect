@@ -1,0 +1,28 @@
+{# Structure only. The legal wording is for counsel to supply (CONTEXT.md section 15). #}
+{% if not counsel_reviewed %}<p class="draft">Draft for counsel review. Not for filing. Counsel has not yet settled the wording of this certificate or who may sign Part B.</p>{% endif %}
+<p class="muted">Bharatiya Sakshya Adhiniyam, 2023, section 63(4): a certificate for electronic records, with the file hash values (Part A) and an expert's certification (Part B).</p>
+
+<h3>Part A: the electronic records and their hash values</h3>
+<table>
+  <tr><th>Case</th><td>{{ alert.code }}, {{ asset.name }}</td></tr>
+  <tr><th>System that produced the records</th><td>{{ processing.software }}</td></tr>
+  <tr><th>Date the pack was produced</th><td>{{ generated_at }}</td></tr>
+  <tr><th>Hash algorithm</th><td>SHA-256</td></tr>
+</table>
+<table class="hashes">
+  <tr><th>File</th><th>SHA-256</th></tr>
+  {% for f in hashed_files %}<tr><td>{{ f.path }}</td><td>{{ f.sha256 }}</td></tr>{% endfor %}
+</table>
+<table>
+  <tr><th>Statement</th><td>[Wording to be supplied by counsel]</td></tr>
+  <tr><th>Name and designation</th><td class="sign"></td></tr>
+  <tr><th>Signature and date</th><td class="sign"></td></tr>
+</table>
+
+<h3>Part B: expert's certification</h3>
+<table>
+  <tr><th>Name of expert</th><td class="sign"></td></tr>
+  <tr><th>Qualification</th><td class="sign"></td></tr>
+  <tr><th>Statement</th><td>[Wording to be supplied by counsel]</td></tr>
+  <tr><th>Signature and date</th><td class="sign"></td></tr>
+</table>

@@ -12,8 +12,8 @@ Read this first at the start of every session, then continue from the first unfi
 | M4 Workflow API | Done | API 161 passed | M4 commit |
 | M5 Desk | Done | API 197 passed, browser 5 passed | M5 commit |
 | M6 Field app | Done | API 204 passed, browser 8 passed | M6 commit |
-| M7 Evidence pack | In progress | | |
-| M8 Officer record, escalation, monthly page | Not started | | |
+| M7 Evidence pack | Done | API 217 passed, browser 10 passed | M7 commit |
+| M8 Officer record, escalation, monthly page | In progress | | |
 | M9 Demo | Not started | | |
 | **Stop: report to owner** | | | |
 | M2 Detection on Sentinel-2 | Not started | | |
@@ -105,6 +105,29 @@ Done-check run on 6 Nov 2026 from empty volumes (`docker compose down -v`, then 
   itself and the server shows `FIELD_CONFIRMED` with the photo, device time and server time.
 - API tests: 204 passed, adding resend idempotency and the changed-photo refusal.
 
+## M7 Evidence pack: done
+
+- `app/evidence/pack.py` builds a zip holding the before and after chips, field photos, boundary and
+  change GeoJSON, the legal check, checklist, full history (with audit hashes), a processing note,
+  the section 63(4) certificate template, a WeasyPrint PDF, and `manifest.json` with the SHA-256 of
+  every file. The PDF (5 pages for the demo case) covers the eight items of section 9.3 in order, with
+  the demo band on every page.
+- A pack is never overwritten: each one is a new version. Downloads are single-case and logged as
+  exports.
+- The desk has an editable checklist (nodal and legal officers), a case-file panel (generate, open the
+  PDF, download the zip, check integrity) and field photo thumbnails.
+- The demo seed now carries the full-path alert through the checklist, pack v1, `PACK_READY` and
+  `WITH_OFFICER`, with the checklist gap logged.
+- Done-check, run on a pack downloaded from the running API:
+  ```
+  lp verify-pack pack.zip --manifest-sha256 783d60d7…   -> PASS  every file matches its hash   (exit 0)
+  (one checklist answer changed inside the zip)
+  lp verify-pack tampered.zip --manifest-sha256 783d60d7… -> FAIL  changed: records/checklist.json (exit 1)
+  ```
+- Tests: API 217 passed. They include invariant 13 (statement present, draft mark present until
+  counsel review and absent after), verify-pack catching a changed, missing, added or forged file,
+  `lp` exit codes, versioning, and the export log. Browser: 10 passed.
+
 ## Stubbed
 
 - Imagery requests are recorded with an estimate. Nothing is ordered (section 3).
@@ -116,7 +139,15 @@ Done-check run on 6 Nov 2026 from empty volumes (`docker compose down -v`, then 
 - Telugu strings are drafts awaiting a native speaker's review (D-028).
 - A real phone over the network needs HTTPS, which is not set up (D-032).
 
+- The section 63(4) certificate is a template with counsel placeholders, marked draft (D-033).
+
+## Questions for counsel (draft marks stay on until answered)
+
+- Section 63(4) certificate wording, and who may sign Part B.
+- How a field check works without being a "survey". The field app shows "This is an observation,
+  not a survey. Do not enter private land." as pending legal review.
+- Buffer widths in `rules/config.yaml` (section 4) before any real use.
+
 ## Next
 
-M7: evidence pack (PDF and zip, manifest of hashes, `lp verify-pack`, draft mark until counsel
-review, checklist screen).
+M8: officer record, the escalation worker container, and the monthly page (screen and one-page PDF).

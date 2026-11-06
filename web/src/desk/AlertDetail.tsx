@@ -8,6 +8,7 @@ import { AuthImage, BoundarySeal, LineSwatch, StatePill, useAsync } from "../com
 import { DatedBracket } from "../components/DatedBracket";
 import { MapView } from "../components/MapView";
 import { useDemoOnScreen } from "../demo";
+import { CaseFilePanel, Checklist } from "./CaseFile";
 
 type Action = { to: string; label: string; two_person: boolean; signer: string; enabled: boolean; blocked_reason: string | null; needs: string[] };
 const REASON_CODES = ["cloud_shadow", "seasonal_water", "transient_object", "crop_cycle", "image_artefact", "other"];
@@ -105,22 +106,17 @@ export function AlertDetail() {
                   {f.observed_stage ? `, ${t(`stage.${f.observed_stage}`)}` : ""}. {t("detail.photos", { count: f.photo_count })}.{" "}
                   {f.distance_to_candidate_m !== null && t("detail.distance", { m: Math.round(f.distance_to_candidate_m) })}
                   {f.notes ? ` ${f.notes}` : ""}
+                  <span className="photo-row">
+                    {Array.from({ length: f.photo_count }, (_, n) => (
+                      <AuthImage key={n} path={`/alerts/${a.id}/field-checks/${f.id}/photos/${n + 1}`} alt={`${t("detail.field_title")} ${n + 1}`} className="photo-thumb" />
+                    ))}
+                  </span>
                 </p>
               ))}
             </section>
           )}
 
-          <section className="section panel">
-            <h3>{t("detail.checklist_title")}</h3>
-            <dl className="facts" style={{ marginTop: "0.6rem" }}>
-              {a.readiness.map((r: any) => (
-                <div key={r.item_key} style={{ display: "contents" }}>
-                  <dt>{t(`checklist.${r.status ?? "unset"}`)}</dt>
-                  <dd>{t(`checklist.${r.item_key}`)}{r.system_hint ? <span className="small muted"> ({r.system_hint})</span> : null}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
+          <Checklist alert={a} onChange={reload} />
 
           <p className="statement" data-testid="statement">{t("statement.imagery")}</p>
         </div>
@@ -130,6 +126,8 @@ export function AlertDetail() {
             <h3>{t("detail.actions_title")}</h3>
             <Actions alert={a} onDone={reload} />
           </div>
+
+          <CaseFilePanel alert={a} onChange={reload} />
 
           <div className="panel" data-testid="legal-panel">
             <h3>{t("detail.checks_title")}</h3>

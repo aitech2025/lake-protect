@@ -184,3 +184,8 @@ table.grid tr.clickable:hover td { background: #f5f8f6; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 @media print { .rail, .demo-band { display: none; } .shell { display: block; } }
+
+.photo-row { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
+.photo-thumb { width: 160px; height: 120px; object-fit: cover; border-radius: var(--radius-s); background: #e4e8e3; display: block; }
+.panel + .panel, aside > .panel { margin-top: 1rem; }
+aside > .panel:first-child { margin-top: 0; }
