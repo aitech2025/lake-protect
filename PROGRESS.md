@@ -11,8 +11,8 @@ Read this first at the start of every session, then continue from the first unfi
 | M1 Assets and boundaries | Done | API 41 passed, pipeline 4 passed | M1 commit |
 | M4 Workflow API | Done | API 161 passed | M4 commit |
 | M5 Desk | Done | API 197 passed, browser 5 passed | M5 commit |
-| M6 Field app | In progress | | |
-| M7 Evidence pack | Not started | | |
+| M6 Field app | Done | API 204 passed, browser 8 passed | M6 commit |
+| M7 Evidence pack | In progress | | |
 | M8 Officer record, escalation, monthly page | Not started | | |
 | M9 Demo | Not started | | |
 | **Stop: report to owner** | | | |
@@ -86,6 +86,25 @@ Done-check run on 6 Nov 2026 from empty volumes (`docker compose down -v`, then 
   The desk switches to Telugu.
 - API tests: 197 passed. The wording scan (invariant 11) now covers every web source and both i18n files.
 
+## M6 Field app: done
+
+- A progressive web app at `/field`, in the same bundle. Workbox precaches the shell, code and fonts
+  (40 files, 2.1 MB) and caches demo tiles on first use. "My alerts", alert details and image pairs
+  are kept in IndexedDB. Captures (photos, GPS fix and accuracy, timestamps, outcome, stage, notes)
+  queue in IndexedDB with a SHA-256 per photo and are sent on reconnect. Sending is idempotent by
+  `client_uuid`, and the server refuses a photo whose hash changed. Device time and server time are
+  both kept.
+- Distance to the change is checked on the phone and again on the server. Beyond 50 m it warns and
+  does not block. The section 9.2 note ("observation, not a survey"), marked as pending counsel, is
+  on every alert. English and Telugu are switchable, and Demo Field Officer 1 defaults to Telugu.
+- Demo-only switches for "no signal" and simulated position (D-031).
+- Done-check (browser, in the same run as M5): 8 passed. The field officer opens the app in Telugu
+  and switches to English. Offline, they reload the app, open the alert and see the image pair from
+  the device, get a distance warning at 430 m, and save a visit that stays queued across another
+  offline reload. The server is unchanged until the browser comes back online. Then the queue sends
+  itself and the server shows `FIELD_CONFIRMED` with the photo, device time and server time.
+- API tests: 204 passed, adding resend idempotency and the changed-photo refusal.
+
 ## Stubbed
 
 - Imagery requests are recorded with an estimate. Nothing is ordered (section 3).
@@ -93,10 +112,11 @@ Done-check run on 6 Nov 2026 from empty volumes (`docker compose down -v`, then 
 - Escalation "notify" is an audit event and an overdue flag. No email or SMS.
 - The scheduled worker container that runs escalation comes in M8. The job itself exists and is tested.
 
-- The Monthly page and Field app routes show a placeholder until M8 and M6.
+- The Monthly page route shows a placeholder until M8.
 - Telugu strings are drafts awaiting a native speaker's review (D-028).
+- A real phone over the network needs HTTPS, which is not set up (D-032).
 
 ## Next
 
-M6: field app (PWA). Offline capture queued in IndexedDB, sync on reconnect, distance warning,
-language toggle.
+M7: evidence pack (PDF and zip, manifest of hashes, `lp verify-pack`, draft mark until counsel
+review, checklist screen).

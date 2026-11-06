@@ -84,6 +84,42 @@ def test_distance_over_50_m_warns_but_does_not_block(db):
     assert out["distance_warning"] is True and out["distance_m"] > 300 and alert.state == "FIELD_CONFIRMED"
 
 
+def test_field_check_resend_is_idempotent(db):
+    import base64
+    import uuid
+
+    from app.models import FieldCheck
+    from app.services import field as field_svc
+    from tests.factories import PNG_B64
+
+    team = Team(db)
+    _, alert = ingest(db, make_asset(db), at=T0)
+    sm.transition(db, alert, "CONFIRMED", actor=team.analyst, data={"image_pair_reviewed": True}, at=at(1))
+    sm.transition(db, alert, "ASSIGNED", actor=team.nodal, data={"owner_user_id": team.field.id}, at=at(1))
+    meta = field_svc.FieldCheckMeta(client_uuid=uuid.uuid4(), observed_at=at(2), lat=14.5, lon=81.5, outcome="confirmed", device_time=at(2))
+    photo = base64.b64decode(PNG_B64)
+    first = field_svc.submit(db, alert, team.field, meta, [photo], at=at(3))
+    again = field_svc.submit(db, alert, team.field, meta, [photo], at=at(4))
+    assert first["duplicate"] is False and again["duplicate"] is True and again["field_check_id"] == first["field_check_id"]
+    assert db.query(FieldCheck).filter_by(alert_id=alert.id).count() == 1
+
+
+def test_field_check_rejects_a_photo_changed_in_transit(db):
+    import base64
+    import uuid
+
+    from app.services import field as field_svc
+    from tests.factories import PNG_B64
+
+    team = Team(db)
+    _, alert = ingest(db, make_asset(db), at=T0)
+    sm.transition(db, alert, "CONFIRMED", actor=team.analyst, data={"image_pair_reviewed": True}, at=at(1))
+    sm.transition(db, alert, "ASSIGNED", actor=team.nodal, data={"owner_user_id": team.field.id}, at=at(1))
+    meta = field_svc.FieldCheckMeta(client_uuid=uuid.uuid4(), observed_at=at(2), lat=14.5, lon=81.5, outcome="confirmed", photo_sha256=["0" * 64])
+    with pytest.raises(field_svc.FieldRefused, match="changed in transit"):
+        field_svc.submit(db, alert, team.field, meta, [base64.b64decode(PNG_B64)], at=at(3))
+
+
 def test_cannot_access_keeps_the_timer_running(db):
     team = Team(db)
     asset = make_asset(db)

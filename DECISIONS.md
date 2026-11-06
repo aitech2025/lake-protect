@@ -171,4 +171,19 @@ Append-only tables cannot be emptied, by design. `python -m app.seed.reset` (gua
 `LP_ALLOW_RESET=true`) migrates down to revision 0001, which keeps PostGIS, migrates up, reloads the
 real assets and reseeds the demo relative to today's date.
 
+### D-031: Two demo-only switches in the field app
+On one laptop, airplane mode does not cut `localhost`, and the demo sites are fictional points in
+the sea, so a real GPS fix is always far away. For demo users only, the field app shows:
+- "Demo: no signal", which pauses sending so captures queue on the device;
+- "Demo: position", which offers "at the site" or "200 m away" as simulated fixes.
+A simulated fix is written into the field record's notes as "[Demo: simulated position]". Real
+offline behaviour (service worker, IndexedDB queue, sync on reconnect) does not depend on these
+switches and is tested with the browser's own offline mode.
+
+### D-032: The field app needs HTTPS on a real phone
+Service workers and GPS work only on a secure origin. `localhost` counts as one, so the demo works on
+the laptop itself, and the browser tests reach the app as `http://localhost` from inside the web
+container's network. Using a real phone over the network would need an HTTPS certificate. None is
+set up in the prototype.
+
 ## Defaults changed

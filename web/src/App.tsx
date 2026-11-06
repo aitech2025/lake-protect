@@ -8,6 +8,7 @@ import { Audit } from "./desk/Audit";
 import { Login } from "./desk/Login";
 import { Queue } from "./desk/Queue";
 import { Records } from "./desk/Records";
+import { FieldApp } from "./field/FieldApp";
 
 function RequireUser({ children }: { children: ReactNode }) {
   const { user, ready } = useAuth();
@@ -36,7 +37,7 @@ export function App() {
         <Route path="/audit" element={<Audit />} />
         <Route path="/monthly" element={<Later what="Monthly page" />} />
       </Route>
-      <Route path="/field/*" element={<RequireUser><Later what="Field app" /></RequireUser>} />
+      <Route path="/field/*" element={<RequireUser><FieldApp /></RequireUser>} />
       <Route path="*" element={<Home />} />
     </Routes>
   );

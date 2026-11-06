@@ -70,8 +70,11 @@ services:
     build:
       context: ./e2e
     image: lakeprotect-e2e:dev
+    # Share the web container's network, so the app is http://localhost: a secure context, as on
+    # a real phone over HTTPS. Service workers and geolocation need one.
+    network_mode: "service:web"
     environment:
-      E2E_BASE: http://web
+      E2E_BASE: http://localhost
     volumes:
       - ./e2e/tests:/e2e/tests:ro
       - ./e2e/playwright.config.ts:/e2e/playwright.config.ts:ro
