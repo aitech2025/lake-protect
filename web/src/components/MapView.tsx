@@ -93,8 +93,11 @@ export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, h
     const apply = () => {
       (m.getSource("boundaries") as maplibregl.GeoJSONSource | undefined)?.setData(withCertainty(boundaries) as never);
       (m.getSource("changes") as maplibregl.GeoJSONSource | undefined)?.setData(changes as never);
-      const box = fit ?? bboxOf([boundaries, changes]) ?? (pins.length ? bboxOf([{ type: "FeatureCollection", features: pins.map((p) => ({ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [p.lon, p.lat] } })) }]) : null);
-      if (box) m.fitBounds(box, { padding: 48, duration: 0, maxZoom: 16.5 });
+      const shapes = fit ?? bboxOf([boundaries, changes]);
+      const pinBox = pins.length ? bboxOf([{ type: "FeatureCollection", features: pins.map((p) => ({ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [p.lon, p.lat] } })) }]) : null;
+      // Pins alone stay at district scale; shapes may zoom in to street level.
+      if (shapes) m.fitBounds(shapes, { padding: 48, duration: 0, maxZoom: 16.5 });
+      else if (pinBox) m.fitBounds(pinBox, { padding: 60, duration: 0, maxZoom: 14 });
     };
     if (loaded.current) apply();
     else m.once("lp:data", apply);

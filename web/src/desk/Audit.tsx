@@ -4,12 +4,14 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { api, fmtDateTime } from "../api";
 import { useAsync } from "../components/Bits";
+import { useDemoOnScreen } from "../demo";
 
 export function Audit() {
   const { t, i18n } = useTranslation();
   const month = new Date().toISOString().slice(0, 7);
   const [check, setCheck] = useState<any | null>(null);
-  const { data } = useAsync(() => api<{ items: any[] }>("/audit?limit=150"), []);
+  const { data } = useAsync(() => api<{ items: any[]; has_demo: boolean }>("/audit?limit=150"), []);
+  useDemoOnScreen(Boolean(data?.has_demo));
   const { data: sample } = useAsync(() => api<any>(`/audit/closure-sample?month=${month}&n=5`), [month]);
 
   return (

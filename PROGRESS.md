@@ -7,15 +7,15 @@ Read this first at the start of every session, then continue from the first unfi
 
 | Milestone | Status | Tests | Commit |
 |---|---|---|---|
-| M0 Scaffold | Done | 1 passed | M0 commit |
-| M1 Assets and boundaries | Done | API 41 passed, pipeline 4 passed | M1 commit |
-| M4 Workflow API | Done | API 161 passed | M4 commit |
-| M5 Desk | Done | API 197 passed, browser 5 passed | M5 commit |
-| M6 Field app | Done | API 204 passed, browser 8 passed | M6 commit |
-| M7 Evidence pack | Done | API 217 passed, browser 10 passed | M7 commit |
-| M8 Officer record, escalation, monthly page | Done | API 232 passed, browser 13 passed | M8 commit |
-| M9 Demo | In progress | | |
-| **Stop: report to owner** | | | |
+| M0 Scaffold | Done | 1 passed | 3d536f3 |
+| M1 Assets and boundaries | Done | API 41 passed, pipeline 4 passed | 31b4513 |
+| M4 Workflow API | Done | API 161 passed | be8e74a |
+| M5 Desk | Done | API 197 passed, browser 5 passed | 3309202 |
+| M6 Field app | Done | API 204 passed, browser 8 passed | b72f1fe |
+| M7 Evidence pack | Done | API 217 passed, browser 10 passed | 3bd08bb |
+| M8 Officer record, escalation, monthly page | Done | API 232 passed, browser 13 passed | 30a287f |
+| M9 Demo | Done | API 235, pipeline 4, browser 14 passed | M9 commit |
+| **Stop: report to owner** | **Waiting for the owner** | | |
 | M2 Detection on Sentinel-2 | Not started | | |
 | M3 Radar and scored backtest | Not started | | |
 
@@ -150,6 +150,51 @@ Done-check run on 6 Nov 2026 from empty volumes (`docker compose down -v`, then 
     action raises "actions" by 1 and lowers "overdue" by 1.
 - Tests: API 232 passed, browser 13 passed.
 
+## M9 Demo: done
+
+- `docs/DEMO.md`: the ten-minute script from section 14, keyed to screens. It opens with "demo data"
+  and says no detection result exists yet (D-001).
+- `e2e/tests/m9-demo.spec.ts` walks all ten steps on one alert, Demo Cheruvu 1:
+  1. map of watched assets;
+  2. image pair and dated bracket;
+  3. legal check panel;
+  4. court hold, restoration work and watch list;
+  5. analyst confirms and nodal officer assigns;
+  6. phone, offline, in Telugu, then sync;
+  7. checklist, evidence pack and integrity check;
+  8. case file ready, sent to the officer, officer action recorded;
+  9. audit log check;
+  10. monthly page.
+  Any request that tries to leave localhost fails the test.
+- Done-check with no internet: `docker-compose.offline.yml` put every container on an internal
+  network (`internal=true`). From inside, the API container could not reach Earth Search,
+  OpenStreetMap tiles or Google Fonts (URLError), and the browser's network could not resolve
+  outside names (EAI_AGAIN). The walkthrough passed in that mode: 1 passed (28.5 s), with no
+  external request attempted. It also passes on the normal network.
+- Fixes from reviewing the walkthrough screenshots: the audit screen now shows the "Demo data" band,
+  and a map showing only pins stops at district zoom.
+- Final runs: API 235 passed, pipeline 4 passed, browser 14 passed (13 milestone tests on one fresh
+  demo, then the walkthrough on a second fresh demo).
+- A fresh demo, dated today, is left in the database for the owner.
+
+## Stop: report to owner (after M9)
+
+The owner's order puts a stop here. M2 and M3 start when the owner replies.
+
+**Needed for M2 and M3, so the owner can prepare now:**
+- **Sentinel-1 access (M3):** a free Copernicus Data Space Ecosystem account, plus S3 keys from its
+  S3 key manager, put in `.env` as `LP_CDSE_S3_ACCESS_KEY` and `LP_CDSE_S3_SECRET_KEY`. Sentinel-2
+  (M2) needs no account.
+- **JRC water history:** this needs Google Earth Engine, with a Cloud project and a service account.
+  Without it, the seasonal control uses the previous two years of Sentinel data, as the owner's
+  instructions allow.
+- **Cases:** of the 21 starter names, 6 have an OpenStreetMap polygon and 3 of those are ambiguous.
+  Each case must be confirmed from its source (location, date, area over 0.25 acre). Hand-traced
+  boundaries from the owner are needed for the rest. Reaching 30 eligible cases is unlikely from the
+  starter list alone, so M3 may be a partial result, not a Gate 1 pass.
+- **Disk:** about 15 GB is free on C:. The geospatial Python packages and a windowed imagery cache
+  fit, but full scenes are never downloaded.
+
 ## Stubbed
 
 - Imagery requests are recorded with an estimate. Nothing is ordered (section 3).
@@ -172,4 +217,5 @@ Done-check run on 6 Nov 2026 from empty volumes (`docker compose down -v`, then 
 
 ## Next
 
-M9: demo. Section 14 end to end on one laptop with no internet, using cached tiles and image chips.
+Waiting for the owner's reply. Then M2: detection on Sentinel-2 (5 tuning lakes, `lp fetch` and `lp detect`,
+no-look-ahead test, invariant 10), then M3.

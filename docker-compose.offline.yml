@@ -1,0 +1,7 @@
+# Offline demo check (M9): every container on a Docker network with no route out.
+#   docker compose -f docker-compose.yml -f docker-compose.offline.yml up -d
+# The host cannot reach the published ports in this mode; the browser tests run inside the web
+# container's network instead. Bring the normal stack back with `docker compose up -d`.
+networks:
+  default:
+    internal: true
