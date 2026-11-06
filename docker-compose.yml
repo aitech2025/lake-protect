@@ -1,0 +1,58 @@
+# Lake Protect prototype. `docker compose up` on one machine (CONTEXT.md section 11).
+# Secrets come from .env (see .env.example). Named volumes keep database files, evidence
+# packs and node_modules out of the OneDrive folder.
+name: lakeprotect
+
+x-api-env: &api-env
+  LP_DATABASE_URL: postgresql+psycopg://${LP_DB_USER:?set in .env}:${LP_DB_PASSWORD:?set in .env}@db:5432/${LP_DB_NAME:?set in .env}
+  LP_TEST_DATABASE_URL: postgresql+psycopg://${LP_DB_USER}:${LP_DB_PASSWORD}@db:5432/${LP_DB_NAME}_test
+  LP_JWT_SECRET: ${LP_JWT_SECRET:?set in .env}
+  LP_STORAGE_DIR: /var/lp/storage
+  LP_DATA_DIR: /srv/data
+  LP_REPO_DIR: /srv/repo
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: ${LP_DB_USER}
+      POSTGRES_PASSWORD: ${LP_DB_PASSWORD}
+      POSTGRES_DB: ${LP_DB_NAME}
+    ports:
+      - "127.0.0.1:${LP_DB_PORT:-5544}:5432"
+    volumes:
+      - lp_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # TCP, not the socket: during first-run init the temporary server answers on the socket only.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    image: lakeprotect-api:dev
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /srv/api/app"
+    environment: *api-env
+    ports:
+      - "127.0.0.1:${LP_API_PORT:-8100}:8000"
+    volumes:
+      - ./api:/srv/api
+      - ./pipeline:/srv/pipeline
+      - ./data:/srv/data:ro
+      - ./:/srv/repo:ro
+      - lp_storage:/var/lp/storage
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  lp_pgdata:
+  lp_storage:

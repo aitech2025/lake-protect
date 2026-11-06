@@ -1,0 +1,40 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+venv/
+.venv/
+*.egg-info/
+
+# Node
+node_modules/
+web/dist/
+web/dev-dist/
+e2e/test-results/
+e2e/playwright-report/
+
+# Imagery cache and derived rasters (kept in LP_CACHE_DIR, outside OneDrive)
+cache/
+.lp-cache/
+lp-cache/
+*.tif
+*.tiff
+
+# Image chips and generated demo assets (rebuilt by the pipeline or the seed job)
+chips/
+data/demo/generated/
+
+# Local object storage (evidence packs, field photos)
+storage/
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
