@@ -151,4 +151,24 @@ ordered.
 `legal_checks`, `field_checks` and `officer_records` are append-only, and `alerts` cannot be
 deleted. Corrections are new rows.
 
+### D-027: Demo images are synthetic and look no sharper than Sentinel
+Demo "before" and "after" chips are drawn from the fictional world file at 10 m per pixel and
+enlarged with hard pixel edges, so the demo never suggests a resolution that free data cannot give.
+Each chip carries "Demo data, synthetic image, not satellite data", and its observation row says the
+same instead of a Copernicus licence notice. Field photos are labelled drawings.
+
+### D-028: Telugu strings are drafts
+`web/src/i18n/te.json` was drafted without a native speaker. It carries a `_review` note and must be
+reviewed before any real use (section 9.2). The wording test checks Telugu stems for the banned words.
+
+### D-029: Browser tests run in a Chromium-only container
+The all-browser Playwright image is about 2 GB and this machine has about 16 GB free. The e2e image
+installs Chromium only. Chromium treats `http://web` as a secure origin inside Docker, so the service
+worker and geolocation behave as they do on localhost.
+
+### D-030: Demo reset rebuilds the schema
+Append-only tables cannot be emptied, by design. `python -m app.seed.reset` (guarded by
+`LP_ALLOW_RESET=true`) migrates down to revision 0001, which keeps PostGIS, migrates up, reloads the
+real assets and reseeds the demo relative to today's date.
+
 ## Defaults changed

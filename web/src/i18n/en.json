@@ -1,0 +1,325 @@
+{
+  "app": {
+    "name": "Lake Protect",
+    "tagline": "Weekly screening of lakes and recovered land"
+  },
+  "nav": {
+    "queue": "Alerts",
+    "assets": "Assets",
+    "records": "Records",
+    "audit": "Audit",
+    "monthly": "Monthly page",
+    "field": "Field app",
+    "logout": "Sign out",
+    "language": "తెలుగు"
+  },
+  "demo": {
+    "badge": "Demo data",
+    "explain": "Fictional places, people and records. Nothing here is a finding."
+  },
+  "login": {
+    "title": "Sign in with a demo role",
+    "intro": "Each account is a fictional role. Pick the role you want to show.",
+    "role": {
+      "analyst": "Reviews candidate changes from the image pair",
+      "reviewer": "Second signature on closures",
+      "field_officer": "Checks one alert on site, works offline",
+      "nodal_officer": "Assigns alerts and watches deadlines",
+      "legal_officer": "Case files, court holds and officer actions",
+      "senior_officer": "Reads the monthly page",
+      "auditor": "Reads the full log and checks closures",
+      "admin": "Assets, boundaries and record imports"
+    }
+  },
+  "role": {
+    "analyst": "Analyst",
+    "reviewer": "Reviewer",
+    "field_officer": "Field officer",
+    "nodal_officer": "Nodal officer",
+    "legal_officer": "Legal officer",
+    "senior_officer": "Senior officer",
+    "auditor": "Auditor",
+    "admin": "Admin",
+    "system": "System"
+  },
+  "state": {
+    "CANDIDATE": "New candidate",
+    "CLOSED_OUT_OF_SCOPE": "Closed: outside the boundary",
+    "CLOSED_LEGACY": "Closed: older than the baseline",
+    "CLOSED_AUTHORISED": "Closed: authorised work or permit",
+    "HOLD_LEGAL": "With legal team: court case",
+    "WATCH_LIST": "Watch list",
+    "TRIAGE": "Waiting for review",
+    "CLOSED_NOT_REAL": "Closed: not a real change",
+    "CONFIRMED": "Confirmed, to assign",
+    "ASSIGNED": "With field team",
+    "CLOSED_FALSE_ALARM": "Closed: false alarm on site",
+    "FIELD_CONFIRMED": "Seen on site",
+    "AWAITING_BOUNDARY": "Waiting for final boundary",
+    "PACK_READY": "Case file ready",
+    "WITH_OFFICER": "With officer",
+    "ACTION_RECORDED": "Officer action recorded",
+    "CLOSED_NO_ACTION": "Closed: no action",
+    "POST_ACTION_WATCH": "Watched after action"
+  },
+  "group": {
+    "review": "Needs review",
+    "field": "In the field",
+    "legal": "With legal",
+    "officer": "With officer",
+    "watch": "Watch list",
+    "closed": "Closed",
+    "overdue": "Overdue",
+    "all": "All"
+  },
+  "action": {
+    "CONFIRMED": "Confirm the change",
+    "CLOSED_NOT_REAL": "Close as not real",
+    "ASSIGNED": "Assign to a field officer",
+    "TRIAGE": "Release for review",
+    "WATCH_LIST": "Release to the watch list",
+    "CLOSED_FALSE_ALARM": "Close as false alarm",
+    "FIELD_CONFIRMED": "Boundary is now final",
+    "PACK_READY": "Mark the case file ready",
+    "WITH_OFFICER": "Send to the officer",
+    "ACTION_RECORDED": "Record officer action",
+    "CLOSED_NO_ACTION": "Close with no action",
+    "first_signature": "You sign first. A second person must agree before it closes.",
+    "second_signature": "A first signature is waiting. Your signature closes it.",
+    "waiting": "Waiting for a second person to sign",
+    "none": "There is nothing for your role to do on this alert now.",
+    "done": "Done",
+    "awaiting": "Signed. Waiting for a second person.",
+    "submit": "Confirm",
+    "cancel": "Cancel"
+  },
+  "form": {
+    "reason": "Reason",
+    "reason_code": "What was it?",
+    "image_pair_reviewed": "I compared the before and after images",
+    "owner": "Field officer",
+    "due": "Due date (optional)",
+    "case_status_ref": "Case status reference",
+    "gap_reason": "Why the case file can go with gaps",
+    "officer_record": "Officer record",
+    "choose": "Choose",
+    "codes": {
+      "cloud_shadow": "Cloud or shadow",
+      "seasonal_water": "Seasonal water level",
+      "transient_object": "Vehicles or stored material",
+      "crop_cycle": "Crop or grass cycle",
+      "image_artefact": "Image fault",
+      "other": "Other"
+    }
+  },
+  "zone": {
+    "inside_ftl": "Inside the lake boundary (FTL)",
+    "buffer": "In the buffer zone",
+    "watch_ring": "In the 100 m watch ring",
+    "outside": "Outside"
+  },
+  "zone_parcel": {
+    "inside_ftl": "Inside the parcel"
+  },
+  "boundary": {
+    "physically_marked": "Marked on the ground",
+    "final_notification": "Final notification",
+    "preliminary_notification": "Preliminary notification",
+    "derived": "Estimated outline, not confirmed",
+    "surveyed_agency": "Surveyed agency land",
+    "survey_number_only": "Survey number only",
+    "confirmed": "Confirmed boundary",
+    "unconfirmed": "Not confirmed: no officer action",
+    "legend_solid": "Solid line: confirmed",
+    "legend_dashed": "Dashed line: preliminary",
+    "legend_dotted": "Dotted line: estimated",
+    "version": "Version {{v}}"
+  },
+  "mode": {
+    "ACTION": "Full path to officer",
+    "VERIFY": "Field check only",
+    "WATCH": "Watch only"
+  },
+  "cohort": {
+    "A_RECOVERED": "A: recovered land",
+    "B_FINAL": "B: final notification",
+    "C_PRELIM": "C: preliminary notification",
+    "D_UNNOTIFIED": "D: no notification",
+    "E_AGENCY": "E: agency land",
+    "F_REVENUE": "F: revenue land"
+  },
+  "change": {
+    "soil_fill": "Soil fill",
+    "clearing": "Land cleared",
+    "small_structure": "Small structure",
+    "building": "Building",
+    "water_loss": "Water loss",
+    "other": "Other change"
+  },
+  "stage": {
+    "soil_dumped": "Soil dumped",
+    "land_levelled": "Land levelled",
+    "sheds_fences": "Sheds or fences",
+    "building_rises": "Building rising",
+    "occupied": "Occupied"
+  },
+  "class": {
+    "GOVT_LAND": "Government land",
+    "RESTRICTED_PRIVATE": "Private title claim in restricted zone",
+    "DISPUTED": "Disputed: court case",
+    "UNKNOWN": "Land category not yet known"
+  },
+  "sensor": {
+    "optical_and_radar": "Optical and radar",
+    "optical_only": "Optical",
+    "radar_only": "Radar only",
+    "pending": "Optical confirmation pending"
+  },
+  "queue": {
+    "title": "Alerts",
+    "count": "{{count}} alerts",
+    "sorted": "Highest priority first",
+    "empty": "No alerts match these filters.",
+    "priority": "Priority {{score}}",
+    "due": "Due {{date}}",
+    "overdue": "Overdue since {{date}}",
+    "owner": "Owner: {{name}}",
+    "acres": "{{acres}} acre",
+    "reopened": "Reopened",
+    "cohort": "Asset group"
+  },
+  "detail": {
+    "back": "All alerts",
+    "before": "Before",
+    "after": "After",
+    "last_clear": "Last clear",
+    "first_changed": "First changed",
+    "detected": "Alert raised",
+    "baseline": "Watching since",
+    "cutoff": "Policy cut-off",
+    "bracket_title": "When the change happened",
+    "bracket_note": "The change happened between the last clear image and the first changed image.",
+    "checks_title": "What the system checked",
+    "zone": "Where",
+    "boundary": "Boundary",
+    "mode": "What this asset allows",
+    "class": "Land category",
+    "permits": "Permits",
+    "works": "Authorised works",
+    "court": "Court register",
+    "none_found": "None found",
+    "matched": "Matched record {{id}}",
+    "permit_conflict": "A permit overlaps the lake or buffer. A permit here does not close the alert.",
+    "live_court": "Live court matter {{id}}",
+    "rule_version": "Rules {{v}}",
+    "actions_title": "Next step",
+    "timeline_title": "History",
+    "map_title": "Boundary and change",
+    "area": "Area",
+    "type": "Change",
+    "stage": "Stage",
+    "sensor": "Seen by",
+    "confidence": "Confidence",
+    "field_title": "Field checks",
+    "photos": "{{count}} photos",
+    "distance": "{{m}} m from the change",
+    "checklist_title": "Case-readiness checklist",
+    "claims_title": "Title claims",
+    "pending_closure": "{{name}} signed to close: {{reason}}",
+    "imagery": "Request sharper imagery",
+    "imagery_done": "Request recorded. Nothing is ordered in the prototype.",
+    "escalated": "Escalated {{n}} times",
+    "owner": "Owner"
+  },
+  "timeline": {
+    "alert.created": "Candidate change recorded",
+    "alert.transition": "Moved to: {{to}}",
+    "closure.requested": "First signature to close",
+    "timer.missed": "Deadline missed, {{notify}} told",
+    "field_check.synced": "Field check received",
+    "readiness.recorded": "Checklist item recorded",
+    "owner_claim.added": "Title claim entered",
+    "recheck.persisting": "Re-check: change still there",
+    "imagery.requested": "Sharper imagery requested",
+    "priority.override": "Priority changed by hand",
+    "evidence.generated": "Evidence pack generated",
+    "officer_record.added": "Officer record added",
+    "reopened": "Reopened: change persists",
+    "by": "by {{name}}"
+  },
+  "notify": {
+    "reviewer": "reviewer",
+    "nodal_officer": "nodal officer",
+    "legal_officer": "legal officer",
+    "monthly_overdue_list": "monthly page"
+  },
+  "checklist": {
+    "boundary_confirmed": "Boundary confirmed by final notification or certified survey",
+    "joint_survey_done": "Joint boundary survey done",
+    "survey_notice_given": "Survey carried out with prior notice",
+    "no_live_court_matter": "No live court matter or undertaking",
+    "title_permits_reviewed": "Title claims and local permissions reviewed",
+    "notice_and_hearing": "Notice served and hearing held",
+    "construction_dated": "Dated bracket shown against the policy cut-off",
+    "yes": "Yes",
+    "no": "No",
+    "not_applicable": "Not applicable",
+    "unset": "Not recorded"
+  },
+  "assets": {
+    "title": "Assets",
+    "dataset_demo": "Demo world",
+    "dataset_real": "Real lakes (OpenStreetMap)",
+    "real_note": "Real lakes use OpenStreetMap outlines. They are estimates for watching only, never for field action.",
+    "versions": "Boundary versions",
+    "source": "Source",
+    "valid": "In force from {{from}}",
+    "until": "until {{to}}",
+    "in_force": "In force",
+    "superseded": "Replaced",
+    "baseline": "Watching since {{date}}",
+    "acres": "{{acres}} acres"
+  },
+  "records": {
+    "title": "Records",
+    "permits": "Permits",
+    "works": "Authorised works",
+    "court-cases": "Court cases",
+    "import": "Import CSV",
+    "imported": "Imported {{n}} records",
+    "held": "{{n}} alerts moved to the legal team",
+    "empty": "No records yet.",
+    "col": {
+      "ref": "Reference",
+      "source": "Source",
+      "kind": "Kind",
+      "from": "From",
+      "to": "To",
+      "agency": "Agency",
+      "work": "Work",
+      "case": "Case",
+      "court": "Court",
+      "status": "Status",
+      "hearing": "Next hearing"
+    }
+  },
+  "audit": {
+    "title": "Audit",
+    "verify": "Check the log",
+    "ok": "The log is intact: {{n}} entries checked.",
+    "broken": "The log has been altered at entry {{id}}: {{problem}}",
+    "sample": "This month's closures to re-check",
+    "sample_none": "No closures this month.",
+    "when": "When",
+    "who": "Who",
+    "what": "What",
+    "item": "Item"
+  },
+  "statement": {
+    "imagery": "Imagery shows physical change. It does not establish title or legality."
+  },
+  "error": {
+    "load": "Could not load this page: {{msg}}",
+    "retry": "Try again"
+  }
+}

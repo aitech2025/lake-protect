@@ -1,0 +1,43 @@
+import type { ReactNode } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { homeFor, useAuth } from "./auth";
+import { Layout } from "./components/Layout";
+import { AlertDetail } from "./desk/AlertDetail";
+import { Assets } from "./desk/Assets";
+import { Audit } from "./desk/Audit";
+import { Login } from "./desk/Login";
+import { Queue } from "./desk/Queue";
+import { Records } from "./desk/Records";
+
+function RequireUser({ children }: { children: ReactNode }) {
+  const { user, ready } = useAuth();
+  if (!ready && !user) return null;
+  return user ? <>{children}</> : <Navigate to="/login" replace />;
+}
+
+function Home() {
+  const { user } = useAuth();
+  return <Navigate to={user ? homeFor(user.role) : "/login"} replace />;
+}
+
+function Later({ what }: { what: string }) {
+  return <div className="page"><h1>{what}</h1><p className="muted">This screen is built in a later milestone.</p></div>;
+}
+
+export function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route element={<RequireUser><Layout /></RequireUser>}>
+        <Route path="/alerts" element={<Queue />} />
+        <Route path="/alerts/:id" element={<AlertDetail />} />
+        <Route path="/assets" element={<Assets />} />
+        <Route path="/records" element={<Records />} />
+        <Route path="/audit" element={<Audit />} />
+        <Route path="/monthly" element={<Later what="Monthly page" />} />
+      </Route>
+      <Route path="/field/*" element={<RequireUser><Later what="Field app" /></RequireUser>} />
+      <Route path="*" element={<Home />} />
+    </Routes>
+  );
+}

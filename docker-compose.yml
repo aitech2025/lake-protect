@@ -54,6 +54,32 @@ services:
       timeout: 5s
       retries: 30
 
+  web:
+    build:
+      context: ./web
+    image: lakeprotect-web:dev
+    ports:
+      - "127.0.0.1:${LP_WEB_PORT:-8180}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # Browser tests: docker compose --profile e2e run --rm e2e
+  e2e:
+    profiles: ["e2e"]
+    build:
+      context: ./e2e
+    image: lakeprotect-e2e:dev
+    environment:
+      E2E_BASE: http://web
+    volumes:
+      - ./e2e/tests:/e2e/tests:ro
+      - ./e2e/playwright.config.ts:/e2e/playwright.config.ts:ro
+      - ./e2e/test-results:/e2e/test-results
+    depends_on:
+      web:
+        condition: service_started
+
 volumes:
   lp_pgdata:
   lp_storage:

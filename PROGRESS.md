@@ -10,8 +10,8 @@ Read this first at the start of every session, then continue from the first unfi
 | M0 Scaffold | Done | 1 passed | M0 commit |
 | M1 Assets and boundaries | Done | API 41 passed, pipeline 4 passed | M1 commit |
 | M4 Workflow API | Done | API 161 passed | M4 commit |
-| M5 Desk | In progress | | |
-| M6 Field app | Not started | | |
+| M5 Desk | Done | API 197 passed, browser 5 passed | M5 commit |
+| M6 Field app | In progress | | |
 | M7 Evidence pack | Not started | | |
 | M8 Officer record, escalation, monthly page | Not started | | |
 | M9 Demo | Not started | | |
@@ -66,6 +66,26 @@ Done-check run on 6 Nov 2026 from empty volumes (`docker compose down -v`, then 
   machine assigns `state`. The invariant 11 wording scan already covers API strings, configuration
   and trigger messages, and will pick up web strings when they exist.
 
+## M5 Desk: done
+
+- Demo world (`data/demo/world.yml`): 20 fictional assets in open sea (D-015), 9 role accounts,
+  fictional permit, restoration work and court case, and 18 alert scenarios. `app.seed.demo` runs
+  every scenario through the real ingest and state machine in time order. Synthetic image chips
+  and offline base-map tiles (2,039) are drawn from the same file (D-027).
+- `python -m app.seed.reset` rebuilds a clean demo (D-030). `sh scripts/e2e.sh` resets, then runs
+  browser tests.
+- Web app (React, TypeScript, Vite, MapLibre, i18next), served by nginx on http://localhost:8180
+  with the API under `/api`. Screens: login by demo role, alert queue (map and list, filters,
+  open alerts first by priority), alert detail (boundary badge, before and after images with dates
+  and sensor, dated bracket strip, map, legal check panel, actions for the role, history,
+  checklist, the section 6.8 statement), assets with boundary versions, records with CSV import,
+  and audit with log check and closure sample. English and Telugu.
+- Done-check (browser, against a fresh demo): 5 passed. The analyst confirms the headline alert
+  only after ticking that the image pair was compared. Closing as not real takes an analyst and a
+  reviewer, and the analyst cannot sign twice. The nodal officer assigns to Demo Field Officer 1.
+  The desk switches to Telugu.
+- API tests: 197 passed. The wording scan (invariant 11) now covers every web source and both i18n files.
+
 ## Stubbed
 
 - Imagery requests are recorded with an estimate. Nothing is ordered (section 3).
@@ -73,7 +93,10 @@ Done-check run on 6 Nov 2026 from empty volumes (`docker compose down -v`, then 
 - Escalation "notify" is an audit event and an overdue flag. No email or SMS.
 - The scheduled worker container that runs escalation comes in M8. The job itself exists and is tested.
 
+- The Monthly page and Field app routes show a placeholder until M8 and M6.
+- Telugu strings are drafts awaiting a native speaker's review (D-028).
+
 ## Next
 
-M5: desk. Seed the fictional demo data, including synthetic image pairs, through the real ingest
-and state machine, then build the analyst and nodal officer screens.
+M6: field app (PWA). Offline capture queued in IndexedDB, sync on reconnect, distance warning,
+language toggle.

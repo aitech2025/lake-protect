@@ -1,0 +1,218 @@
+# Fictional demo world. Every place, name, survey number, record and alert here is invented.
+# It sits in open sea (DECISIONS.md D-015), so nothing can coincide with a real lake, parcel or
+# person. Positions are metres east and north of the origin. Days are relative to the seed date.
+#
+# Telugu names are drafts for review by a native speaker.
+
+origin: [81.50, 14.50]
+baseline_days_ago: 365      # monitoring started a year before the seed date
+boundary_days_ago: 400
+
+users:
+  - {username: demo.analyst,  name: Demo Analyst,         role: analyst}
+  - {username: demo.reviewer, name: Demo Reviewer,        role: reviewer}
+  - {username: demo.field1,   name: Demo Field Officer 1, role: field_officer, language: te}
+  - {username: demo.field2,   name: Demo Field Officer 2, role: field_officer}
+  - {username: demo.nodal,    name: Demo Nodal Officer,   role: nodal_officer}
+  - {username: demo.legal,    name: Demo Legal Officer,   role: legal_officer}
+  - {username: demo.senior,   name: Demo Senior Officer,  role: senior_officer}
+  - {username: demo.auditor,  name: Demo Auditor,         role: auditor}
+  - {username: demo.admin,    name: Demo Admin,           role: admin}
+
+assets:
+  # Cohort A: recovered land, physically marked
+  - {key: demo-cheruvu-1, name: Demo Cheruvu 1, name_te: డెమో చెరువు 1, cohort: A_RECOVERED, lake: {at: [-1500, 1200], r: 260, seed: 11}, survey: [D-101, D-102], cctv: true}
+  - {key: demo-cheruvu-2, name: Demo Cheruvu 2, name_te: డెమో చెరువు 2, cohort: A_RECOVERED, lake: {at: [1400, 1800], r: 220, seed: 12}, survey: [D-110]}
+  - {key: demo-cheruvu-3, name: Demo Cheruvu 3, name_te: డెమో చెరువు 3, cohort: A_RECOVERED, lake: {at: [-2600, -600], r: 300, seed: 13}, survey: [D-120, D-121]}
+  - {key: demo-cheruvu-4, name: Demo Cheruvu 4, name_te: డెమో చెరువు 4, cohort: A_RECOVERED, lake: {at: [300, -1900], r: 200, seed: 14}, survey: [D-130]}
+  - {key: demo-parcel-a,  name: Demo Parcel A,  name_te: డెమో స్థలం A,  cohort: A_RECOVERED, parcel: {at: [2600, -300], size: [260, 180], rot: 12}, survey: [D-201]}
+  - {key: demo-parcel-b,  name: Demo Parcel B,  name_te: డెమో స్థలం B,  cohort: A_RECOVERED, parcel: {at: [-400, 2900], size: [300, 200], rot: -8}, survey: [D-202]}
+  - {key: demo-parcel-c,  name: Demo Parcel C,  name_te: డెమో స్థలం C,  cohort: A_RECOVERED, parcel: {at: [3200, 2400], size: [220, 160], rot: 25}, survey: [D-203]}
+  # Cohort B: lakes with a final notification
+  - {key: demo-cheruvu-5, name: Demo Cheruvu 5, name_te: డెమో చెరువు 5, cohort: B_FINAL, lake: {at: [-3400, 2300], r: 240, seed: 15}, survey: [D-140], ref: DEMO/FINAL/005}
+  - {key: demo-cheruvu-6, name: Demo Cheruvu 6, name_te: డెమో చెరువు 6, cohort: B_FINAL, lake: {at: [2200, -2600], r: 210, seed: 16}, survey: [D-150], ref: DEMO/FINAL/006}
+  - {key: demo-cheruvu-7, name: Demo Cheruvu 7, name_te: డెమో చెరువు 7, cohort: B_FINAL, lake: {at: [-1200, -3000], r: 260, seed: 17}, survey: [D-160], ref: DEMO/FINAL/007}
+  - {key: demo-cheruvu-8, name: Demo Cheruvu 8, name_te: డెమో చెరువు 8, cohort: B_FINAL, lake: {at: [700, 400], r: 230, seed: 18}, survey: [D-170], ref: DEMO/FINAL/008}
+  - {key: demo-cheruvu-9, name: Demo Cheruvu 9, name_te: డెమో చెరువు 9, cohort: B_FINAL, lake: {at: [-3800, -2600], r: 220, seed: 19}, survey: [D-180], ref: DEMO/FINAL/009}
+  # Cohort C: lakes with a preliminary notification
+  - {key: demo-kunta-1, name: Demo Kunta 1, name_te: డెమో కుంట 1, cohort: C_PRELIM, lake: {at: [3700, 900], r: 130, seed: 21}, survey: [D-301], ref: DEMO/PRELIM/001}
+  - {key: demo-kunta-2, name: Demo Kunta 2, name_te: డెమో కుంట 2, cohort: C_PRELIM, lake: {at: [-2000, 3600], r: 120, seed: 22}, survey: [D-302], ref: DEMO/PRELIM/002}
+  - {key: demo-kunta-3, name: Demo Kunta 3, name_te: డెమో కుంట 3, cohort: C_PRELIM, lake: {at: [1800, 3600], r: 110, seed: 23}, survey: [D-303], ref: DEMO/PRELIM/003}
+  - {key: demo-kunta-4, name: Demo Kunta 4, name_te: డెమో కుంట 4, cohort: C_PRELIM, lake: {at: [-300, -800], r: 125, seed: 24}, survey: [D-304], ref: DEMO/PRELIM/004}
+  # Cohort D: lakes without a notification (derived outline, watch only)
+  - {key: demo-kunta-5, name: Demo Kunta 5, name_te: డెమో కుంట 5, cohort: D_UNNOTIFIED, lake: {at: [4200, -1800], r: 120, seed: 25}, survey: []}
+  - {key: demo-kunta-6, name: Demo Kunta 6, name_te: డెమో కుంట 6, cohort: D_UNNOTIFIED, lake: {at: [-4300, 600], r: 115, seed: 26}, survey: []}
+  - {key: demo-kunta-7, name: Demo Kunta 7, name_te: డెమో కుంట 7, cohort: D_UNNOTIFIED, lake: {at: [900, -3700], r: 110, seed: 27}, survey: []}
+  - {key: demo-kunta-8, name: Demo Kunta 8, name_te: డెమో కుంట 8, cohort: D_UNNOTIFIED, lake: {at: [-2900, 1500], r: 105, seed: 28}, survey: []}
+
+# Base map features (drawn on the offline tiles only).
+roads:
+  - [[-4800, 300], [-2600, 400], [-1000, 600], [500, 900], [2400, 700], [4800, 500]]
+  - [[-600, -4800], [-500, -2200], [-300, 0], [-200, 2200], [0, 4800]]
+  - [[-4800, -3600], [-2500, -1800], [-800, -1200], [1200, -1500], [3600, -1000], [4800, -2400]]
+  - [[1200, 4800], [1500, 2600], [2400, 1500], [3000, 0], [3300, -3200], [3000, -4800]]
+villages:
+  - {at: [-700, 400], r: 260}
+  - {at: [2700, 1000], r: 200}
+  - {at: [-2200, -1500], r: 220}
+  - {at: [600, -1300], r: 180}
+  - {at: [-1000, 2400], r: 170}
+
+# Records (fictional). Geometry is a box in metres relative to an asset's centre.
+permits:
+  - {asset: demo-cheruvu-8, ref: DEMO-BP-2025-0417, source: Demo building permission register, kind: building, box: [180, 330, -90, 60], valid_from_days: -200}
+works:
+  - {asset: demo-cheruvu-3, ref: DEMO-RW-0007, agency: Demo Lake Restoration Programme, description: Desilting and bund strengthening, box: [-360, 360, -360, 360], starts_days: -60, ends_days: 60}
+court_cases:
+  - {asset: demo-cheruvu-7, court: Demo High Court, case_no: DEMO-WP-1234/2026, status: pending, next_hearing_days: 21}
+
+# Alert scenarios. Each covers one path from CONTEXT.md section 13. Change shapes:
+#   edge:   blob centred on the boundary edge at `angle` degrees (part inside, part buffer)
+#   inside: blob at `offset` metres from the centre
+#   ring:   blob in the watch ring at `angle`
+#   far:    blob well outside the watch ring at `angle`
+scenarios:
+  - key: headline
+    asset: demo-cheruvu-1
+    note: Demo script step 2. Fresh soil fill at the lake edge, left in TRIAGE for the live walkthrough.
+    change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 35, size: [95, 60]}
+    detect: {first_changed: -14, last_clear: -19, day: -2}
+    steps: []
+
+  - key: full_path
+    asset: demo-cheruvu-2
+    note: Full path to the officer. Seed continues it through pack and officer record (M7, M8).
+    change: {type: soil_fill, stage: land_levelled, shape: edge, angle: 200, size: [110, 70]}
+    detect: {first_changed: -52, last_clear: -58, day: -45}
+    steps:
+      - {day: -44, do: confirm, by: demo.analyst}
+      - {day: -44, do: assign, by: demo.nodal, to: demo.field1}
+      - {day: -40, do: field, by: demo.field1, outcome: confirmed, stage: land_levelled}
+
+  - key: building
+    asset: demo-cheruvu-4
+    note: Building rising inside the lake. Confirmed and waiting for assignment.
+    change: {type: building, stage: building_rises, shape: inside, offset: [60, -40], size: [55, 45]}
+    detect: {first_changed: -22, last_clear: -30, day: -9}
+    steps:
+      - {day: -8, do: confirm, by: demo.analyst}
+
+  - key: not_real
+    asset: demo-cheruvu-5
+    note: Cloud shadow. Closed as not real by two people.
+    change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 120, size: [80, 55]}
+    detect: {first_changed: -33, last_clear: -38, day: -27}
+    steps:
+      - {day: -26, do: close_not_real, by: demo.analyst, cosign: demo.reviewer, reason: Cloud shadow on one date only, code: cloud_shadow}
+
+  - key: false_alarm
+    asset: demo-cheruvu-6
+    note: Field visit found a seasonal crop. Closed as false alarm by two people.
+    change: {type: clearing, stage: land_levelled, shape: edge, angle: 300, size: [90, 60]}
+    detect: {first_changed: -30, last_clear: -36, day: -24}
+    steps:
+      - {day: -23, do: confirm, by: demo.analyst}
+      - {day: -23, do: assign, by: demo.nodal, to: demo.field2}
+      - {day: -19, do: false_alarm, by: demo.field2, cosign: demo.nodal, reason: Seasonal crop on the lake bed, no fill or structure}
+
+  - key: court_hold
+    asset: demo-cheruvu-7
+    note: A live court case on the lake. Held for the legal team.
+    change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 80, size: [85, 60]}
+    detect: {first_changed: -18, last_clear: -24, day: -11}
+    steps: []
+
+  - key: watch_list
+    asset: demo-kunta-5
+    note: Lake with no notification. Logged on the watch list, no field action.
+    change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 150, size: [70, 50]}
+    detect: {first_changed: -16, last_clear: -22, day: -8}
+    steps: []
+
+  - key: authorised_work
+    asset: demo-cheruvu-3
+    note: Earth-moving by the demo restoration programme. Closed as authorised work.
+    change: {type: soil_fill, stage: land_levelled, shape: edge, angle: 250, size: [120, 70]}
+    detect: {first_changed: -20, last_clear: -27, day: -13}
+    steps: []
+
+  - key: permit_conflict
+    asset: demo-cheruvu-8
+    note: A building permit that overlaps the buffer. Flagged as a permit conflict, not closed.
+    change: {type: clearing, stage: land_levelled, shape: edge, angle: 0, size: [90, 60]}
+    detect: {first_changed: -12, last_clear: -17, day: -5}
+    steps: []
+
+  - key: overdue
+    asset: demo-cheruvu-9
+    note: Assigned 20 days ago with a 7-day timer. Overdue and escalated to the nodal officer.
+    change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 60, size: [80, 60]}
+    detect: {first_changed: -30, last_clear: -35, day: -22}
+    steps:
+      - {day: -21, do: confirm, by: demo.analyst}
+      - {day: -20, do: assign, by: demo.nodal, to: demo.field2}
+
+  - key: overdue_triage
+    asset: demo-parcel-c
+    note: Waiting for review past its 3-day timer. The reviewer has been notified.
+    change: {type: clearing, stage: land_levelled, shape: inside, offset: [20, 10], size: [70, 55]}
+    detect: {first_changed: -15, last_clear: -21, day: -6}
+    steps: []
+
+  - key: reopened
+    asset: demo-parcel-b
+    note: Closed as not real, then a re-check from space found the change persisting and larger.
+    change: {type: soil_fill, stage: soil_dumped, shape: inside, offset: [-30, 20], size: [70, 50]}
+    detect: {first_changed: -48, last_clear: -54, day: -41}
+    steps:
+      - {day: -40, do: close_not_real, by: demo.analyst, cosign: demo.reviewer, reason: Looked like a parked truck convoy, code: transient_object}
+      - {day: -4, do: recheck, grow: 1.6, first_changed: -12, last_clear: -40}
+
+  - key: awaiting_boundary
+    asset: demo-kunta-1
+    note: Cohort C. Field-confirmed, waiting for the final notification before any officer step.
+    change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 220, size: [70, 50]}
+    detect: {first_changed: -34, last_clear: -40, day: -28}
+    steps:
+      - {day: -27, do: confirm, by: demo.analyst}
+      - {day: -27, do: assign, by: demo.nodal, to: demo.field1}
+      - {day: -24, do: field, by: demo.field1, outcome: confirmed, stage: soil_dumped}
+
+  - key: radar_only
+    asset: demo-kunta-2
+    note: Seen by radar only during the monsoon. Optical confirmation pending.
+    change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 100, size: [65, 50]}
+    detect: {first_changed: -62, last_clear: -70, day: -55, sensor_basis: radar_only, confidence: 0.55}
+    steps: []
+
+  - key: legacy
+    asset: demo-parcel-a
+    note: The change dates from before the asset's baseline. Logged as legacy, never alerted.
+    change: {type: building, stage: occupied, shape: inside, offset: [40, -20], size: [60, 50]}
+    detect: {first_changed: -380, last_clear: -420, day: -30}
+    steps: []
+
+  - key: out_of_scope
+    asset: demo-kunta-6
+    note: Change well outside the lake's watch ring. Closed as out of scope.
+    change: {type: clearing, stage: land_levelled, shape: far, angle: 30, size: [80, 60]}
+    detect: {first_changed: -25, last_clear: -31, day: -18}
+    steps: []
+
+  - key: last_month_1
+    asset: demo-kunta-3
+    note: Last month's alert for the trend line, assigned and field-confirmed.
+    change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 10, size: [60, 45]}
+    detect: {first_changed: -66, last_clear: -72, day: -58}
+    steps:
+      - {day: -57, do: confirm, by: demo.analyst}
+      - {day: -56, do: assign, by: demo.nodal, to: demo.field1}
+      - {day: -52, do: field, by: demo.field1, outcome: confirmed, stage: soil_dumped}
+
+  - key: last_month_2
+    asset: demo-kunta-4
+    note: Last month's alert for the trend line, closed as not real.
+    change: {type: clearing, stage: land_levelled, shape: edge, angle: 280, size: [60, 45]}
+    detect: {first_changed: -63, last_clear: -69, day: -50}
+    steps:
+      - {day: -49, do: close_not_real, by: demo.analyst, cosign: demo.reviewer, reason: Seasonal drawdown of the water edge, code: seasonal_water}
