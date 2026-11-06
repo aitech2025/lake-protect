@@ -50,6 +50,15 @@ def db(test_engine) -> Iterator[Session]:
         connection.close()
 
 
+@pytest.fixture(autouse=True)
+def isolated_storage(tmp_path, monkeypatch):
+    """Tests write chips, photos and packs to a temporary folder, never to the real store."""
+    from app.storage import store
+
+    monkeypatch.setattr(store, "root", tmp_path / "storage")
+    yield store
+
+
 @pytest.fixture()
 def client(db: Session) -> Iterator[TestClient]:
     app.dependency_overrides[get_db] = lambda: db

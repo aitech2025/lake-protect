@@ -9,8 +9,8 @@ Read this first at the start of every session, then continue from the first unfi
 |---|---|---|---|
 | M0 Scaffold | Done | 1 passed | M0 commit |
 | M1 Assets and boundaries | Done | API 41 passed, pipeline 4 passed | M1 commit |
-| M4 Workflow API | In progress | | |
-| M5 Desk | Not started | | |
+| M4 Workflow API | Done | API 161 passed | M4 commit |
+| M5 Desk | In progress | | |
 | M6 Field app | Not started | | |
 | M7 Evidence pack | Not started | | |
 | M8 Officer record, escalation, monthly page | Not started | | |
@@ -47,10 +47,33 @@ Done-check run on 6 Nov 2026 from empty volumes (`docker compose down -v`, then 
   retrievable by date, buffer widths 30 m and 9 m, role checks, and the audit chain catching an edit.
 - On the dev database, `UPDATE boundaries ...` fails with "the table is append-only".
 
+## M4 Workflow API: done
+
+- Legal check (`app/rules/legal_check.py`): `decide` follows section 6.2 step by step, and `run`
+  gathers zone, works, permits and court matters with PostGIS. Each result stores the rule version,
+  the boundary version and the matched records.
+- Priority (`app/rules/priority.py`): section 6.4 with every factor stored. Overrides need a reason
+  and are logged.
+- State machine (`app/workflow/state_machine.py`): one table of 24 rules covering section 6.5, plus
+  E-004 and D-017. A database trigger refuses any state change made outside it.
+- Timers and escalation (`timers.py`, `escalation.py`), with monsoon timing for field assignment.
+- Re-check reopen (D-020) and court holds after import (E-004).
+- API: `POST /candidates` (pipeline token), `GET /alerts` with filters, `GET /alerts/{id}` with
+  allowed actions per role, `POST /alerts/{id}/transitions`, field checks (idempotent, photo hashes,
+  server-side distance), owner claims, readiness items, imagery-request stub, priority override,
+  records CSV import and list, `GET /audit`, `GET /audit/verify`, `GET /audit/closure-sample`.
+- Tests: API 161 passed. Invariants 1 to 9 and 12 pass, plus a test that no module but the state
+  machine assigns `state`. The invariant 11 wording scan already covers API strings, configuration
+  and trigger messages, and will pick up web strings when they exist.
+
 ## Stubbed
 
-- No demo users exist yet, so the API can only be called from tests. They are seeded in M4.
+- Imagery requests are recorded with an estimate. Nothing is ordered (section 3).
+- Signals (CCTV, Praja Vani) have a table but no endpoint. They are not in the demo script.
+- Escalation "notify" is an audit event and an overdue flag. No email or SMS.
+- The scheduled worker container that runs escalation comes in M8. The job itself exists and is tested.
 
 ## Next
 
-M4: workflow API.
+M5: desk. Seed the fictional demo data, including synthetic image pairs, through the real ingest
+and state machine, then build the analyst and nodal officer screens.

@@ -1,0 +1,250 @@
+"""Alerts (section 9.5). Every state change goes through the state machine."""
+from __future__ import annotations
+
+import json
+import math
+from typing import Literal
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from sqlalchemy import select, text
+from sqlalchemy.orm import Session
+
+from app.audit import chain
+from app.clock import utcnow
+from app.db import db_guard, get_db
+from app.enums import ReadinessStatus, Role
+from app.models import Candidate, ImageryRequest, OwnerClaim, ReadinessItem, User
+from app.security import current_user, require_roles
+from app.services import alert_view
+from app.services import field as field_svc
+from app.storage import store
+from app.workflow import state_machine as sm
+
+router = APIRouter(prefix="/alerts", tags=["alerts"])
+
+DESK_ROLES = [r.value for r in Role if r != Role.field_officer]
+
+
+@router.get("")
+def list_alerts(
+    state: str | None = None,
+    mode: str | None = None,
+    cohort: str | None = None,
+    overdue: bool | None = None,
+    user: User = Depends(current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    items = alert_view.list_alerts(db, user, state=state, mode=mode, cohort=cohort, overdue=overdue)
+    chain.record(db, actor_id=user.id, action="view.alerts", entity="alert", details={"filters": {"state": state, "mode": mode, "cohort": cohort, "overdue": overdue}, "count": len(items)})
+    db.commit()
+    return {"items": items, "count": len(items), "has_demo": any(i["is_demo"] for i in items)}
+
+
+@router.get("/{alert_id}")
+def get_alert(alert_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    alert = alert_view.get_visible(db, alert_id, user)
+    out = alert_view.detail(db, alert, user)
+    chain.record(db, actor_id=user.id, action="view.alert", entity="alert", entity_id=alert_id)
+    db.commit()
+    return out
+
+
+@router.get("/{alert_id}/chips/{which}")
+def get_chip(alert_id: int, which: Literal["before", "after"], user: User = Depends(current_user), db: Session = Depends(get_db)) -> Response:
+    alert = alert_view.get_visible(db, alert_id, user)
+    cand = db.get(Candidate, alert.candidate_id)
+    key = cand.before_chip if which == "before" else cand.after_chip
+    if not key or store.head_object(key) is None:
+        raise HTTPException(404, "No image for this alert")
+    chain.record(db, actor_id=user.id, action="view.chip", entity="alert", entity_id=alert_id, details={"which": which})
+    db.commit()
+    return Response(store.get_object(key), media_type="image/png", headers={"Cache-Control": "private, max-age=3600"})
+
+
+class TransitionIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    to: str
+    reason: str | None = None
+    data: dict = Field(default_factory=dict)
+
+
+def _refusal(db: Session, exc: sm.Refused):
+    db.rollback()
+    return HTTPException(exc.status, exc.message)
+
+
+@router.post("/{alert_id}/transitions")
+def post_transition(alert_id: int, body: TransitionIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    alert = alert_view.get_visible(db, alert_id, user)
+    with db_guard(db):
+        try:
+            result = sm.transition(db, alert, body.to, actor=user, reason=body.reason, data=body.data)
+        except ValueError as exc:
+            db.rollback()
+            raise HTTPException(422, f"Unknown state {body.to}") from exc
+        except sm.Refused as exc:
+            raise _refusal(db, exc) from exc
+        db.commit()
+    return result
+
+
+@router.post("/{alert_id}/field-checks")
+async def post_field_check(
+    alert_id: int,
+    meta: str = Form(...),
+    photos: list[UploadFile] = File(default=[]),
+    user: User = Depends(require_roles(Role.field_officer)),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Idempotent: resending the same client_uuid returns the stored record."""
+    alert = alert_view.get_visible(db, alert_id, user)
+    try:
+        parsed = field_svc.FieldCheckMeta.model_validate(json.loads(meta))
+    except (ValidationError, json.JSONDecodeError) as exc:
+        raise HTTPException(422, f"Bad field check metadata: {exc}") from exc
+    blobs = [await p.read() for p in photos]
+    with db_guard(db):
+        try:
+            result = field_svc.submit(db, alert, user, parsed, blobs)
+        except field_svc.FieldRefused as exc:
+            db.rollback()
+            raise HTTPException(exc.status, exc.message) from exc
+        db.commit()
+    return result
+
+
+class OwnerClaimIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    claim_type: str
+    claimant_name: str
+    document_ref: str | None = None
+
+
+@router.post("/{alert_id}/owner-claims", status_code=201)
+def post_owner_claim(
+    alert_id: int,
+    body: OwnerClaimIn,
+    user: User = Depends(require_roles(Role.field_officer, Role.nodal_officer, Role.legal_officer)),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Rule 4: owner names stay out until a field check confirms the change."""
+    alert = alert_view.get_visible(db, alert_id, user)
+    if alert.state not in sm.FIELD_CONFIRMED_OR_LATER:
+        raise HTTPException(409, f"Owner claims are accepted only after field confirmation (alert is {alert.state})")
+    with db_guard(db):
+        now = utcnow()
+        claim = OwnerClaim(alert_id=alert.id, claim_type=body.claim_type, claimant_name=body.claimant_name, document_ref=body.document_ref, entered_by=user.id, entered_at=now)
+        db.add(claim)
+        db.flush()
+        reclassified = _reclassify_after_claim(db, alert, body.claim_type, now)
+        chain.record(db, actor_id=user.id, action="owner_claim.added", entity="alert", entity_id=alert.id, details={"owner_claim_id": claim.id, "claim_type": body.claim_type, "alert_class": reclassified})
+        db.commit()
+    return {"id": claim.id, "alert_class": reclassified}
+
+
+def _reclassify_after_claim(db: Session, alert, claim_type: str, now) -> str | None:
+    """Section 6.3: a private title claim inside the FTL or buffer makes the class RESTRICTED_PRIVATE.
+
+    Legal checks are append-only, so the new class is a new row that copies the latest one.
+    """
+    from app.models import Asset, Candidate, LegalCheck
+    from app.rules import legal_check
+
+    latest = db.scalar(select(LegalCheck).where(LegalCheck.candidate_id == alert.candidate_id).order_by(LegalCheck.id.desc()).limit(1))
+    if latest is None or claim_type != "private_title":
+        return latest.alert_class if latest else None
+    asset = db.get(Asset, db.get(Candidate, alert.candidate_id).asset_id)
+    new_class = legal_check.alert_class_for(asset, latest.matched_court_case_id, private_title_claim=True, zone=latest.zone).value
+    if new_class == latest.alert_class:
+        return new_class
+    db.add(LegalCheck(
+        candidate_id=latest.candidate_id, zone=latest.zone, boundary_status=latest.boundary_status, mode=latest.mode,
+        alert_class=new_class, result=alert.state, matched_permit_id=latest.matched_permit_id, matched_work_id=latest.matched_work_id,
+        matched_court_case_id=latest.matched_court_case_id, boundary_id=latest.boundary_id, boundary_version=latest.boundary_version,
+        flags=sorted(set(latest.flags or []) | {"reclassified_after_title_claim"}), rule_version=latest.rule_version, checked_at=now,
+    ))
+    db.flush()
+    return new_class
+
+
+class ReadinessIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    status: ReadinessStatus
+    evidence_ref: str | None = None
+
+
+@router.put("/{alert_id}/readiness/{item_key}")
+def put_readiness(
+    alert_id: int,
+    item_key: str,
+    body: ReadinessIn,
+    user: User = Depends(require_roles(Role.nodal_officer, Role.legal_officer)),
+    db: Session = Depends(get_db),
+) -> dict:
+    if item_key not in sm.READINESS_KEYS:
+        raise HTTPException(422, f"Unknown checklist item {item_key}")
+    alert = alert_view.get_visible(db, alert_id, user)
+    item = db.scalar(select(ReadinessItem).where(ReadinessItem.alert_id == alert.id, ReadinessItem.item_key == item_key))
+    before = None if item is None else {"status": item.status, "evidence_ref": item.evidence_ref, "checked_by": item.checked_by}
+    now = utcnow()
+    if item is None:
+        item = ReadinessItem(alert_id=alert.id, item_key=item_key, status=body.status.value, evidence_ref=body.evidence_ref, checked_by=user.id, checked_at=now)
+        db.add(item)
+    else:
+        item.status, item.evidence_ref, item.checked_by, item.checked_at = body.status.value, body.evidence_ref, user.id, now
+    db.flush()
+    chain.record(db, actor_id=user.id, action="readiness.recorded", entity="alert", entity_id=alert.id, details={"item_key": item_key, "before": before, "after": body.model_dump(mode="json")})
+    db.commit()
+    return {"item_key": item_key, "status": item.status}
+
+
+class ImageryIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    provider: Literal["isro_nrsc", "commercial_archive", "commercial_tasking"]
+    note: str | None = None
+
+
+# Reseller guide figures from CONTEXT.md section 8.1, upper end. Planning estimates, not quotes.
+_USD_PER_SQ_KM = {"isro_nrsc": None, "commercial_archive": 26.0, "commercial_tasking": 55.0}
+
+
+@router.post("/{alert_id}/imagery-request", status_code=201)
+def post_imagery_request(
+    alert_id: int,
+    body: ImageryIn,
+    user: User = Depends(require_roles(Role.analyst, Role.nodal_officer)),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Stub: records the request and its estimated cost. Nothing is ordered (section 3)."""
+    alert = alert_view.get_visible(db, alert_id, user)
+    area = db.scalar(
+        text("SELECT ST_Area(ST_Transform(ST_Envelope(ST_Buffer(geom::geography, 250)::geometry), 32644)) / 1e6 FROM candidates WHERE id = :c"),
+        {"c": alert.candidate_id},
+    )
+    rate = _USD_PER_SQ_KM[body.provider]
+    req = ImageryRequest(alert_id=alert.id, provider=body.provider, area_sq_km=round(area, 3), est_cost_usd=None if rate is None else round(math.ceil(area * 100) / 100 * rate, 2), status="recorded", requested_by=user.id, created_at=utcnow())
+    db.add(req)
+    db.flush()
+    chain.record(db, actor_id=user.id, action="imagery.requested", entity="alert", entity_id=alert.id, details={"imagery_request_id": req.id, "provider": body.provider, "area_sq_km": float(req.area_sq_km), "est_cost_usd": req.est_cost_usd and float(req.est_cost_usd), "note": body.note})
+    db.commit()
+    return {"id": req.id, "status": req.status, "area_sq_km": float(req.area_sq_km), "est_cost_usd": req.est_cost_usd and float(req.est_cost_usd), "note": "Recorded only. No imagery is ordered in the prototype."}
+
+
+class OverrideIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    score: float = Field(ge=0, le=100)
+    reason: str = Field(min_length=3)
+
+
+@router.post("/{alert_id}/priority-override")
+def post_priority_override(alert_id: int, body: OverrideIn, user: User = Depends(require_roles(Role.nodal_officer)), db: Session = Depends(get_db)) -> dict:
+    """Section 6.4: manual overrides need a reason and are logged."""
+    alert = alert_view.get_visible(db, alert_id, user)
+    before = float(alert.priority_score) if alert.priority_score is not None else None
+    alert.priority_factors = {**(alert.priority_factors or {}), "override": {"score": body.score, "reason": body.reason, "by": user.id, "at": utcnow().isoformat(), "previous": before}}
+    alert.priority_score = body.score
+    db.flush()
+    chain.record(db, actor_id=user.id, action="priority.override", entity="alert", entity_id=alert.id, details={"before": before, "after": body.score, "reason": body.reason})
+    db.commit()
+    return {"priority_score": body.score}

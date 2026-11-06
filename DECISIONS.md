@@ -29,6 +29,27 @@ An append-only row cannot have `valid_to` filled in when a later version superse
 superseded version is derived by the `boundary_versions` view (`superseded_by_id`,
 `effective_valid_to`), and `supersedes_id` is checked by a trigger. No row is ever updated.
 
+### E-002: The priority score has no cohort factor for D, E or F (section 6.4)
+Section 6.4 gives A = 1.0, B = 0.9, C = 0.5 only. **Applied (config, `rules-v0`):** D = 0.0 and
+F = 0.0, because watch-only alerts never reach review unless the asset moves cohort, at which point
+the score uses the new cohort. E = 0.9, the same as B, because E is also ACTION mode on a surveyed
+boundary. These are placeholders to agree with HYDRAA, not derived values.
+
+### E-003: "Officer" in section 6.5 is not a role in section 2
+`WITH_OFFICER` to `ACTION_RECORDED` and `CLOSED_NO_ACTION` name "Officer", which is not one of the
+eight roles. **Applied:** `legal_officer` and `senior_officer` act as the officer. For
+`CLOSED_NO_ACTION` the officer signs first and a `nodal_officer` co-signs.
+
+### E-004: A live court matter found after the candidate stage has no route to `HOLD_LEGAL`
+Section 6.1 says a live court matter moves an alert to `HOLD_LEGAL` "whatever the cohort", but
+section 6.5 only has `CANDIDATE` to `HOLD_LEGAL`. **Applied:** a system step from any open state
+to `HOLD_LEGAL`, run straight after a court register import. Assignment also re-checks the
+register, so invariant 1 holds even if a case is added some other way.
+
+### E-005: The `zone` enum has no value for the inside of a parcel
+Cohort A parcels have a parcel boundary, not an FTL. **Applied:** the inside of a parcel is
+reported as `inside_ftl`. The alert screen labels it by boundary kind.
+
 ## Gaps filled (no change to CONTEXT.md)
 
 ### D-010: Additions to the section 7 schema
@@ -67,5 +88,67 @@ have no public geometry and are not loaded.
 `baseline_date` is required. For a real asset it is the date its boundary was retrieved, so only
 change after enrolment can alert (rule 3). The backtest sets its own per-case baseline and does not
 read this value.
+
+### D-015: Demo and test places are in open sea
+Every fictional asset, test fixture and demo alert sits around 81.5 E, 14.5 N, in the Bay of Bengal
+about 150 km offshore and inside UTM zone 44N. No invented alert can then coincide with a real lake,
+parcel or person (section 13), and areas in EPSG:32644 still work. The demo base map is drawn from
+the demo data, so the sea is never shown.
+
+### D-016: How a candidate's zone is located
+A candidate is in the most restrictive zone whose interior it overlaps: FTL or parcel, then buffer,
+then watch ring. Touching a zone's edge does not count. The rule is applied against the boundary
+version in force on the check date, and that version is stored.
+
+### D-017: Release from legal hold
+`HOLD_LEGAL` to `TRIAGE` needs the court register to show no live matter, plus a reason and a case
+status reference. A watch-only asset is released to `WATCH_LIST`, because section 6.5 has no other
+route that keeps it out of the field.
+
+### D-018: Two-person closures
+The first signature is stored in `closure_requests`. The second must come from a different user with
+the co-signing role: analyst then reviewer (`CLOSED_NOT_REAL`), field officer then nodal officer
+(`CLOSED_FALSE_ALARM`), officer then nodal officer (`CLOSED_NO_ACTION`). A database check forbids the
+same person resolving their own request. Any other step on the alert supersedes an open request.
+
+### D-019: What counts as a court register hit
+A court case with a live status (`pending`, `interim_order`, `stay` or `undertaking`, configurable)
+whose footprint intersects the candidate, or which names the asset with no footprint, or which shares
+a survey number with the asset.
+
+### D-020: Re-check from space
+A new candidate that overlaps an alert closed by people (`CLOSED_NOT_REAL`, `CLOSED_FALSE_ALARM`,
+`CLOSED_NO_ACTION`), and covers at least 90% of its area, reopens it to `TRIAGE`. Alerts closed by
+the system (legacy, out of scope, authorised) never reopen. A new change on an alert that is still
+open is recorded on that alert, not duplicated.
+
+### D-021: Leaving the watch list
+"A new boundary version with a confirmed status" is read as: a boundary version newer than the one
+the legal check used, whose status's cohort is not watch-only. So a new preliminary notification
+moves a cohort D lake to C (VERIFY), which allows a field check but no officer step.
+
+### D-022: Owner claims
+Accepted in `FIELD_CONFIRMED` and every later state. Claimant names are personal data, so only the
+legal and nodal officers see them. A `private_title` claim inside the FTL or buffer changes the class
+to `RESTRICTED_PRIVATE` by appending a legal check row.
+
+### D-023: Pipeline ingest
+"Pipeline" is not a role, so `POST /candidates` takes a shared secret (`LP_PIPELINE_TOKEN` in `.env`)
+instead of a login. Ingest also refuses a candidate whose observations were acquired after its ingest
+time, which backs up invariant 10.
+
+### D-024: Missed timers and notification
+A miss is recorded once per timer, by the scheduled job or, if the alert moves first, by the
+transition itself. `escalation_level` only goes up. "Notify" means an audit event plus the overdue
+flag in the queue for the named role. The prototype sends no email or SMS.
+
+### D-025: Imagery request estimate
+The stub records an area (candidate envelope plus 250 m) and a cost at the upper end of the section
+8.1 reseller figures: $26 per sq km archive and $55 tasking. ISRO's cost is left blank. Nothing is
+ordered.
+
+### D-026: More append-only tables
+`legal_checks`, `field_checks` and `officer_records` are append-only, and `alerts` cannot be
+deleted. Corrections are new rows.
 
 ## Defaults changed
