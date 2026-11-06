@@ -32,7 +32,7 @@ def test_engine():
     cfg.attributes["url"] = settings.test_database_url
     command.upgrade(cfg, "head")
 
-    engine = create_engine(settings.test_database_url)
+    engine = create_engine(settings.test_database_url, connect_args={"options": "-c timezone=UTC"})
     yield engine
     engine.dispose()
 

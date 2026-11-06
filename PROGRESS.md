@@ -8,8 +8,8 @@ Read this first at the start of every session, then continue from the first unfi
 | Milestone | Status | Tests | Commit |
 |---|---|---|---|
 | M0 Scaffold | Done | 1 passed | M0 commit |
-| M1 Assets and boundaries | In progress | | |
-| M4 Workflow API | Not started | | |
+| M1 Assets and boundaries | Done | API 41 passed, pipeline 4 passed | M1 commit |
+| M4 Workflow API | In progress | | |
 | M5 Desk | Not started | | |
 | M6 Field app | Not started | | |
 | M7 Evidence pack | Not started | | |
@@ -31,10 +31,26 @@ Done-check run on 6 Nov 2026 from empty volumes (`docker compose down -v`, then 
 - Fix made during the check: the database health check now tests TCP. The socket check passed
   during PostGIS's first-run init, so the API started too early and was refused.
 
+## M1 Assets and boundaries: done
+
+- Migration 0002 holds the whole section 7 data model with database guards: append-only
+  `boundaries`, `audit_log` and `evidence_packs`; boundary version and supersession checks; the
+  owner-claim gate (invariant 4, database half).
+- Real assets: `lp assets-osm` builds `data/assets.geojson` from one saved Overpass response
+  (DECISIONS.md D-012). `python -m app.seed.real_assets` loaded 11 lakes into the dev database,
+  all `derived`, cohort D, mode WATCH. Reloading reports 11 unchanged.
+- API: `POST /auth/login` (demo accounts only), `GET /assets`, `GET /assets/{id}`,
+  `GET /assets/{id}/boundaries` (all versions, with `in_force`, `superseded_by_id` and
+  `effective_valid_to`), `POST /assets/{id}/boundaries` (admin or nodal officer, always a new version).
+- Tests: API 41 passed, pipeline 4 passed. They cover mode by cohort for all six cohorts,
+  invariant 12 (UPDATE, DELETE, ORM update and TRUNCATE refused), superseded boundary
+  retrievable by date, buffer widths 30 m and 9 m, role checks, and the audit chain catching an edit.
+- On the dev database, `UPDATE boundaries ...` fails with "the table is append-only".
+
 ## Stubbed
 
-Nothing yet.
+- No demo users exist yet, so the API can only be called from tests. They are seeded in M4.
 
 ## Next
 
-M1: assets and boundaries.
+M4: workflow API.

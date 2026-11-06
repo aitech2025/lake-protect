@@ -24,6 +24,7 @@ geo = [
     "pyproj>=3.7,<4",
     "httpx>=0.27,<1",
 ]
+osm = ["httpx>=0.27,<1", "shapely>=2.0.6,<3", "pyproj>=3.7,<4", "pyyaml>=6,<7"]
 dev = ["pytest>=8.3,<9"]
 
 [project.scripts]

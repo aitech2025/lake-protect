@@ -1,0 +1,131 @@
+"""Assets and boundary versions (section 9.5)."""
+from __future__ import annotations
+
+import datetime as dt
+from typing import Literal
+
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, ConfigDict
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
+from app.audit import chain
+from app.db import db_guard, get_db
+from app.enums import BoundaryStatus, Role
+from app.models import Asset, User
+from app.rules import config as rules
+from app.security import current_user, require_roles
+from app.services import boundaries as bsvc
+
+router = APIRouter(tags=["assets"])
+
+_LIST_SQL = text(
+    """
+    SELECT a.id, a.asset_key, a.name, a.name_te, a.type::text AS type, a.cohort::text AS cohort,
+           a.district, a.mandal, a.village, a.survey_numbers, a.area_acres, a.custodian_agency,
+           a.has_cctv, a.baseline_date, a.is_demo, a.notes,
+           b.id AS boundary_id, b.version AS boundary_version, b.kind::text AS boundary_kind,
+           b.status::text AS boundary_status, b.source_name AS boundary_source,
+           ST_AsGeoJSON(b.geom)::json AS geometry
+    FROM assets a
+    LEFT JOIN LATERAL (
+        SELECT bv.* FROM boundary_versions bv
+        WHERE bv.asset_id = a.id AND bv.kind IN ('ftl', 'parcel')
+          AND bv.valid_from <= CURRENT_DATE
+          AND (bv.effective_valid_to IS NULL OR bv.effective_valid_to > CURRENT_DATE)
+        ORDER BY bv.version DESC LIMIT 1
+    ) b ON true
+    WHERE (CAST(:area_user AS bigint) IS NULL
+           OR ST_Intersects(b.geom, (SELECT u.area_geom FROM users u WHERE u.id = CAST(:area_user AS bigint))))
+      AND (CAST(:asset_id AS bigint) IS NULL OR a.id = CAST(:asset_id AS bigint))
+    ORDER BY a.is_demo DESC, a.name
+    """
+)
+
+
+def _feature(row: dict) -> dict:
+    props = {k: v for k, v in row.items() if k != "geometry"}
+    props["mode"] = rules.mode_for_cohort(row["cohort"]).value
+    props["boundary_confirmed"] = bool(row["boundary_status"]) and rules.is_confirmed_status(row["boundary_status"])
+    props["area_acres"] = float(row["area_acres"]) if row["area_acres"] is not None else None
+    return {"type": "Feature", "id": row["id"], "geometry": row["geometry"], "properties": props}
+
+
+def _area_user(user: User) -> int | None:
+    # Field officers see only their area (section 10).
+    return user.id if user.role == Role.field_officer.value else None
+
+
+@router.get("/assets")
+def list_assets(user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    rows = db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": None}).mappings().all()
+    chain.record(db, actor_id=user.id, action="view.assets", entity="asset", details={"count": len(rows)})
+    db.commit()
+    return {"type": "FeatureCollection", "features": [_feature(dict(r)) for r in rows]}
+
+
+@router.get("/assets/{asset_id}")
+def get_asset(asset_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    row = db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": asset_id}).mappings().first()
+    if row is None:
+        raise HTTPException(404, "Asset not found")
+    chain.record(db, actor_id=user.id, action="view.asset", entity="asset", entity_id=asset_id)
+    db.commit()
+    return _feature(dict(row))
+
+
+@router.get("/assets/{asset_id}/boundaries")
+def list_boundaries(asset_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    if db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": asset_id}).first() is None:
+        raise HTTPException(404, "Asset not found")
+    versions = bsvc.all_versions(db, asset_id)
+    current = {r["id"] for r in bsvc.current_boundary_set(db, asset_id).values()}
+    features = []
+    for v in versions:
+        props = {k: val for k, val in v.items() if k != "geometry"}
+        props["in_force"] = v["id"] in current
+        props["area_sq_m"] = float(v["area_sq_m"])
+        features.append({"type": "Feature", "id": v["id"], "geometry": v["geometry"], "properties": props})
+    chain.record(db, actor_id=user.id, action="view.boundaries", entity="asset", entity_id=asset_id)
+    db.commit()
+    return {"type": "FeatureCollection", "asset_id": asset_id, "features": features}
+
+
+class BoundaryIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    kind: Literal["ftl", "parcel"]
+    status: BoundaryStatus
+    geometry: dict
+    source_name: str
+    source_url: str | None = None
+    source_date: dt.date | None = None
+    notification_ref: str | None = None
+    certified_by: str | None = None
+    valid_from: dt.date | None = None
+
+
+@router.post("/assets/{asset_id}/boundaries", status_code=201)
+def add_boundary(
+    asset_id: int,
+    body: BoundaryIn,
+    user: User = Depends(require_roles(Role.admin, Role.nodal_officer)),
+    db: Session = Depends(get_db),
+) -> dict:
+    """New version, never an update."""
+    asset = db.get(Asset, asset_id)
+    if asset is None:
+        raise HTTPException(404, "Asset not found")
+    if not body.source_name.strip():
+        raise HTTPException(422, "Every boundary needs its source")
+    with db_guard(db):
+        try:
+            rows = bsvc.add_version(db, asset, actor_id=user.id, **body.model_dump(mode="python") | {"status": body.status.value})
+        except bsvc.BoundaryError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        db.commit()
+    return {
+        "asset_id": asset_id,
+        "cohort": asset.cohort,
+        "version": rows[0].version,
+        "boundaries": [{"id": r.id, "kind": r.kind, "version": r.version, "status": r.status, "sha256": r.sha256} for r in rows],
+    }

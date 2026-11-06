@@ -1,0 +1,78 @@
+# Rule configuration. Every legal check and priority score stores `rule_version`.
+# Change any value here only with a new rule_version. Values marked "proposed" are starting
+# values from CONTEXT.md, to agree with HYDRAA or to be confirmed by counsel before real use.
+rule_version: rules-v0
+
+# Section 6.1
+mode_by_cohort:
+  A_RECOVERED: ACTION
+  B_FINAL: ACTION
+  C_PRELIM: VERIFY
+  D_UNNOTIFIED: WATCH
+  E_AGENCY: ACTION
+  F_REVENUE: WATCH
+
+cohort_by_boundary_status:
+  physically_marked: A_RECOVERED
+  final_notification: B_FINAL
+  preliminary_notification: C_PRELIM
+  derived: D_UNNOTIFIED
+  surveyed_agency: E_AGENCY
+  survey_number_only: F_REVENUE
+
+# Rule 2: only these statuses can lead to action (WITH_OFFICER).
+confirmed_boundary_statuses: [physically_marked, final_notification, surveyed_agency]
+
+# Section 4, buffer widths in metres from the FTL or defined boundary. Counsel to confirm.
+buffer_widths_m:
+  river: 50
+  lake_10ha_or_more: 30
+  lake_under_10ha: 9
+  shikam: 9
+  drain_over_10m: 9
+  drain_up_to_10m: 2
+lake_size_threshold_ha: 10
+
+# Section 8.3
+watch_ring_m: 100
+
+# Section 6.7. HYDRAA said "July 2024"; the exact date is unconfirmed.
+policy_cutoff_date: "2024-07-19"
+
+# Court case statuses treated as a live matter (section 6.1, HOLD_LEGAL).
+live_court_statuses: [pending, interim_order, stay, undertaking]
+
+# Section 6.4, proposed starting weights.
+priority:
+  weights: {stage: 0.35, area: 0.25, growth: 0.20, cohort: 0.20}
+  stage:
+    soil_dumped: 1.0
+    land_levelled: 1.0
+    sheds_fences: 1.0
+    building_rises: 0.8
+    occupied: 0.2
+  # A, B and C come from section 6.4. D, E and F are not given there (DECISIONS.md D-013).
+  cohort:
+    A_RECOVERED: 1.0
+    B_FINAL: 0.9
+    C_PRELIM: 0.5
+    D_UNNOTIFIED: 0.0
+    E_AGENCY: 0.9
+    F_REVENUE: 0.0
+  # Used when a candidate has no stage estimate.
+  default_stage_factor: 1.0
+
+# Section 6.6, proposed defaults. Monsoon is June to September.
+timers_days:
+  TRIAGE: 3
+  ASSIGNED: 7
+  ASSIGNED_MONSOON: 14
+  FIELD_CONFIRMED: 7
+  WITH_OFFICER: 30
+monsoon_months: [6, 7, 8, 9]
+
+# Section 9.2: warn, do not block, beyond this distance.
+field_distance_warning_m: 50
+
+# Section 8.4
+min_candidate_area_sq_m: 1000

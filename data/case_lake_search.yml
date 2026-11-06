@@ -1,0 +1,51 @@
+# Name patterns used to find OpenStreetMap water polygons for the lakes named in CONTEXT.md
+# section 13. These are spelling variants only. A match tells us a real OSM polygon carries a
+# similar name. It does NOT confirm that the polygon is the lake in the press report: that is
+# checked against the source when the case is confirmed in M3.
+#
+# Patterns are regular expressions over a normalised name: lower case, with every run of
+# non-letters replaced by one space.
+bbox: [78.22, 17.20, 78.72, 17.62]   # approximate ORR area, CONTEXT.md section 8.3
+lakes:
+  - case: Nalla Cheruvu
+    patterns: ['\bnalla ?cheru']
+  - case: Durgam Cheruvu
+    patterns: ['\bdurgam']
+  - case: Bum-Rukn-ud-Daula
+    patterns: ['\bbum\b.*\bruk', 'rukn ?u?d? ?d[ao]u?w?la']
+  - case: Bathukamma Kunta
+    patterns: ['\bbath?ukamma']
+  - case: Thammidikunta
+    patterns: ['\btham+idi']
+  - case: Pedda Cheruvu
+    patterns: ['\bpedda ?cheru']
+  - case: Sunnam Cheruvu
+    patterns: ['\bsun+am']
+  - case: Mallampet Cheruvu
+    patterns: ['\bmal+ampet']
+  - case: Dundigal Kotwa pond
+    patterns: ['\bkotwa', '\bdundigal']
+  - case: Komati Kunta
+    patterns: ['\bkomati']
+  - case: Mushkin Cheruvu
+    patterns: ['\bmus?h?kin']
+  - case: Bhagirathamma tank
+    patterns: ['\bbhagirath']
+  - case: Tautanikunta
+    patterns: ['\bt[ao]u?tani']
+  - case: Puppalaguda tank
+    patterns: ['\bpup+alagud']
+  - case: Budwel tank
+    patterns: ['\bbudwel', '\bbudvel']
+  - case: Pedda Amberpet tank
+    patterns: ['\bpedda ?amberpet', '\bamberpet']
+  - case: Devaryamjal tank
+    patterns: ['\bdevar[iy]?a?y?amjal', '\bdevaryam']
+  - case: Pupplagunda tank
+    patterns: ['\bpup+lagund']
+  - case: Boduppal tank
+    patterns: ['\bbodup+al']
+  - case: Thumkunta tank
+    patterns: ['\bthum+ ?kunta', '\bthumkunta']
+  - case: Miyapur water body
+    patterns: ['\bmiyapur']
