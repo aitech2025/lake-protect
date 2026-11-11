@@ -160,15 +160,23 @@ def _new_alert(db: Session, candidate: Candidate, asset: Asset, at: dt.datetime)
 
 def _persist_platform_intelligence(db: Session, candidate: Candidate, asset: Asset, primary: dict, obs: list[Observation]) -> None:
     """Join the lake workflow to canonical platform identity and immutable triage provenance."""
-    platform_asset_id = db.scalar(
-        text("SELECT id FROM public_assets WHERE legacy_asset_id = :legacy_id"),
-        {"legacy_id": asset.id},
-    )
+    platform_asset_id = db.execute(text("""
+      INSERT INTO public_assets
+        (asset_code, display_name, category_code, legacy_asset_id, baseline_date,
+         source_authority, source_record_ref)
+      SELECT 'LEGACY-' || a.id::text, a.name, a.type::text, a.id, a.baseline_date,
+             'DERIVED', 'legacy:assets:' || a.id::text
+      FROM assets a WHERE a.id = :legacy_id
+      ON CONFLICT (legacy_asset_id) DO NOTHING
+      RETURNING id
+    """), {"legacy_id": asset.id}).scalar_one_or_none()
     if platform_asset_id is None:
-        raise IngestRefused(
-            "Canonical platform asset mapping is missing. Reconcile the asset registry before ingest.",
-            503,
+        platform_asset_id = db.scalar(
+            text("SELECT id FROM public_assets WHERE legacy_asset_id = :legacy_id"),
+            {"legacy_id": asset.id},
         )
+    if platform_asset_id is None:
+        raise IngestRefused("Legacy asset could not be reconciled to a canonical platform identity.", 503)
 
     db.execute(text("""
       INSERT INTO candidate_asset_links

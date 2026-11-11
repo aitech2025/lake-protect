@@ -34,6 +34,8 @@ jobs:
       LP_PIPELINE_TOKEN: ci-only-pipeline-token
       LP_DB_POOL_SIZE: 3
       LP_DB_MAX_OVERFLOW: 2
+      LP_DATA_DIR: ${{ github.workspace }}/data
+      LP_REPO_DIR: ${{ github.workspace }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -65,7 +67,7 @@ jobs:
           cache-dependency-path: pipeline/pyproject.toml
       - name: Install pipeline test dependencies
         working-directory: pipeline
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,osm]"
       - name: Run pipeline tests
         working-directory: pipeline
         run: pytest -q

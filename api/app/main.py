@@ -25,4 +25,6 @@ def readiness(db: Session = Depends(get_db)) -> dict:
 
 @app.get("/health")
 def health(db: Session = Depends(get_db)) -> dict:
-    return readiness(db)
+    result = readiness(db)
+    result["status"] = "ok"
+    return result

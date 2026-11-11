@@ -93,6 +93,8 @@ def upgrade():
       ));
     CREATE POLICY public_assets_admin_write ON public_assets FOR ALL
       USING (lp_is_platform_admin()) WITH CHECK (lp_is_platform_admin());
+    CREATE POLICY public_assets_pipeline_legacy_insert ON public_assets FOR INSERT
+      WITH CHECK (lp_is_pipeline_ingest() AND source_authority = 'DERIVED' AND legacy_asset_id IS NOT NULL);
 
     ALTER TABLE asset_responsibilities ENABLE ROW LEVEL SECURITY;
     ALTER TABLE asset_responsibilities FORCE ROW LEVEL SECURITY;
