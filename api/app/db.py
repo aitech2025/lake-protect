@@ -1,18 +1,25 @@
-"""Database engine and session dependency."""
+"""Bounded SQLAlchemy pool and transaction-scoped database sessions."""
 from collections.abc import Iterator
 from contextlib import contextmanager
-
 from fastapi import HTTPException
 from sqlalchemy import create_engine
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session, sessionmaker
-
 from app.config import settings
 
-# All timestamps are handled in UTC, so audit hashes are stable.
-engine = create_engine(settings.database_url, pool_pre_ping=True, connect_args={"options": "-c timezone=UTC"})
+engine = create_engine(
+    settings.database_url,
+    pool_pre_ping=True,
+    pool_size=settings.db_pool_size,
+    max_overflow=settings.db_max_overflow,
+    pool_timeout=settings.db_pool_timeout_seconds,
+    pool_recycle=settings.db_pool_recycle_seconds,
+    connect_args={
+        "options": f"-c timezone=UTC -c statement_timeout={settings.db_statement_timeout_ms}",
+        "application_name": "lake-protect-api",
+    },
+)
 SessionLocal = sessionmaker(bind=engine, expire_on_commit=False)
-
 
 def get_db() -> Iterator[Session]:
     session = SessionLocal()
@@ -24,16 +31,12 @@ def get_db() -> Iterator[Session]:
     finally:
         session.close()
 
-
-# SQLSTATE codes raised by our guard triggers and constraints. Messages from our own triggers are
-# shown as written; generic constraint messages are replaced with plain wording (section 6.8).
 _OWN_MESSAGE = {"23514", "23001"}
 _PLAIN = {"23505": "This record already exists.", "23503": "This refers to a record that does not exist."}
 
-
 @contextmanager
 def db_guard(db: Session):
-    """Turn a database guard (trigger or constraint) into HTTP 409 and roll the session back."""
+    """Map expected integrity/immutability guards to HTTP 409; preserve unexpected errors."""
     try:
         yield
     except DBAPIError as exc:

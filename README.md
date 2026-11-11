@@ -49,3 +49,8 @@ Remove-Item Env:COMPOSE_FILE; docker compose -f docker-compose.yml -f docker-com
 
 Keep `node_modules`, virtual environments and the imagery cache outside this OneDrive folder. The
 containers use named volumes, and the pipeline venv is at `C:\lp-cache\venv`.
+
+
+## Statewide platform evolution
+
+The statewide architecture and additive implementation increments are documented in [the architecture index](docs/architecture/README.md). The original lake workflow remains the operational pilot while canonical public-asset identity, department scope, provenance and ML governance are integrated incrementally. See [implementation foundation](docs/architecture/08-implementation-foundation.md) and [unified platform integration](docs/architecture/09-unified-platform-integration.md). This repository is not production-certified: review the explicit go-live gates before handling live government records.

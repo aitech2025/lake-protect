@@ -11,8 +11,14 @@ Order matters:
 from __future__ import annotations
 
 import base64
+import binascii
 import datetime as dt
 import hashlib
+import json
+import uuid
+
+from lake_protect.intelligence.features import CandidateFeatures
+from lake_protect.intelligence.triage import baseline_triage
 
 from geoalchemy2.elements import WKTElement
 from pydantic import BaseModel, ConfigDict, Field
@@ -41,14 +47,14 @@ class IngestRefused(Exception):
 
 class ObservationIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    sensor: str
-    scene_id: str
+    sensor: str = Field(min_length=2, max_length=40)
+    scene_id: str = Field(min_length=2, max_length=200)
     acquired_at: dt.datetime
-    cloud_pct: float | None = None
-    stac_href: str | None = None
-    processing_version: str | None = None
-    licence_notice: str
-    sha256: str | None = None
+    cloud_pct: float | None = Field(default=None, ge=0, le=100)
+    stac_href: str | None = Field(default=None, max_length=2048)
+    processing_version: str | None = Field(default=None, max_length=100)
+    licence_notice: str = Field(min_length=2, max_length=500)
+    sha256: str | None = Field(default=None, min_length=64, max_length=64, pattern=r"^[a-fA-F0-9]{64}$")
 
 
 class CandidateIn(BaseModel):
@@ -61,20 +67,23 @@ class CandidateIn(BaseModel):
     stage_estimate: Stage | None = None
     last_clear_at: dt.date | None = None
     first_changed_at: dt.date
-    observations: list[ObservationIn] = Field(min_length=1)
+    observations: list[ObservationIn] = Field(min_length=1, max_length=100)
     sensor_basis: SensorBasis
     confidence: float = Field(ge=0, le=1)
-    rule_version: str
-    flags: list[str] = []
+    rule_version: str = Field(min_length=1, max_length=100)
+    flags: list[str] = Field(default_factory=list, max_length=100)
     area_growth: float | None = None
-    before_chip_png_b64: str | None = None
-    after_chip_png_b64: str | None = None
+    before_chip_png_b64: str | None = Field(default=None, max_length=7_000_000)
+    after_chip_png_b64: str | None = Field(default=None, max_length=7_000_000)
 
 
 def _store_chip(asset: Asset, kind: str, b64: str | None) -> str | None:
     if not b64:
         return None
-    data = base64.b64decode(b64)
+    try:
+        data = base64.b64decode(b64, validate=True)
+    except (binascii.Error, ValueError) as exc:
+        raise IngestRefused("Image chips must be valid base64-encoded PNG files") from exc
     if not data.startswith(b"\x89PNG"):
         raise IngestRefused("Image chips must be PNG")
     digest = hashlib.sha256(data).hexdigest()
@@ -149,6 +158,110 @@ def _new_alert(db: Session, candidate: Candidate, asset: Asset, at: dt.datetime)
     return alert
 
 
+def _persist_platform_intelligence(db: Session, candidate: Candidate, asset: Asset, primary: dict, obs: list[Observation]) -> None:
+    """Join the lake workflow to canonical platform identity and immutable triage provenance."""
+    platform_asset_id = db.execute(text("""
+      INSERT INTO public_assets
+        (asset_code, display_name, category_code, legacy_asset_id, baseline_date,
+         source_authority, source_record_ref)
+      SELECT 'LEGACY-' || a.id::text, a.name, a.type::text, a.id, a.baseline_date,
+             'DERIVED', 'legacy:assets:' || a.id::text
+      FROM assets a WHERE a.id = :legacy_id
+      ON CONFLICT (legacy_asset_id) DO NOTHING
+      RETURNING id
+    """), {"legacy_id": asset.id}).scalar_one_or_none()
+    if platform_asset_id is None:
+        platform_asset_id = db.scalar(
+            text("SELECT id FROM public_assets WHERE legacy_asset_id = :legacy_id"),
+            {"legacy_id": asset.id},
+        )
+    if platform_asset_id is None:
+        raise IngestRefused("Legacy asset could not be reconciled to a canonical platform identity.", 503)
+
+    db.execute(text("""
+      INSERT INTO candidate_asset_links
+        (legacy_candidate_id, platform_asset_id, boundary_id, spatial_relation, overlap_area_sq_m)
+      SELECT c.id, :platform_asset_id, c.boundary_id,
+             CASE WHEN ST_Intersects(c.geom, b.geom) THEN 'INTERSECTS_BOUNDARY'
+                  ELSE 'OUTSIDE_BOUNDARY' END,
+             CASE WHEN ST_Intersects(c.geom, b.geom)
+                  THEN ST_Area(ST_Transform(ST_Intersection(c.geom, b.geom), 32644))
+                  ELSE 0 END
+      FROM candidates c JOIN boundaries b ON b.id = c.boundary_id
+      WHERE c.id = :candidate_id
+      ON CONFLICT DO NOTHING
+    """), {"platform_asset_id": str(platform_asset_id), "candidate_id": candidate.id})
+
+    times = sorted(o.acquired_at for o in obs)
+    gap_days = max(0.0, (times[-1] - times[0]).total_seconds() / 86400.0)
+    sensor_agreement = {
+        SensorBasis.optical_and_radar.value: 1.0,
+        SensorBasis.optical_only.value: 0.65,
+        SensorBasis.radar_only.value: 0.65,
+    }[candidate.sensor_basis]
+    boundary_quality = {
+        "physically_marked": 1.0,
+        "final_notification": 1.0,
+        "surveyed_agency": 0.85,
+        "preliminary_notification": 0.70,
+        "survey_number_only": 0.55,
+        "derived": 0.40,
+    }.get(str(primary["status"]), 0.40)
+    preventability = {
+        Stage.soil_dumped.value: 1.0,
+        Stage.land_levelled.value: 0.80,
+        Stage.sheds_fences.value: 0.55,
+        Stage.building_rises.value: 0.25,
+        Stage.occupied.value: 0.10,
+    }.get(candidate.stage_estimate, 0.50)
+
+    features = CandidateFeatures(
+        area_sq_m=float(candidate.area_sq_m),
+        area_growth=float(candidate.area_growth or 0),
+        persistence_count=len({o.scene_id for o in obs}),
+        observation_gap_days=gap_days,
+        sensor_agreement=sensor_agreement,
+        boundary_quality=boundary_quality,
+        stage_preventability=preventability,
+    )
+    result = baseline_triage(features)
+    db.execute(text("""
+      INSERT INTO candidate_predictions
+        (candidate_id, score_type, score, model_name, model_version,
+         feature_schema_version, features, factors, disclaimer)
+      VALUES (:candidate_id, 'REVIEW_PRIORITY', :score, :model_name, :model_version,
+              :feature_schema_version, CAST(:features AS jsonb), CAST(:factors AS jsonb), :disclaimer)
+      ON CONFLICT (candidate_id, model_name, model_version) DO NOTHING
+    """), {
+        "candidate_id": candidate.id,
+        "score": result.score,
+        "model_name": result.method,
+        "model_version": result.model_version,
+        "feature_schema_version": result.feature_schema_version,
+        "features": json.dumps(features.to_dict()),
+        "factors": json.dumps(result.factors),
+        "disclaimer": result.disclaimer,
+    })
+
+    correlation_id = str(uuid.uuid4())
+    db.execute(text("""
+      INSERT INTO outbox_events
+        (event_type, aggregate_type, aggregate_id, correlation_id, payload)
+      VALUES ('candidate.detected', 'candidate', :aggregate_id, :correlation_id, CAST(:payload AS jsonb))
+    """), {
+        "aggregate_id": str(candidate.id),
+        "correlation_id": correlation_id,
+        "payload": json.dumps({
+            "candidate_id": candidate.id,
+            "legacy_asset_id": asset.id,
+            "platform_asset_id": str(platform_asset_id),
+            "boundary_id": candidate.boundary_id,
+            "review_priority_score": result.score,
+            "model_version": result.model_version,
+        }),
+    })
+
+
 def ingest(db: Session, body: CandidateIn, *, at: dt.datetime | None = None) -> dict:
     at = as_utc(at)
     if body.change_type == ChangeType.water_loss:
@@ -192,6 +305,7 @@ def ingest(db: Session, body: CandidateIn, *, at: dt.datetime | None = None) -> 
     )
     db.add(candidate)
     db.flush()
+    _persist_platform_intelligence(db, candidate, asset, primary, obs)
     check, decision = legal_check.run(db, candidate, asset, at)
 
     if decision.result.value in sm.SYSTEM_CLOSURES:
