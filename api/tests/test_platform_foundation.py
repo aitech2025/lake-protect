@@ -26,7 +26,10 @@ def test_rls_is_enabled_and_forced_on_department_scoped_tables(db):
       WHERE n.nspname='public' AND c.relname = ANY(:names)
     """), {"names": ["departments", "public_assets", "asset_responsibilities",
                      "asset_parcels", "asset_admin_links", "land_parcels",
-                     "candidate_asset_links", "candidate_predictions", "candidate_ingest_requests", "user_department_access", "ingestion_batches", "source_records", "satellite_scenes", "processing_runs", "ml_model_versions", "ml_evaluations", "outbox_events"]}).all()
+                     "candidate_asset_links", "candidate_predictions", "candidate_ingest_requests",
+                     "user_department_access", "ingestion_batches", "source_records",
+                     "satellite_scenes", "processing_runs", "ml_model_versions",
+                     "ml_evaluations", "outbox_events"]}).all()
     assert len(rows) == 17
     assert all(row.relrowsecurity and row.relforcerowsecurity for row in rows)
 
@@ -60,3 +63,18 @@ def test_department_membership_can_be_revoked_on_its_start_date(db):
       WHERE user_id=:user_id AND valid_to > CURRENT_DATE
     """), {"user_id": user_id})
     assert active == 0
+
+
+def test_outbox_dispatch_has_lease_and_retry_fields(db):
+    columns = db.execute(text("""
+      SELECT column_name FROM information_schema.columns
+      WHERE table_schema='public' AND table_name='outbox_events'
+    """)).scalars().all()
+    assert {"next_attempt_at","claimed_by","claimed_at","dead_lettered_at"}.issubset(set(columns))
+    policies = db.execute(text("""
+      SELECT policyname FROM pg_policies
+      WHERE schemaname='public' AND tablename='outbox_events'
+    """)).scalars().all()
+    assert {"outbox_events_worker_read","outbox_events_worker_update"}.issubset(set(policies))
+    db.execute(text("SELECT set_config('lp.outbox_worker','true',true)"))
+    assert db.scalar(text("SELECT lp_is_outbox_worker()")) is True
