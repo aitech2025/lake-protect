@@ -23,9 +23,11 @@ The baseline score is a queue-ordering heuristic, not a probability of encroachm
 
 ## Operational limitations and go-live gates
 - No production identity provider/SSO or MFA adapter is included yet.
-- No durable outbox publisher, retry/dead-letter consumer or orchestration service is included yet.
-- No STAC API/pgSTAC deployment, COG object-store adapter or complete Sentinel-1/2 processing pipeline is included yet.
-- The existing local disk object store is suitable for development only; production requires approved S3-compatible/object storage and retention controls.
+- A durable outbox webhook dispatcher with leases, idempotency keys, bounded retries and dead-letter state is now implemented; production still needs a real consumer, alerting and replay tooling.
+- An S3-compatible object-store adapter is implemented; STAC API/pgSTAC deployment, COG scene cataloguing and the complete Sentinel-1/2 processing pipeline remain outstanding.
+- Local disk remains the development default. Production must configure private S3-compatible storage, encryption, versioning, lifecycle/retention, replication and restore policies.
 - RLS tests must run using a non-owner, non-superuser application role. The existing test harness's administrative database connection cannot prove isolation by itself.
 - Validate migration 0005 forward and rollback on a restored PostGIS database; run API, pipeline and browser test suites; execute cross-department negative tests using the non-owner `lakeprotect_app` role; load-test spatial queries; test backups/restores and failover before deployment.
 - Configure bounded SQLAlchemy connection-pool settings (`LP_DB_POOL_*`) from measured concurrency and database capacity; monitor pool wait time and saturation.
+
+See [Production storage and event delivery](10-production-storage-and-events.md) for the S3 adapter and outbox dispatch design.

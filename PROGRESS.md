@@ -223,3 +223,8 @@ no-look-ahead test, invariant 10), then M3.
 ## Current implementation increment (2026-11-11)
 
 The statewide architecture and first integration foundation are merged. The next hardening increment is maintained on a feature branch and adds department-scoped RLS, transaction-local authorization context, candidate prediction provenance, idempotent pipeline ingest, candidate-to-canonical-asset linking, audit events for platform administration, bounded database connection pools, and CI integration-test workflows. It is not yet merged or runtime-validated. The M2/M3 Sentinel-1/2 detection and independent backtest remain incomplete; see docs/architecture/09-unified-platform-integration.md for production gates.
+
+
+## Production integration increment (2026-11-11)
+
+The S3-compatible object-store adapter and durable outbox webhook dispatcher are implemented on a follow-up branch. The adapter supports SHA-256 metadata, optional KMS encryption, byte-range reads and pre-signed GET URLs. The dispatcher claims events with leases, publishes outside database transactions, uses stable idempotency keys, retries with bounded backoff and dead-letters exhausted deliveries. See docs/architecture/10-production-storage-and-events.md. Bucket configuration, real consumer contract tests and production geospatial processing remain go-live gates.
