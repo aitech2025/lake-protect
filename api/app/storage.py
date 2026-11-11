@@ -139,10 +139,10 @@ def create_store(config=settings) -> ObjectStore:
     from botocore.config import Config
     client = boto3.client(
         "s3",
-        endpoint_url=config.s3_endpoint_url,
-        region_name=config.s3_region,
-        aws_access_key_id=config.s3_access_key_id,
-        aws_secret_access_key=config.s3_secret_access_key,
+        endpoint_url=config.s3_endpoint_url or None,
+        region_name=config.s3_region or None,
+        aws_access_key_id=config.s3_access_key_id or None,
+        aws_secret_access_key=config.s3_secret_access_key or None,
         config=Config(
             signature_version="s3v4",
             s3={"addressing_style": "path"},
