@@ -65,7 +65,7 @@ export function FieldApp() {
   };
 
   return (
-    <div className="field" data-testid="field-app">
+    <div className="field-app" data-testid="field-app">
       <DemoBand />
       <header className="f-head">
         <div>

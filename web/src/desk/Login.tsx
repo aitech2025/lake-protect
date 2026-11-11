@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { api, type User } from "../api";
 import { homeFor, useAuth } from "../auth";
+import { usePageTitle } from "../components/Bits";
 import { Mark } from "../components/Layout";
 import { DemoBand, useDemoOnScreen } from "../demo";
 
@@ -13,6 +14,7 @@ export function Login() {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
   useDemoOnScreen(users.length > 0);
+  usePageTitle(t("login.title"));
 
   useEffect(() => {
     api<User[]>("/auth/demo-users").then(setUsers).catch((e: Error) => setError(e.message));

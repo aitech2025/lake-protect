@@ -1,0 +1,178 @@
+{
+ "filterLabel": {
+  "labelBg": "rgb(255, 255, 255)",
+  "labelBox": {
+   "x": 1018.21875,
+   "y": 59.28125,
+   "width": 165.59375,
+   "height": 61.875,
+   "top": 59.28125,
+   "right": 1183.8125,
+   "bottom": 121.15625,
+   "left": 1018.21875
+  },
+  "selectBox": {
+   "x": 1018.21875,
+   "y": 82.78125,
+   "width": 165.59375,
+   "height": 38.375,
+   "top": 82.78125,
+   "right": 1183.8125,
+   "bottom": 121.15625,
+   "left": 1018.21875
+  },
+  "selectBg": "rgb(255, 255, 255)",
+  "colorScheme": "normal"
+ },
+ "bracket1440": [
+  {
+   "text": "Last clear 18 Oct 2026",
+   "left": 617,
+   "rightOverPanel": -76,
+   "top": 707
+  },
+  {
+   "text": "First changed 23 Oct 2026",
+   "left": 692,
+   "rightOverPanel": 2,
+   "top": 707
+  },
+  {
+   "text": "Watching since 6 Nov 2025",
+   "left": 383,
+   "rightOverPanel": -298,
+   "top": 761
+  },
+  {
+   "text": "Policy cut-off 19 Jul 2024",
+   "left": 28,
+   "rightOverPanel": -665,
+   "top": 761
+  },
+  {
+   "text": "Alert raised 4 Nov 2026",
+   "left": 668,
+   "rightOverPanel": -30,
+   "top": 761
+  }
+ ],
+ "bracket1280": [
+  {
+   "text": "Last clear 18 Oct 2026",
+   "left": 468,
+   "rightOverPanel": -65,
+   "top": 627
+  },
+  {
+   "text": "First changed 23 Oct 2026",
+   "left": 542,
+   "rightOverPanel": 12,
+   "top": 627
+  },
+  {
+   "text": "Watching since 6 Nov 2025",
+   "left": 294,
+   "rightOverPanel": -227,
+   "top": 681
+  },
+  {
+   "text": "Policy cut-off 19 Jul 2024",
+   "left": 19,
+   "rightOverPanel": -514,
+   "top": 681
+  },
+  {
+   "text": "Alert raised 4 Nov 2026",
+   "left": 516,
+   "rightOverPanel": -22,
+   "top": 681
+  }
+ ],
+ "bracket1024": [
+  {
+   "text": "Last clear 18 Oct 2026",
+   "left": 606,
+   "rightOverPanel": -75,
+   "top": 701
+  },
+  {
+   "text": "First changed 23 Oct 2026",
+   "left": 680,
+   "rightOverPanel": 2,
+   "top": 701
+  },
+  {
+   "text": "Watching since 6 Nov 2025",
+   "left": 376,
+   "rightOverPanel": -293,
+   "top": 755
+  },
+  {
+   "text": "Policy cut-off 19 Jul 2024",
+   "left": 27,
+   "rightOverPanel": -654,
+   "top": 755
+  },
+  {
+   "text": "Alert raised 4 Nov 2026",
+   "left": 656,
+   "rightOverPanel": -30,
+   "top": 755
+  }
+ ],
+ "legalOverflow1440": {
+  "mainOverflow": 0,
+  "checklistRowWidth": 727,
+  "asideWidth": 380
+ },
+ "legalOverflow1280": {
+  "mainOverflow": 0,
+  "checklistRowWidth": 567,
+  "asideWidth": 380
+ },
+ "legalOverflow1100": {
+  "mainOverflow": 0,
+  "checklistRowWidth": 791,
+  "asideWidth": 828
+ },
+ "legalOverflow1024": {
+  "mainOverflow": 0,
+  "checklistRowWidth": 715,
+  "asideWidth": 752
+ },
+ "legalOverflow900": {
+  "mainOverflow": 0,
+  "checklistRowWidth": 591,
+  "asideWidth": 628
+ },
+ "legalOverflow768": {
+  "mainOverflow": 66,
+  "checklistRowWidth": 532,
+  "asideWidth": 570
+ },
+ "legalOverflow390": {
+  "mainOverflow": 216,
+  "checklistRowWidth": 532,
+  "asideWidth": 570
+ },
+ "monthlySvg": {
+  "role": "img",
+  "ariaHidden": null,
+  "ariaLabel": "Map of watched assets",
+  "title": "Demo Cheruvu 1",
+  "shapes": 57
+ },
+ "monthlyLate": [
+  "52 days late",
+  "13 days late",
+  "6 days late",
+  "3 days late",
+  "2 days late",
+  "1 days late"
+ ],
+ "fieldButtons": [
+  "తెలుగు",
+  "Send now",
+  "Demo Cheruvu 9\nSoil fill, 0.93 acre\nOverdue since 24 Oct 2026"
+ ]
+}

@@ -1,0 +1,795 @@
+{
+ "review": {
+  "analyst-en-1440x900": {
+   "mainOverflowX": 0,
+   "decisionTop": 172,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 264,
+   "h1Lines": 1,
+   "actionOrder": [
+    "CONFIRMED",
+    "CLOSED_NOT_REAL"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "Demo Cheruvu 1 · Alerts · Lake Protect"
+  },
+  "analyst-en-1280x720": {
+   "mainOverflowX": 0,
+   "decisionTop": 172,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 264,
+   "h1Lines": 1,
+   "actionOrder": [
+    "CONFIRMED",
+    "CLOSED_NOT_REAL"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "Demo Cheruvu 1 · Alerts · Lake Protect"
+  },
+  "analyst-en-1024x768": {
+   "mainOverflowX": 0,
+   "decisionTop": 172,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 264,
+   "h1Lines": 1,
+   "actionOrder": [
+    "CONFIRMED",
+    "CLOSED_NOT_REAL"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "Demo Cheruvu 1 · Alerts · Lake Protect"
+  },
+  "analyst-en-768x1024": {
+   "mainOverflowX": 0,
+   "decisionTop": 233,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 325,
+   "h1Lines": 1,
+   "actionOrder": [
+    "CONFIRMED",
+    "CLOSED_NOT_REAL"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "Demo Cheruvu 1 · Alerts · Lake Protect"
+  },
+  "analyst-en-390x844": {
+   "mainOverflowX": 0,
+   "decisionTop": 401,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 494,
+   "h1Lines": 1,
+   "actionOrder": [
+    "CONFIRMED",
+    "CLOSED_NOT_REAL"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "Demo Cheruvu 1 · Alerts · Lake Protect"
+  },
+  "analyst-te-1440x900": {
+   "mainOverflowX": 0,
+   "decisionTop": 178,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 276,
+   "h1Lines": 1,
+   "actionOrder": [
+    "CONFIRMED",
+    "CLOSED_NOT_REAL"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "డెమో చెరువు 1 · హెచ్చరికలు · Lake Protect"
+  },
+  "analyst-te-1280x720": {
+   "mainOverflowX": 0,
+   "decisionTop": 178,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 276,
+   "h1Lines": 1,
+   "actionOrder": [
+    "CONFIRMED",
+    "CLOSED_NOT_REAL"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "డెమో చెరువు 1 · హెచ్చరికలు · Lake Protect"
+  },
+  "analyst-te-1024x768": {
+   "mainOverflowX": 0,
+   "decisionTop": 210,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 308,
+   "h1Lines": 1,
+   "actionOrder": [
+    "CONFIRMED",
+    "CLOSED_NOT_REAL"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "డెమో చెరువు 1 · హెచ్చరికలు · Lake Protect"
+  },
+  "analyst-te-768x1024": {
+   "mainOverflowX": 0,
+   "decisionTop": 243,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 341,
+   "h1Lines": 1,
+   "actionOrder": [
+    "CONFIRMED",
+    "CLOSED_NOT_REAL"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "డెమో చెరువు 1 · హెచ్చరికలు · Lake Protect"
+  },
+  "analyst-te-390x844": {
+   "mainOverflowX": 0,
+   "decisionTop": 421,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 519,
+   "h1Lines": 1,
+   "actionOrder": [
+    "CONFIRMED",
+    "CLOSED_NOT_REAL"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "డెమో చెరువు 1 · హెచ్చరికలు · Lake Protect"
+  },
+  "nodal-en-1440x900": {
+   "mainOverflowX": 0,
+   "decisionTop": 172,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 264,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ASSIGNED"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "Demo Cheruvu 4 · Alerts · Lake Protect"
+  },
+  "nodal-en-1280x720": {
+   "mainOverflowX": 0,
+   "decisionTop": 172,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 264,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ASSIGNED"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "Demo Cheruvu 4 · Alerts · Lake Protect"
+  },
+  "nodal-en-1024x768": {
+   "mainOverflowX": 0,
+   "decisionTop": 172,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 264,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ASSIGNED"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "Demo Cheruvu 4 · Alerts · Lake Protect"
+  },
+  "nodal-en-768x1024": {
+   "mainOverflowX": 0,
+   "decisionTop": 202,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 295,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ASSIGNED"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "Demo Cheruvu 4 · Alerts · Lake Protect"
+  },
+  "nodal-en-390x844": {
+   "mainOverflowX": 0,
+   "decisionTop": 425,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 518,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ASSIGNED"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "Demo Cheruvu 4 · Alerts · Lake Protect"
+  },
+  "nodal-te-1440x900": {
+   "mainOverflowX": 0,
+   "decisionTop": 178,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 276,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ASSIGNED"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "డెమో చెరువు 4 · హెచ్చరికలు · Lake Protect"
+  },
+  "nodal-te-1280x720": {
+   "mainOverflowX": 0,
+   "decisionTop": 178,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 276,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ASSIGNED"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "డెమో చెరువు 4 · హెచ్చరికలు · Lake Protect"
+  },
+  "nodal-te-1024x768": {
+   "mainOverflowX": 0,
+   "decisionTop": 178,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 276,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ASSIGNED"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "డెమో చెరువు 4 · హెచ్చరికలు · Lake Protect"
+  },
+  "nodal-te-768x1024": {
+   "mainOverflowX": 0,
+   "decisionTop": 210,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 308,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ASSIGNED"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "డెమో చెరువు 4 · హెచ్చరికలు · Lake Protect"
+  },
+  "nodal-te-390x844": {
+   "mainOverflowX": 0,
+   "decisionTop": 447,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 545,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ASSIGNED"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "డెమో చెరువు 4 · హెచ్చరికలు · Lake Protect"
+  },
+  "legal-en-1440x900": {
+   "mainOverflowX": 0,
+   "decisionTop": 172,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 264,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ACTION_RECORDED",
+    "CLOSED_NO_ACTION"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "Demo Cheruvu 2 · Alerts · Lake Protect"
+  },
+  "legal-en-1280x720": {
+   "mainOverflowX": 0,
+   "decisionTop": 202,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 295,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ACTION_RECORDED",
+    "CLOSED_NO_ACTION"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "Demo Cheruvu 2 · Alerts · Lake Protect"
+  },
+  "legal-en-1024x768": {
+   "mainOverflowX": 0,
+   "decisionTop": 233,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 325,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ACTION_RECORDED",
+    "CLOSED_NO_ACTION"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "Demo Cheruvu 2 · Alerts · Lake Protect"
+  },
+  "legal-en-768x1024": {
+   "mainOverflowX": 0,
+   "decisionTop": 294,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 386,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ACTION_RECORDED",
+    "CLOSED_NO_ACTION"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "Demo Cheruvu 2 · Alerts · Lake Protect"
+  },
+  "legal-en-390x844": {
+   "mainOverflowX": 0,
+   "decisionTop": 455,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 548,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ACTION_RECORDED",
+    "CLOSED_NO_ACTION"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "Demo Cheruvu 2 · Alerts · Lake Protect"
+  },
+  "legal-te-1440x900": {
+   "mainOverflowX": 0,
+   "decisionTop": 210,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 308,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ACTION_RECORDED",
+    "CLOSED_NO_ACTION"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "డెమో చెరువు 2 · హెచ్చరికలు · Lake Protect"
+  },
+  "legal-te-1280x720": {
+   "mainOverflowX": 0,
+   "decisionTop": 210,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 308,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ACTION_RECORDED",
+    "CLOSED_NO_ACTION"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "డెమో చెరువు 2 · హెచ్చరికలు · Lake Protect"
+  },
+  "legal-te-1024x768": {
+   "mainOverflowX": 0,
+   "decisionTop": 243,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 341,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ACTION_RECORDED",
+    "CLOSED_NO_ACTION"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "డెమో చెరువు 2 · హెచ్చరికలు · Lake Protect"
+  },
+  "legal-te-768x1024": {
+   "mainOverflowX": 0,
+   "decisionTop": 309,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 407,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ACTION_RECORDED",
+    "CLOSED_NO_ACTION"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "డెమో చెరువు 2 · హెచ్చరికలు · Lake Protect"
+  },
+  "legal-te-390x844": {
+   "mainOverflowX": 0,
+   "decisionTop": 545,
+   "decisionInFirstScreen": true,
+   "firstActionBottom": 643,
+   "h1Lines": 1,
+   "actionOrder": [
+    "ACTION_RECORDED",
+    "CLOSED_NO_ACTION"
+   ],
+   "headings": [
+    "H1",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2",
+    "H2"
+   ],
+   "bracketEscape": 0,
+   "title": "డెమో చెరువు 2 · హెచ్చరికలు · Lake Protect"
+  }
+ },
+ "focus": {
+  "order": [
+   "Confirm the change",
+   "Close as not real",
+   "Request sharper imagery"
+  ],
+  "afterOpen": "h3 \"Confirm the change\"",
+  "nextTab": "input[input-reviewed] \"\"",
+  "afterCancel": "button[action-CONFIRMED] \"Confirm the change\"",
+  "afterSubmit": "p \"Done\""
+ },
+ "shell": {
+  "queueTitle": "Alerts · Lake Protect",
+  "firstTab": "a \"Skip to content\"",
+  "afterSkip": "main#main \"Alerts 19 alerts. Highest priority first\"",
+  "tabAfterSkip": "select[filter-mode] \"All Full path to officer Field check onl\"",
+  "afterRouteChange": "main#main \"All alerts / DEMO-2026-0005 Demo Cheruvu\"",
+  "detailTitle": "Demo Cheruvu 2 · Alerts · Lake Protect",
+  "narrowAccount": [
+   {
+    "text": "తెలుగు",
+    "visible": true,
+    "h": 33
+   },
+   {
+    "text": "Sign out",
+    "visible": true,
+    "h": 33
+   }
+  ],
+  "at320": {
+   "docOverflow": 0,
+   "mainOverflow": 0,
+   "signOutVisible": true
+  }
+ },
+ "states": {
+  "queueLoading": {
+   "shown": [
+    "loading: Loading…"
+   ],
+   "count": " "
+  },
+  "queueError": [
+   "error: Could not load this page: Simulated server error (audit) Try again"
+  ],
+  "imageLoading": {
+   "shown": [
+    "evidence: Loading image…",
+    "evidence: Loading image…"
+   ],
+   "heights": [
+    415,
+    415
+   ]
+  },
+  "imageLoaded": [
+   415,
+   415
+  ],
+  "imageFailed": {
+   "shown": [
+    "evidence: This image could not be loaded. Try again",
+    "evidence: This image could not be loaded. Try again"
+   ],
+   "heights": [
+    415,
+    415
+   ]
+  },
+  "detail404": [
+   "not-found: This page could not be found. Go to your start page"
+  ],
+  "audit403": {
+   "shown": [
+    "forbidden: Your role cannot open this page. Go to your start page"
+   ],
+   "verifyButton": 0
+  },
+  "assetsError": {
+   "shown": [
+    "Could not load this page: Simulated server error (audit)\n\nTr"
+   ],
+   "count": " "
+  },
+  "recordsPhone": {
+   "mainOverflow": 0,
+   "regionScrolls": true,
+   "regionLabel": "Permits"
+  }
+ }
+}

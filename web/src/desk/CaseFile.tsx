@@ -28,9 +28,9 @@ export function Checklist({ alert, onChange }: { alert: any; onChange: () => voi
   const gaps = alert.readiness.filter((r: any) => r.status === "no").map((r: any) => t(`checklist.${r.item_key}`));
   return (
     <section className="section panel" data-testid="checklist">
-      <h3>{t("detail.checklist_title")}</h3>
+      <h2 className="title-s">{t("detail.checklist_title")}</h2>
       {gaps.length > 0 && <p className="banner warn" style={{ marginTop: "0.6rem" }}>{t("checklist_ui.gaps", { items: gaps.join("; ") })}</p>}
-      <div style={{ display: "grid", gap: "0.6rem", marginTop: "0.75rem" }}>
+      <div className="check-list">
         {alert.readiness.map((r: any) => (
           <ChecklistRow key={r.item_key} alertId={alert.id} row={r} canEdit={Boolean(canEdit)} onChange={onChange} lang={i18n.language} />
         ))}
@@ -53,7 +53,7 @@ function ChecklistRow({ alertId, row, canEdit, onChange, lang }: { alertId: numb
     }
   };
   return (
-    <div style={{ display: "grid", gridTemplateColumns: canEdit ? "1fr 150px 1fr auto" : "120px 1fr", gap: "0.5rem", alignItems: "start", borderBottom: "1px solid #edf0ed", paddingBottom: "0.5rem" }} data-testid={`check-${row.item_key}`}>
+    <div className={`check-row ${canEdit ? "edit" : "read"}`} data-testid={`check-${row.item_key}`}>
       {canEdit ? (
         <>
           <span>
@@ -61,15 +61,15 @@ function ChecklistRow({ alertId, row, canEdit, onChange, lang }: { alertId: numb
             {row.system_hint && <span className="small muted"> ({row.system_hint})</span>}
             {row.checked_by && <div className="small muted">{t("checklist_ui.checked", { name: row.checked_by, date: fmtDateTime(row.checked_at, lang) })}</div>}
           </span>
-          <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label={t(`checklist.${row.item_key}`)}>
+          <select className="control" value={status} onChange={(e) => setStatus(e.target.value)} aria-label={t(`checklist.${row.item_key}`)}>
             <option value="">{t("checklist.unset")}</option>
             <option value="yes">{t("checklist.yes")}</option>
             <option value="no">{t("checklist.no")}</option>
             <option value="not_applicable">{t("checklist.not_applicable")}</option>
           </select>
-          <input value={ref} onChange={(e) => setRef(e.target.value)} placeholder={t("checklist_ui.evidence")} aria-label={t("checklist_ui.evidence")} />
+          <input className="control" value={ref} onChange={(e) => setRef(e.target.value)} placeholder={t("checklist_ui.evidence")} aria-label={t("checklist_ui.evidence")} />
           <button className="btn secondary" onClick={() => void save()} disabled={!status}>{t("checklist_ui.save")}</button>
-          {error && <p className="error small" style={{ gridColumn: "1 / -1" }}>{error}</p>}
+          {error && <p className="error small check-row-error">{error}</p>}
         </>
       ) : (
         <>
@@ -110,7 +110,7 @@ export function CaseFilePanel({ alert, onChange }: { alert: any; onChange: () =>
 
   return (
     <div className="panel" data-testid="case-file">
-      <h3>{t("pack.title")}</h3>
+      <h2 className="title-s">{t("pack.title")}</h2>
       {!ready && <p className="small muted" style={{ marginTop: "0.5rem" }}>{t("pack.needs_field")}</p>}
       {ready && packs.length === 0 && <p className="small muted" style={{ marginTop: "0.5rem" }}>{t("pack.none")}</p>}
       <ul style={{ listStyle: "none", padding: 0, margin: "0.6rem 0", display: "grid", gap: "0.6rem" }}>

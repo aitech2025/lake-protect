@@ -4,7 +4,7 @@
 .figure span { font-weight: 600; }
 .figure small { color: var(--ink-2); }
 .figure.late { border-top-color: var(--buffer); }
-.figure.late b { color: var(--buffer); }
+.figure.late b { color: var(--text-danger); }
 .monthly-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(280px, 2fr); gap: 1.75rem; align-items: start; }
 .monthly-map { margin: 0; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-m); padding: 0.5rem; }
 .monthly-map svg { width: 100%; height: auto; display: block; }

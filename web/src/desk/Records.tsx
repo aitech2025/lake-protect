@@ -3,7 +3,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, fmtDate } from "../api";
 import { useAuth } from "../auth";
-import { useAsync } from "../components/Bits";
+import { useAsync, usePageTitle } from "../components/Bits";
+import { PageState, TableRegion } from "../components/PageState";
 import { DemoTag, useDemoOnScreen } from "../demo";
 
 const KINDS = ["permits", "works", "court-cases"] as const;
@@ -13,8 +14,9 @@ export function Records() {
   const { user } = useAuth();
   const [kind, setKind] = useState<(typeof KINDS)[number]>("permits");
   const [message, setMessage] = useState<string | null>(null);
-  const { data, error, reload } = useAsync(() => api<{ items: any[]; has_demo: boolean }>(`/records/${kind}`), [kind]);
+  const { data, error, status, loading, reload } = useAsync(() => api<{ items: any[]; has_demo: boolean }>(`/records/${kind}`), [kind]);
   useDemoOnScreen(Boolean(data?.has_demo));
+  usePageTitle(t("records.title"));
   const canImport = user && ["admin", "legal_officer"].includes(user.role);
 
   const upload = async (file: File) => {
@@ -50,17 +52,19 @@ export function Records() {
         {KINDS.map((k) => <button key={k} className="chip" aria-pressed={kind === k} onClick={() => setKind(k)}>{t(`records.${k}`)}</button>)}
       </div>
       {message && <p className="banner info" role="status" style={{ marginBottom: "1rem" }}>{message}</p>}
-      {error && <p className="error">{t("error.load", { msg: error })}</p>}
-      {data && data.items.length === 0 && <p className="muted">{t("records.empty")}</p>}
-      {data && data.items.length > 0 && (
-        <table className="grid">
-          <thead><tr>{cols[kind].map(([h]) => <th key={h}>{t(`records.col.${h}`)}</th>)}<th /></tr></thead>
-          <tbody>
-            {data.items.map((r) => (
-              <tr key={r.id}>{cols[kind].map(([h, f]) => <td key={h}>{f(r)}</td>)}<td>{r.is_demo && <DemoTag />}</td></tr>
-            ))}
-          </tbody>
-        </table>
+      <PageState loading={loading && !data} error={error} status={status} onRetry={reload} />
+      {!error && data && data.items.length === 0 && <p className="muted">{t("records.empty")}</p>}
+      {!error && data && data.items.length > 0 && (
+        <TableRegion label={t(`records.${kind}`)}>
+          <table className="grid">
+            <thead><tr>{cols[kind].map(([h]) => <th key={h}>{t(`records.col.${h}`)}</th>)}<th /></tr></thead>
+            <tbody>
+              {data.items.map((r) => (
+                <tr key={r.id}>{cols[kind].map(([h, f]) => <td key={h}>{f(r)}</td>)}<td>{r.is_demo && <DemoTag />}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </TableRegion>
       )}
     </div>
   );

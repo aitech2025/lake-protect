@@ -2,9 +2,10 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { api, fmtDate, type AlertRow } from "../api";
-import { LineSwatch, StatePill, useAsync } from "../components/Bits";
+import { LineSwatch, StatePill, useAsync, usePageTitle } from "../components/Bits";
 import { GROUP_COLOUR, GROUP_OF } from "../components/labels";
 import { MapView, type Pin } from "../components/MapView";
+import { PageState } from "../components/PageState";
 import { useDemoOnScreen } from "../demo";
 
 const GROUPS = ["all", "review", "field", "legal", "officer", "watch", "closed", "overdue"] as const;
@@ -15,8 +16,9 @@ export function Queue() {
   const [group, setGroup] = useState<(typeof GROUPS)[number]>("all");
   const [mode, setMode] = useState("");
   const [cohort, setCohort] = useState("");
-  const { data, error, reload } = useAsync(() => api<{ items: AlertRow[]; has_demo: boolean }>("/alerts"), []);
+  const { data, error, status, reload } = useAsync(() => api<{ items: AlertRow[]; has_demo: boolean }>("/alerts"), []);
   useDemoOnScreen(Boolean(data?.has_demo));
+  usePageTitle(t("queue.title"));
 
   const items = useMemo(() => {
     let rows = data?.items ?? [];
@@ -50,7 +52,8 @@ export function Queue() {
       <div className="page-head">
         <div>
           <h1>{t("queue.title")}</h1>
-          <p className="muted">{t("queue.count", { count: items.length })}. {t("queue.sorted")}.</p>
+          {/* No count until the alerts have arrived: "0 alerts" while loading reads as an empty queue. */}
+          <p className="muted" aria-hidden={!data}>{data ? `${t("queue.count", { count: items.length })}. ${t("queue.sorted")}.` : " "}</p>
         </div>
         <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", alignItems: "flex-end" }}>
           <label className="field">
@@ -76,11 +79,7 @@ export function Queue() {
           </button>
         ))}
       </div>
-      {error && (
-        <p className="error">
-          {t("error.load", { msg: error })} <button className="btn secondary" onClick={reload}>{t("error.retry")}</button>
-        </p>
-      )}
+      <PageState error={error} status={status} onRetry={reload} />
       <div className="queue">
         <div className="mapbox">
           <MapView pins={pins} testId="queue-map" />
@@ -92,6 +91,7 @@ export function Queue() {
           </div>
         </div>
         <div className="list" data-testid="alert-list">
+          <PageState loading={!data && !error} />
           {items.length === 0 && data && <p className="muted" style={{ padding: "1rem" }}>{t("queue.empty")}</p>}
           {items.map((r) => (
             <Link key={r.id} to={`/alerts/${r.id}`} className="row" data-testid={`alert-row-${r.code}`}>

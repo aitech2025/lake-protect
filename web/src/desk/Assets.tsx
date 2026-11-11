@@ -2,8 +2,9 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, fmtDate } from "../api";
-import { BoundarySeal, useAsync } from "../components/Bits";
+import { BoundarySeal, useAsync, usePageTitle } from "../components/Bits";
 import { MapView } from "../components/MapView";
+import { PageState, TableRegion } from "../components/PageState";
 import { DemoTag, useDemoOnScreen } from "../demo";
 
 export function Assets() {
@@ -11,9 +12,10 @@ export function Assets() {
   const lang = i18n.language;
   const [dataset, setDataset] = useState<"demo" | "real">("demo");
   const [selected, setSelected] = useState<number | null>(null);
-  const { data } = useAsync(() => api<{ features: any[] }>("/assets"), []);
+  const { data, error, status, loading, reload } = useAsync(() => api<{ features: any[] }>("/assets"), []);
   const features = useMemo(() => (data?.features ?? []).filter((f) => f.properties.is_demo === (dataset === "demo")), [data, dataset]);
   useDemoOnScreen(dataset === "demo" && features.length > 0);
+  usePageTitle(t("assets.title"));
   const { data: versions } = useAsync(() => (selected ? api<{ features: any[] }>(`/assets/${selected}/boundaries`) : Promise.resolve(null)), [selected]);
 
   const mapFc = useMemo(
@@ -33,7 +35,7 @@ export function Assets() {
       <div className="page-head">
         <div>
           <h1>{t("assets.title")}</h1>
-          <p className="muted">{features.length}</p>
+          <p className="muted" aria-hidden={!data}>{data ? features.length : " "}</p>
         </div>
         <div className="chips">
           <button className="chip" aria-pressed={dataset === "demo"} onClick={() => { setDataset("demo"); setSelected(null); }}>{t("assets.dataset_demo")}</button>
@@ -41,6 +43,7 @@ export function Assets() {
         </div>
       </div>
       {dataset === "real" && <p className="note" style={{ marginBottom: "1rem" }}>{t("assets.real_note")}</p>}
+      <PageState loading={loading && !data} error={error} status={status} onRetry={reload} />
       <div className="queue" style={{ height: "auto" }}>
         <div className="mapbox" style={{ height: 520 }}>
           <MapView boundaries={selected ? selectedFc : mapFc} />
@@ -69,28 +72,30 @@ export function Assets() {
       {versions && (
         <section className="section">
           <h2>{t("assets.versions")}</h2>
-          <table className="grid" style={{ marginTop: "0.6rem" }} data-testid="boundary-versions">
-            <thead>
-              <tr><th>#</th><th>{t("detail.boundary")}</th><th>{t("assets.source")}</th><th /></tr>
-            </thead>
-            <tbody>
-              {versions.features.filter((f) => ["ftl", "parcel"].includes(f.properties.kind)).map((f) => {
-                const p = f.properties;
-                return (
-                  <tr key={p.id}>
-                    <td>{p.version}</td>
-                    <td><BoundarySeal status={p.status} /></td>
-                    <td>
-                      {p.source_url ? <a href={p.source_url} target="_blank" rel="noreferrer">{p.source_name}</a> : p.source_name}
-                      {p.notification_ref && <div className="small muted">{p.notification_ref}</div>}
-                      <div className="small muted">{t("assets.valid", { from: fmtDate(p.valid_from, lang) })}{p.effective_valid_to ? ` ${t("assets.until", { to: fmtDate(p.effective_valid_to, lang) })}` : ""}</div>
-                    </td>
-                    <td>{p.in_force ? t("assets.in_force") : t("assets.superseded")}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <TableRegion label={t("assets.versions")}>
+            <table className="grid" data-testid="boundary-versions">
+              <thead>
+                <tr><th>#</th><th>{t("detail.boundary")}</th><th>{t("assets.source")}</th><th /></tr>
+              </thead>
+              <tbody>
+                {versions.features.filter((f) => ["ftl", "parcel"].includes(f.properties.kind)).map((f) => {
+                  const p = f.properties;
+                  return (
+                    <tr key={p.id}>
+                      <td>{p.version}</td>
+                      <td><BoundarySeal status={p.status} /></td>
+                      <td>
+                        {p.source_url ? <a href={p.source_url} target="_blank" rel="noreferrer">{p.source_name}</a> : p.source_name}
+                        {p.notification_ref && <div className="small muted">{p.notification_ref}</div>}
+                        <div className="small muted">{t("assets.valid", { from: fmtDate(p.valid_from, lang) })}{p.effective_valid_to ? ` ${t("assets.until", { to: fmtDate(p.effective_valid_to, lang) })}` : ""}</div>
+                      </td>
+                      <td>{p.in_force ? t("assets.in_force") : t("assets.superseded")}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </TableRegion>
         </section>
       )}
     </div>

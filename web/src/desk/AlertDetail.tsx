@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 import { api, fmtDate, fmtDateTime } from "../api";
 import { useAuth } from "../auth";
-import { AuthImage, BoundarySeal, LineSwatch, StatePill, useAsync } from "../components/Bits";
+import { AuthImage, BoundarySeal, LineSwatch, StatePill, useAsync, usePageTitle } from "../components/Bits";
 import { DatedBracket } from "../components/DatedBracket";
 import { MapView } from "../components/MapView";
+import { PageState } from "../components/PageState";
 import { useDemoOnScreen } from "../demo";
 import { CaseFilePanel, Checklist } from "./CaseFile";
 import { OfficerRecordPanel } from "./OfficerRecord";
@@ -18,7 +19,7 @@ export function AlertDetail() {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
-  const { data: a, error, reload } = useAsync(() => api<any>(`/alerts/${id}`), [id]);
+  const { data: a, error, status, reload } = useAsync(() => api<any>(`/alerts/${id}`), [id]);
   useDemoOnScreen(Boolean(a?.is_demo));
 
   const boundaries = useMemo(() => ({ type: "FeatureCollection" as const, features: a?.boundary.features ?? [] }), [a]);
@@ -27,8 +28,17 @@ export function AlertDetail() {
     [a],
   );
 
-  if (error) return <div className="page"><p className="error">{t("error.load", { msg: error })}</p></div>;
-  if (!a) return <div className="page" aria-busy="true" />;
+  const titleName = a ? (lang === "te" && a.asset.name_te ? a.asset.name_te : a.asset.name) : null;
+  usePageTitle(titleName ? `${titleName} · ${t("nav.queue")}` : t("nav.queue"));
+
+  if (error || !a) {
+    return (
+      <div className="page">
+        <p className="crumbs"><Link to="/alerts">{t("detail.back")}</Link></p>
+        <PageState loading={!error} error={error} status={status} onRetry={reload} />
+      </div>
+    );
+  }
 
   const assetName = lang === "te" && a.asset.name_te ? a.asset.name_te : a.asset.name;
   const isParcel = a.asset.type === "recovered_parcel";
@@ -56,17 +66,24 @@ export function AlertDetail() {
         <BoundarySeal status={a.boundary.status} version={a.boundary.version} />
       </div>
 
+      {/* The decision panel comes first in the page order: beside the evidence on wide screens,
+          directly under the header on narrow ones (UI audit A8). */}
       <div className="detail">
-        <div>
+        <section className="panel detail-decision" aria-labelledby="next-step-title">
+          <h2 id="next-step-title" className="title-s">{t("detail.actions_title")}</h2>
+          <Actions alert={a} onDone={reload} />
+        </section>
+
+        <div className="detail-evidence">
           {cand.has_image_pair ? (
             <>
               <div className="pair" data-testid="image-pair">
                 <figure>
-                  <AuthImage path={`/alerts/${a.id}/chips/before`} alt={`${t("detail.before")} ${cand.last_clear_at ?? ""}`} />
+                  <AuthImage frame path={`/alerts/${a.id}/chips/before`} alt={`${t("detail.before")}, ${fmtDate(cand.last_clear_at, lang)}`} />
                   <figcaption><b>{t("detail.before")}</b><span>{fmtDate(cand.last_clear_at, lang)}</span></figcaption>
                 </figure>
                 <figure>
-                  <AuthImage path={`/alerts/${a.id}/chips/after`} alt={`${t("detail.after")} ${cand.first_changed_at}`} />
+                  <AuthImage frame path={`/alerts/${a.id}/chips/after`} alt={`${t("detail.after")}, ${fmtDate(cand.first_changed_at, lang)}`} />
                   <figcaption><b>{t("detail.after")}</b><span>{fmtDate(cand.first_changed_at, lang)}</span></figcaption>
                 </figure>
               </div>
@@ -81,12 +98,12 @@ export function AlertDetail() {
           ) : null}
 
           <section className="section panel">
-            <h3>{t("detail.bracket_title")}</h3>
+            <h2 className="title-s">{t("detail.bracket_title")}</h2>
             <DatedBracket baseline={a.asset.baseline_date} cutoff={a.policy_cutoff_date} lastClear={cand.last_clear_at} firstChanged={cand.first_changed_at} detected={a.created_at} />
           </section>
 
           <section className="section">
-            <h3>{t("detail.map_title")}</h3>
+            <h2 className="title-s">{t("detail.map_title")}</h2>
             <div className="mapbox" style={{ height: 380 }}>
               <MapView boundaries={boundaries} changes={changes} testId="detail-map" />
               <div className="legend">
@@ -100,7 +117,7 @@ export function AlertDetail() {
 
           {a.field_checks.length > 0 && (
             <section className="section panel">
-              <h3>{t("detail.field_title")}</h3>
+              <h2 className="title-s">{t("detail.field_title")}</h2>
               {a.field_checks.map((f: any) => (
                 <p key={f.id} className="small" style={{ marginTop: "0.5rem" }}>
                   <b>{f.officer}</b>, {fmtDateTime(f.observed_at, lang)}: {f.outcome === "confirmed" ? t("state.FIELD_CONFIRMED") : f.outcome === "false_alarm" ? t("state.CLOSED_FALSE_ALARM") : t("form.reason")}
@@ -122,18 +139,13 @@ export function AlertDetail() {
           <p className="statement" data-testid="statement">{t("statement.imagery")}</p>
         </div>
 
-        <aside>
-          <div className="panel">
-            <h3>{t("detail.actions_title")}</h3>
-            <Actions alert={a} onDone={reload} />
-          </div>
-
+        <aside className="detail-side">
           <OfficerRecordPanel alert={a} onChange={reload} />
 
           <CaseFilePanel alert={a} onChange={reload} />
 
           <div className="panel" data-testid="legal-panel">
-            <h3>{t("detail.checks_title")}</h3>
+            <h2 className="title-s">{t("detail.checks_title")}</h2>
             {lc?.permit_conflict && <p className="banner warn" style={{ marginTop: "0.6rem" }}>{t("detail.permit_conflict")}</p>}
             {lc?.live_court_matter_now && <p className="banner stop" style={{ marginTop: "0.6rem" }}>{t("detail.live_court", { id: lc.live_court_matter_now })}</p>}
             {lc && (
@@ -160,7 +172,7 @@ export function AlertDetail() {
           </div>
 
           <div className="panel">
-            <h3>{t("detail.timeline_title")}</h3>
+            <h2 className="title-s">{t("detail.timeline_title")}</h2>
             <ol className="timeline" style={{ marginTop: "0.75rem" }} data-testid="timeline">
               {a.timeline.slice().reverse().map((e: any) => (
                 <li key={e.id} className={e.action === "timer.missed" ? "miss" : undefined}>
@@ -192,8 +204,22 @@ function Actions({ alert, onDone }: { alert: any; onDone: () => void }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const actions: Action[] = alert.allowed_actions;
-  const [message, setMessage] = useState<string | null>(null);
+  // A counter makes the same message text count as a new result, so focus still moves to it.
+  const [message, setMessage] = useState<{ text: string; n: number } | null>(null);
+  const messageRef = useRef<HTMLParagraphElement>(null);
   const canRequestImagery = user && ["analyst", "nodal_officer"].includes(user.role) && !alert.state.startsWith("CLOSED");
+  const show = (text: string) => setMessage((m) => ({ text, n: (m?.n ?? 0) + 1 }));
+
+  // After an action, focus its result: the button that started it may be gone (UI audit A4).
+  useEffect(() => {
+    if (message) messageRef.current?.focus();
+  }, [message]);
+
+  // Owner decision D1: forward steps first, closures after. Every action the server allows is
+  // still shown with its own label; only the order changes (the sort is stable within each group).
+  const shown = actions
+    .filter((x) => !x.needs.some((n) => n.startsWith("field_check")))
+    .sort((x, y) => Number(x.to.startsWith("CLOSED")) - Number(y.to.startsWith("CLOSED")));
 
   return (
     <div className="actions" style={{ marginTop: "0.75rem" }} data-testid="actions">
@@ -201,17 +227,15 @@ function Actions({ alert, onDone }: { alert: any; onDone: () => void }) {
         <p key={p.id} className="banner info">{t("detail.pending_closure", { name: p.requested_by, reason: p.reason })}</p>
       ))}
       {actions.length === 0 && <p className="muted small">{t("action.none")}</p>}
-      {actions
-        .filter((x) => !x.needs.some((n) => n.startsWith("field_check")))
-        .map((x) => (
-          <ActionForm key={x.to + x.signer} alertId={alert.id} action={x} onDone={(msg) => { setMessage(msg); onDone(); }} />
-        ))}
+      {shown.map((x) => (
+        <ActionForm key={x.to + x.signer} alertId={alert.id} action={x} onDone={(msg) => { show(msg); onDone(); }} />
+      ))}
       {canRequestImagery && (
-        <button className="btn secondary" onClick={() => api(`/alerts/${alert.id}/imagery-request`, { json: { provider: "commercial_archive" } }).then(() => setMessage(t("detail.imagery_done")))}>
+        <button className="btn quiet" onClick={() => api(`/alerts/${alert.id}/imagery-request`, { json: { provider: "commercial_archive" } }).then(() => show(t("detail.imagery_done")))}>
           {t("detail.imagery")}
         </button>
       )}
-      {message && <p className="banner info" role="status">{message}</p>}
+      {message && <p className="banner info" role="status" tabIndex={-1} ref={messageRef}>{message.text}</p>}
     </div>
   );
 }
@@ -227,6 +251,23 @@ function ActionForm({ alertId, action, onDone }: { alertId: number; action: Acti
   const [caseRef, setCaseRef] = useState("");
   const [gapReason, setGapReason] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const returnFocus = useRef(false);
+
+  // Opening the form moves focus into it; cancelling returns focus to the button that opened it,
+  // so keyboard users never land on the page body (UI audit A4).
+  useEffect(() => {
+    if (open) headingRef.current?.focus();
+    else if (returnFocus.current) {
+      returnFocus.current = false;
+      triggerRef.current?.focus();
+    }
+  }, [open]);
+  const cancel = () => {
+    returnFocus.current = true;
+    setOpen(false);
+  };
   const { data: officers } = useAsync(
     () => (action.needs.includes("field_owner") ? api<any[]>("/users?role=field_officer") : Promise.resolve([])),
     [action.needs.join()],
@@ -266,14 +307,14 @@ function ActionForm({ alertId, action, onDone }: { alertId: number; action: Acti
   const danger = action.to.startsWith("CLOSED");
   if (!open) {
     return (
-      <button className={`btn ${danger ? "danger" : ""}`} onClick={() => setOpen(true)} data-testid={`action-${action.to}`}>
+      <button ref={triggerRef} className={`btn ${danger ? "danger" : ""}`} onClick={() => setOpen(true)} data-testid={`action-${action.to}`}>
         {t(`action.${action.to}`)}
       </button>
     );
   }
   return (
     <div className="action" data-testid={`form-${action.to}`}>
-      <b>{t(`action.${action.to}`)}</b>
+      <h3 className="title-xs" tabIndex={-1} ref={headingRef}>{t(`action.${action.to}`)}</h3>
       {action.two_person && <p className="why">{second ? t("action.second_signature") : t("action.first_signature")}</p>}
       {needs.has("image_pair_reviewed") && (
         <label className="check"><input type="checkbox" checked={reviewed} onChange={(e) => setReviewed(e.target.checked)} data-testid="input-reviewed" />{t("form.image_pair_reviewed")}</label>
@@ -305,7 +346,7 @@ function ActionForm({ alertId, action, onDone }: { alertId: number; action: Acti
       {error && <p className="error" role="alert">{error}</p>}
       <div style={{ display: "flex", gap: "0.5rem" }}>
         <button className={`btn ${danger ? "danger" : ""}`} onClick={() => void submit()} data-testid="submit-action">{t("action.submit")}</button>
-        <button className="btn secondary" onClick={() => setOpen(false)}>{t("action.cancel")}</button>
+        <button className="btn secondary" onClick={cancel}>{t("action.cancel")}</button>
       </div>
     </div>
   );

@@ -4,8 +4,8 @@ Single source for building the prototype. A developer or coding agent should be 
 
 | | |
 |---|---|
-| **Status** | Nothing is built yet. This file is the only thing in the project folder. |
-| **Last updated** | 5 November 2026 |
+| **Status** | Prototype milestones M0, M1 and M4 to M9 are built on demo data; the backtest (M2, M3) is not. See `PROGRESS.md`. |
+| **Last updated** | 7 November 2026: section 17 added (officials, personas, detection by stage, alert contents, escalation, due diligence, dashboard, citizen reporting) and the imagery and owner-blind decisions refined at the owner's request |
 | **Name** | "Lake Protect" is a working name taken from the folder. The final name is not decided. |
 | **Background** | [Feasibility and solution design](https://claude.ai/artifact/6SgGGK4e8Zf8gyzjbC13wD) and [pitch deck](https://claude.ai/artifact/ABdLPgjWa1t5Y7V855Kbsa). Both are private until the owner shares them. |
 
@@ -15,7 +15,7 @@ Single source for building the prototype. A developer or coding agent should be 
 
 ## 1. Start here
 
-**What it is.** A monitoring system for Telangana's lakes and government land. Free satellite data screens every asset each week. A rules engine checks the legal position of each change. Field teams verify what remains, and officers receive a complete case file.
+**What it is.** A monitoring system for Telangana's lakes and government land. Satellite imagery screens every asset each week (free, ISRO or commercial imagery: the source is open, section 17.9). A rules engine checks the legal position of each change. Field teams verify what remains, and officers receive a complete case file.
 
 **Why this shape.** HYDRAA, the Hyderabad agency that protects lakes and public land, already has satellite data from ISRO's National Remote Sensing Centre (NRSC), a lake-boundary portal and 900 CCTV cameras on 264 lakes. No public evidence was found of a recurring alert loop that reaches field teams and produces evidence that holds up in court. That loop is the product. Do not build a satellite-map viewer: the State already has one.
 
@@ -28,7 +28,7 @@ Single source for building the prototype. A developer or coding agent should be 
 1. **Officers decide.** A satellite sees change, not illegality. The product reports verified facts. It never labels a change illegal and never recommends demolition.
 2. **Boundary status is always visible.** Every alert shows how certain its boundary is. Only confirmed boundaries can lead to action.
 3. **New change only.** Alert only on change after an asset's baseline date. Old structures are a separate policy problem, not an alert.
-4. **Owner-blind detection.** Owner names stay out of the system until a field check confirms the change.
+4. **Owner-blind detection.** Owner names stay out of the system until a field check confirms the change. The survey-number record (land category, Section 22A status, court cases, disputes) is shown with every alert; the personal names of owners and claimants are not (section 17.10).
 5. **Nothing closes silently.** Every action is logged, closing needs two people, and missed deadlines escalate automatically.
 6. **No invented results.** Demo data is labelled, uses fictional places, and never appears in a pitch as a finding.
 
@@ -46,8 +46,11 @@ Single source for building the prototype. A developer or coding agent should be 
 | `senior_officer` | Commissioner, Secretary | One page a month | Monthly page |
 | `auditor` | Internal or external | Read the full log, re-check closures | Audit view |
 | `admin` | Vendor | Users, assets, record imports | Desk |
+| `revenue_officer` | Tahsildar with Mandal Surveyor | Confirm survey number, land category and title status; joint survey with notice | Desk (design only, not in the prototype) |
+| `irrigation_officer` | Irrigation engineer (DEE or AEE) | Confirm the FTL and buffer position and the map version used | Desk (design only) |
+| `citizen` | Resident, lake committee | Report a change by WhatsApp or web; get status updates | Portal or WhatsApp (design only) |
 
-The audience for the demo is senior officials. They should grasp every screen at a glance, so favour pictures, maps and plain words over tables of numbers.
+Section 17.2 maps every role to Telangana's officials. The audience for the demo is senior officials. They should grasp every screen at a glance, so favour pictures, maps and plain words over tables of numbers.
 
 ---
 
@@ -73,7 +76,8 @@ A web app and field app showing the whole loop on about 20 recovered assets: det
 - Ordering ISRO or paid imagery. Record the request and its estimated cost only.
 - NISAR, until Sentinel-1 and Sentinel-2 work.
 - Deep learning. Rules first (section 15).
-- Drone data processing, citizen portal, statewide coverage, Revenue land workflows.
+- Drone data processing, statewide coverage, Revenue land workflows.
+- The citizen reporting channel (section 17.8), the survey-number file from live land records (17.4), the full escalation matrix (17.5) and the drill-down dashboard (17.7). These are part of the solution design and the pitch, not of the current prototype build.
 - Production security certification.
 - Any real owner or personal data.
 
@@ -172,6 +176,8 @@ Inputs by group:
 - **Satellite images:** free radar and optical data, then ISRO and paid imagery on a cue.
 - **Legal records:** FTL maps, survey parcels, permits, authorised works, court case register.
 - **Field signals:** CCTV alerts, Praja Vani complaints, citizen reports. These raise priority or open a check; they never create a finding alone.
+
+Section 17 turns this into the solution architecture shown to officials: what comes in (imagery, government records, ground and citizen signals), the platform (detect, check the records, route and escalate, seal the evidence), and who acts (field teams, verifiers, officers, senior officials, citizens).
 
 ---
 
@@ -426,6 +432,8 @@ Checked on 5 November 2026. Re-check endpoints before depending on them.
 | **NISAR L-band** | Later: second radar view through vegetation | 12-day repeat. HDF5. Public since 20 July 2026, provisional | [ASF](https://nisar-docs.asf.alaska.edu/access-overview/), `asf_search`, free Earthdata Login. Resolution and Hyderabad coverage not yet confirmed |
 | **ISRO high-resolution** | Confirm priority cases, production only | Finer than 5 m. [Free to government bodies, priced for private firms](https://www.isro.gov.in/media_isro/pdf/IndianSpacePolicy2023.pdf) | Through NRSC. Order routing not confirmed |
 | **Commercial 30 to 50 cm** | Fallback, production only | About [$17 to $26 per sq km archive, $25 to $55 tasking](https://geopera-website.pages.dev/blog/satellite-imagery-cost-guide), reseller guide figures | Stub only in the prototype |
+
+These are the free sources the backtest and first pipeline use. The production imagery source is open: free, ISRO or commercial, chosen per phase (section 17.9).
 
 **Licence notices to carry:**
 
@@ -808,11 +816,11 @@ If the backtest has been run, open with its real result.
 |---|---|
 | Start with recovered land | Clearest boundary, least dispute, asked for in HYDRAA's own plan |
 | Weekly screening with a monthly page | Free data arrives every 5 to 6 days, and a month can separate soil fill from a foundation |
-| Free data first, high-resolution only on a cue | Blanket monthly 50 cm imagery of Telangana would cost over ₹300 crore a year |
+| Tiered imagery: a frequent screening layer, sharper images only on a cue. The provider of each layer (free, ISRO or commercial) is open and chosen per phase. *Changed 7 November 2026 from "free data first" at the owner's request (section 17.9)* | Blanket monthly 50 cm imagery of Telangana would cost over ₹300 crore a year, so sharp images stay targeted whoever supplies them |
 | Legal check before analyst and paid imagery | Saves money and keeps blocked cases out of the field |
 | Rules before deep learning | Easier to defend in court, and labels are scarce |
 | Officers decide, product supplies facts | Courts test process, and the State holds legal authority |
-| Owner-blind detection | Limits targeting and personal data exposure |
+| Owner-blind detection: names withheld until a field check; land category, court cases and disputes shown on every alert. *Refined 7 November 2026 (section 17.10)* | Limits targeting and personal data exposure, while officers see the legal position of the land |
 | Annual fee per asset, never per alert or per acre recovered | Other pricing rewards false alarms and would look bad in court |
 | Portable stack | Must be able to move to a government data centre |
 
@@ -876,3 +884,192 @@ As reported, mostly in the press. HYDRAA's figures are agency claims that vary b
 | Precedents: BLUIS in Odisha, with [about 768 alerts by November 2021](https://odishabytes.com/national-e-governance-awards-bluis-odisha-wins-gold-for-excellence-in-adopting-emerging-technologies/). Defence Estates tool, with [1,133 changes in 62 cantonments](https://dgde.gov.in/?p=10295). Madhya Pradesh [forest alerts](https://apacnewsnetwork.com/2025/04/mp-govt-launches-indias-first-ai-based-real-time-forest-alert-system/). None publishes verified precision in the reports found, so publishing ours would set us apart | As linked |
 
 The full source list is in the [feasibility document](https://claude.ai/artifact/6SgGGK4e8Zf8gyzjbC13wD). This file is not legal advice.
+
+---
+
+## 17. Solution design for Telangana (added 7 November 2026)
+
+Researched on 7 November 2026 from public reports, court filings and government notices. Titles and procedures are as reported and must be confirmed with HYDRAA, the Revenue Department and HMDA before they are relied on. Sources are listed in 17.12. Sections 17.4 to 17.8 describe the solution as pitched; 17.11 says what the prototype already has.
+
+### 17.1 Who protects lakes and public land today
+
+| Body | Posts | Part they play |
+|---|---|---|
+| Government of Telangana | Chief Minister; Chief Secretary; Principal Secretary, Municipal Administration and Urban Development (MA&UD) | HYDRAA's Commissioner reports directly to the Chief Minister. The Chief Secretary has reviewed HYDRAA's powers and staffing. HYDRAA, HMDA and the municipal corporations sit under MA&UD. |
+| Revenue Department | Chief Commissioner of Land Administration (CCLA) | Heads revenue administration, including Survey, Settlement and Land Records (SS&LR), and runs Bhu Bharati and Grama Palana Officer recruitment. |
+| District | District Collector; Additional Collector (Revenue) | Revenue administration of the district. The Collector certifies cadastral maps for FTL notifications. |
+| Revenue division | Revenue Divisional Officer (RDO) | Certifies cadastral maps with the Tahsildar. Telangana has about 74 revenue divisions. |
+| Mandal | Tahsildar; Mandal Surveyor (SS&LR) | Survey numbers and land records. Prepares lake records for the Lake Protection Committee; joint inspections with Irrigation. |
+| Village | Grama Palana Officer (GPO) | 10,954 posts created in March 2025, one per revenue village, to restore village revenue work after VROs were abolished. In April 2026 many qualified candidates still awaited appointment. |
+| HYDRAA | Commissioner; Additional Commissioners; Asset Protection, Disaster Management and Logistical Support wings | Protects lakes, nalas, parks and government land up to the ORR (now the core urban region). 169 deputation posts, four of them Additional Commissioners, were reported. 900 CCTV cameras on 264 lakes; guards in shifts at some lakes; a dedicated police station at Buddha Bhavan led by an Assistant Commissioner of Police (order of January 2025); weekly Praja Vani hearings; the 1070 helpline and a WhatsApp number for encroachment reports. |
+| HMDA | Metropolitan Commissioner; Lake Protection Committee (LPC) | The LPC was formed by G.O.Ms.No.157, MA&UD, 6 April 2010, and issues preliminary and final FTL notifications. It was chaired by the Metropolitan Commissioner; recent reports name the HYDRAA Commissioner as its chairman. Confirm the current chair. |
+| Irrigation and CAD Department | Executive, Deputy Executive and Assistant Executive Engineers | Survey the FTL in the field and certify FTL maps. |
+| Municipal corporations | Commissioners; town planning | Building permissions through BuildNow. |
+| Registration and Stamps | Sub-Registrars | The Section 22A prohibited-properties list, searchable by district, mandal, village and survey number. It is known to mark whole survey numbers when only part is restricted. |
+| Police | Local police stations; HYDRAA police station | Register FIRs on complaints from HYDRAA, Irrigation or Revenue. |
+| Courts and litigation | Telangana High Court; Court Case Monitoring System (CCMS) | CCMS, launched in February 2026 and piloted in the Home, Revenue and Higher Education departments, tracks government litigation and links to the High Court's case information. On 14 April 2026 the High Court restrained HYDRAA's demolitions until it files written standard operating procedures, and said action without prior notice is not permissible. |
+| Maps and coordination | TGRAC; NRSC; Telangana Integrated Command and Control Centre (TGICCC) | TGRAC and NRSC supply maps and imagery. TGICCC coordinates HYDRAA with other agencies in emergencies. |
+
+**How an FTL is fixed, as reported.** Irrigation surveys the lake and drafts FTL maps. Revenue survey numbers are superimposed and the cadastral map is certified by the Tahsildar, RDO and Collector. The LPC issues a preliminary notification, hears objections and then issues a final notification. The High Court has been told that no statute prescribes this procedure, which is one reason boundaries are contested.
+
+**Scale beyond Hyderabad.** The 2014 minor irrigation census counted about 46,531 tanks and related structures across Telangana. HMDA's area alone has over 3,000 lakes (section 16).
+
+### 17.2 Personas
+
+Each persona maps to a system role (section 2). `revenue_officer`, `irrigation_officer` and `citizen` are design only; the prototype has the original eight roles.
+
+| Persona | Example posts | System role | Sees | Does | Hears about an alert when |
+|---|---|---|---|---|---|
+| **State overseer** | Chief Secretary; Principal Secretary, MA&UD; CCLA | `senior_officer` | State dashboard and monthly page | Reviews performance across agencies and districts; acts on level 4 escalations | Monthly, and at level 4 |
+| **Agency head** | HYDRAA Commissioner; District Collector outside HYDRAA's area | `senior_officer`, and the deciding officer where the law gives them the power | Dashboard of their own area; escalations | Directs or takes the action decision | At level 3, or when a court-sensitive case arises |
+| **Nodal officer** | HYDRAA Additional Commissioner (Asset Protection); Additional Collector (Revenue) | `nodal_officer` | Queue, map, deadlines | Assigns each alert to a named field officer and verifiers; sends case files to the officer | When an alert is confirmed, and at levels 1 and 2 |
+| **Revenue verifier** | Tahsildar with the Mandal Surveyor | `revenue_officer` | The survey-number file | Confirms the survey number, land category and title status; holds the joint survey with prior notice | When a change in their mandal is field-confirmed |
+| **Irrigation verifier** | Deputy or Assistant Executive Engineer, Irrigation | `irrigation_officer` | Boundary versions | Confirms where the change sits against the FTL and buffer, and which map version applies | When a change at a lake is field-confirmed |
+| **Field officer** | HYDRAA Lake Protection Team member; GPO outside HYDRAA's area | `field_officer` | One alert, its map and its images | Visits and records photos, position and outcome, even offline | When assigned |
+| **Analyst and reviewer** | Vendor or HYDRAA desk staff | `analyst`, `reviewer` | Before and after images | Confirms a change, or closes it as not real with a second person | When a candidate passes the legal check |
+| **Legal officer** | HYDRAA legal cell; liaison with the Government Pleader | `legal_officer` | Court register and case files | Holds court cases; prepares the case file and notices | On a court register hit, or when a case file is due |
+| **Auditor** | Internal audit or vigilance | `auditor` | The full log | Re-checks a random sample of closures | Monthly |
+| **Citizen** | Resident or lake committee member | `citizen` | Their own reports only | Reports a change; gets status updates | Never; they receive updates on their own reports |
+
+**Who decides.** The "officer" of section 6.5 is whoever holds the legal power for that land and action: in HYDRAA's area, its Commissioner or an officer he authorises; elsewhere the Collector or RDO under revenue law, or a municipal commissioner for building permissions. Counsel must confirm this (section 15).
+
+### 17.3 Detecting each stage of encroachment
+
+The five stages on the deck's "easiest to stop early" slide, and what imagery shows at each. The rules are those of section 8.4 and are the same whichever provider supplies the images; thresholds are tuned per sensor.
+
+**Imagery tiers.**
+- **Screen:** every asset, at least weekly, with multispectral optical images (3 to 10 m) and radar. Radar sees through monsoon cloud.
+- **Confirm:** sub-metre images on priority cases only: commercial tasking at about 0.3 to 0.5 m, or ISRO Cartosat-3 (about 0.28 m panchromatic) through NRSC.
+- **Verify:** the field team, CCTV and drones.
+
+| Stage | What happens on the ground | What the images show | Rule (section 8.4) | Tier |
+|---|---|---|---|---|
+| Soil dumped | Earth or debris dumped at the edge of, or into, the water | Water or vegetation turns to bright bare soil: the water index falls and the bare-soil index rises; radar texture changes | Water to bare soil at the lake edge: `soil_fill`, stage `soil_dumped` | Screen |
+| Land levelled | Plants cleared, ground flattened, plots pegged | A uniform bare patch where vegetation was; the pegs and plot lines need sub-metre images | Vegetation to bare soil: `clearing`, stage `land_levelled` | Screen, then confirm |
+| Sheds and fences | Sheds, compound walls, fencing | Often smaller than one 10 m pixel, so medium-resolution images cannot see them reliably | Not claimed from medium resolution | Confirm or field |
+| Building rises | Columns, slabs and walls go up | Radar return rises sharply as walls and ground form corner reflections; the interferometric coherence pattern changes; the built-up index rises | Bare soil or vegetation to built: `building`, stage `building_rises` | Screen; confirm the footprint |
+| Family moves in | The building is occupied | Stable built-up surface; little new to detect | The dated bracket shows when it was built; change before the baseline is `CLOSED_LEGACY` (rule 3) | Record only |
+
+Water loss alone never alerts (section 8.4). Every alert names the sensor that saw the change and the dates of both images.
+
+### 17.4 What every alert carries: the survey-number file
+
+| Block | Contents | Source in production | In the prototype |
+|---|---|---|---|
+| Identity | Alert code, asset, cohort, mode, priority and its factors, state, owner, due date | System | Built |
+| Location | Coordinates; village, mandal, district, municipality and ward; nearest road; a map with the FTL, buffer and watch ring; a link to a maps app | System and boundary layers | Coordinates and map built; administrative units come from the asset record |
+| Survey numbers | Every survey or sub-division number the change overlaps, with the area of overlap; the 14-digit Bhudhaar number where issued; land category (government, assigned, patta, inam, endowment, wakf, shikam); extent; a Record of Rights summary; recent mutations and pending applications | Bhu Bharati; SS&LR cadastral maps | Not built |
+| Prohibitions | Section 22A entry and its clause, with a warning that the list marks whole survey numbers and may be wrong | Registration and Stamps | Not built |
+| Boundary | Status and version, notification references, who certified it | LPC, Irrigation, HYDRAA Raksha | Built |
+| Court and police | Cases on the survey numbers or the asset: court, case number, status, next hearing, interim orders or stays; FIRs | CCMS, eCourts, police | Court register built (CSV import); CCMS and eCourts links not built |
+| Permits and works | Building permissions, layout approvals, authorised works | BuildNow and departments | Built (CSV import) |
+| History | Earlier alerts, closures, actions and title claims | System | Built |
+| Evidence | Before and after images, dated bracket, sensor, area, stage, confidence | System | Built |
+| Signals | Linked citizen reports, CCTV alerts, Praja Vani complaints | System | Table only |
+| People | Names of owners and claimants | Bhu Bharati and the field record | Only after field confirmation, to authorised roles (17.10) |
+
+Every item shows its source and the date it was read. When two records disagree, both are shown side by side and neither is overwritten.
+
+### 17.5 Who gets the alert, and the escalation matrix
+
+**Routing.** An alert goes to the nodal officer of the body that holds the asset: HYDRAA inside its area, the District Collector's nodal officer elsewhere, and the owning agency for cohort E. Once the change is field-confirmed, the Tahsildar of the mandal and the Irrigation engineer of the division are added as verifiers.
+
+Proposed deadlines, to agree with HYDRAA and the Revenue Department. They extend section 6.6 and stay configurable.
+
+| Step | Goes to | Deadline | If missed, level 1 | Level 2 | Level 3 |
+|---|---|---|---|---|---|
+| Review the image pair | Analyst; a reviewer co-signs any closure | 3 days | Reviewer | Nodal officer | |
+| Assign a field officer | Nodal officer | 1 working day | Additional Commissioner or Additional Collector | Commissioner or Collector | State dashboard |
+| Check on site | Field officer | 7 days; 48 hours if the priority score is 80 or more, or soil is dumped inside the FTL of a cohort A or B asset; 14 days in the monsoon | Nodal officer | Additional Commissioner or Additional Collector | Commissioner or Collector |
+| Confirm the survey number and FTL position | Tahsildar; Irrigation engineer | 7 days from field confirmation | RDO; Executive Engineer | Collector; Superintending Engineer | State dashboard |
+| Prepare the case file | Legal officer with the nodal officer | 7 days | Head of the legal cell | Commissioner or Collector | State dashboard |
+| Record the officer's decision | Deciding officer | 30 days | Commissioner or Collector | State dashboard | |
+
+- **Level 4** is the State dashboard's overdue list, seen by the State overseer.
+- **A court register hit** goes straight to the legal officer, with no field visit (invariant 1).
+- **A linked citizen report** sends the reporter a status update at each step.
+- **Channels:** in-app inbox, SMS, WhatsApp through a State-approved channel, and a daily email digest. Each notification needs an acknowledgement. If it is not acknowledged within 24 hours it is repeated and escalated.
+
+### 17.6 Due diligence: four gates
+
+| Gate | When | Checks |
+|---|---|---|
+| A. Before anyone moves (automatic) | When a candidate arrives | Section 6.2 (boundary version and status, baseline date, authorised works, permits, court register), plus land category and Section 22A, duplicates and earlier closures, and the seasonal and drought controls |
+| B. Before the field visit | Analyst review | Two-image review; sharper images requested if needed; a field brief listing the survey numbers, access and the "observation, not a survey" note (section 9.2) |
+| C. Before the officer decides | Case file | Geotagged photos on site; survey number and title status confirmed by Revenue; FTL position confirmed by Irrigation; joint survey held with prior notice; notice served and hearing held; no live court matter; evidence pack verified; checklist (section 6.7) recorded, with any gap logged |
+| D. Before anything closes | Closure | Two different people; a reason code; a weekly re-check from space that reopens a closed alert if the change persists |
+
+The April 2026 High Court order asked HYDRAA for written procedures and prior notice. These gates are such a procedure, enforced and logged by the software. Counsel must confirm the wording and the order of steps.
+
+### 17.7 Central dashboard and drill-down
+
+- **Levels:** State, then agency or district, then mandal, municipality or zone, then village or ward, then lake or parcel, then survey number, then alert.
+- **At every level:** a map shaded by open and overdue alerts; the five monthly figures (section 9.4); the share of deadlines met; overdue alerts by officer; boundary coverage (the share of assets with a final or marked boundary); citizen reports received and closed; and the trend against last month.
+- **Scope by role and area:** the State sees everything, a Commissioner or Collector sees their own area, and a Tahsildar sees their own mandal.
+- **Every number opens the cases behind it.** Every view is logged, and there is no bulk export (section 10).
+- **Monthly page:** the printable summary of the same view (section 9.4). Summary tiles can be fed to TGICCC if the State wants them on its video wall.
+
+### 17.8 Citizen reporting by web portal and WhatsApp
+
+**Channels.** A web portal (map pin, photo, short description) and a WhatsApp chatbot. The chatbot could use HYDRAA's existing WhatsApp number or the MeeSeva on WhatsApp platform the State launched in November 2025; the choice is for the State. Calls to the 1070 helpline and Praja Vani complaints are entered by staff into the same intake.
+
+**Flow.**
+1. The citizen sends a photo, a location (a pin or shared location) and a short description. A name and phone number are optional; a phone number is verified by one-time password if the citizen wants updates.
+2. The citizen gets a reference number at once.
+3. The system matches the location to an asset and survey number and merges duplicate reports.
+4. The report becomes a signal (the `signals` table, section 7). It raises the priority of a matching alert, or opens a satellite re-check and a field check.
+5. The citizen gets a status update at each step: received, checked, closed with a reason. They never see officer names, owner names or evidence.
+
+**Rules.**
+- A report never creates a finding on its own (section 5).
+- The reporter's identity is protected and kept to a minimum, under the Digital Personal Data Protection Act, 2023.
+- Accused persons are never shown publicly.
+- Rate limits and the one-time password guard against abuse; repeated false reports are flagged.
+- The channel works in English, Telugu and Urdu.
+- A report about a place the system does not watch is passed to the right department.
+
+### 17.9 Imagery sourcing (changed 7 November 2026)
+
+At the owner's request the imagery source is no longer fixed as "free data first". The tiers in 17.3 stay. Each tier may use free (Copernicus Sentinel), ISRO (through NRSC) or commercial imagery, chosen per phase on cost, revisit and resolution. Section 8.1 remains the reference for the free sources the backtest uses. The cost figures in section 16 assume free screening, so they must be revised if commercial screening is chosen. The pitch deck no longer presents the solution as built on free data.
+
+### 17.10 Owner-blind detection, refined (changed 7 November 2026)
+
+The owner asked that ownership, disputes and court cases around a survey number be visible to officers. Applied:
+- Every alert shows the land category, the type of record, the Section 22A entry, court cases, disputes and mutation activity, to the desk and officer roles.
+- The personal names of owners and claimants appear only after field confirmation, only to the nodal, revenue and legal roles, and every view is logged.
+- Detection and the priority score stay owner-blind.
+
+Reason: if names were visible as soon as a change was detected, an alert could be used to target or extort the people named (section 10, vendor conduct).
+
+### 17.11 What the prototype has, and what this section adds
+
+| Feature | In the prototype (M0 to M9) | Added by this section |
+|---|---|---|
+| Legal check, priority, state machine, two-person closure, audit chain | Built | |
+| Alert with boundary, legal check, images and dated bracket | Built | Survey-number file from Bhu Bharati, the Section 22A list and CCMS (17.4) |
+| Timers and escalation (section 6.6) | Built | The full matrix, a verification step, a 48-hour urgent timer, and the notification channels (17.5) |
+| Case-readiness checklist and evidence pack | Built | Revenue and Irrigation verification steps (17.6, gate C) |
+| Monthly page | Built | Drill-down dashboard from State to survey number (17.7) |
+| Field app, offline, in English and Telugu | Built | GPO as a field user outside HYDRAA's area |
+| Citizen reporting | `signals` table only | Portal, WhatsApp intake and status updates (17.8) |
+| Roles | Eight | `revenue_officer`, `irrigation_officer`, `citizen` (17.2) |
+
+### 17.12 Sources for this section
+
+- HYDRAA structure and staffing: [Telangana Today](https://telanganatoday.com/all-you-need-to-know-about-hydraa-organisation-function-and-responsibilities), [The News Minute](https://thenewsminute.com/telangana/hyderabad-hydra-to-get-four-additional-commissioners-among-169-officers), [Deccan Chronicle](https://www.deccanchronicle.com/amp/southern-states/telangana/hydraa-to-get-more-powers-and-staff-for-protecting-lakes-and-govt-properties-1819933), [Wikipedia](https://en.wikipedia.org/wiki/HYDRAA)
+- HYDRAA police station: [Deccan Chronicle](https://deccanchronicle.com/southern-states/telangana/hydraa-gets-dedicated-police-station-1852599)
+- HYDRAA helpline 1070 and WhatsApp reporting: [NewsMeter](https://newsmeter.in/hyderabad/hyderabad-can-now-dial-1070-to-report-encroachments-flood-related-emergencies-754408), [Siasat](https://www.siasat.com/hydraa-introduces-phone-number-to-report-lake-encroachments-3238098), [Deccan Chronicle](https://www.deccanchronicle.com/southern-states/telangana/hydraa-launches-toll-free-number-to-raise-complaints-1901231)
+- Lake guards per lake: [Hyderabad News Hunt](https://hyderabadnewshunt.com/hyderabad-lakes-cctv-monitoring-185-water-bodies-hydraa)
+- Lake Protection Committee: [HMDA](https://www.hmda.gov.in/lake-protection-committee/), [NGT filing OA 71 of 2023](https://www.greentribunal.gov.in/sites/default/files/news_updates/OA%20No.%2071%20of%202023%20Report%20of%20R-2.pdf), [Siasat on the chair](https://www.siasat.com/hyderabad-durgam-cheruvus-ftl-to-be-fixed-in-4-months-says-hydraa-commissioner-3162831/amp/)
+- FTL procedure: [Deccan Chronicle on the High Court](https://deccanchronicle.com/southern-states/telangana/telangana-hc-directs-state-to-clarify-procedures-for-setting-lake-ftl-1824865), [NGT filing](https://www.greentribunal.gov.in/sites/default/files/news_updates/16321_2.pdf)
+- High Court order of April 2026 on SOPs and notice: [Siasat, 14 April 2026](https://www.siasat.com/no-sops-no-demolitions-hc-restrains-hydraa-flags-lack-of-notice-and-due-process-3452589/)
+- Revenue hierarchy: [CAG audit report](https://cag.gov.in/webroot/uploads/download_audit_report/2020/Chapter-VI-0605b2d7259e7d3.27393891.pdf), [revenue divisions](https://en.wikipedia.org/wiki/List_of_revenue_divisions_in_Telangana)
+- Grama Palana Officers: [Deccan Chronicle](https://deccanchronicle.com/southern-states/telangana/telangana-govt-sanctions-creation-of-10954-village-level-officer-posts-1868381), [Telangana Today](https://telanganatoday.com/vros-vras-qualified-in-gpo-test-wait-for-appointment-orders)
+- Bhu Bharati and Bhudhaar: [The News Minute](https://www.thenewsminute.com/telangana/how-is-bhu-bharati-telanganas-new-land-records-system-different-from-dharani), [The Week](https://www.theweek.in/news/india/2026/04/22/bhudhaar-card-can-telanganas-unique-id-get-rid-of-land-disputes-for-good.html)
+- Section 22A list: [ThePrint](https://theprint.in/india/telanganas-section-22a-mess-how-thousands-of-acres-of-private-property-landed-up-in-prohibited-list/3018683/), [The South First](https://thesouthfirst.com/telangana/section-22a-row-intensifies-in-telangana-cm-revanth-assures-protection-of-property-owners-rights/)
+- Court Case Monitoring System: [The Week](https://www.theweek.in/news/india/2026/02/10/telangana-rolls-out-court-case-monitoring-system-to-strengthen-coordination-between-govt-and-courts.html)
+- MeeSeva on WhatsApp: [Deccan Chronicle](https://www.deccanchronicle.com/southern-states/telangana/meeseva-on-whatsapp-launched-1918037), [NewsMeter](https://newsmeter.in/nation/telangana-unveils-new-meeseva-expansion-offers-580-services-from-38-departments-via-whatsapp-758427)
+- TGICCC: [Wikipedia](https://en.wikipedia.org/wiki/Telangana_Integrated_Command_and_Control_Centre), [Telangana Today](https://telanganatoday.com/monsoon-preparedness-meeting-held-at-tgiccc-in-hyderabad)
+- Tanks in Telangana: [Mission Kakatiya](https://en.wikipedia.org/wiki/Mission_Kakatiya)
+- Radar change detection for urban building change: Che and Gamba, 2020, Sentinel-1 amplitude and coherence time series ([summary](https://www.bohrium.com/paper-details/bi-and-three-dimensional-urban-change-detection-using-sentinel-1-sar-temporal-series/812671251611910146-2681)); false alarms of coherence change detection in dense urban areas ([Manzoni et al., 2020](https://doaj.org/article/efc4f458c7b749ab84427c192aa0d30b))
+- High-resolution imagery: [PlanetScope and SkySat (NASA Earthdata)](https://www.earthdata.nasa.gov/about/csda/vendor-planet?page=9), [Cartosat-3 (NRSC brochure)](https://www.nrsc.gov.in/sites/default/files/pdf/training/C3_BROCHURE_JAN2021_modified.pdf)

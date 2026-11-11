@@ -1,0 +1,8602 @@
+{
+ "pages": {
+  "login-desk": {
+   "url": "/login",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Sign in with a demo role · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": null,
+    "offenders": []
+   },
+   "headings": [
+    "1 Lake Protect",
+    "2 Sign in with a demo role"
+   ],
+   "landmarks": {
+    "main": 0,
+    "nav": 0,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 34,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button.btn.secondary",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 10,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 1
+   },
+   "railButtons": [],
+   "demoBand": true
+  },
+  "login-phone": {
+   "url": "/login",
+   "viewport": {
+    "width": 390,
+    "height": 844
+   },
+   "lang": "en",
+   "title": "Sign in with a demo role · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": null,
+    "offenders": []
+   },
+   "headings": [
+    "1 Lake Protect",
+    "2 Sign in with a demo role"
+   ],
+   "landmarks": {
+    "main": 0,
+    "nav": 0,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 34,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button.btn.secondary",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 10,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 1
+   },
+   "railButtons": [],
+   "demoBand": true
+  },
+  "login-phone-te": {
+   "url": "/login",
+   "viewport": {
+    "width": 390,
+    "height": 844
+   },
+   "lang": "te",
+   "title": "డెమో పాత్రతో ప్రవేశించండి · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": null,
+    "offenders": []
+   },
+   "headings": [
+    "1 Lake Protect",
+    "2 డెమో పాత్రతో ప్రవేశించండి"
+   ],
+   "landmarks": {
+    "main": 0,
+    "nav": 0,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 34,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "డెమో డేటా"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "కల్పిత ప్రదేశాలు, వ్యక్తులు, రికార్డులు."
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button.btn.secondary",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 10,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 1
+   },
+   "railButtons": [],
+   "demoBand": true
+  },
+  "queue-desk": {
+   "url": "/alerts",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Alerts",
+    "3 Demo Cheruvu 2",
+    "3 Demo Cheruvu 1",
+    "3 Demo Parcel C",
+    "3 Demo Cheruvu 8",
+    "3 Demo Cheruvu 5",
+    "3 Demo Cheruvu 7",
+    "3 Demo Parcel B",
+    "3 Demo Cheruvu 9",
+    "3 Demo Cheruvu 4",
+    "3 Demo Kunta 1",
+    "3 Demo Kunta 2",
+    "3 Demo Kunta 3",
+    "3 Demo Kunta 5",
+    "3 Demo Cheruvu 3",
+    "3 Demo Cheruvu 6",
+    "3 Demo Cheruvu 5",
+    "3 Demo Kunta 4",
+    "3 Demo Kunta 6",
+    "3 Demo Parcel A"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 211,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "select[filter-mode]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button[group-all].chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[group-review].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 7
+    }
+   ],
+   "targets": {
+    "total": 75,
+    "under24": [
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 3"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 5"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Kunta 4"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Kunta 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Parcel A"
+     }
+    ],
+    "under24Count": 12,
+    "under44": 31
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "queue-laptop": {
+   "url": "/alerts",
+   "viewport": {
+    "width": 1024,
+    "height": 768
+   },
+   "lang": "en",
+   "title": "Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Alerts",
+    "3 Demo Cheruvu 2",
+    "3 Demo Cheruvu 1",
+    "3 Demo Parcel C",
+    "3 Demo Cheruvu 8",
+    "3 Demo Cheruvu 5",
+    "3 Demo Cheruvu 7",
+    "3 Demo Parcel B",
+    "3 Demo Cheruvu 9",
+    "3 Demo Cheruvu 4",
+    "3 Demo Kunta 1",
+    "3 Demo Kunta 2",
+    "3 Demo Kunta 3",
+    "3 Demo Kunta 5",
+    "3 Demo Cheruvu 3",
+    "3 Demo Cheruvu 6",
+    "3 Demo Cheruvu 5",
+    "3 Demo Kunta 4",
+    "3 Demo Kunta 6",
+    "3 Demo Parcel A"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 211,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "select[filter-mode]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button[group-all].chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[group-review].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 7
+    }
+   ],
+   "targets": {
+    "total": 75,
+    "under24": [
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 3"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 5"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Kunta 4"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Kunta 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Parcel A"
+     }
+    ],
+    "under24Count": 12,
+    "under44": 31
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "queue-tablet": {
+   "url": "/alerts",
+   "viewport": {
+    "width": 768,
+    "height": 1024
+   },
+   "lang": "en",
+   "title": "Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Alerts",
+    "3 Demo Cheruvu 2",
+    "3 Demo Cheruvu 1",
+    "3 Demo Parcel C",
+    "3 Demo Cheruvu 8",
+    "3 Demo Cheruvu 5",
+    "3 Demo Cheruvu 7",
+    "3 Demo Parcel B",
+    "3 Demo Cheruvu 9",
+    "3 Demo Cheruvu 4",
+    "3 Demo Kunta 1",
+    "3 Demo Kunta 2",
+    "3 Demo Kunta 3",
+    "3 Demo Kunta 5",
+    "3 Demo Cheruvu 3",
+    "3 Demo Cheruvu 6",
+    "3 Demo Cheruvu 5",
+    "3 Demo Kunta 4",
+    "3 Demo Kunta 6",
+    "3 Demo Parcel A"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 211,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "select[filter-mode]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button[group-all].chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[group-review].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 7
+    }
+   ],
+   "targets": {
+    "total": 75,
+    "under24": [
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 3"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 5"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Kunta 4"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Kunta 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Parcel A"
+     }
+    ],
+    "under24Count": 12,
+    "under44": 31
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "queue-phone": {
+   "url": "/alerts",
+   "viewport": {
+    "width": 390,
+    "height": 844
+   },
+   "lang": "en",
+   "title": "Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Alerts",
+    "3 Demo Cheruvu 2",
+    "3 Demo Cheruvu 1",
+    "3 Demo Parcel C",
+    "3 Demo Cheruvu 8",
+    "3 Demo Cheruvu 5",
+    "3 Demo Cheruvu 7",
+    "3 Demo Parcel B",
+    "3 Demo Cheruvu 9",
+    "3 Demo Cheruvu 4",
+    "3 Demo Kunta 1",
+    "3 Demo Kunta 2",
+    "3 Demo Kunta 3",
+    "3 Demo Kunta 5",
+    "3 Demo Cheruvu 3",
+    "3 Demo Cheruvu 6",
+    "3 Demo Cheruvu 5",
+    "3 Demo Kunta 4",
+    "3 Demo Kunta 6",
+    "3 Demo Parcel A"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 209,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "select[filter-mode]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button[group-all].chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[group-review].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 7
+    }
+   ],
+   "targets": {
+    "total": 75,
+    "under24": [
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 3"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 5"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Kunta 4"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Kunta 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Parcel A"
+     }
+    ],
+    "under24Count": 12,
+    "under44": 31
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "queue-zoom200": {
+   "url": "/alerts",
+   "viewport": {
+    "width": 720,
+    "height": 450
+   },
+   "lang": "en",
+   "title": "Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Alerts",
+    "3 Demo Cheruvu 2",
+    "3 Demo Cheruvu 1",
+    "3 Demo Parcel C",
+    "3 Demo Cheruvu 8",
+    "3 Demo Cheruvu 5",
+    "3 Demo Cheruvu 7",
+    "3 Demo Parcel B",
+    "3 Demo Cheruvu 9",
+    "3 Demo Cheruvu 4",
+    "3 Demo Kunta 1",
+    "3 Demo Kunta 2",
+    "3 Demo Kunta 3",
+    "3 Demo Kunta 5",
+    "3 Demo Cheruvu 3",
+    "3 Demo Cheruvu 6",
+    "3 Demo Cheruvu 5",
+    "3 Demo Kunta 4",
+    "3 Demo Kunta 6",
+    "3 Demo Parcel A"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 209,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "select[filter-mode]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button[group-all].chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[group-review].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 7
+    }
+   ],
+   "targets": {
+    "total": 75,
+    "under24": [
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 3"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 5"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Kunta 4"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Kunta 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Parcel A"
+     }
+    ],
+    "under24Count": 12,
+    "under44": 31
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "detail-desk": {
+   "url": "/alerts/19",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Demo Cheruvu 1 · Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Demo Cheruvu 1",
+    "2 Next step",
+    "2 When the change happened",
+    "2 Boundary and change",
+    "2 Case-readiness checklist",
+    "2 Case file",
+    "2 What the system checked",
+    "2 History"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 1,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 104,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    }
+   ],
+   "targets": {
+    "total": 12,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 12
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "detail-laptop": {
+   "url": "/alerts/19",
+   "viewport": {
+    "width": 1024,
+    "height": 768
+   },
+   "lang": "en",
+   "title": "Demo Cheruvu 1 · Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Demo Cheruvu 1",
+    "2 Next step",
+    "2 When the change happened",
+    "2 Boundary and change",
+    "2 Case-readiness checklist",
+    "2 Case file",
+    "2 What the system checked",
+    "2 History"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 1,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 104,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    }
+   ],
+   "targets": {
+    "total": 12,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 12
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "detail-tablet": {
+   "url": "/alerts/19",
+   "viewport": {
+    "width": 768,
+    "height": 1024
+   },
+   "lang": "en",
+   "title": "Demo Cheruvu 1 · Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Demo Cheruvu 1",
+    "2 Next step",
+    "2 When the change happened",
+    "2 Boundary and change",
+    "2 Case-readiness checklist",
+    "2 Case file",
+    "2 What the system checked",
+    "2 History"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 1,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 104,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    }
+   ],
+   "targets": {
+    "total": 12,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 12
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "detail-phone": {
+   "url": "/alerts/19",
+   "viewport": {
+    "width": 390,
+    "height": 844
+   },
+   "lang": "en",
+   "title": "Demo Cheruvu 1 · Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Demo Cheruvu 1",
+    "2 Next step",
+    "2 When the change happened",
+    "2 Boundary and change",
+    "2 Case-readiness checklist",
+    "2 Case file",
+    "2 What the system checked",
+    "2 History"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 1,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 102,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    }
+   ],
+   "targets": {
+    "total": 12,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 12
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "detail-zoom200": {
+   "url": "/alerts/19",
+   "viewport": {
+    "width": 720,
+    "height": 450
+   },
+   "lang": "en",
+   "title": "Demo Cheruvu 1 · Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Demo Cheruvu 1",
+    "2 Next step",
+    "2 When the change happened",
+    "2 Boundary and change",
+    "2 Case-readiness checklist",
+    "2 Case file",
+    "2 What the system checked",
+    "2 History"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 1,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 102,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    }
+   ],
+   "targets": {
+    "total": 12,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 12
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "detail-phone-top": {
+   "url": "/alerts/19",
+   "viewport": {
+    "width": 390,
+    "height": 844
+   },
+   "lang": "en",
+   "title": "Demo Cheruvu 1 · Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Demo Cheruvu 1",
+    "2 Next step",
+    "2 When the change happened",
+    "2 Boundary and change",
+    "2 Case-readiness checklist",
+    "2 Case file",
+    "2 What the system checked",
+    "2 History"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 1,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 102,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    }
+   ],
+   "targets": {
+    "total": 12,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 12
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "queue-desk-te": {
+   "url": "/alerts",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "te",
+   "title": "హెచ్చరికలు · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 హెచ్చరికలు",
+    "3 డెమో చెరువు 2",
+    "3 డెమో చెరువు 1",
+    "3 డెమో స్థలం C",
+    "3 డెమో చెరువు 8",
+    "3 డెమో చెరువు 5",
+    "3 డెమో చెరువు 7",
+    "3 డెమో స్థలం B",
+    "3 డెమో చెరువు 9",
+    "3 డెమో చెరువు 4",
+    "3 డెమో కుంట 1",
+    "3 డెమో కుంట 2",
+    "3 డెమో కుంట 3",
+    "3 డెమో కుంట 5",
+    "3 డెమో చెరువు 3",
+    "3 డెమో చెరువు 6",
+    "3 డెమో చెరువు 5",
+    "3 డెమో కుంట 4",
+    "3 డెమో కుంట 6",
+    "3 డెమో స్థలం A"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 211,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "డెమో డేటా"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "కల్పిత ప్రదేశాలు, వ్యక్తులు, రికార్డులు."
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "select[filter-mode]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button[group-all].chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[group-review].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 7
+    }
+   ],
+   "targets": {
+    "total": 75,
+    "under24": [
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "డెమో చెరువు 3"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "డెమో చెరువు 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "డెమో చెరువు 5"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "డెమో కుంట 4"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "డెమో కుంట 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "డెమో స్థలం A"
+     }
+    ],
+    "under24Count": 12,
+    "under44": 31
+   },
+   "railButtons": [
+    {
+     "text": "హెచ్చరికలు",
+     "visible": true
+    },
+    {
+     "text": "ఆస్తులు",
+     "visible": true
+    },
+    {
+     "text": "రికార్డులు",
+     "visible": true
+    },
+    {
+     "text": "English",
+     "visible": true
+    },
+    {
+     "text": "బయటకు",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "detail-desk-te": {
+   "url": "/alerts/19",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "te",
+   "title": "డెమో చెరువు 1 · హెచ్చరికలు · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 డెమో చెరువు 1",
+    "2 తదుపరి దశ",
+    "2 మార్పు ఎప్పుడు జరిగింది",
+    "2 హద్దు, మార్పు",
+    "2 కేసు సిద్ధత జాబితా",
+    "2 కేసు ఫైల్",
+    "2 సిస్టమ్ ఏమి తనిఖీ చేసింది",
+    "2 చరిత్ర"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 1,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 104,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "డెమో డేటా"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "కల్పిత ప్రదేశాలు, వ్యక్తులు, రికార్డులు."
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    }
+   ],
+   "targets": {
+    "total": 12,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 12
+   },
+   "railButtons": [
+    {
+     "text": "హెచ్చరికలు",
+     "visible": true
+    },
+    {
+     "text": "ఆస్తులు",
+     "visible": true
+    },
+    {
+     "text": "రికార్డులు",
+     "visible": true
+    },
+    {
+     "text": "English",
+     "visible": true
+    },
+    {
+     "text": "బయటకు",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "detail-phone-te": {
+   "url": "/alerts/19",
+   "viewport": {
+    "width": 390,
+    "height": 844
+   },
+   "lang": "te",
+   "title": "డెమో చెరువు 1 · హెచ్చరికలు · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 డెమో చెరువు 1",
+    "2 తదుపరి దశ",
+    "2 మార్పు ఎప్పుడు జరిగింది",
+    "2 హద్దు, మార్పు",
+    "2 కేసు సిద్ధత జాబితా",
+    "2 కేసు ఫైల్",
+    "2 సిస్టమ్ ఏమి తనిఖీ చేసింది",
+    "2 చరిత్ర"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 1,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 102,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "డెమో డేటా"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "కల్పిత ప్రదేశాలు, వ్యక్తులు, రికార్డులు."
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    }
+   ],
+   "targets": {
+    "total": 12,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 12
+   },
+   "railButtons": [
+    {
+     "text": "హెచ్చరికలు",
+     "visible": true
+    },
+    {
+     "text": "ఆస్తులు",
+     "visible": true
+    },
+    {
+     "text": "రికార్డులు",
+     "visible": true
+    },
+    {
+     "text": "English",
+     "visible": true
+    },
+    {
+     "text": "బయటకు",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "state-queue-loading": {
+   "url": "/alerts",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Alerts"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 29,
+    "fails": [],
+    "manual": []
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "select[filter-mode]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button[group-all].chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[group-review].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 7
+    }
+   ],
+   "targets": {
+    "total": 18,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 18
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": false
+  },
+  "state-queue-error": {
+   "url": "/alerts",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Alerts"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 0,
+    "[role=alert]": 1
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 30,
+    "fails": [],
+    "manual": []
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "select[filter-mode]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button[group-all].chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[group-review].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 7
+    },
+    {
+     "el": "button.btn.secondary",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#f6dfdb",
+     "borderRatio": 3.04,
+     "fillRatio": 1.27,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 19,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 19
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": false
+  },
+  "state-queue-empty": {
+   "url": "/alerts",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Alerts"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 0,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 30,
+    "fails": [],
+    "manual": []
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "select[filter-mode]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button[group-all].chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[group-review].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 7
+    }
+   ],
+   "targets": {
+    "total": 18,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 18
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": false
+  },
+  "state-queue-long-desk": {
+   "url": "/alerts",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Alerts",
+    "3 Demo Cheruvu 2",
+    "3 Demo Cheruvu 1",
+    "3 Demo Parcel C",
+    "3 Demo Cheruvu 8",
+    "3 Demo Cheruvu 5",
+    "3 Demo Cheruvu 7",
+    "3 Demo Parcel B",
+    "3 Demo Cheruvu 9",
+    "3 Demo Cheruvu 4",
+    "3 Demo Kunta 1",
+    "3 Demo Kunta 2",
+    "3 Demo Kunta 3",
+    "3 Demo Kunta 5",
+    "3 Demo Cheruvu with a deliberately long name to test",
+    "3 Demo Cheruvu 6",
+    "3 Demo Cheruvu 5",
+    "3 Demo Kunta 4",
+    "3 Demo Kunta 6",
+    "3 Demo Parcel A"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 212,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "select[filter-mode]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button[group-all].chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[group-review].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 7
+    }
+   ],
+   "targets": {
+    "total": 75,
+    "under24": [
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu with a deliberate"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 5"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Kunta 4"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Kunta 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Parcel A"
+     }
+    ],
+    "under24Count": 12,
+    "under44": 31
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "state-queue-long-phone": {
+   "url": "/alerts",
+   "viewport": {
+    "width": 390,
+    "height": 844
+   },
+   "lang": "en",
+   "title": "Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Alerts",
+    "3 Demo Cheruvu 2",
+    "3 Demo Cheruvu 1",
+    "3 Demo Parcel C",
+    "3 Demo Cheruvu 8",
+    "3 Demo Cheruvu 5",
+    "3 Demo Cheruvu 7",
+    "3 Demo Parcel B",
+    "3 Demo Cheruvu 9",
+    "3 Demo Cheruvu 4",
+    "3 Demo Kunta 1",
+    "3 Demo Kunta 2",
+    "3 Demo Kunta 3",
+    "3 Demo Kunta 5",
+    "3 Demo Cheruvu with a deliberately long name to test",
+    "3 Demo Cheruvu 6",
+    "3 Demo Cheruvu 5",
+    "3 Demo Kunta 4",
+    "3 Demo Kunta 6",
+    "3 Demo Parcel A"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 210,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "select[filter-mode]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button[group-all].chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[group-review].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 7
+    }
+   ],
+   "targets": {
+    "total": 75,
+    "under24": [
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu with a deliberate"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 5"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Kunta 4"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Kunta 6"
+     },
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Parcel A"
+     }
+    ],
+    "under24Count": 12,
+    "under44": 31
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "state-detail-loading": {
+   "url": "/alerts/19",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 12,
+    "fails": [],
+    "manual": []
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    }
+   ],
+   "targets": {
+    "total": 7,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 7
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": false
+  },
+  "state-detail-error": {
+   "url": "/alerts/19",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 0,
+    "[role=alert]": 1
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 13,
+    "fails": [],
+    "manual": []
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.btn.secondary",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#f6dfdb",
+     "borderRatio": 3.04,
+     "fillRatio": 1.27,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 8,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 8
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": false
+  },
+  "state-detail-404": {
+   "url": "/alerts/999999",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 0,
+    "[role=alert]": 1
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 13,
+    "fails": [],
+    "manual": []
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    }
+   ],
+   "targets": {
+    "total": 8,
+    "under24": [
+     {
+      "el": "a",
+      "w": 147,
+      "h": 23,
+      "text": "Go to your start page"
+     }
+    ],
+    "under24Count": 1,
+    "under44": 7
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": false
+  },
+  "role-analyst-on-audit": {
+   "url": "/audit",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Audit · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Audit"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 0,
+    "[role=alert]": 1
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 13,
+    "fails": [],
+    "manual": []
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    }
+   ],
+   "targets": {
+    "total": 7,
+    "under24": [
+     {
+      "el": "a",
+      "w": 147,
+      "h": 23,
+      "text": "Go to your start page"
+     }
+    ],
+    "under24Count": 1,
+    "under44": 6
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": false
+  },
+  "detail-nodal-assign-form": {
+   "url": "/alerts/15",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Demo Cheruvu 4 · Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Demo Cheruvu 4",
+    "2 Next step",
+    "3 Assign to a field officer",
+    "2 When the change happened",
+    "2 Boundary and change",
+    "2 Case-readiness checklist",
+    "2 Case file",
+    "2 What the system checked",
+    "2 History"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 1,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 110,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "select[input-owner]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "input",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button.btn.secondary",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 15,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 15
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "detail-legal-officer-record": {
+   "url": "/alerts/5",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Demo Cheruvu 2 · Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Demo Cheruvu 2",
+    "2 Next step",
+    "2 When the change happened",
+    "2 Boundary and change",
+    "2 Field checks",
+    "2 Case-readiness checklist",
+    "2 Officer record",
+    "2 Case file",
+    "2 What the system checked",
+    "2 History"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 1,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 194,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "select.control",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 7
+    },
+    {
+     "el": "input.control",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 7
+    },
+    {
+     "el": "button.btn.secondary",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 11
+    },
+    {
+     "el": "input[officer-notice_ref]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 6
+    },
+    {
+     "el": "textarea",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 46,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 45
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "detail-legal-officer-record-phone": {
+   "url": "/alerts/5",
+   "viewport": {
+    "width": 390,
+    "height": 844
+   },
+   "lang": "en",
+   "title": "Demo Cheruvu 2 · Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Demo Cheruvu 2",
+    "2 Next step",
+    "2 When the change happened",
+    "2 Boundary and change",
+    "2 Field checks",
+    "2 Case-readiness checklist",
+    "2 Officer record",
+    "2 Case file",
+    "2 What the system checked",
+    "2 History"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 1,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 192,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "select.control",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 7
+    },
+    {
+     "el": "input.control",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 7
+    },
+    {
+     "el": "button.btn.secondary",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 11
+    },
+    {
+     "el": "input[officer-notice_ref]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 6
+    },
+    {
+     "el": "textarea",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 46,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 45
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "assets-desk": {
+   "url": "/assets",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Assets · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Assets",
+    "3 Demo Cheruvu 1 Demo data",
+    "3 Demo Cheruvu 2 Demo data",
+    "3 Demo Cheruvu 3 Demo data",
+    "3 Demo Cheruvu 4 Demo data",
+    "3 Demo Cheruvu 5 Demo data",
+    "3 Demo Cheruvu 6 Demo data",
+    "3 Demo Cheruvu 7 Demo data",
+    "3 Demo Cheruvu 8 Demo data",
+    "3 Demo Cheruvu 9 Demo data",
+    "3 Demo Kunta 1 Demo data",
+    "3 Demo Kunta 2 Demo data",
+    "3 Demo Kunta 3 Demo data",
+    "3 Demo Kunta 4 Demo data",
+    "3 Demo Kunta 5 Demo data",
+    "3 Demo Kunta 6 Demo data",
+    "3 Demo Kunta 7 Demo data",
+    "3 Demo Kunta 8 Demo data",
+    "3 Demo Parcel A Demo data",
+    "3 Demo Parcel B Demo data",
+    "3 Demo Parcel C Demo data"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 199,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[dataset-real].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 32,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 12
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "Audit",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "assets-desk-selected": {
+   "url": "/assets",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Assets · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Assets",
+    "3 Demo Cheruvu 1 Demo data",
+    "3 Demo Cheruvu 2 Demo data",
+    "3 Demo Cheruvu 3 Demo data",
+    "3 Demo Cheruvu 4 Demo data",
+    "3 Demo Cheruvu 5 Demo data",
+    "3 Demo Cheruvu 6 Demo data",
+    "3 Demo Cheruvu 7 Demo data",
+    "3 Demo Cheruvu 8 Demo data",
+    "3 Demo Cheruvu 9 Demo data",
+    "3 Demo Kunta 1 Demo data",
+    "3 Demo Kunta 2 Demo data",
+    "3 Demo Kunta 3 Demo data",
+    "3 Demo Kunta 4 Demo data",
+    "3 Demo Kunta 5 Demo data",
+    "3 Demo Kunta 6 Demo data",
+    "3 Demo Kunta 7 Demo data",
+    "3 Demo Kunta 8 Demo data",
+    "3 Demo Parcel A Demo data",
+    "3 Demo Parcel B Demo data",
+    "3 Demo Parcel C Demo data",
+    "2 Boundary versions"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 209,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     },
+     {
+      "fg": "#1c2b33",
+      "el": "td",
+      "sample": "1"
+     },
+     {
+      "fg": "#4a5a62",
+      "el": "div.small.muted",
+      "sample": "In force from 3 Oct 2025"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[dataset-real].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 32,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 12
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "Audit",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "assets-phone-selected": {
+   "url": "/assets",
+   "viewport": {
+    "width": 390,
+    "height": 844
+   },
+   "lang": "en",
+   "title": "Assets · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Assets",
+    "3 Demo Cheruvu 1 Demo data",
+    "3 Demo Cheruvu 2 Demo data",
+    "3 Demo Cheruvu 3 Demo data",
+    "3 Demo Cheruvu 4 Demo data",
+    "3 Demo Cheruvu 5 Demo data",
+    "3 Demo Cheruvu 6 Demo data",
+    "3 Demo Cheruvu 7 Demo data",
+    "3 Demo Cheruvu 8 Demo data",
+    "3 Demo Cheruvu 9 Demo data",
+    "3 Demo Kunta 1 Demo data",
+    "3 Demo Kunta 2 Demo data",
+    "3 Demo Kunta 3 Demo data",
+    "3 Demo Kunta 4 Demo data",
+    "3 Demo Kunta 5 Demo data",
+    "3 Demo Kunta 6 Demo data",
+    "3 Demo Kunta 7 Demo data",
+    "3 Demo Kunta 8 Demo data",
+    "3 Demo Parcel A Demo data",
+    "3 Demo Parcel B Demo data",
+    "3 Demo Parcel C Demo data",
+    "2 Boundary versions"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 207,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     },
+     {
+      "fg": "#1c2b33",
+      "el": "td",
+      "sample": "1"
+     },
+     {
+      "fg": "#4a5a62",
+      "el": "div.small.muted",
+      "sample": "In force from 3 Oct 2025"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[dataset-real].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 32,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 12
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "Audit",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "records-desk": {
+   "url": "/records",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Records · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Records"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 29,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     },
+     {
+      "fg": "#1c2b33",
+      "el": "td",
+      "sample": "DEMO-BP-2025-0417"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "label.btn.secondary",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button.chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button.chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 2
+    }
+   ],
+   "targets": {
+    "total": 11,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 11
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "Audit",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "records-phone": {
+   "url": "/records",
+   "viewport": {
+    "width": 390,
+    "height": 844
+   },
+   "lang": "en",
+   "title": "Records · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": [
+     {
+      "el": "table.grid",
+      "left": 17,
+      "right": 427,
+      "text": "Reference\tSource\tKind\tFrom\tTo\t\nDEMO-BP-2"
+     }
+    ]
+   },
+   "headings": [
+    "1 Records"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 27,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     },
+     {
+      "fg": "#1c2b33",
+      "el": "td",
+      "sample": "DEMO-BP-2025-0417"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "label.btn.secondary",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button.chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button.chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 2
+    }
+   ],
+   "targets": {
+    "total": 11,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 11
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "Audit",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "state-assets-error": {
+   "url": "/assets",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Assets · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Assets"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 0,
+    "[role=alert]": 1
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 18,
+    "fails": [],
+    "manual": []
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[dataset-real].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button.btn.secondary",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#f6dfdb",
+     "borderRatio": 3.04,
+     "fillRatio": 1.27,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 13,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 13
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "Audit",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": false
+  },
+  "state-records-error": {
+   "url": "/records",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Records · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Records"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 0,
+    "[role=alert]": 1
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 19,
+    "fails": [],
+    "manual": []
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "label.btn.secondary",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button.chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button.chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.btn.secondary",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#f6dfdb",
+     "borderRatio": 3.04,
+     "fillRatio": 1.27,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 12,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 12
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Assets",
+     "visible": true
+    },
+    {
+     "text": "Records",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "Audit",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": false
+  },
+  "audit-desk": {
+   "url": "/audit",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Audit · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Audit",
+    "3 This month's closures to re-check"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 990,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     },
+     {
+      "fg": "#1c2b33",
+      "el": "td",
+      "sample": "7 Nov, 08:53 am"
+     },
+     {
+      "fg": "#4a5a62",
+      "el": "div.small.muted",
+      "sample": "Auditor"
+     },
+     {
+      "fg": "#4a5a62",
+      "el": "td.small.muted",
+      "sample": "181"
+     },
+     {
+      "fg": "#1f6fa8",
+      "el": "a",
+      "sample": "alert"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    }
+   ],
+   "targets": {
+    "total": 107,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 107
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "Audit",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "audit-phone": {
+   "url": "/audit",
+   "viewport": {
+    "width": 390,
+    "height": 844
+   },
+   "lang": "en",
+   "title": "Audit · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": [
+     {
+      "el": "table.grid",
+      "left": 17,
+      "right": 420,
+      "text": "When\tWho\tWhat\tItem\t#\n7 Nov, 08:53 am\tDem"
+     }
+    ]
+   },
+   "headings": [
+    "1 Audit",
+    "3 This month's closures to re-check"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 988,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     },
+     {
+      "fg": "#1c2b33",
+      "el": "td",
+      "sample": "7 Nov, 08:53 am"
+     },
+     {
+      "fg": "#4a5a62",
+      "el": "div.small.muted",
+      "sample": "Auditor"
+     },
+     {
+      "fg": "#4a5a62",
+      "el": "td.small.muted",
+      "sample": "181"
+     },
+     {
+      "fg": "#1f6fa8",
+      "el": "a",
+      "sample": "alert"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    }
+   ],
+   "targets": {
+    "total": 107,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 107
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "Audit",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "state-audit-error": {
+   "url": "/audit",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Audit · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Audit"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 0,
+    "[role=alert]": 1
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 13,
+    "fails": [],
+    "manual": []
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.btn.secondary",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#f6dfdb",
+     "borderRatio": 3.04,
+     "fillRatio": 1.27,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 7,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 7
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "Audit",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": false
+  },
+  "monthly-desk": {
+   "url": "/monthly",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Monthly page: November 2026 · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Monthly page: November 2026",
+    "2 Overdue, by who must act",
+    "2 Overdue alerts"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 88,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 4
+    }
+   ],
+   "targets": {
+    "total": 18,
+    "under24": [
+     {
+      "el": "a",
+      "w": 354,
+      "h": 23,
+      "text": "Demo Kunta 2"
+     },
+     {
+      "el": "a",
+      "w": 354,
+      "h": 23,
+      "text": "Demo Cheruvu 9"
+     },
+     {
+      "el": "a",
+      "w": 363,
+      "h": 23,
+      "text": "Demo Cheruvu 2"
+     },
+     {
+      "el": "a",
+      "w": 363,
+      "h": 23,
+      "text": "Demo Parcel C"
+     },
+     {
+      "el": "a",
+      "w": 363,
+      "h": 23,
+      "text": "Demo Cheruvu 8"
+     },
+     {
+      "el": "a",
+      "w": 363,
+      "h": 23,
+      "text": "Demo Parcel B"
+     }
+    ],
+    "under24Count": 6,
+    "under44": 12
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "monthly-tablet": {
+   "url": "/monthly",
+   "viewport": {
+    "width": 768,
+    "height": 1024
+   },
+   "lang": "en",
+   "title": "Monthly page: November 2026 · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Monthly page: November 2026",
+    "2 Overdue, by who must act",
+    "2 Overdue alerts"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 88,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 4
+    }
+   ],
+   "targets": {
+    "total": 18,
+    "under24": [
+     {
+      "el": "a",
+      "w": 394,
+      "h": 23,
+      "text": "Demo Kunta 2"
+     },
+     {
+      "el": "a",
+      "w": 394,
+      "h": 23,
+      "text": "Demo Cheruvu 9"
+     },
+     {
+      "el": "a",
+      "w": 403,
+      "h": 23,
+      "text": "Demo Cheruvu 2"
+     },
+     {
+      "el": "a",
+      "w": 403,
+      "h": 23,
+      "text": "Demo Parcel C"
+     },
+     {
+      "el": "a",
+      "w": 403,
+      "h": 23,
+      "text": "Demo Cheruvu 8"
+     },
+     {
+      "el": "a",
+      "w": 403,
+      "h": 23,
+      "text": "Demo Parcel B"
+     }
+    ],
+    "under24Count": 6,
+    "under44": 12
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "monthly-phone": {
+   "url": "/monthly",
+   "viewport": {
+    "width": 390,
+    "height": 844
+   },
+   "lang": "en",
+   "title": "Monthly page: November 2026 · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Monthly page: November 2026",
+    "2 Overdue, by who must act",
+    "2 Overdue alerts"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 86,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 4
+    }
+   ],
+   "targets": {
+    "total": 18,
+    "under24": [
+     {
+      "el": "a",
+      "w": 256,
+      "h": 23,
+      "text": "Demo Kunta 2"
+     },
+     {
+      "el": "a",
+      "w": 256,
+      "h": 23,
+      "text": "Demo Cheruvu 9"
+     },
+     {
+      "el": "a",
+      "w": 265,
+      "h": 23,
+      "text": "Demo Cheruvu 2"
+     },
+     {
+      "el": "a",
+      "w": 265,
+      "h": 23,
+      "text": "Demo Parcel C"
+     },
+     {
+      "el": "a",
+      "w": 265,
+      "h": 23,
+      "text": "Demo Cheruvu 8"
+     },
+     {
+      "el": "a",
+      "w": 265,
+      "h": 23,
+      "text": "Demo Parcel B"
+     }
+    ],
+    "under24Count": 6,
+    "under44": 12
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "monthly-desk-te": {
+   "url": "/monthly",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "te",
+   "title": "నెలవారీ పేజీ: నవంబర్ 2026 · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 నెలవారీ పేజీ: నవంబర్ 2026",
+    "2 గడువు దాటినవి, ఎవరు చర్య తీసుకోవాలి",
+    "2 గడువు దాటిన హెచ్చరికలు"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 88,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "డెమో డేటా"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "కల్పిత ప్రదేశాలు, వ్యక్తులు, రికార్డులు."
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 4
+    }
+   ],
+   "targets": {
+    "total": 18,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 18
+   },
+   "railButtons": [
+    {
+     "text": "హెచ్చరికలు",
+     "visible": true
+    },
+    {
+     "text": "నెలవారీ పేజీ",
+     "visible": true
+    },
+    {
+     "text": "English",
+     "visible": true
+    },
+    {
+     "text": "బయటకు",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "state-monthly-error": {
+   "url": "/monthly",
+   "viewport": {
+    "width": 1440,
+    "height": 900
+   },
+   "lang": "en",
+   "title": "Monthly page: November 2026 · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Monthly page: November 2026"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 0,
+    "[role=alert]": 1
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 19,
+    "fails": [],
+    "manual": []
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button.chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 4
+    },
+    {
+     "el": "button.btn.secondary",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#f6dfdb",
+     "borderRatio": 3.04,
+     "fillRatio": 1.27,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 13,
+    "under24": [],
+    "under24Count": 0,
+    "under44": 13
+   },
+   "railButtons": [
+    {
+     "text": "Alerts",
+     "visible": true
+    },
+    {
+     "text": "Monthly page",
+     "visible": true
+    },
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": false
+  },
+  "field-list": {
+   "url": "/field",
+   "viewport": {
+    "width": 412,
+    "height": 915
+   },
+   "lang": "en",
+   "title": "Sign in with a demo role · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": null,
+    "offenders": []
+   },
+   "headings": [
+    "1 My alerts"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 0,
+    "header": 1,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 15,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button[field-lang]",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[sync-now]",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#f1f4f1",
+     "borderRatio": 13.14,
+     "fillRatio": 1.11,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 4,
+    "under24": [
+     {
+      "el": "input[demo-no-signal]",
+      "w": 13,
+      "h": 13,
+      "text": "on"
+     }
+    ],
+    "under24Count": 1,
+    "under44": 1
+   },
+   "railButtons": [],
+   "demoBand": true
+  },
+  "field-alert": {
+   "url": "/field/alerts/11",
+   "viewport": {
+    "width": 412,
+    "height": 915
+   },
+   "lang": "en",
+   "title": "Sign in with a demo role · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": null,
+    "offenders": []
+   },
+   "headings": [
+    "1 Demo Cheruvu 9",
+    "2 Record your visit"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 0,
+    "header": 1,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 39,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button[field-lang]",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[sync-now]",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#f1f4f1",
+     "borderRatio": 13.14,
+     "fillRatio": 1.11,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "select[pos-mode]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1.15,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "label",
+     "border": "#75848b",
+     "borderWidth": 2,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 3
+    },
+    {
+     "el": "textarea[notes]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 14,
+    "under24": [
+     {
+      "el": "input[demo-no-signal]",
+      "w": 13,
+      "h": 13,
+      "text": "on"
+     },
+     {
+      "el": "input[outcome-confirmed]",
+      "w": 22,
+      "h": 22,
+      "text": "confirmed"
+     },
+     {
+      "el": "input[outcome-false_alarm]",
+      "w": 22,
+      "h": 22,
+      "text": "false_alarm"
+     },
+     {
+      "el": "input[outcome-cannot_access]",
+      "w": 22,
+      "h": 22,
+      "text": "cannot_access"
+     }
+    ],
+    "under24Count": 4,
+    "under44": 5
+   },
+   "railButtons": [],
+   "demoBand": true
+  },
+  "field-alert-small": {
+   "url": "/field/alerts/11",
+   "viewport": {
+    "width": 360,
+    "height": 740
+   },
+   "lang": "en",
+   "title": "Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": null,
+    "offenders": []
+   },
+   "headings": [
+    "1 Demo Cheruvu 9",
+    "2 Record your visit"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 0,
+    "header": 1,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 39,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button[field-lang]",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[sync-now]",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#f1f4f1",
+     "borderRatio": 13.14,
+     "fillRatio": 1.11,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "select[pos-mode]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1.15,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "label",
+     "border": "#75848b",
+     "borderWidth": 2,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 3
+    },
+    {
+     "el": "textarea[notes]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 14,
+    "under24": [
+     {
+      "el": "input[demo-no-signal]",
+      "w": 13,
+      "h": 13,
+      "text": "on"
+     },
+     {
+      "el": "input[outcome-confirmed]",
+      "w": 22,
+      "h": 22,
+      "text": "confirmed"
+     },
+     {
+      "el": "input[outcome-false_alarm]",
+      "w": 22,
+      "h": 22,
+      "text": "false_alarm"
+     },
+     {
+      "el": "input[outcome-cannot_access]",
+      "w": 22,
+      "h": 22,
+      "text": "cannot_access"
+     }
+    ],
+    "under24Count": 4,
+    "under44": 5
+   },
+   "railButtons": [],
+   "demoBand": true
+  },
+  "field-alert-small-te": {
+   "url": "/field/alerts/11",
+   "viewport": {
+    "width": 360,
+    "height": 740
+   },
+   "lang": "te",
+   "title": "Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": null,
+    "offenders": []
+   },
+   "headings": [
+    "1 డెమో చెరువు 9",
+    "2 మీ సందర్శనను నమోదు చేయండి"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 0,
+    "header": 1,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 39,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "డెమో డేటా"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "కల్పిత ప్రదేశాలు, వ్యక్తులు, రికార్డులు."
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button[field-lang]",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[sync-now]",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#f1f4f1",
+     "borderRatio": 13.14,
+     "fillRatio": 1.11,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "select[pos-mode]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1.15,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "label",
+     "border": "#75848b",
+     "borderWidth": 2,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 3
+    },
+    {
+     "el": "textarea[notes]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#ffffff",
+     "borderRatio": 3.87,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 14,
+    "under24": [
+     {
+      "el": "input[demo-no-signal]",
+      "w": 13,
+      "h": 13,
+      "text": "on"
+     },
+     {
+      "el": "input[outcome-confirmed]",
+      "w": 22,
+      "h": 22,
+      "text": "confirmed"
+     },
+     {
+      "el": "input[outcome-false_alarm]",
+      "w": 22,
+      "h": 22,
+      "text": "false_alarm"
+     },
+     {
+      "el": "input[outcome-cannot_access]",
+      "w": 22,
+      "h": 22,
+      "text": "cannot_access"
+     }
+    ],
+    "under24Count": 4,
+    "under44": 4
+   },
+   "railButtons": [],
+   "demoBand": true
+  },
+  "field-list-small-te": {
+   "url": "/field",
+   "viewport": {
+    "width": 360,
+    "height": 740
+   },
+   "lang": "te",
+   "title": "Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": null,
+    "offenders": []
+   },
+   "headings": [
+    "1 నా హెచ్చరికలు"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 0,
+    "header": 1,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 15,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "డెమో డేటా"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "కల్పిత ప్రదేశాలు, వ్యక్తులు, రికార్డులు."
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button[field-lang]",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[sync-now]",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#f1f4f1",
+     "borderRatio": 13.14,
+     "fillRatio": 1.11,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 4,
+    "under24": [
+     {
+      "el": "input[demo-no-signal]",
+      "w": 13,
+      "h": 13,
+      "text": "on"
+     }
+    ],
+    "under24Count": 1,
+    "under44": 1
+   },
+   "railButtons": [],
+   "demoBand": true
+  },
+  "field-list-offline": {
+   "url": "/field",
+   "viewport": {
+    "width": 412,
+    "height": 915
+   },
+   "lang": "en",
+   "title": "Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": null,
+    "offenders": []
+   },
+   "headings": [
+    "1 My alerts"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 0,
+    "header": 1,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 14,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button[field-lang]",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[sync-now]",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#f1f4f1",
+     "borderRatio": 13.14,
+     "fillRatio": 1.11,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 4,
+    "under24": [
+     {
+      "el": "input[demo-no-signal]",
+      "w": 13,
+      "h": 13,
+      "text": "on"
+     }
+    ],
+    "under24Count": 1,
+    "under44": 1
+   },
+   "railButtons": [],
+   "demoBand": true
+  },
+  "role-field-on-desk": {
+   "url": "/alerts",
+   "viewport": {
+    "width": 412,
+    "height": 915
+   },
+   "lang": "en",
+   "title": "Alerts · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": 0,
+    "offenders": []
+   },
+   "headings": [
+    "1 Alerts",
+    "3 Demo Cheruvu 9",
+    "3 Demo Cheruvu 6"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 1,
+    "header": 0,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 1,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 46,
+    "fails": [],
+    "manual": [
+     {
+      "fg": "#ffffff",
+      "el": "strong",
+      "sample": "Demo data"
+     },
+     {
+      "fg": "#ffffff",
+      "el": "span",
+      "sample": "Fictional places, people and records. No"
+     }
+    ]
+   },
+   "nonText": [
+    {
+     "el": "button",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "select[filter-mode]",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 2
+    },
+    {
+     "el": "button[group-all].chip",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 12.77,
+     "fillRatio": 12.77,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[group-review].chip",
+     "border": "#75848b",
+     "borderWidth": 1,
+     "outside": "#eef1ec",
+     "borderRatio": 3.39,
+     "fillRatio": 1.14,
+     "pass": true,
+     "count": 7
+    }
+   ],
+   "targets": {
+    "total": 21,
+    "under24": [
+     {
+      "el": "div.pin-wrap.maplibregl-marker.maplibregl-marker-anchor-center",
+      "w": 18,
+      "h": 20,
+      "text": "Map marker"
+     },
+     {
+      "el": "button.pin",
+      "w": 18,
+      "h": 18,
+      "text": "Demo Cheruvu 6"
+     }
+    ],
+    "under24Count": 2,
+    "under44": 16
+   },
+   "railButtons": [
+    {
+     "text": "తెలుగు",
+     "visible": true
+    },
+    {
+     "text": "Sign out",
+     "visible": true
+    }
+   ],
+   "demoBand": true
+  },
+  "field1-list-te": {
+   "url": "/field",
+   "viewport": {
+    "width": 412,
+    "height": 915
+   },
+   "lang": "te",
+   "title": "డెమో పాత్రతో ప్రవేశించండి · Lake Protect",
+   "overflow": {
+    "doc": 0,
+    "main": null,
+    "offenders": []
+   },
+   "headings": [
+    "1 నా హెచ్చరికలు"
+   ],
+   "landmarks": {
+    "main": 1,
+    "nav": 0,
+    "header": 1,
+    "footer": 0,
+    "aside": 0,
+    "[role=main]": 0,
+    "[role=navigation]": 0,
+    "[role=banner]": 0,
+    "[role=status]": 0,
+    "[role=alert]": 0
+   },
+   "unnamed": [],
+   "images": {
+    "imgNoAlt": [],
+    "ariaLabelWithoutRole": [],
+    "svgUnlabelled": []
+   },
+   "contrast": {
+    "checked": 9,
+    "fails": [],
+    "manual": []
+   },
+   "nonText": [
+    {
+     "el": "button[field-lang]",
+     "border": "#6c7f87",
+     "borderWidth": 1,
+     "outside": "#1c2b33",
+     "borderRatio": 3.48,
+     "fillRatio": 1,
+     "pass": true,
+     "count": 1
+    },
+    {
+     "el": "button[sync-now]",
+     "border": "#1c2b33",
+     "borderWidth": 1,
+     "outside": "#f1f4f1",
+     "borderRatio": 13.14,
+     "fillRatio": 1.11,
+     "pass": true,
+     "count": 1
+    }
+   ],
+   "targets": {
+    "total": 3,
+    "under24": [
+     {
+      "el": "input[demo-no-signal]",
+      "w": 13,
+      "h": 13,
+      "text": "on"
+     }
+    ],
+    "under24Count": 1,
+    "under44": 1
+   },
+   "railButtons": [],
+   "demoBand": false
+  }
+ },
+ "tabs": {
+  "login-desk": [
+   {
+    "el": "button.btn.secondary",
+    "label": "తెలుగు",
+    "w": 75,
+    "h": 41,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[login-demo.analyst]",
+    "label": "Analyst Demo Analyst Reviews candidate c",
+    "w": 224,
+    "h": 124,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[login-demo.reviewer]",
+    "label": "Reviewer Demo Reviewer Second signature ",
+    "w": 224,
+    "h": 124,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[login-demo.field1]",
+    "label": "Field officer Demo Field Officer 1 Check",
+    "w": 224,
+    "h": 124,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[login-demo.field2]",
+    "label": "Field officer Demo Field Officer 2 Check",
+    "w": 224,
+    "h": 124,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[login-demo.nodal]",
+    "label": "Nodal officer Demo Nodal Officer Assigns",
+    "w": 224,
+    "h": 124,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[login-demo.legal]",
+    "label": "Legal officer Demo Legal Officer Case fi",
+    "w": 224,
+    "h": 124,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[login-demo.senior]",
+    "label": "Senior officer Demo Senior Officer Reads",
+    "w": 224,
+    "h": 124,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[login-demo.auditor]",
+    "label": "Auditor Demo Auditor Reads the full log ",
+    "w": 224,
+    "h": 124,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[login-demo.admin]",
+    "label": "Admin Demo Admin Assets, boundaries and ",
+    "w": 224,
+    "h": 124,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "body"
+   },
+   {
+    "el": "button.btn.secondary",
+    "label": "తెలుగు",
+    "w": 75,
+    "h": 41,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[login-demo.analyst]",
+    "label": "Analyst Demo Analyst Reviews candidate c",
+    "w": 224,
+    "h": 124,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[login-demo.reviewer]",
+    "label": "Reviewer Demo Reviewer Second signature ",
+    "w": 224,
+    "h": 124,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   }
+  ],
+  "queue-desk": [
+   {
+    "el": "a.skip-link",
+    "label": "Skip to content",
+    "w": 143,
+    "h": 39,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a.active",
+    "label": "Alerts",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Assets",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Records",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "తెలుగు",
+    "w": 58,
+    "h": 28,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "Sign out",
+    "w": 71,
+    "h": 28,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "select[filter-mode]",
+    "label": "What this asset allows All Full path to ",
+    "w": 166,
+    "h": 38,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "select[filter-cohort]",
+    "label": "Asset group All A: recovered land B: fin",
+    "w": 219,
+    "h": 38,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[group-all].chip",
+    "label": "All",
+    "w": 42,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[group-review].chip",
+    "label": "Needs review",
+    "w": 108,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[group-field].chip",
+    "label": "In the field",
+    "w": 92,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[group-legal].chip",
+    "label": "With legal",
+    "w": 87,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[group-officer].chip",
+    "label": "With officer",
+    "w": 97,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[group-watch].chip",
+    "label": "Watch list",
+    "w": 86,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[group-closed].chip",
+    "label": "Closed",
+    "w": 68,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[group-overdue].chip",
+    "label": "Overdue",
+    "w": 80,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "canvas.maplibregl-canvas",
+    "label": "Map",
+    "w": 689,
+    "h": 688,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.pin.big",
+    "label": "Demo Cheruvu 2",
+    "w": 24,
+    "h": 24,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.pin.big",
+    "label": "Demo Cheruvu 1",
+    "w": 24,
+    "h": 24,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.pin.big",
+    "label": "Demo Parcel C",
+    "w": 24,
+    "h": 24,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.pin.big",
+    "label": "Demo Cheruvu 8",
+    "w": 24,
+    "h": 24,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.pin.big",
+    "label": "Demo Cheruvu 5",
+    "w": 24,
+    "h": 24,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.pin.big",
+    "label": "Demo Cheruvu 7",
+    "w": 24,
+    "h": 24,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.pin.big",
+    "label": "Demo Parcel B",
+    "w": 24,
+    "h": 24,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.pin.big",
+    "label": "Demo Cheruvu 9",
+    "w": 24,
+    "h": 24,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.pin.big",
+    "label": "Demo Cheruvu 4",
+    "w": 24,
+    "h": 24,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.pin.big",
+    "label": "Demo Kunta 1",
+    "w": 24,
+    "h": 24,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.pin.big",
+    "label": "Demo Kunta 2",
+    "w": 24,
+    "h": 24,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.pin.big",
+    "label": "Demo Kunta 3",
+    "w": 24,
+    "h": 24,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.pin.big",
+    "label": "Demo Kunta 5",
+    "w": 24,
+    "h": 24,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   }
+  ],
+  "queue-phone": [
+   {
+    "el": "a.skip-link",
+    "label": "Skip to content",
+    "w": 143,
+    "h": 39,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a.active",
+    "label": "Alerts",
+    "w": 62,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Assets",
+    "w": 66,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Records",
+    "w": 77,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "తెలుగు",
+    "w": 63,
+    "h": 33,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "Sign out",
+    "w": 76,
+    "h": 33,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "select[filter-mode]",
+    "label": "What this asset allows All Full path to ",
+    "w": 166,
+    "h": 38,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "select[filter-cohort]",
+    "label": "Asset group All A: recovered land B: fin",
+    "w": 219,
+    "h": 38,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[group-all].chip",
+    "label": "All",
+    "w": 42,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[group-review].chip",
+    "label": "Needs review",
+    "w": 108,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[group-field].chip",
+    "label": "In the field",
+    "w": 92,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[group-legal].chip",
+    "label": "With legal",
+    "w": 87,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   }
+  ],
+  "detail-desk": [
+   {
+    "el": "a.skip-link",
+    "label": "Skip to content",
+    "w": 143,
+    "h": 39,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a.active",
+    "label": "Alerts",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Assets",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Records",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "తెలుగు",
+    "w": 58,
+    "h": 28,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "Sign out",
+    "w": 71,
+    "h": 28,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "All alerts",
+    "w": 50,
+    "h": 18,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[action-CONFIRMED].btn",
+    "label": "Confirm the change",
+    "w": 343,
+    "h": 41,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[action-CLOSED_NOT_REAL].btn.danger",
+    "label": "Close as not real",
+    "w": 343,
+    "h": 41,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.btn.quiet",
+    "label": "Request sharper imagery",
+    "w": 188,
+    "h": 41,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "canvas.maplibregl-canvas",
+    "label": "Map",
+    "w": 762,
+    "h": 378,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.maplibregl-ctrl-zoom-in",
+    "label": "Zoom in",
+    "w": 29,
+    "h": 29,
+    "outline": "none",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.maplibregl-ctrl-zoom-out",
+    "label": "Zoom out",
+    "w": 29,
+    "h": 29,
+    "outline": "none",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "summary.maplibregl-ctrl-attrib-button",
+    "label": "Toggle attribution",
+    "w": 24,
+    "h": 24,
+    "outline": "none",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "body"
+   },
+   {
+    "el": "a.skip-link",
+    "label": "Skip to content",
+    "w": 143,
+    "h": 39,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a.active",
+    "label": "Alerts",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Assets",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Records",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "తెలుగు",
+    "w": 58,
+    "h": 28,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "Sign out",
+    "w": 71,
+    "h": 28,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "All alerts",
+    "w": 50,
+    "h": 18,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[action-CONFIRMED].btn",
+    "label": "Confirm the change",
+    "w": 343,
+    "h": 41,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[action-CLOSED_NOT_REAL].btn.danger",
+    "label": "Close as not real",
+    "w": 343,
+    "h": 41,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.btn.quiet",
+    "label": "Request sharper imagery",
+    "w": 188,
+    "h": 41,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "canvas.maplibregl-canvas",
+    "label": "Map",
+    "w": 762,
+    "h": 378,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.maplibregl-ctrl-zoom-in",
+    "label": "Zoom in",
+    "w": 29,
+    "h": 29,
+    "outline": "none",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.maplibregl-ctrl-zoom-out",
+    "label": "Zoom out",
+    "w": 29,
+    "h": 29,
+    "outline": "none",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "summary.maplibregl-ctrl-attrib-button",
+    "label": "Toggle attribution",
+    "w": 24,
+    "h": 24,
+    "outline": "none",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "body"
+   },
+   {
+    "el": "a.skip-link",
+    "label": "Skip to content",
+    "w": 143,
+    "h": 39,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a.active",
+    "label": "Alerts",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Assets",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Records",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "తెలుగు",
+    "w": 58,
+    "h": 28,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "Sign out",
+    "w": 71,
+    "h": 28,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "All alerts",
+    "w": 50,
+    "h": 18,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[action-CONFIRMED].btn",
+    "label": "Confirm the change",
+    "w": 343,
+    "h": 41,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[action-CLOSED_NOT_REAL].btn.danger",
+    "label": "Close as not real",
+    "w": 343,
+    "h": 41,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.btn.quiet",
+    "label": "Request sharper imagery",
+    "w": 188,
+    "h": 41,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   }
+  ],
+  "assets-desk": [
+   {
+    "el": "a.skip-link",
+    "label": "Skip to content",
+    "w": 143,
+    "h": 39,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Alerts",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a.active",
+    "label": "Assets",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Records",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Monthly page",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Audit",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "తెలుగు",
+    "w": 58,
+    "h": 28,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "Sign out",
+    "w": 71,
+    "h": 28,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.chip",
+    "label": "Demo world",
+    "w": 101,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[dataset-real].chip",
+    "label": "Real lakes (OpenStreetMap)",
+    "w": 193,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "canvas.maplibregl-canvas",
+    "label": "Map",
+    "w": 689,
+    "h": 518,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.maplibregl-ctrl-zoom-in",
+    "label": "Zoom in",
+    "w": 29,
+    "h": 29,
+    "outline": "none",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.maplibregl-ctrl-zoom-out",
+    "label": "Zoom out",
+    "w": 29,
+    "h": 29,
+    "outline": "none",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "summary.maplibregl-ctrl-attrib-button",
+    "label": "Toggle attribution",
+    "w": 24,
+    "h": 24,
+    "outline": "none",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.row",
+    "label": "Demo Cheruvu 1 Demo data A: recovered la",
+    "w": 459,
+    "h": 116,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.row",
+    "label": "Demo Cheruvu 2 Demo data A: recovered la",
+    "w": 459,
+    "h": 116,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   }
+  ],
+  "records-desk": [
+   {
+    "el": "a.skip-link",
+    "label": "Skip to content",
+    "w": 143,
+    "h": 39,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Alerts",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Assets",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a.active",
+    "label": "Records",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Monthly page",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Audit",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "తెలుగు",
+    "w": 58,
+    "h": 28,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "Sign out",
+    "w": 71,
+    "h": 28,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "input.sr-only",
+    "label": "Import CSV",
+    "w": 1,
+    "h": 1,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": true
+   },
+   {
+    "el": "button.chip",
+    "label": "Permits",
+    "w": 74,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.chip",
+    "label": "Authorised works",
+    "w": 133,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.chip",
+    "label": "Court cases",
+    "w": 97,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "div.table-scroll",
+    "label": "Permits",
+    "w": 1168,
+    "h": 80,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "body"
+   }
+  ],
+  "monthly-desk": [
+   {
+    "el": "a.skip-link",
+    "label": "Skip to content",
+    "w": 143,
+    "h": 39,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Alerts",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a.active",
+    "label": "Monthly page",
+    "w": 192,
+    "h": 40,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "తెలుగు",
+    "w": 58,
+    "h": 28,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button",
+    "label": "Sign out",
+    "w": 71,
+    "h": 28,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[print-monthly].btn",
+    "label": "Print one page",
+    "w": 140,
+    "h": 41,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.chip",
+    "label": "November 2026",
+    "w": 123,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.chip",
+    "label": "October 2026",
+    "w": 108,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.chip",
+    "label": "September 2026",
+    "w": 125,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.chip",
+    "label": "August 2026",
+    "w": 102,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.chip",
+    "label": "Demo world",
+    "w": 101,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.chip",
+    "label": "Real lakes",
+    "w": 86,
+    "h": 30,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Demo Kunta 2",
+    "w": 354,
+    "h": 23,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Demo Cheruvu 9",
+    "w": 354,
+    "h": 23,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Demo Cheruvu 2",
+    "w": 363,
+    "h": 23,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Demo Parcel C",
+    "w": 363,
+    "h": 23,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   }
+  ],
+  "field-alert": [
+   {
+    "el": "button[field-lang]",
+    "label": "తెలుగు",
+    "w": 75,
+    "h": 44,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[sync-now]",
+    "label": "Send now",
+    "w": 104,
+    "h": 40,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "input[demo-no-signal]",
+    "label": "Demo: no signal",
+    "w": 13,
+    "h": 13,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "My alerts",
+    "w": 71,
+    "h": 23,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "canvas.maplibregl-canvas",
+    "label": "Map",
+    "w": 378,
+    "h": 240,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.maplibregl-ctrl-zoom-in",
+    "label": "Zoom in",
+    "w": 29,
+    "h": 29,
+    "outline": "none",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.maplibregl-ctrl-zoom-out",
+    "label": "Zoom out",
+    "w": 29,
+    "h": 29,
+    "outline": "none",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "summary.maplibregl-ctrl-attrib-button",
+    "label": "Toggle attribution",
+    "w": 24,
+    "h": 24,
+    "outline": "none",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "Open in maps app",
+    "w": 137,
+    "h": 20,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "input[photo-input]",
+    "label": "Take or add a photo",
+    "w": 1,
+    "h": 1,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 0,
+    "inView": true,
+    "hiddenFocus": true
+   },
+   {
+    "el": "select[pos-mode]",
+    "label": "Demo: position This device's GPS At the ",
+    "w": 380,
+    "h": 48,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[get-gps].f-btn.secondary",
+    "label": "Get my position",
+    "w": 380,
+    "h": 48,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "input[outcome-confirmed]",
+    "label": "The change is there",
+    "w": 22,
+    "h": 22,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "textarea[notes]",
+    "label": "Notes",
+    "w": 380,
+    "h": 94,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[save-visit].f-btn",
+    "label": "Save visit",
+    "w": 380,
+    "h": 56,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "body"
+   },
+   {
+    "el": "button[field-lang]",
+    "label": "తెలుగు",
+    "w": 75,
+    "h": 44,
+    "outline": "3px solid rgb(127, 182, 221)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button[sync-now]",
+    "label": "Send now",
+    "w": 104,
+    "h": 40,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "input[demo-no-signal]",
+    "label": "Demo: no signal",
+    "w": 13,
+    "h": 13,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "a",
+    "label": "My alerts",
+    "w": 71,
+    "h": 23,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "canvas.maplibregl-canvas",
+    "label": "Map",
+    "w": 378,
+    "h": 240,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.maplibregl-ctrl-zoom-in",
+    "label": "Zoom in",
+    "w": 29,
+    "h": 29,
+    "outline": "none",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "button.maplibregl-ctrl-zoom-out",
+    "label": "Zoom out",
+    "w": 29,
+    "h": 29,
+    "outline": "none",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   {
+    "el": "summary.maplibregl-ctrl-attrib-button",
+    "label": "Toggle attribution",
+    "w": 24,
+    "h": 24,
+    "outline": "none",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   }
+  ]
+ },
+ "checks": {
+  "ariaLogin": "- status:\n  - strong: Demo data\n  - text: Fictional places, people and records. Nothing here is a finding.\n- heading \"Lake Protect\" [level=1]\n- paragraph: Weekly screening of lakes and recovered land\n- button \"తెలుగు\"\n- heading \"Sign in with a demo role\" [level=2]\n- paragraph: Each account is a fictional role. Pick the role you want to show.\n- button \"Analyst Demo Analyst Reviews candidate changes from the image pair\"\n- button \"Reviewer Demo Reviewer Second signature on closures\"\n- button \"Field officer Demo Field Officer 1 Checks one alert on site, works offline\"\n- button \"Field officer Demo Field Officer 2 Checks one alert on site, works offline\"\n- button \"Nodal officer Demo Nodal Officer Assigns alerts and watches deadlines\"\n- button \"Legal officer Demo Legal Officer Case files, court holds and officer actions\"\n- button \"Senior officer Demo Senior Officer Reads the monthly page\"\n- button \"Auditor Demo Auditor Reads the full log and checks closures\"\n- button \"Admin Demo Admin Assets, boundaries and record imports\"",
+  "ariaQueue": "- main:\n  - heading \"Alerts\" [level=1]\n  - paragraph: 19 alerts. Highest priority first.\n  - text: What this asset allows\n  - combobox \"What this asset allows\":\n    - option \"All\" [selected]\n    - option \"Full path to officer\"\n    - option \"Field check only\"\n    - option \"Watch only\"\n  - text: Asset group\n  - combobox \"Asset group\":\n    - option \"All\" [selected]\n    - 'option \"A: recovered land\"'\n    - 'option \"B: final notification\"'\n    - 'option \"C: preliminary notification\"'\n    - 'option \"D: no notification\"'\n  - group \"State\":\n    - button \"All\" [pressed]\n    - button \"Needs review\"\n    - button \"In the field\"\n    - button \"With legal\"\n    - button \"With officer\"\n    - button \"Watch list\"\n    - button \"Closed\"\n    - button \"Overdue\"\n  - region \"Map\"\n  - button \"Map marker\":\n    - button \"Demo Cheruvu 2\"\n    - text: Demo Cheruvu 2\n  - button \"Map marker\":\n    - button \"Demo Cheruvu 1\"\n    - text: Demo Cheruvu 1\n  - button \"Map marker\":\n    - button \"Demo Parcel C\"\n    - text: Demo Parcel C\n  - button \"Map marker\":\n    - button \"Demo Cheruvu 8\"\n    - text: Demo Cheruvu 8\n  - button \"Map marker\":\n    - button \"Demo Cheruvu 5\"\n    - text: Demo Cheruvu 5\n  - button \"Map marker\":\n    - button \"Demo Cheruvu 7\"\n    - text: Demo Cheruvu 7\n  - button \"Map marker\":\n    - button \"Demo Parcel B\"\n    - text: Demo Parcel B\n  - button \"Map marker\":\n    - button \"Demo Cheruvu 9\"\n    - text: Demo Cheruvu 9\n  - button \"Map marker\":\n    - button \"Demo Cheruvu 4\"\n    - text: Demo Cheruvu 4\n  - button \"Map marker\":\n    - button \"Demo Kunta 1\"\n    - text: Demo Kunta 1\n  - button \"Map marker\":\n    - button \"Demo Kunta 2\"\n    - text: Demo Kunta 2\n  - button \"Map marker\":\n    - button \"Demo Kunta 3\"\n    - text: Demo Kunta 3\n  - button \"Map marker\":\n    - button \"Demo Kunta 5\"\n    - text: Demo Kunta 5\n  - button \"Map marker\":\n    - button \"Demo Cheruvu 3\"\n  - button \"Map marker\":\n    - button \"Demo Cheruvu 6\"\n  - button \"Map marker\":\n    - button \"Demo Cheruvu 5\"\n  - button \"Map marker\":\n    - button \"Demo Kunta 4\"\n  - button \"Map marker\":\n    - button \"Demo Kunta 6\"\n  - button \"Map marker\":\n    - button \"Demo Parcel A\"\n  - button \"Zoom in\"\n  - button \"Zoom out\"\n  - group: Demo map (fictional)\n  - text: Needs review In the field With legal With officer Watch list Overdue\n  - 'link \"Demo Cheruvu 2 With officer Soil fill 1.49 acre Inside the lake boundary (FTL) Overdue since 1 Nov 2026 Owner: Demo Field Officer 1 DEMO-2026-0005 65 Priority\"':\n    - /url: /alerts/5\n    - heading \"Demo Cheruvu 2\" [level=3]\n    - text: \"With officer Soil fill 1.49 acre Inside the lake boundary (FTL) Overdue since 1 Nov 2026 Owner: Demo Field Officer 1 DEMO-2026-0005 65 Priority\"\n  - link \"Demo Cheruvu 1 Waiting for review Soil fill 1.11 acre Inside the lake boundary (FTL) Due 8 Nov 2026 DEMO-2026-0019 63 Priority\":\n    - /url: /alerts/19\n    - heading \"Demo Cheruvu 1\" [level=3]\n    - text: Waiting for review Soil fill 1.11 acre Inside the lake boundary (FTL) Due 8 Nov 2026 DEMO-2026-0019 63 Priority\n  - link \"Demo Parcel C Waiting for review Land cleared 0.75 acre Inside the parcel Overdue since 4 Nov 2026 DEMO-2026-0017 61 Priority\":\n    - /url: /alerts/17\n    - heading \"Demo Parcel C\" [level=3]\n    - text: Waiting for review Land cleared 0.75 acre Inside the parcel Overdue since 4 Nov 2026 DEMO-2026-0017 61 Priority\n  - link \"Demo Cheruvu 8 Waiting for review Land cleared 1.05 acre Inside the lake boundary (FTL) Overdue since 5 Nov 2026 Permits DEMO-2026-0018 61 Priority\":\n    - /url: /alerts/18\n    - heading \"Demo Cheruvu 8\" [level=3]\n    - text: Waiting for review Land cleared 1.05 acre Inside the lake boundary (FTL) Overdue since 5 Nov 2026 Permits DEMO-2026-0018 61 Priority\n  - 'link \"Demo Cheruvu 5 Watched after action Soil fill 1.05 acre Inside the lake boundary (FTL) Owner: Demo Field Officer 1 DEMO-2026-0001 61 Priority\"':\n    - /url: /alerts/1\n    - heading \"Demo Cheruvu 5\" [level=3]\n    - text: \"Watched after action Soil fill 1.05 acre Inside the lake boundary (FTL) Owner: Demo Field Officer 1 DEMO-2026-0001 61 Priority\"\n  - 'link \"Demo Cheruvu 7 With legal team: court case Soil fill 0.99 acre Inside the lake boundary (FTL) DEMO-2026-0014 61 Priority\"':\n    - /url: /alerts/14\n    - heading \"Demo Cheruvu 7\" [level=3]\n    - text: \"With legal team: court case Soil fill 0.99 acre Inside the lake boundary (FTL) DEMO-2026-0014 61 Priority\"\n  - link \"Demo Parcel B Waiting for review Soil fill 0.68 acre Inside the parcel Overdue since 6 Nov 2026 Reopened DEMO-2026-0006 60 Priority\":\n    - /url: /alerts/6\n    - heading \"Demo Parcel B\" [level=3]\n    - text: Waiting for review Soil fill 0.68 acre Inside the parcel Overdue since 6 Nov 2026 Reopened DEMO-2026-0006 60 Priority\n  - 'link \"Demo Cheruvu 9 With field team Soil fill 0.93 acre Inside the lake boundary (FTL) Overdue since 25 Oct 2026 Owner: Demo Field Officer 2 DEMO-2026-0011 60 Priority\"':\n    - /url: /alerts/11\n    - heading \"Demo Cheruvu 9\" [level=3]\n    - text: \"With field team Soil fill 0.93 acre Inside the lake boundary (FTL) Overdue since 25 Oct 2026 Owner: Demo Field Officer 2 DEMO-2026-0011 60 Priority\"\n  - link \"Demo Cheruvu 4 Confirmed, to assign Building 0.48 acre Inside the lake boundary (FTL) DEMO-2026-0015 52 Priority\":\n    - /url: /alerts/15\n    - heading \"Demo Cheruvu 4\" [level=3]\n    - text: Confirmed, to assign Building 0.48 acre Inside the lake boundary (FTL) DEMO-2026-0015 52 Priority\n  - 'link \"Demo Kunta 1 Waiting for final boundary Soil fill 0.68 acre Inside the lake boundary (FTL) Owner: Demo Field Officer 1 DEMO-2026-0008 50 Priority\"':\n    - /url: /alerts/8\n    - heading \"Demo Kunta 1\" [level=3]\n    - text: \"Waiting for final boundary Soil fill 0.68 acre Inside the lake boundary (FTL) Owner: Demo Field Officer 1 DEMO-2026-0008 50 Priority\"\n  - link \"Demo Kunta 2 Waiting for review Soil fill 0.63 acre Inside the lake boundary (FTL) Overdue since 16 Sept 2026 DEMO-2026-0003 50 Priority\":\n    - /url: /alerts/3\n    - heading \"Demo Kunta 2\" [level=3]",
+  "ariaDetail": "- main:\n  - paragraph:\n    - link \"All alerts\":\n      - /url: /alerts\n    - text: / DEMO-2026-0019\n  - heading \"Demo Cheruvu 1\" [level=1]\n  - text: Waiting for review Soil fill 1.11 acre Soil dumped Due 8 Nov 2026 Marked on the ground Confirmed boundary Version 1\n  - region \"Next step\":\n    - heading \"Next step\" [level=2]\n    - button \"Confirm the change\"\n    - button \"Close as not real\"\n    - button \"Request sharper imagery\"\n  - figure \"Before 19 Oct 2026\":\n    - img \"Before, 19 Oct 2026\"\n    - text: Before 19 Oct 2026\n  - figure \"After 24 Oct 2026\":\n    - img \"After, 24 Oct 2026\"\n    - text: After 24 Oct 2026\n  - text: \"Inside the lake boundary (FTL) In the buffer zone Change Seen by: Optical Synthetic demo image. Not satellite data.\"\n  - heading \"When the change happened\" [level=2]\n  - paragraph: Last clear 19 Oct 2026 First changed 24 Oct 2026\n  - text: Policy cut-off 19 Jul 2024 Watching since 7 Nov 2025 Alert raised 5 Nov 2026\n  - paragraph: The change happened between the last clear image and the first changed image.\n  - heading \"Boundary and change\" [level=2]\n  - region \"Map\"\n  - button \"Zoom in\"\n  - button \"Zoom out\"\n  - group: Demo map (fictional)\n  - text: \"Solid line: confirmed Dashed line: preliminary Dotted line: estimated In the buffer zone\"\n  - heading \"Case-readiness checklist\" [level=2]\n  - text: \"Not recorded Boundary confirmed by final notification or certified survey Boundary status: physically_marked (version 1) Not recorded Joint boundary survey done Not recorded Survey carried out with prior notice Not recorded No live court matter or undertaking Court register: no live matter found Not recorded Title claims and local permissions reviewed Not recorded Notice served and hearing held Not recorded Dated bracket shown against the policy cut-off Last clear 2026-10-19, first changed 2026-10-24; policy cut-off 2024-07-19\"\n  - paragraph: Imagery shows physical change. It does not establish title or legality.\n  - complementary:\n    - heading \"Case file\" [level=2]\n    - paragraph: A pack can be made once the change is confirmed on site.\n    - list\n    - heading \"What the system checked\" [level=2]\n    - term: Where\n    - definition: Inside the lake boundary (FTL)\n    - term: Boundary\n    - definition: Marked on the ground, Version 1\n    - term: What this asset allows\n    - definition: Full path to officer\n    - term: Land category\n    - definition: Government land\n    - term: Permits\n    - definition: None found\n    - term: Authorised works\n    - definition: None found\n    - term: Court register\n    - definition: None found\n    - term: Confidence\n    - definition: 80%\n    - paragraph: Rules rules-v0\n    - heading \"History\" [level=2]\n    - list:\n      - listitem: \"Moved to: Waiting for review 5 Nov, 04:30 am\"\n      - listitem: Candidate change recorded 5 Nov, 04:30 am",
+  "actionFocus": {
+   "label": "Confirm the change",
+   "afterOpen": {
+    "el": "h3.title-xs",
+    "label": "Confirm the change",
+    "w": 317,
+    "h": 20,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   "afterTabFromThere": {
+    "el": "input[input-reviewed]",
+    "label": "I compared the before and after images",
+    "w": 13,
+    "h": 13,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   },
+   "afterCancel": {
+    "el": "button[action-CONFIRMED].btn",
+    "label": "Confirm the change",
+    "w": 343,
+    "h": 41,
+    "outline": "3px solid rgb(31, 111, 168)",
+    "opacity": 1,
+    "inView": true,
+    "hiddenFocus": false
+   }
+  },
+  "imagePairHeights": {
+   "whileLoading": [
+    415,
+    415
+   ],
+   "afterLoad": [
+    415,
+    415
+   ]
+  },
+  "imagePairFailed": [
+   {
+    "h": 415,
+    "text": "This image could not be loaded.\n\nTry again\nBefore\n19 Oct 202"
+   },
+   {
+    "h": 415,
+    "text": "This image could not be loaded.\n\nTry again\nAfter\n24 Oct 2026"
+   }
+  ],
+  "printDemoBand": "flex",
+  "ariaField": "- main:\n  - paragraph:\n    - link \"My alerts\":\n      - /url: /field\n  - heading \"Demo Cheruvu 9\" [level=1]\n  - paragraph: Soil fill, 0.93 acre. Overdue since 25 Oct 2026\n  - paragraph: Go to the marked place. Photograph the change from the edge. Record what you see.\n  - paragraph: This is an observation, not a survey. Do not enter private land. Wording pending legal review.\n  - region \"Map\"\n  - button \"Zoom in\"\n  - button \"Zoom out\"\n  - group: Demo map (fictional)\n  - paragraph:\n    - text: \"Location: 14.47838, 81.46578\"\n    - link \"Open in maps app\":\n      - /url: geo:14.478383,81.465778\n  - figure \"Before 3 Oct 2026\":\n    - img \"Before\"\n    - text: Before 3 Oct 2026\n  - figure \"After 8 Oct 2026\":\n    - img \"After\"\n    - text: After 8 Oct 2026\n  - heading \"Record your visit\" [level=2]\n  - text: Take or add a photo\n  - button \"Take or add a photo\"\n  - text: \"Demo: position\"\n  - 'combobox \"Demo: position\"':\n    - option \"This device's GPS\" [selected]\n    - option \"At the site (simulated)\"\n    - option \"200 m away (simulated)\"\n  - button \"Get my position\"\n  - group \"What did you find?\":\n    - text: What did you find?\n    - radio \"The change is there\"\n    - text: The change is there\n    - radio \"No change on the ground\"\n    - text: No change on the ground\n    - radio \"Could not reach the place\"\n    - text: Could not reach the place\n  - text: Notes\n  - textbox \"Notes\"\n  - button \"Save visit\"",
+  "fieldValidation": {
+   "text": "Choose what you found.",
+   "role": "status",
+   "top": 804,
+   "viewportH": 915,
+   "focus": "save-visit"
+  }
+ },
+ "console": [
+  {
+   "step": "queue-error",
+   "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+  },
+  {
+   "step": "detail-error",
+   "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+  },
+  {
+   "step": "detail-404",
+   "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+   "step": "detail-chips-fail",
+   "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+   "step": "detail-chips-fail",
+   "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+   "step": "analyst-forbidden",
+   "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+  },
+  {
+   "step": "analyst-forbidden",
+   "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+  },
+  {
+   "step": "assets-error",
+   "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+  },
+  {
+   "step": "records-error",
+   "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+  },
+  {
+   "step": "audit-error",
+   "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+  },
+  {
+   "step": "monthly-error",
+   "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+  }
+ ],
+ "external": [],
+ "errors": [],
+ "ids": {
+  "alerts": [
+   {
+    "id": 13,
+    "code": "DEMO-2026-0013",
+    "name": "Demo Cheruvu 3",
+    "state": "CLOSED_AUTHORISED",
+    "overdue": false
+   },
+   {
+    "id": 5,
+    "code": "DEMO-2026-0005",
+    "name": "Demo Cheruvu 2",
+    "state": "WITH_OFFICER",
+    "overdue": true
+   },
+   {
+    "id": 19,
+    "code": "DEMO-2026-0019",
+    "name": "Demo Cheruvu 1",
+    "state": "TRIAGE",
+    "overdue": false
+   },
+   {
+    "id": 17,
+    "code": "DEMO-2026-0017",
+    "name": "Demo Parcel C",
+    "state": "TRIAGE",
+    "overdue": true
+   },
+   {
+    "id": 10,
+    "code": "DEMO-2026-0010",
+    "name": "Demo Cheruvu 6",
+    "state": "CLOSED_FALSE_ALARM",
+    "overdue": false
+   },
+   {
+    "id": 18,
+    "code": "DEMO-2026-0018",
+    "name": "Demo Cheruvu 8",
+    "state": "TRIAGE",
+    "overdue": true
+   },
+   {
+    "id": 1,
+    "code": "DEMO-2026-0001",
+    "name": "Demo Cheruvu 5",
+    "state": "POST_ACTION_WATCH",
+    "overdue": false
+   },
+   {
+    "id": 14,
+    "code": "DEMO-2026-0014",
+    "name": "Demo Cheruvu 7",
+    "state": "HOLD_LEGAL",
+    "overdue": false
+   },
+   {
+    "id": 6,
+    "code": "DEMO-2026-0006",
+    "name": "Demo Parcel B",
+    "state": "TRIAGE",
+    "overdue": true
+   },
+   {
+    "id": 11,
+    "code": "DEMO-2026-0011",
+    "name": "Demo Cheruvu 9",
+    "state": "ASSIGNED",
+    "overdue": true
+   },
+   {
+    "id": 9,
+    "code": "DEMO-2026-0009",
+    "name": "Demo Cheruvu 5",
+    "state": "CLOSED_NOT_REAL",
+    "overdue": false
+   },
+   {
+    "id": 15,
+    "code": "DEMO-2026-0015",
+    "name": "Demo Cheruvu 4",
+    "state": "CONFIRMED",
+    "overdue": false
+   },
+   {
+    "id": 8,
+    "code": "DEMO-2026-0008",
+    "name": "Demo Kunta 1",
+    "state": "AWAITING_BOUNDARY",
+    "overdue": false
+   },
+   {
+    "id": 3,
+    "code": "DEMO-2026-0003",
+    "name": "Demo Kunta 2",
+    "state": "TRIAGE",
+    "overdue": true
+   },
+   {
+    "id": 2,
+    "code": "DEMO-2026-0002",
+    "name": "Demo Kunta 3",
+    "state": "AWAITING_BOUNDARY",
+    "overdue": false
+   },
+   {
+    "id": 4,
+    "code": "DEMO-2026-0004",
+    "name": "Demo Kunta 4",
+    "state": "CLOSED_NOT_REAL",
+    "overdue": false
+   },
+   {
+    "id": 12,
+    "code": "DEMO-2026-0012",
+    "name": "Demo Kunta 6",
+    "state": "CLOSED_OUT_OF_SCOPE",
+    "overdue": false
+   },
+   {
+    "id": 16,
+    "code": "DEMO-2026-0016",
+    "name": "Demo Kunta 5",
+    "state": "WATCH_LIST",
+    "overdue": false
+   },
+   {
+    "id": 7,
+    "code": "DEMO-2026-0007",
+    "name": "Demo Parcel A",
+    "state": "CLOSED_LEGACY",
+    "overdue": false
+   }
+  ],
+  "headline": {
+   "id": 19,
+   "code": "DEMO-2026-0019",
+   "name": "Demo Cheruvu 1",
+   "state": "TRIAGE",
+   "overdue": false
+  },
+  "withOfficer": {
+   "id": 5,
+   "code": "DEMO-2026-0005",
+   "name": "Demo Cheruvu 2",
+   "state": "WITH_OFFICER",
+   "overdue": true
+  },
+  "confirmed": {
+   "id": 15,
+   "code": "DEMO-2026-0015",
+   "name": "Demo Cheruvu 4",
+   "state": "CONFIRMED",
+   "overdue": false
+  },
+  "hold": {
+   "id": 14,
+   "code": "DEMO-2026-0014",
+   "name": "Demo Cheruvu 7",
+   "state": "HOLD_LEGAL",
+   "overdue": false
+  }
+ }
+}

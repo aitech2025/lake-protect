@@ -1,0 +1,73 @@
+{
+ "railFocus": {
+  "el": "Alerts",
+  "outline": "3px solid rgb(127, 182, 221)",
+  "vsActiveBg": 5.6,
+  "vsRail": 6.68
+ },
+ "railButtonFocus": {
+  "el": "తెలుగు",
+  "outlineColor": "rgb(127, 182, 221)",
+  "vsRail": 6.68,
+  "border": "rgb(108, 127, 135)",
+  "borderVsRail": 3.48
+ },
+ "filterLabel": {
+  "labelBg": "rgba(0, 0, 0, 0)",
+  "selectBorder": "rgb(117, 132, 139)"
+ },
+ "pills": [
+  "pill officer 13px",
+  "pill review 13px",
+  "pill legal 13px",
+  "pill field 13px",
+  "pill watch 13px",
+  "pill closed 13px"
+ ],
+ "overdueFlag": {
+  "color": "rgb(184, 57, 42)",
+  "onPaper": 5.04
+ },
+ "importFocus": {
+  "tabs": 8,
+  "labelOutline": "3px solid rgb(31, 111, 168)"
+ },
+ "fieldRootClass": "field-app",
+ "fieldHeadFocus": {
+  "el": "తెలుగు",
+  "outlineColor": "rgb(127, 182, 221)",
+  "vsHeader": 6.68
+ },
+ "photoFocus": {
+  "labelOutline": "3px solid rgb(31, 111, 168)",
+  "tabs": 10
+ },
+ "fieldBorders": [
+  {
+   "s": ".f-field select",
+   "c": "rgb(117, 132, 139)",
+   "vsWhite": 3.87
+  },
+  {
+   "s": ".f-field textarea",
+   "c": "rgb(117, 132, 139)",
+   "vsWhite": 3.87
+  },
+  {
+   "s": ".f-outcome label",
+   "c": "rgb(117, 132, 139)",
+   "vsWhite": 3.87
+  }
+ ],
+ "offlineBadge": {
+  "text": "No signal: saving on this phone",
+  "bg": "rgb(154, 99, 21)",
+  "ratio": 5.04
+ },
+ "printBand": {
+  "display": "flex",
+  "border": "2px solid rgb(110, 63, 163)",
+  "color": "rgb(28, 43, 51)",
+  "text": "Demo data\nFictional places, people and records. Nothing here is a finding."
+ }
+}

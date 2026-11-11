@@ -3,7 +3,8 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { API_BASE, api, authHeaders, fmtDate } from "../api";
-import { useAsync } from "../components/Bits";
+import { useAsync, usePageTitle } from "../components/Bits";
+import { PageState } from "../components/PageState";
 import { useDemoOnScreen } from "../demo";
 import "./monthly.css";
 
@@ -30,8 +31,9 @@ export function Monthly() {
   const choices = useMemo(() => months(4), []);
   const [month, setMonth] = useState(choices[0]);
   const [dataset, setDataset] = useState<"demo" | "real">("demo");
-  const { data, error } = useAsync(() => api<any>(`/bulletins/${month}?dataset=${dataset}`), [month, dataset]);
+  const { data, error, status, loading, reload } = useAsync(() => api<any>(`/bulletins/${month}?dataset=${dataset}`), [month, dataset]);
   useDemoOnScreen(dataset === "demo" && Boolean(data));
+  usePageTitle(t("monthly.title", { month: monthName(month, lang) }));
 
   const print = async () => {
     const res = await fetch(`${API_BASE}/bulletins/${month}/pdf?dataset=${dataset}`, { headers: authHeaders() });
@@ -65,8 +67,8 @@ export function Monthly() {
         <button className="chip" aria-pressed={dataset === "demo"} onClick={() => setDataset("demo")}>{t("monthly.dataset_demo")}</button>
         <button className="chip" aria-pressed={dataset === "real"} onClick={() => setDataset("real")}>{t("monthly.dataset_real")}</button>
       </div>
-      {error && <p className="error">{t("error.load", { msg: error })}</p>}
-      {data && (
+      <PageState loading={loading && !data} error={error} status={status} onRetry={reload} />
+      {data && !error && (
         <>
           <div className="figures">
             {FIGURES.map((k) => (

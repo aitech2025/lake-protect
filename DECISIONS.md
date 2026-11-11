@@ -21,6 +21,18 @@ detection works before anyone sees a pitch. Under this order the demo exists bef
 detection result, so section 14's "open with its real result" cannot be used yet, and the demo
 must not imply that detection has been shown to work.
 
+### D-037: CONTEXT.md section 17 and two refined decisions (owner's request, 7 Nov 2026)
+The owner asked for research on Telangana's officials, personas, detection by stage, alert
+contents, escalation, due diligence, a drill-down dashboard and citizen reporting, and asked that
+the pitch stop presenting the solution as free-data based. Recorded in CONTEXT.md (not silently):
+- Section 17 added, with sources.
+- "Free data first" is replaced by tiered imagery with an open provider choice (17.9). The cost
+  figures in section 16 assume free screening and need revising if commercial screening is chosen.
+- Owner-blind detection is refined (17.10): land category, Section 22A, court cases and disputes are
+  shown on every alert, and names of owners and claimants only after field confirmation. Rule 4's
+  wording is extended to say so.
+- The citizen channel moves from "out of scope" to "solution design, not in the current build".
+
 ## Errors and gaps found in CONTEXT.md
 
 ### E-001: `boundaries` is append-only but has `valid_to` (section 7, invariant 12)

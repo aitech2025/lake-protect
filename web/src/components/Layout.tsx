@@ -1,4 +1,5 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { useEffect, useRef, type MouseEvent } from "react";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth";
 import { DemoBand } from "../demo";
@@ -24,11 +25,34 @@ export function Mark() {
 export function Layout() {
   const { t, i18n } = useTranslation();
   const { user, logout } = useAuth();
+  const { pathname } = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+  const firstRender = useRef(true);
   const toggle = () => void i18n.changeLanguage(i18n.language === "te" ? "en" : "te");
+
+  // After moving to another page, start keyboard and screen-reader users at the new content,
+  // not wherever focus was on the old page (UI audit A4).
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    const main = mainRef.current;
+    if (!main) return;
+    main.scrollTop = 0;
+    main.focus({ preventScroll: true });
+  }, [pathname]);
+
+  const skipToContent = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    mainRef.current?.focus();
+  };
+
   return (
     <div className="shell">
+      <a className="skip-link" href="#main" onClick={skipToContent}>{t("nav.skip")}</a>
       <DemoBand />
-      <nav className="rail" aria-label="Main">
+      <nav className="rail" aria-label={t("nav.label")}>
         <div className="brand">
           <Mark />
           <b>{t("app.name")}</b>
@@ -48,7 +72,7 @@ export function Layout() {
           </div>
         </div>
       </nav>
-      <main className="main">
+      <main className="main" id="main" ref={mainRef} tabIndex={-1}>
         <Outlet />
       </main>
     </div>

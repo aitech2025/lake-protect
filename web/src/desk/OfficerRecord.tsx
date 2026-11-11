@@ -37,7 +37,7 @@ export function OfficerRecordPanel({ alert, onChange }: { alert: any; onChange: 
 
   return (
     <div className="panel" data-testid="officer-record">
-      <h3>{t("officer.title")}</h3>
+      <h2 className="title-s">{t("officer.title")}</h2>
       {alert.officer_records.map((r: any) => (
         <dl key={r.id} className="facts small" style={{ marginTop: "0.6rem" }}>
           {r.notice_ref && <><dt>{t("officer.notice_ref")}</dt><dd>{r.notice_ref} {fmtDate(r.notice_date, i18n.language)}</dd></>}

@@ -1,11 +1,14 @@
-/* Field app: one column, large type and targets, high contrast for outdoor light. */
-.field { min-height: 100%; background: #fff; color: var(--ink); font-size: 1.05rem; }
-.f-head { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; padding: 0.8rem 1rem; background: var(--ink); color: #fff; }
+/* Field app: one column, large type and targets, high contrast for outdoor light.
+   Root class is .field-app, not .field: the CSS bundle is global and the desk uses label.field
+   and .pill.field, which a bare .field rule would restyle. */
+.field-app { min-height: 100%; background: #fff; color: var(--ink); font-size: 1.05rem; }
+.f-head { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; padding: 0.8rem 1rem; background: var(--surface-inverse); color: #fff; }
+.f-head :focus-visible { outline-color: var(--focus-inverse); }
 .f-head b { display: block; font-size: 1.05rem; }
-.f-head button { background: none; color: #fff; border: 1px solid #6c7f87; border-radius: var(--radius-s); padding: 0.45rem 0.8rem; min-height: 44px; cursor: pointer; }
+.f-head button { background: none; color: #fff; border: 1px solid var(--border-control-inverse); border-radius: var(--radius-s); padding: 0.45rem 0.8rem; min-height: 44px; cursor: pointer; }
 .net { display: inline-block; margin-top: 0.15rem; font-size: 0.85rem; font-weight: 600; padding: 0.05rem 0.5rem; border-radius: 3px; }
-.net.on { background: #2d7a57; }
-.net.off { background: #b07219; }
+.net.on { background: var(--green); }
+.net.off { background: var(--status-offline); }
 .f-sync { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; padding: 0.6rem 1rem; background: #f1f4f1; border-bottom: 1px solid var(--rule); font-size: 0.95rem; }
 .f-sync button { min-height: 40px; padding: 0 0.9rem; border: 1px solid var(--ink); background: #fff; border-radius: var(--radius-s); font-weight: 600; cursor: pointer; }
 .f-sync button:disabled { opacity: 0.4; }
@@ -17,7 +20,7 @@
 .f-list { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: 0.6rem; }
 .f-list a { display: grid; gap: 0.15rem; padding: 0.9rem 1rem; border: 2px solid var(--ink); border-radius: var(--radius-m); color: inherit; text-decoration: none; }
 .f-list a b { font-size: 1.2rem; }
-.f-list .late { color: var(--buffer); font-weight: 700; }
+.f-list .late { color: var(--text-danger); font-weight: 700; }
 .f-what { color: var(--ink-2); }
 .f-instruction { font-size: 1.15rem; font-weight: 600; margin: 0.75rem 0; }
 .f-banner { padding: 0.7rem 0.85rem; border-radius: var(--radius-s); margin: 0.6rem 0; }
@@ -33,13 +36,15 @@
 .f-pair img, .f-img-missing { width: 100%; aspect-ratio: 1; display: block; image-rendering: pixelated; background: #e4e8e3; border-radius: var(--radius-s); }
 .f-pair figcaption { font-size: 0.85rem; color: var(--ink-2); }
 .f-capture { border-top: 2px solid var(--ink); margin-top: 1.25rem; padding-top: 1rem; display: grid; gap: 0.8rem; }
-.f-photo { display: grid; place-items: center; min-height: 64px; border: 2px dashed var(--ink); border-radius: var(--radius-m); font-weight: 700; cursor: pointer; }
+.f-photo { position: relative; display: grid; place-items: center; min-height: 64px; border: 2px dashed var(--ink); border-radius: var(--radius-m); font-weight: 700; cursor: pointer; }
 .f-photo input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+/* The file input is invisible; its label carries the focus ring. */
+.f-photo:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
 .f-field { display: grid; gap: 0.3rem; font-weight: 600; }
-.f-field select, .f-field textarea { min-height: 48px; font-size: 1.05rem; padding: 0.5rem; border: 1px solid #93a19a; border-radius: var(--radius-s); font-weight: 400; }
+.f-field select, .f-field textarea { min-height: 48px; font-size: 1.05rem; padding: 0.5rem; border: 1px solid var(--border-control); border-radius: var(--radius-s); font-weight: 400; }
 .f-outcome { border: 0; padding: 0; margin: 0; display: grid; gap: 0.5rem; }
 .f-outcome legend { font-weight: 600; margin-bottom: 0.4rem; }
-.f-outcome label { display: flex; align-items: center; gap: 0.6rem; min-height: 52px; padding: 0 0.9rem; border: 2px solid #b4beb8; border-radius: var(--radius-m); cursor: pointer; }
+.f-outcome label { display: flex; align-items: center; gap: 0.6rem; min-height: 52px; padding: 0 0.9rem; border: 2px solid var(--border-control); border-radius: var(--radius-m); cursor: pointer; }
 .f-outcome label.on { border-color: var(--ink); background: #f1f4f1; font-weight: 700; }
 .f-outcome input { width: 22px; height: 22px; }
 .f-btn { min-height: 56px; font-size: 1.15rem; font-weight: 700; border: 0; background: var(--ink); color: #fff; border-radius: var(--radius-m); cursor: pointer; }

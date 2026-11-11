@@ -11,7 +11,9 @@
     "monthly": "Monthly page",
     "field": "Field app",
     "logout": "Sign out",
-    "language": "తెలుగు"
+    "language": "తెలుగు",
+    "label": "Main navigation",
+    "skip": "Skip to content"
   },
   "demo": {
     "badge": "Demo data",
@@ -320,7 +322,13 @@
   },
   "error": {
     "load": "Could not load this page: {{msg}}",
-    "retry": "Try again"
+    "retry": "Try again",
+    "loading": "Loading…",
+    "forbidden": "Your role cannot open this page.",
+    "not_found": "This page could not be found.",
+    "home": "Go to your start page",
+    "image_loading": "Loading image…",
+    "image_failed": "This image could not be loaded."
   },
   "field": {
     "my_alerts": "My alerts",

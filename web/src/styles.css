@@ -23,6 +23,33 @@
   --step-1: 1.125rem;
   --step-2: 1.4rem;
   --step-3: 1.9rem;
+
+  /* Semantic layer (docs/uef/UI_DESIGN_SYSTEM.md). The palette above stays the source; these name
+     each colour's job. Contrast figures are WCAG ratios against the surfaces they sit on. */
+  --surface-page: var(--paper);
+  --surface-raised: var(--sheet);
+  --surface-sunken: #f4f6f3;
+  --surface-inverse: var(--ink);
+  --surface-inverse-2: #26383f;
+  --text: var(--ink);
+  --text-muted: var(--ink-2);
+  --text-on-inverse: #dfe7e3;
+  --text-danger: #b8392a;            /* 5.04:1 on paper, 5.74:1 on sheet */
+  --border-control: var(--ink-3);    /* 3.39:1 on paper, 3.87:1 on sheet */
+  --border-control-inverse: #6c7f87; /* 3.48:1 on ink */
+  --focus-inverse: #7fb6dd;          /* 6.68:1 on ink, 5.60:1 on the active rail item */
+  --status-offline: #9a6315;         /* behind white text, 5.04:1 */
+  --violet-deep: #5d3290;
+  --step--2: 0.75rem;
+  --radius-pill: 999px;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --shadow-float: 0 0 0 1px rgb(28 43 51 / 0.12), 0 1px 3px rgb(28 43 51 / 0.18);
 }
 
 * { box-sizing: border-box; }
@@ -39,24 +66,30 @@ h3 { font-size: var(--step-1); font-weight: 600; }
 p { margin: 0; }
 .muted { color: var(--ink-2); }
 .small { font-size: var(--step--1); }
-.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* Shell ------------------------------------------------------------------------------------ */
 .shell { display: grid; grid-template-columns: 216px 1fr; grid-template-rows: auto 1fr; height: 100%; }
 .demo-band { grid-column: 1 / -1; display: flex; gap: 0.75rem; align-items: baseline; padding: 0.4rem 1rem;
-  background: repeating-linear-gradient(135deg, var(--violet) 0 14px, #5d3290 14px 28px); color: #fff; font-size: var(--step--1); }
+  background: repeating-linear-gradient(135deg, var(--violet) 0 14px, var(--violet-deep) 14px 28px); color: #fff; font-size: var(--step--1); }
 .demo-band strong { font-size: var(--step-0); }
-.rail { grid-row: 2; background: var(--ink); color: #dfe7e3; display: flex; flex-direction: column; padding: 1.25rem 0.75rem; gap: 0.25rem; }
+.rail { grid-row: 2; background: var(--surface-inverse); color: var(--text-on-inverse); display: flex; flex-direction: column; padding: 1.25rem 0.75rem; gap: 0.25rem; }
+.rail :focus-visible { outline-color: var(--focus-inverse); }
 .rail .brand { padding: 0 0.6rem 1.25rem; }
 .rail .brand b { display: block; font-size: var(--step-1); color: #fff; }
 .rail .brand svg { display: block; margin-bottom: 0.5rem; }
 .rail a { color: inherit; text-decoration: none; padding: 0.55rem 0.6rem; border-radius: var(--radius-s); border-left: 3px solid transparent; }
-.rail a:hover { background: #26383f; }
-.rail a.active { background: #26383f; border-left-color: #7fb6dd; color: #fff; }
+.rail a:hover { background: var(--surface-inverse-2); }
+.rail a.active { background: var(--surface-inverse-2); border-left-color: #7fb6dd; color: #fff; }
 .rail .who { margin-top: auto; padding: 0.75rem 0.6rem 0; border-top: 1px solid #33464d; font-size: var(--step--1); }
 .rail .who b { display: block; color: #fff; font-size: var(--step-0); }
-.rail .who button { margin-top: 0.5rem; margin-right: 0.4rem; background: none; border: 1px solid #4b6068; color: #dfe7e3; border-radius: var(--radius-s); padding: 0.2rem 0.6rem; cursor: pointer; }
+.rail .who button { margin-top: 0.5rem; margin-right: 0.4rem; background: none; border: 1px solid var(--border-control-inverse); color: var(--text-on-inverse); border-radius: var(--radius-s); padding: 0.2rem 0.6rem; cursor: pointer; }
 .main { grid-row: 2; overflow: auto; min-width: 0; }
+/* The main region takes focus after navigation and from the skip link; it is not a control, so no ring. */
+.main:focus { outline: none; }
+.skip-link { position: absolute; left: var(--space-2); top: var(--space-2); z-index: 20; transform: translateY(-200%);
+  background: var(--sheet); color: var(--ink); padding: var(--space-2) var(--space-4); border-radius: var(--radius-s); font-weight: 600; box-shadow: var(--shadow-float); }
+.skip-link:focus { transform: none; }
 .page { padding: 1.5rem 1.75rem 3rem; max-width: 1480px; }
 .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
 
@@ -64,17 +97,20 @@ p { margin: 0; }
 .btn { display: inline-flex; align-items: center; gap: 0.4rem; border: 1px solid var(--ink); background: var(--ink); color: #fff; border-radius: var(--radius-s);
   padding: 0.5rem 0.95rem; cursor: pointer; font-weight: 600; }
 .btn:hover { background: #2b3f48; }
-.btn.secondary { background: var(--sheet); color: var(--ink); border-color: #aab6b0; }
-.btn.secondary:hover { background: #f4f6f3; }
-.btn.danger { background: var(--sheet); color: var(--buffer); border-color: var(--buffer); }
+.btn.secondary { background: var(--sheet); color: var(--ink); border-color: var(--border-control); }
+.btn.secondary:hover { background: var(--surface-sunken); }
+.btn.danger { background: var(--sheet); color: var(--text-danger); border-color: var(--text-danger); }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+/* A file picker is a visually hidden input inside a button-styled label: show focus on the label. */
+label.btn:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
 label.field { display: grid; gap: 0.25rem; font-size: var(--step--1); color: var(--ink-2); }
-label.field input, label.field select, label.field textarea { font-size: var(--step-0); color: var(--ink); padding: 0.45rem 0.55rem; border: 1px solid #b4beb8; border-radius: var(--radius-s); background: #fff; }
+label.field input, label.field select, label.field textarea, .control { font-size: var(--step-0); color: var(--ink); padding: 0.45rem 0.55rem; border: 1px solid var(--border-control); border-radius: var(--radius-s); background: var(--surface-raised); }
+.control { width: 100%; min-width: 0; }
 label.check { display: flex; gap: 0.5rem; align-items: flex-start; }
 .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-.chip { border: 1px solid #b4beb8; background: var(--sheet); border-radius: 999px; padding: 0.25rem 0.8rem; cursor: pointer; font-size: var(--step--1); }
+.chip { border: 1px solid var(--border-control); background: var(--sheet); border-radius: var(--radius-pill); padding: 0.25rem 0.8rem; cursor: pointer; font-size: var(--step--1); }
 .chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
-.error { color: var(--buffer); font-weight: 600; }
+.error { color: var(--text-danger); font-weight: 600; }
 .note { background: #f6f8f5; border-left: 3px solid var(--rule); padding: 0.6rem 0.8rem; font-size: var(--step--1); color: var(--ink-2); }
 
 /* Boundary line language --------------------------------------------------------------------- */
@@ -93,7 +129,7 @@ label.check { display: flex; gap: 0.5rem; align-items: flex-start; }
 .pill.officer { background: #dbefe5; color: #1f5a40; }
 .pill.watch { background: #e7e4ef; color: #4b3a6e; }
 .pill.closed { background: #eceeec; color: var(--ink-2); }
-.flag-overdue { color: var(--buffer); font-weight: 700; }
+.flag-overdue { color: var(--text-danger); font-weight: 700; }
 .demo-tag { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 0.05rem 0.4rem; border-radius: 3px; background: var(--violet-tint); color: var(--violet); border: 1px solid #cdb6ea; }
 
 /* Queue -------------------------------------------------------------------------------------- */
@@ -115,9 +151,24 @@ label.check { display: flex; gap: 0.5rem; align-items: flex-start; }
 
 /* Alert detail --------------------------------------------------------------------------------- */
 .detail-head { display: grid; grid-template-columns: 1fr auto; gap: 0.75rem 1.5rem; align-items: start; margin-bottom: 1.25rem; }
-.detail-head .crumbs { font-size: var(--step--1); }
+.crumbs, .detail-head .crumbs { font-size: var(--step--1); }
 .detail-head .sub { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: center; margin-top: 0.4rem; color: var(--ink-2); }
-.detail { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 1.5rem; align-items: start; }
+/* Alert detail: evidence on the left; the decision panel heads the right column on wide screens and
+   follows the header on narrow ones (UI audit A8). The last row takes the slack, so the decision panel
+   is never stretched by long evidence. */
+.detail { display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-rows: auto 1fr;
+  grid-template-areas: "evidence decision" "evidence side"; gap: 1rem 1.5rem; align-items: start; }
+.detail-decision { grid-area: decision; }
+.detail-evidence { grid-area: evidence; min-width: 0; }
+.detail-evidence > :first-child { margin-top: 0; }
+.detail-side { grid-area: side; min-width: 0; }
+/* Heading level follows structure; these classes set the visual size (design system: typography). */
+.title-s { font-size: var(--step-1); font-weight: 600; line-height: 1.3; }
+.title-xs { font-size: var(--step-0); font-weight: 600; line-height: 1.35; }
+html[lang="te"] .title-s, html[lang="te"] .title-xs { line-height: 1.45; }
+/* Tertiary action: looks like a link, behaves as a button. */
+.btn.quiet { justify-self: start; background: none; border-color: transparent; color: var(--ftl); padding-left: 0; padding-right: 0; font-weight: 600; text-decoration: underline; text-underline-offset: 0.15em; }
+.btn.quiet:hover { background: none; color: var(--ink); }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 .pair figure { margin: 0; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-m); overflow: hidden; }
 .pair img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; image-rendering: pixelated; background: #dfe4de; }
@@ -146,14 +197,47 @@ label.check { display: flex; gap: 0.5rem; align-items: flex-start; }
 .timeline li.miss::before { background: var(--buffer); }
 .timeline li b { display: block; font-size: var(--step-0); font-weight: 600; }
 
-/* Dated bracket strip */
-.bracket { position: relative; height: 86px; margin: 0.5rem 0.4rem 0; }
-.bracket .axis { position: absolute; left: 0; right: 0; top: 40px; height: 2px; background: #c7cfc9; }
-.bracket .span { position: absolute; top: 33px; height: 16px; background: rgba(176,114,25,0.25); border-left: 3px solid var(--green); border-right: 3px solid var(--buffer); }
-.bracket .mark { position: absolute; top: 0; transform: translateX(-50%); text-align: center; font-size: 0.72rem; color: var(--ink-2); white-space: nowrap; }
-.bracket .mark.below { top: 54px; }
-.bracket .mark b { display: block; color: var(--ink); font-size: 0.8rem; }
-.bracket .tick { position: absolute; top: 34px; width: 2px; height: 14px; background: var(--ink-3); transform: translateX(-50%); }
+/* Dated bracket strip. Labels stay inside the strip at every width and in Telugu (UI audit A10). */
+.bracket-window { display: flex; flex-wrap: wrap; gap: 0.15rem 1rem; margin: 0.6rem 0.4rem 0.4rem; font-size: var(--step--1); color: var(--ink-2); }
+.bracket-window.at-start { justify-content: flex-start; }
+.bracket-window.at-mid { justify-content: center; }
+.bracket-window.at-end { justify-content: flex-end; }
+.bracket-window b { color: var(--ink); font-weight: 600; }
+.bracket { position: relative; height: 5.25rem; margin: 0 0.4rem; }
+.bracket .axis { position: absolute; left: 0; right: 0; top: 7px; height: 2px; background: #c7cfc9; }
+.bracket .span { position: absolute; top: 0; height: 16px; background: rgba(176,114,25,0.25); border-left: 3px solid var(--green); border-right: 3px solid var(--buffer); }
+.bracket .tick { position: absolute; top: 1px; width: 2px; height: 14px; background: var(--ink-3); transform: translateX(-50%); }
+.bracket .mark { position: absolute; top: 24px; max-width: 34%; font-size: var(--step--2); line-height: 1.35; color: var(--ink-2); }
+.bracket .mark b { display: block; color: var(--ink); font-size: var(--step--1); }
+.bracket .mark.at-start { text-align: left; }
+.bracket .mark.at-mid { transform: translateX(-50%); text-align: center; }
+.bracket .mark.at-end { text-align: right; }
+.bracket.two-rows { height: 7.5rem; }
+.bracket .mark.row-1 { top: 64px; }
+.bracket-note { margin-top: 0.4rem; }
+.bracket-wrap { container-type: inline-size; }
+/* On a narrow strip the dated marks become a short list under the axis; the ticks keep their places. */
+@container (max-width: 520px) {
+  .bracket, .bracket.two-rows { display: flex; flex-wrap: wrap; gap: 0.35rem 1.25rem; height: auto; padding-top: 24px; }
+  .bracket .mark.at-start, .bracket .mark.at-mid, .bracket .mark.at-end { position: static; transform: none; max-width: none; text-align: left; }
+}
+
+/* Case-readiness checklist rows. Sized by the column they sit in, not the window, so they also fit the
+   narrower evidence column just above 1100 px (UI audit A3). */
+.check-list { container-type: inline-size; display: grid; gap: 0.6rem; margin-top: 0.75rem; }
+.check-row { display: grid; gap: 0.5rem; align-items: start; border-bottom: 1px solid #edf0ed; padding-bottom: 0.5rem; }
+.check-row.read { grid-template-columns: 120px minmax(0, 1fr); }
+.check-row.edit { grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr) auto; }
+.check-row-error { grid-column: 1 / -1; }
+@container (max-width: 640px) {
+  .check-row.edit { grid-template-columns: 150px minmax(0, 1fr) auto; }
+  .check-row.edit > :first-child { grid-column: 1 / -1; }
+}
+@container (max-width: 400px) {
+  .check-row.edit { grid-template-columns: minmax(0, 1fr) auto; }
+  .check-row.edit > select { grid-column: 1 / -1; }
+  .check-row.read { grid-template-columns: 96px minmax(0, 1fr); }
+}
 
 /* Tables (assets, records, audit) */
 table.grid { width: 100%; border-collapse: collapse; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-m); overflow: hidden; font-size: var(--step--1); }
@@ -165,27 +249,67 @@ table.grid tr.clickable:hover td { background: #f5f8f6; }
 /* Login */
 .login { max-width: 980px; margin: 0 auto; padding: 3rem 1.5rem; }
 .login .roles { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin-top: 1.5rem; }
-.login .roles button { text-align: left; background: var(--sheet); border: 1px solid #b4beb8; border-radius: var(--radius-m); padding: 0.9rem 1rem; cursor: pointer; display: grid; gap: 0.25rem; }
+.login .roles button { text-align: left; background: var(--sheet); border: 1px solid var(--border-control); border-radius: var(--radius-m); padding: 0.9rem 1rem; cursor: pointer; display: grid; gap: 0.25rem; }
 .login .roles button:hover { border-color: var(--ink); }
 .login .roles b { font-size: var(--step-1); }
 
 @media (max-width: 1100px) {
-  .detail { grid-template-columns: 1fr; }
+  .detail { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "decision" "evidence" "side"; }
   .queue { grid-template-columns: 1fr; height: auto; }
   .queue .mapbox { height: 50vh; }
 }
 @media (max-width: 760px) {
   .shell { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; }
   .rail { grid-row: 2; flex-direction: row; flex-wrap: wrap; padding: 0.5rem; }
-  .rail .brand, .rail .who { display: none; }
+  .rail .brand { display: none; }
+  /* Name, language and sign-out stay reachable on narrow screens and at high zoom (UI audit A3). */
+  .rail .who { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-3); flex-basis: 100%; margin: var(--space-1) 0 0; padding: var(--space-2) 0.6rem 0; }
+  .rail .who b { display: inline; font-size: var(--step--1); }
+  .rail .who > div { margin-left: auto; display: flex; gap: var(--space-2); }
+  .rail .who button { margin: 0; padding: 0.35rem 0.75rem; }
   .main { grid-row: 3; }
   .page { padding: 1rem; }
   .pair { grid-template-columns: 1fr; }
 }
+@media (max-width: 600px) {
+  /* The boundary badge moves under the title instead of squeezing it to one word per line. */
+  .detail-head { grid-template-columns: minmax(0, 1fr); }
+  .detail-head .seal { justify-self: start; }
+}
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
-@media print { .rail, .demo-band { display: none; } .shell { display: block; } }
+@media print {
+  .rail { display: none; }
+  .shell { display: block; }
+  /* Demo marking must survive printing (rule 6), whether or not the browser prints backgrounds. */
+  .demo-band { background: none; color: var(--ink); border: 2px solid var(--violet); }
+  .demo-band strong { color: var(--violet); }
+}
 
 .photo-row { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
 .photo-thumb { width: 160px; height: 120px; object-fit: cover; border-radius: var(--radius-s); background: #e4e8e3; display: block; }
 .panel + .panel, aside > .panel { margin-top: 1rem; }
 aside > .panel:first-child { margin-top: 0; }
+
+/* Page states: loading, failed, not allowed, not found (UI audit A1) ------------------------- */
+.page-state { display: grid; gap: var(--space-3); justify-items: start; max-width: 72ch; margin: var(--space-4) 0; }
+.page-state p { margin: 0; }
+.page-state:not(.banner):not(.loading) { padding: var(--space-4); background: var(--surface-raised); border: 1px solid var(--rule); border-left: 4px solid var(--ink-3); border-radius: var(--radius-s); }
+.page-state.loading { color: var(--text-muted); }
+.list > .page-state { margin: var(--space-4); }
+
+/* Evidence image frame: holds the square while loading and on failure (UI audit A2) ----------- */
+.evidence-frame { aspect-ratio: 1; display: grid; place-items: center; background: #dfe4de; }
+.evidence-frame img { width: 100%; height: 100%; }
+.evidence-note { display: grid; gap: var(--space-3); justify-items: center; margin: 0; padding: var(--space-4); text-align: center; font-size: var(--step--1); color: var(--text); }
+.evidence-note p { margin: 0; }
+
+/* Table region: tables scroll inside their own frame on narrow screens, with a shadow at the
+   edge that still has content (UI audit A3). The covers scroll with the content; the shadows don't. */
+.table-scroll { overflow-x: auto; max-width: 100%; border: 1px solid var(--rule); border-radius: var(--radius-m);
+  background:
+    linear-gradient(to right, var(--sheet) 30%, rgb(255 255 255 / 0)) left center / 2rem 100% no-repeat local,
+    linear-gradient(to left, var(--sheet) 30%, rgb(255 255 255 / 0)) right center / 2rem 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgb(28 43 51 / 0.22), rgb(28 43 51 / 0)) left center / 0.75rem 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgb(28 43 51 / 0.22), rgb(28 43 51 / 0)) right center / 0.75rem 100% no-repeat scroll,
+    var(--sheet); }
+.table-scroll > table.grid { border: 0; border-radius: 0; background: transparent; }
