@@ -12,8 +12,10 @@ def test_statewide_registry_and_security_tables_exist(db):
         "processing_runs", "ml_model_versions", "ml_evaluations", "outbox_events",
     ]}).scalars().all()
     assert set(names) == {
-        "public_assets", "departments", "asset_responsibilities",
-        "user_department_access", "candidate_predictions", "candidate_ingest_requests", "outbox_events",
+        "public_assets", "departments", "asset_responsibilities", "asset_parcels", "asset_admin_links",
+        "land_parcels", "candidate_asset_links", "user_department_access", "candidate_predictions",
+        "candidate_ingest_requests", "ingestion_batches", "source_records", "satellite_scenes",
+        "processing_runs", "ml_model_versions", "ml_evaluations", "outbox_events",
     }
 
 
