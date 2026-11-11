@@ -4,11 +4,13 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.db import get_db
+from app.platform import router as platform_router
 from app.routers import alerts, assets, audit, auth, bulletins, candidates, records, tiles, users
 
-app = FastAPI(title="Lake Protect API", version="0.1.0")
+app = FastAPI(title="Lake Protect API", version="0.2.0")
 for module in (auth, assets, candidates, alerts, records, audit, users, tiles, bulletins):
     app.include_router(module.router)
+app.include_router(platform_router.router)
 
 
 @app.get("/health")
