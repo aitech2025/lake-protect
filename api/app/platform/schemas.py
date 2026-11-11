@@ -41,7 +41,7 @@ class ResponsibilityCreate(BaseModel):
 
     @model_validator(mode="after")
     def valid_interval(self):
-        if self.valid_to is not None and self.valid_to < self.valid_from:
+        if self.valid_to is not None and self.valid_to <= self.valid_from:
             raise ValueError("valid_to must not be earlier than valid_from.")
         if self.source_authority in {"AUTHORITATIVE","CERTIFIED"} and not self.source_record_ref:
             raise ValueError("Authoritative relationships require a source record reference.")

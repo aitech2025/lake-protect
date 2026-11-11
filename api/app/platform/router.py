@@ -121,16 +121,18 @@ def grant_department_access(department_id: UUID,user_id: int,payload: Department
 
 @router.delete("/departments/{department_id}/members/{user_id}",status_code=status.HTTP_204_NO_CONTENT)
 def revoke_department_access(department_id: UUID,user_id: int,actor: User = Depends(require_roles("admin")),db: Session = Depends(get_db)):
-    result=db.execute(text("""
-      UPDATE user_department_access SET valid_to=CURRENT_DATE
+    revoked=db.execute(text("""
+      UPDATE user_department_access
+      SET valid_to=GREATEST(CURRENT_DATE,valid_from)
       WHERE department_id=:department_id AND user_id=:user_id AND valid_to IS NULL
-        AND valid_from <= CURRENT_DATE
-    """),{"department_id":str(department_id),"user_id":user_id})
-    if result.rowcount == 0:
+      RETURNING valid_from,valid_to
+    """),{"department_id":str(department_id),"user_id":user_id}).mappings().all()
+    if not revoked:
         db.rollback()
-        raise HTTPException(status_code=404,detail="Active department membership not found.")
+        raise HTTPException(status_code=404,detail="Active or scheduled department membership not found.")
     chain.record(db, actor_id=actor.id, action="department.access_revoked", entity="department",
-                 entity_id=department_id, details={"user_id":user_id,"effective_date":"today"})
+                 entity_id=department_id, details={"user_id":user_id,
+                 "intervals":[{"valid_from":r["valid_from"],"valid_to":r["valid_to"]} for r in revoked]})
     db.commit()
     return None
 
