@@ -10,6 +10,8 @@ Target: a secure, evidence-first geospatial intelligence and case-management pla
 5. [Application, APIs and workflows](05-application-api-workflows.md)
 6. [Production, security and operations](06-production-security-operations.md)
 7. [Repository assessment and migration](07-repository-assessment-migration.md)
+8. [Implementation foundation](08-implementation-foundation.md)
+9. [Unified platform integration and security hardening](09-unified-platform-integration.md)
 
 ## Non-negotiable principles
 - Department systems remain authoritative sources. Lake Protect stores traceable references or synchronised snapshots; it does not silently become the legal source of truth.

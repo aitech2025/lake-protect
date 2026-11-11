@@ -219,3 +219,7 @@ The owner's order puts a stop here. M2 and M3 start when the owner replies.
 
 Waiting for the owner's reply. Then M2: detection on Sentinel-2 (5 tuning lakes, `lp fetch` and `lp detect`,
 no-look-ahead test, invariant 10), then M3.
+
+## Current implementation increment (2026-11-11)
+
+The statewide architecture and first integration foundation are merged. The next hardening increment is maintained on a feature branch and adds department-scoped RLS, transaction-local authorization context, candidate prediction provenance, idempotent pipeline ingest, candidate-to-canonical-asset linking, audit events for platform administration, bounded database connection pools, and CI integration-test workflows. It is not yet merged or runtime-validated. The M2/M3 Sentinel-1/2 detection and independent backtest remain incomplete; see docs/architecture/09-unified-platform-integration.md for production gates.
