@@ -235,10 +235,10 @@ The S3-compatible object-store adapter and durable outbox webhook dispatcher are
 - The statewide UUID asset registry, effective-dated department memberships, canonical RLS,
   provenance, candidate prediction lineage, idempotent pipeline ingest, S3-compatible object
   storage and durable outbox dispatch are present in the merged code line.
-- Follow-up migrations 0007–0009 extend RLS to the original lake workflow records. Legacy assets,
+- Follow-up migrations 0007–0010 extend RLS to the original lake workflow records. Legacy assets,
   boundaries, candidates, observations, legal checks, alerts, field records and evidence inherit
   department scope through canonical asset responsibilities. Department MANAGE members can append
-  boundary versions; auditors retain full audit-chain visibility.
+  boundary versions; auditors retain full audit-chain visibility, and saved monthly bulletin snapshots are user-scoped.
 - CI includes a non-owner role for RLS isolation tests. The follow-up code still requires PR review,
   CI and production-role validation. No production deployment or Sentinel-1/2 backtest is claimed.
 - M2 Sentinel-2 detection and M3 radar/backtest remain not started. The review-priority baseline is

@@ -2,7 +2,7 @@
 
 ## Purpose
 The statewide registry and the original lake workflow share one department access boundary.
-Migrations 0007–0009 extend PostgreSQL row-level security from canonical registry records to
+Migrations 0007–0010 extend PostgreSQL row-level security from canonical registry records to
 the operational lake records, without removing the lake-specific workflow.
 
 ## Access path
@@ -18,7 +18,7 @@ The current auditor role also receives a trusted transaction-local `lp_is_audito
 - Alerts, closure requests, field checks, owner claims, readiness items, evidence packs, officer records
   and imagery requests.
 - Signals and audit-log rows.
-- Monthly bulletins are platform-admin-only because they aggregate across assets.
+- Saved monthly bulletins are scoped to the generating user; platform administrators and auditors can inspect all saved snapshots. The live report itself is computed from records visible in that user's department scope.
 
 ## Special authorization cases
 - Department members with MANAGE access can append a boundary version for an asset assigned to one
@@ -40,7 +40,7 @@ The current auditor role also receives a trusted transaction-local `lp_is_audito
   Repeat the same negative tests using the actual deployed `lakeprotect_app` database role.
 - Application role checks remain mandatory: RLS isolates data by department but does not decide
   whether a user may close an alert, certify a boundary or record a field action.
-- Validate migrations 0007–0009 on a restored PostGIS database and run API, pipeline and browser
+- Validate migrations 0007–0010 on a restored PostGIS database and run API, pipeline and browser
   suites before production rollout.
 
 ## Limitations

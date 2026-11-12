@@ -80,3 +80,23 @@ def test_legacy_operational_tables_force_row_security(db):
 def test_auditor_context_is_transaction_local(db):
     db.execute(text("SELECT set_config('lp.is_auditor','true',true)"))
     assert db.scalar(text("SELECT lp_is_auditor()")) is True
+
+
+
+def test_saved_bulletins_are_scoped_to_the_generating_user(db):
+    user_a = make_user(db, "senior_officer")
+    user_b = make_user(db, "nodal_officer")
+    db.execute(text("""
+      INSERT INTO bulletins(month,stats,generated_at,scope_user_id)
+      VALUES ('2026-10','{}'::jsonb,now(),:user_a),
+             ('2026-09','{}'::jsonb,now(),:user_b)
+    """), {"user_a":user_a.id,"user_b":user_b.id})
+    db.flush()
+    db.execute(text("SET LOCAL ROLE lakeprotect_rls_test"))
+    db.execute(text("""
+      SELECT set_config('lp.user_id',:user_id,true),
+             set_config('lp.is_platform_admin','false',true),
+             set_config('lp.is_auditor','false',true)
+    """), {"user_id":str(user_a.id)})
+    months = set(db.scalars(text("SELECT month FROM bulletins")).all())
+    assert months == {"2026-10"}
