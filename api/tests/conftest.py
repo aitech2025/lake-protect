@@ -39,11 +39,11 @@ def test_engine():
     role_admin = create_engine(url.set(database="postgres"), isolation_level="AUTOCOMMIT")
     with role_admin.connect() as conn:
         conn.execute(text("""
-          DO $ BEGIN
+          DO $role$ BEGIN
             IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname='lakeprotect_rls_test') THEN
               CREATE ROLE lakeprotect_rls_test NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS;
             END IF;
-          END $
+          END $role$
         """))
         conn.execute(text(f'GRANT CONNECT ON DATABASE "{url.database}" TO lakeprotect_rls_test'))
     role_admin.dispose()
