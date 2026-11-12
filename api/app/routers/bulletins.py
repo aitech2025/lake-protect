@@ -42,7 +42,7 @@ def get_bulletin_pdf(month: str, dataset: Literal["demo", "real"] = "demo", user
     pdf = render.render_pdf(out, render.map_svg(db, out, demo=dataset == "demo"))
     now = utcnow()
     key = store.put_object(f"bulletins/{dataset}/{month}/{now.strftime('%Y%m%dT%H%M%S')}.pdf", pdf)
-    row = Bulletin(month=month, stats={k: v for k, v in out.items() if k != "new_alert_points"}, pdf_path=key, generated_at=now)
+    row = Bulletin(month=month, stats={k: v for k, v in out.items() if k != "new_alert_points"}, pdf_path=key, generated_at=now, scope_user_id=user.id)
     db.add(row)
     db.flush()
     chain.record(db, actor_id=user.id, action="export.bulletin_pdf", entity="bulletin", entity_id=month, details={"dataset": dataset, "bulletin_id": row.id})
@@ -52,5 +52,8 @@ def get_bulletin_pdf(month: str, dataset: Literal["demo", "real"] = "demo", user
 
 @router.get("")
 def list_bulletins(user: User = Depends(require_roles(*READERS)), db: Session = Depends(get_db)) -> list[dict]:
-    rows = db.scalars(select(Bulletin).order_by(Bulletin.generated_at.desc()).limit(24))
+    stmt = select(Bulletin).order_by(Bulletin.generated_at.desc()).limit(24)
+    if user.role not in {Role.admin, Role.auditor}:
+        stmt = stmt.where(Bulletin.scope_user_id == user.id)
+    rows = db.scalars(stmt)
     return [{"id": b.id, "month": b.month, "generated_at": b.generated_at.isoformat(), "counts": b.stats.get("counts")} for b in rows]

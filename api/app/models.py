@@ -344,3 +344,4 @@ class Bulletin(Base):
     stats: Mapped[dict] = mapped_column(JSONB)
     pdf_path: Mapped[str | None] = mapped_column(Text)
     generated_at: Mapped[dt.datetime] = mapped_column(TZ)
+    scope_user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
