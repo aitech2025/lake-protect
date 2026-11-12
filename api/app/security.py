@@ -31,12 +31,20 @@ def current_user(creds: HTTPAuthorizationCredentials | None = Depends(_bearer),
     user = db.get(User, user_id)
     if user is None or not user.is_active:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User not active")
-    # Transaction-local context is reset on commit/rollback; never trust stale role claims in JWT.
+    # All authorization context is derived from the live database record, never JWT role claims.
+    # SET LOCAL semantics ensure the context is cleared at transaction end.
+    is_admin = user.role == "admin"
+    is_auditor = user.role in {"admin", "auditor"}
     db.execute(text("""
       SELECT set_config('lp.user_id', :user_id, true),
              set_config('lp.is_platform_admin', :is_admin, true),
+             set_config('lp.is_auditor', :is_auditor, true),
              set_config('lp.pipeline_ingest', 'false', true)
-    """), {"user_id": str(user.id), "is_admin": "true" if user.role == "admin" else "false"})
+    """), {
+        "user_id": str(user.id),
+        "is_admin": "true" if is_admin else "false",
+        "is_auditor": "true" if is_auditor else "false",
+    })
     return user
 
 def require_roles(*roles: str):

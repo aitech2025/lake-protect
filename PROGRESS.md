@@ -228,3 +228,18 @@ The statewide architecture and first integration foundation are merged. The next
 ## Production integration increment (2026-11-11)
 
 The S3-compatible object-store adapter and durable outbox webhook dispatcher are implemented on a follow-up branch. The adapter supports SHA-256 metadata, optional KMS encryption, byte-range reads and pre-signed GET URLs. The dispatcher claims events with leases, publishes outside database transactions, uses stable idempotency keys, retries with bounded backoff and dead-letters exhausted deliveries. See docs/architecture/10-production-storage-and-events.md. Bucket configuration, real consumer contract tests and production geospatial processing remain go-live gates.
+
+
+## Unified platform integration status (2026-11-12)
+
+- The statewide UUID asset registry, effective-dated department memberships, canonical RLS,
+  provenance, candidate prediction lineage, idempotent pipeline ingest, S3-compatible object
+  storage and durable outbox dispatch are present in the merged code line.
+- Follow-up migrations 0007–0009 extend RLS to the original lake workflow records. Legacy assets,
+  boundaries, candidates, observations, legal checks, alerts, field records and evidence inherit
+  department scope through canonical asset responsibilities. Department MANAGE members can append
+  boundary versions; auditors retain full audit-chain visibility.
+- CI includes a non-owner role for RLS isolation tests. The follow-up code still requires PR review,
+  CI and production-role validation. No production deployment or Sentinel-1/2 backtest is claimed.
+- M2 Sentinel-2 detection and M3 radar/backtest remain not started. The review-priority baseline is
+  a transparent heuristic, not a trained model or probability of encroachment.

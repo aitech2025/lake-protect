@@ -33,6 +33,25 @@ def test_engine():
     command.upgrade(cfg, "head")
 
     engine = create_engine(settings.test_database_url, connect_args={"options": "-c timezone=UTC"})
+
+    # A separate non-owner role is used by the RLS integration tests. The normal
+    # test connection is an administrator and would otherwise bypass row security.
+    role_admin = create_engine(url.set(database="postgres"), isolation_level="AUTOCOMMIT")
+    with role_admin.connect() as conn:
+        conn.execute(text("""
+          DO $ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname='lakeprotect_rls_test') THEN
+              CREATE ROLE lakeprotect_rls_test NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS;
+            END IF;
+          END $
+        """))
+        conn.execute(text(f'GRANT CONNECT ON DATABASE "{url.database}" TO lakeprotect_rls_test'))
+    role_admin.dispose()
+    with engine.begin() as conn:
+        conn.execute(text("GRANT USAGE ON SCHEMA public TO lakeprotect_rls_test"))
+        conn.execute(text("GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO lakeprotect_rls_test"))
+        conn.execute(text("GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO lakeprotect_rls_test"))
+
     yield engine
     engine.dispose()
 
