@@ -100,3 +100,33 @@ def test_saved_bulletins_are_scoped_to_the_generating_user(db):
     """), {"user_id":str(user_a.id)})
     months = set(db.scalars(text("SELECT month FROM bulletins")).all())
     assert months == {"2026-10"}
+
+
+
+def test_machine_pipeline_context_can_create_candidate_prediction_and_outbox(db):
+    from tests.factories import ingest
+
+    asset = make_asset(db)
+    db.flush()
+    db.execute(text("SET LOCAL ROLE lakeprotect_rls_test"))
+    db.execute(text("""
+      SELECT set_config('lp.user_id','',true),
+             set_config('lp.is_platform_admin','false',true),
+             set_config('lp.is_auditor','false',true),
+             set_config('lp.pipeline_ingest','true',true)
+    """))
+
+    out, _alert = ingest(db, asset)
+    assert out["candidate_id"] > 0
+
+    # The pipeline role can write these records in the same transaction.
+    db.execute(text("RESET ROLE"))
+    prediction_count = db.scalar(text("""
+      SELECT count(*) FROM candidate_predictions WHERE candidate_id=:candidate_id
+    """), {"candidate_id":out["candidate_id"]})
+    event_count = db.scalar(text("""
+      SELECT count(*) FROM outbox_events
+      WHERE event_type='candidate.detected' AND aggregate_id=:candidate_id
+    """), {"candidate_id":str(out["candidate_id"])})
+    assert prediction_count == 1
+    assert event_count == 1
