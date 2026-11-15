@@ -14,6 +14,7 @@ Target: a secure, evidence-first geospatial intelligence and case-management pla
 9. [Unified platform integration and security hardening](09-unified-platform-integration.md)
 10. [Production storage and event delivery](10-production-storage-and-events.md)
 11. [Legacy operational-domain row-level security](11-legacy-domain-rls.md)
+12. [Unified architecture decision and current implementation status](12-unified-architecture-decision-and-current-state.md)
 
 ## Non-negotiable principles
 - Department systems remain authoritative sources. Lake Protect stores traceable references or synchronised snapshots; it does not silently become the legal source of truth.
