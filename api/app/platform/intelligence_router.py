@@ -214,6 +214,61 @@ def approve_model(
     return {"id": str(model_id), "status": "APPROVED", "approved_by": actor.username}
 
 
+@router.post("/models/{model_id}/promote")
+def promote_model(
+    model_id: UUID,
+    actor: User = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    model = db.execute(text("""
+        SELECT id, model_name, model_version, task_type, artifact_uri, artifact_sha256,
+               feature_schema_version, status
+        FROM ml_model_versions WHERE id=:model_id FOR UPDATE
+    """), {"model_id": model_id}).mappings().first()
+    if model is None:
+        raise HTTPException(404, "Model version not found.")
+    if model["status"] != "APPROVED":
+        raise HTTPException(409, "Only an approved model can be promoted to production.")
+    if model["task_type"] != "physical_change_review_priority":
+        raise HTTPException(409, "No runtime inference adapter is configured for this model task.")
+    if model["feature_schema_version"] != "1.0":
+        raise HTTPException(409, "The model feature schema is not supported by this API version.")
+    evaluation = db.execute(text("""
+        SELECT passed FROM ml_evaluations
+        WHERE model_version_id=:model_id
+        ORDER BY evaluated_at DESC LIMIT 1
+    """), {"model_id": model_id}).scalar_one_or_none()
+    if evaluation is not True:
+        raise HTTPException(409, "A passing latest evaluation is required for production promotion.")
+    try:
+        artifact_meta = store.head_object(model["artifact_uri"])
+    except Exception as exc:
+        raise HTTPException(409, "Unable to verify the model artifact in object storage.") from exc
+    if not artifact_meta or artifact_meta.get("sha256") != model["artifact_sha256"]:
+        raise HTTPException(409, "Model artifact is missing or its SHA-256 does not match.")
+    previous = db.execute(text("""
+        SELECT id, model_name, model_version FROM ml_model_versions
+        WHERE task_type=:task_type AND status='PRODUCTION' AND id<>:model_id
+        FOR UPDATE
+    """), {"task_type": model["task_type"], "model_id": model_id}).mappings().all()
+    db.execute(text("""
+        UPDATE ml_model_versions SET status='SHADOW'
+        WHERE task_type=:task_type AND status='PRODUCTION' AND id<>:model_id
+    """), {"task_type": model["task_type"], "model_id": model_id})
+    db.execute(text("""
+        UPDATE ml_model_versions SET status='PRODUCTION'
+        WHERE id=:model_id
+    """), {"model_id": model_id})
+    chain.record(db, actor_id=actor.id, action="ml_model.promoted", entity="ml_model_version",
+                 entity_id=model_id, details={"model_name": model["model_name"],
+                 "model_version": model["model_version"],
+                 "previous_production_models": [f"{item['model_name']}:{item['model_version']}" for item in previous]})
+    db.commit()
+    _load_cache_clear = None
+    return {"id": str(model_id), "status": "PRODUCTION",
+            "previous_models_moved_to_shadow": len(previous)}
+
+
 @router.get("/candidates/{candidate_id}/predictions")
 def candidate_predictions(
     candidate_id: int,
