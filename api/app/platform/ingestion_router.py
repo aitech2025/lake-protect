@@ -60,12 +60,9 @@ class SourceRecordCreate(BaseModel):
     payload: dict[str, Any] = Field(default_factory=dict)
 
 
-class BatchStatusUpdate(BaseModel):
+class SourceRecordValidation(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    status: Literal["VALIDATING", "ACCEPTED", "PARTIAL", "REJECTED", "FAILED"]
-    records_accepted: int = Field(default=0, ge=0)
-    records_rejected: int = Field(default=0, ge=0)
-    error_summary: dict[str, Any] = Field(default_factory=dict)
+    validation_status: Literal["VALID", "INVALID", "CONFLICT", "QUARANTINED"]
 
 
 class SceneCreate(BaseModel):
@@ -161,39 +158,58 @@ def add_source_record(batch_id: UUID, body: SourceRecordCreate, db: Session = De
     return {"duplicate": False, "record": dict(row)}
 
 
-@router.patch("/batches/{batch_id}", dependencies=[Depends(pipeline_credential)])
-def update_batch_status(batch_id: UUID, body: BatchStatusUpdate, db: Session = Depends(get_db)):
+@router.patch("/batches/{batch_id}/records/{record_id}", dependencies=[Depends(pipeline_credential)])
+def validate_source_record(
+    batch_id: UUID,
+    record_id: UUID,
+    body: SourceRecordValidation,
+    db: Session = Depends(get_db),
+):
     _pipeline_context(db)
-    current = db.execute(text("""
-        SELECT status, records_received FROM ingestion_batches
-        WHERE id=:batch_id FOR UPDATE
-    """), {"batch_id": batch_id}).mappings().first()
-    if current is None:
-        raise HTTPException(404, "Ingestion batch not found.")
-    allowed = {
-        "RECEIVED": {"VALIDATING", "REJECTED", "FAILED"},
-        "VALIDATING": {"ACCEPTED", "PARTIAL", "REJECTED", "FAILED"},
-    }
-    if body.status != current["status"] and body.status not in allowed.get(current["status"], set()):
-        raise HTTPException(409, f"Invalid ingestion-batch transition {current['status']} -> {body.status}.")
-    if body.records_accepted + body.records_rejected > current["records_received"]:
-        raise HTTPException(422, "Accepted plus rejected records cannot exceed records received.")
-    if body.status in {"ACCEPTED", "PARTIAL", "REJECTED", "FAILED"}:
-        if body.records_accepted + body.records_rejected != current["records_received"]:
-            raise HTTPException(422, "A terminal batch must account for every received record.")
-    row = db.execute(text("""
+    record = db.execute(text("""
+        SELECT validation_status FROM source_records
+        WHERE id=:record_id AND batch_id=:batch_id FOR UPDATE
+    """), {"record_id": record_id, "batch_id": batch_id}).mappings().first()
+    if record is None:
+        raise HTTPException(404, "Source record not found in this batch.")
+    if record["validation_status"] != "PENDING":
+        if record["validation_status"] == body.validation_status:
+            return {"id": str(record_id), "validation_status": record["validation_status"], "duplicate": True}
+        raise HTTPException(409, "A validated source record cannot be reclassified.")
+    db.execute(text("""
+        UPDATE source_records SET validation_status=:validation_status WHERE id=:record_id
+    """), {"validation_status": body.validation_status, "record_id": record_id})
+    counts = db.execute(text("""
+        SELECT
+          count(*) FILTER (WHERE validation_status='VALID') AS accepted,
+          count(*) FILTER (WHERE validation_status IN ('INVALID','CONFLICT','QUARANTINED')) AS rejected,
+          count(*) FILTER (WHERE validation_status='PENDING') AS pending
+        FROM source_records WHERE batch_id=:batch_id
+    """), {"batch_id": batch_id}).mappings().one()
+    if counts["pending"] > 0:
+        batch_status = "VALIDATING"
+        completed_at = None
+    elif counts["rejected"] == 0:
+        batch_status = "ACCEPTED"
+        completed_at = "now"
+    elif counts["accepted"] == 0:
+        batch_status = "REJECTED"
+        completed_at = "now"
+    else:
+        batch_status = "PARTIAL"
+        completed_at = "now"
+    db.execute(text("""
         UPDATE ingestion_batches
         SET status=:status, records_accepted=:accepted, records_rejected=:rejected,
-            error_summary=CAST(:error_summary AS jsonb),
-            completed_at=CASE WHEN :status IN ('ACCEPTED','PARTIAL','REJECTED','FAILED')
-                              AND completed_at IS NULL THEN now() ELSE completed_at END
+            completed_at=CASE WHEN :is_complete THEN now() ELSE NULL END
         WHERE id=:batch_id
-        RETURNING id, status, records_received, records_accepted, records_rejected, completed_at
-    """), {"status": body.status, "accepted": body.records_accepted,
-           "rejected": body.records_rejected, "error_summary": json.dumps(body.error_summary),
-           "batch_id": batch_id}).mappings().one()
+    """), {"status": batch_status, "accepted": counts["accepted"],
+           "rejected": counts["rejected"], "is_complete": counts["pending"] == 0,
+           "batch_id": batch_id})
     db.commit()
-    return dict(row)
+    return {"id": str(record_id), "validation_status": body.validation_status,
+            "batch_status": batch_status, "records_accepted": counts["accepted"],
+            "records_rejected": counts["rejected"], "records_pending": counts["pending"]}
 
 
 @router.post("/scenes", status_code=201, dependencies=[Depends(pipeline_credential)])
