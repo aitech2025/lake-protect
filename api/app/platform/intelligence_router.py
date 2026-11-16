@@ -246,6 +246,7 @@ def promote_model(
         raise HTTPException(409, "Unable to verify the model artifact in object storage.") from exc
     if not artifact_meta or artifact_meta.get("sha256") != model["artifact_sha256"]:
         raise HTTPException(409, "Model artifact is missing or its SHA-256 does not match.")
+    db.execute(text("SELECT pg_advisory_xact_lock(hashtext(:task_type))"), {"task_type": model["task_type"]})
     previous = db.execute(text("""
         SELECT id, model_name, model_version FROM ml_model_versions
         WHERE task_type=:task_type AND status='PRODUCTION' AND id<>:model_id
@@ -264,7 +265,6 @@ def promote_model(
                  "model_version": model["model_version"],
                  "previous_production_models": [f"{item['model_name']}:{item['model_version']}" for item in previous]})
     db.commit()
-    _load_cache_clear = None
     return {"id": str(model_id), "status": "PRODUCTION",
             "previous_models_moved_to_shadow": len(previous)}
 
