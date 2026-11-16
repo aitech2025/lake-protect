@@ -34,6 +34,9 @@ def _read_dataset(path: Path):
         if not reader.fieldnames or not REQUIRED_COLUMNS.issubset(set(reader.fieldnames)):
             missing = sorted(REQUIRED_COLUMNS - set(reader.fieldnames or []))
             raise TrainingDataError(f"Dataset is missing required columns: {', '.join(missing)}")
+        unexpected = sorted(set(reader.fieldnames) - REQUIRED_COLUMNS)
+        if unexpected:
+            raise TrainingDataError(f"Unexpected columns are not accepted (owner-blind contract): {', '.join(unexpected)}")
         for line, row in enumerate(reader, start=2):
             try:
                 label = int(row["label"])
