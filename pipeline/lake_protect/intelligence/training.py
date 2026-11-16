@@ -7,11 +7,10 @@ from __future__ import annotations
 
 import csv
 import hashlib
-import json
 from pathlib import Path
 from typing import Any
 
-from .features import FEATURE_NAMES, FEATURE_SCHEMA_VERSION
+from .features import CandidateFeatures, FEATURE_NAMES, FEATURE_SCHEMA_VERSION
 
 REQUIRED_COLUMNS = {"asset_id", "label", *FEATURE_NAMES}
 MODEL_NAME = "lake_change_review_priority"
@@ -121,6 +120,7 @@ def train_model(dataset: str | Path, artifact_path: str | Path, *, dataset_ref: 
         "dataset_ref": dataset_ref or dataset_path.name,
         "label_definition": "1=physical change confirmed by independent field verification; 0=no physical change on verification",
         "metrics": metrics,
+        "feature_importance": {name: round(float(value), 6) for name, value in zip(FEATURE_NAMES, model.feature_importances_)},
         "limitations": [
             "Requires representative, independently field-verified labels.",
             "Asset-group holdout reduces spatial/entity leakage but does not replace temporal and district-level external validation.",
@@ -152,7 +152,10 @@ def predict(artifact_path: str | Path, expected_sha256: str, features: dict[str,
         raise ValueError("Unsupported feature schema version.")
     if payload.get("feature_names") != list(FEATURE_NAMES):
         raise ValueError("Model feature order does not match the current contract.")
-    vector = [float(features[name]) for name in FEATURE_NAMES]
+    if set(features) != set(FEATURE_NAMES):
+        raise ValueError("Prediction features do not match the versioned feature contract.")
+    validated = CandidateFeatures(**{name: float(features[name]) for name in FEATURE_NAMES})
+    vector = validated.to_vector()
     probability = float(payload["model"].predict_proba([vector])[0][1])
     return {"score": round(probability * 100, 2), "score_type": "PHYSICAL_CHANGE_REVIEW_PRIORITY",
             "model_version": payload["model_card"]["model_version"],
