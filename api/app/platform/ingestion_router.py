@@ -257,8 +257,8 @@ def create_processing_run(body: ProcessingRunCreate, db: Session = Depends(get_d
           (id, pipeline_name, pipeline_version, config_hash, status, input_manifest, geographic_scope)
         VALUES (:id, :pipeline_name, :pipeline_version, :config_hash, 'QUEUED',
                 CAST(:input_manifest AS jsonb),
-                CASE WHEN :scope IS NULL THEN NULL
-                     ELSE ST_SetSRID(ST_GeomFromGeoJSON(:scope),4326) END)
+                CASE WHEN CAST(:scope AS text) IS NULL THEN NULL
+                     ELSE ST_SetSRID(ST_GeomFromGeoJSON(CAST(:scope AS text)),4326) END)
         ON CONFLICT (id) DO NOTHING
         RETURNING id, status, correlation_id, created_at
     """), {"id": body.id, "pipeline_name": body.pipeline_name,
