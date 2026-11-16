@@ -24,7 +24,9 @@ A trained artifact must be placed in controlled object storage, registered in `m
 
 ## API
 
+- `POST /api/v1/intelligence/models`: register an artifact after object-store SHA-256 verification.
 - `GET /api/v1/intelligence/models`: model registry metadata and model cards.
+- `POST /api/v1/intelligence/models/{id}/evaluations`: record a versioned evaluation and human pass/fail decision.
 - `GET /api/v1/intelligence/evaluations`: evaluation metrics and slices.
 - `GET /api/v1/intelligence/processing-runs`: processing lineage and run status.
 - `GET /api/v1/intelligence/candidates/{id}/predictions`: authorised prediction history.
