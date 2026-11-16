@@ -108,7 +108,7 @@ def record_evaluation(
                 CAST(:slice_metrics AS jsonb), :evaluator, :passed, :notes)
         RETURNING id, model_version_id, evaluation_type, passed, evaluated_at
     """), {"model_id": model_id, "evaluation_type": body.evaluation_type,
-           "dataset_ref": body.dataset_ref, "metrics": __import__("json").dumps(body.metrics),
+           "dataset_ref": body.dataset_ref, "metrics": json.dumps(body.metrics),
            "slice_metrics": __import__("json").dumps(body.slice_metrics),
            "evaluator": actor.username, "passed": body.passed, "notes": body.notes}).mappings().one()
     chain.record(db, actor_id=actor.id, action="ml_model.evaluated", entity="ml_model_version",
@@ -191,7 +191,7 @@ def approve_model(
         raise HTTPException(409, f"Model status {model['status']} cannot be approved.")
     try:
         artifact_meta = store.head_object(model["artifact_uri"])
-    except (OSError, ValueError):
+    except Exception:
         artifact_meta = None
     if not artifact_meta or artifact_meta.get("sha256") != model["artifact_sha256"]:
         raise HTTPException(409, "Stored model artifact is missing or its SHA-256 metadata does not match.")
