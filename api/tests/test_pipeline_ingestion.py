@@ -46,6 +46,22 @@ def test_pipeline_ingestion_is_idempotent_and_processing_run_has_state_machine(c
                            headers=_pipeline_headers(), json=changed)
     assert conflict.status_code == 409
 
+    record_id = first.json()["record"]["id"]
+    validated = client.patch(
+        f"/api/v1/ingestion/batches/{batch_id}/records/{record_id}",
+        headers=_pipeline_headers(),
+        json={"validation_status": "VALID"},
+    )
+    assert validated.status_code == 200, validated.text
+    assert validated.json()["batch_status"] == "ACCEPTED"
+    repeated_validation = client.patch(
+        f"/api/v1/ingestion/batches/{batch_id}/records/{record_id}",
+        headers=_pipeline_headers(),
+        json={"validation_status": "VALID"},
+    )
+    assert repeated_validation.status_code == 200
+    assert repeated_validation.json()["duplicate"] is True
+
     scene_payload = {
         "provider": "test-provider",
         "collection_id": "sentinel-2-l2a",
