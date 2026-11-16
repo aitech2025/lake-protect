@@ -18,7 +18,6 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.models import Base
 
 TZ = DateTime(timezone=True)
-UUID_PK = mapped_column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
 
 
 class Department(Base):
@@ -33,6 +32,7 @@ class Department(Base):
 
 class AdministrativeUnit(Base):
     __tablename__ = "administrative_units"
+    __table_args__ = (UniqueConstraint("code", "unit_type", "valid_from"),)
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     code: Mapped[str] = mapped_column(Text)
     name: Mapped[str] = mapped_column(Text)
@@ -130,6 +130,7 @@ class IngestionBatch(Base):
 
 class SourceRecord(Base):
     __tablename__ = "source_records"
+    __table_args__ = (UniqueConstraint("source_system", "source_record_id", "source_version"),)
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     batch_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("ingestion_batches.id"))
     source_system: Mapped[str] = mapped_column(Text)
@@ -146,6 +147,7 @@ class SourceRecord(Base):
 
 class SatelliteScene(Base):
     __tablename__ = "satellite_scenes"
+    __table_args__ = (UniqueConstraint("provider", "collection_id", "item_id"),)
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     provider: Mapped[str] = mapped_column(Text)
     collection_id: Mapped[str] = mapped_column(Text)
@@ -185,6 +187,7 @@ class ProcessingRun(Base):
 
 class CandidateAssetLink(Base):
     __tablename__ = "candidate_asset_links"
+    __table_args__ = (UniqueConstraint("legacy_candidate_id", "platform_asset_id", "parcel_id", "boundary_id"),)
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     legacy_candidate_id: Mapped[int | None] = mapped_column(ForeignKey("candidates.id"))
     platform_asset_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("public_assets.id"))
@@ -198,6 +201,7 @@ class CandidateAssetLink(Base):
 
 class MLModelVersion(Base):
     __tablename__ = "ml_model_versions"
+    __table_args__ = (UniqueConstraint("model_name", "model_version"),)
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     model_name: Mapped[str] = mapped_column(Text)
     model_version: Mapped[str] = mapped_column(Text)
@@ -231,6 +235,7 @@ class MLEvaluation(Base):
 
 class UserDepartmentAccess(Base):
     __tablename__ = "user_department_access"
+    __table_args__ = (UniqueConstraint("user_id", "department_id", "valid_from"),)
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     department_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("departments.id"))
@@ -243,6 +248,7 @@ class UserDepartmentAccess(Base):
 
 class CandidatePrediction(Base):
     __tablename__ = "candidate_predictions"
+    __table_args__ = (UniqueConstraint("candidate_id", "model_name", "model_version"),)
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id"))
     score_type: Mapped[str] = mapped_column(Text)
@@ -279,3 +285,7 @@ class OutboxEvent(Base):
     published_at: Mapped[dt.datetime | None] = mapped_column(TZ)
     publish_attempts: Mapped[int] = mapped_column(Integer, server_default=text("0"))
     last_error: Mapped[str | None] = mapped_column(Text)
+    next_attempt_at: Mapped[dt.datetime | None] = mapped_column(TZ)
+    claimed_by: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
+    claimed_at: Mapped[dt.datetime | None] = mapped_column(TZ)
+    dead_lettered_at: Mapped[dt.datetime | None] = mapped_column(TZ)
