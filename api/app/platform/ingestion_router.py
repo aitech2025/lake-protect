@@ -236,11 +236,14 @@ def register_scene(body: SceneCreate, db: Session = Depends(get_db)):
            "footprint": geometry, "stac_item": json.dumps(body.stac_item)}).mappings().first()
     if row is None:
         existing = db.execute(text("""
-            SELECT id, suitability_status, ingested_at FROM satellite_scenes
+            SELECT id, suitability_status, ingested_at, checksum_sha256 FROM satellite_scenes
             WHERE provider=:provider AND collection_id=:collection_id AND item_id=:item_id
         """), body.model_dump(include={"provider", "collection_id", "item_id"})).mappings().one()
+        if existing["checksum_sha256"] != body.checksum_sha256:
+            db.rollback()
+            raise HTTPException(409, "STAC scene identity already exists with a different checksum.")
         db.commit()
-        return {"duplicate": True, "scene": dict(existing)}
+        return {"duplicate": True, "scene": {k: existing[k] for k in ("id", "suitability_status", "ingested_at")}}
     db.commit()
     return {"duplicate": False, "scene": dict(row)}
 
@@ -264,12 +267,13 @@ def create_processing_run(body: ProcessingRunCreate, db: Session = Depends(get_d
     if row is None:
         existing = db.execute(text("""
             SELECT id, status, correlation_id, created_at, pipeline_name, pipeline_version,
-                   config_hash, input_manifest
+                   config_hash, input_manifest,
+                   CASE WHEN geographic_scope IS NULL THEN NULL ELSE ST_AsGeoJSON(geographic_scope)::jsonb END AS geographic_scope_json
             FROM processing_runs WHERE id=:id
         """), {"id": body.id}).mappings().one()
         if (existing["pipeline_name"], existing["pipeline_version"], existing["config_hash"],
-            existing["input_manifest"]) != (body.pipeline_name, body.pipeline_version,
-                                             body.config_hash, body.input_manifest):
+            existing["input_manifest"], existing["geographic_scope_json"]) != (body.pipeline_name, body.pipeline_version,
+                                             body.config_hash, body.input_manifest, body.geographic_scope):
             db.rollback()
             raise HTTPException(409, "Run ID was already used for a different processing request.")
         db.commit()
