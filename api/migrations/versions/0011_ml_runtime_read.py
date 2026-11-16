@@ -14,6 +14,8 @@ def upgrade():
     op.execute("""
     CREATE INDEX ix_ml_model_versions_runtime
       ON ml_model_versions(task_type, status, approved_at DESC);
+    CREATE UNIQUE INDEX uq_ml_one_production_model_per_task
+      ON ml_model_versions(task_type) WHERE status='PRODUCTION';
 
     -- Pipeline credentials may read only a model explicitly promoted to PRODUCTION.
     -- Registry writes and evaluation records remain platform-admin only.
@@ -26,5 +28,6 @@ def upgrade():
 def downgrade():
     op.execute("""
     DROP POLICY IF EXISTS ml_model_versions_pipeline_runtime_read ON ml_model_versions;
+    DROP INDEX IF EXISTS uq_ml_one_production_model_per_task;
     DROP INDEX IF EXISTS ix_ml_model_versions_runtime;
     """)
