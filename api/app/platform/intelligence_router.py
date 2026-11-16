@@ -5,6 +5,7 @@ this API never turns a model score into a legal or enforcement decision.
 """
 from __future__ import annotations
 
+import json
 import re
 from typing import Any, Literal
 from uuid import UUID
@@ -75,7 +76,7 @@ def register_model(
                :feature_schema_version, :training_dataset_ref, :validation_report_uri,
                CAST(:model_card AS jsonb), 'REGISTERED')
             RETURNING id, model_name, model_version, status, created_at
-        """), {**body.model_dump(exclude={"model_card"}), "model_card": __import__("json").dumps(body.model_card)}).mappings().one()
+        """), {**body.model_dump(exclude={"model_card"}), "model_card": json.dumps(body.model_card)}).mappings().one()
         chain.record(db, actor_id=actor.id, action="ml_model.registered", entity="ml_model_version",
                      entity_id=row["id"], details={"model_name": body.model_name,
                      "model_version": body.model_version, "artifact_sha256": body.artifact_sha256})
