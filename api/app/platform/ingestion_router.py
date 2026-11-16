@@ -54,7 +54,7 @@ class SourceRecordCreate(BaseModel):
     source_record_id: str = Field(min_length=1, max_length=300)
     authority_class: AuthorityClass
     source_uri: str | None = Field(default=None, max_length=2048)
-    source_version: str | None = Field(default=None, max_length=120)
+    source_version: str = Field(min_length=1, max_length=120)
     source_effective_at: datetime | None = None
     checksum_sha256: str | None = Field(default=None, pattern=r"^[0-9a-fA-F]{64}$")
     payload: dict[str, Any] = Field(default_factory=dict)
