@@ -20,7 +20,7 @@ def test_training_dataset_rejects_missing_feature_columns(tmp_path: Path):
 def test_training_dataset_rejects_out_of_range_features(tmp_path: Path):
     path = tmp_path / "bad.csv"
     path.write_text(",".join(HEADER) + "\na,1,100,0.1,2,10,1.5,0.8,0.5\n", encoding="utf-8")
-    with pytest.raises(TrainingDataError, match="must be between 0 and 1"):
+    with pytest.raises(TrainingDataError, match="must be in \\[0,1\\]"):
         _read_dataset(path)
 
 
