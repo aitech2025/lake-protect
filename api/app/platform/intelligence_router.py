@@ -6,10 +6,13 @@ this API never turns a model score into a legal or enforcement decision.
 from __future__ import annotations
 
 import re
+from typing import Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.audit import chain
@@ -20,6 +23,98 @@ from app.storage import store
 
 router = APIRouter(prefix="/api/v1/intelligence", tags=["intelligence"])
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
+
+
+class ModelRegisterIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    model_name: str = Field(min_length=2, max_length=160)
+    model_version: str = Field(min_length=1, max_length=80)
+    task_type: str = Field(min_length=2, max_length=120)
+    framework: str | None = Field(default=None, max_length=120)
+    artifact_uri: str = Field(min_length=1, max_length=2048)
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    feature_schema_version: str = Field(min_length=1, max_length=40)
+    training_dataset_ref: str | None = Field(default=None, max_length=500)
+    validation_report_uri: str | None = Field(default=None, max_length=2048)
+    model_card: dict[str, Any]
+
+
+class EvaluationCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    evaluation_type: Literal["BACKTEST", "VALIDATION", "SHADOW", "DRIFT", "PRODUCTION"]
+    dataset_ref: str = Field(min_length=1, max_length=500)
+    metrics: dict[str, Any]
+    slice_metrics: dict[str, Any] = Field(default_factory=dict)
+    passed: bool
+    notes: str | None = Field(default=None, max_length=4000)
+
+
+@router.post("/models", status_code=201)
+def register_model(
+    body: ModelRegisterIn,
+    actor: User = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    if body.model_card.get("model_name") != body.model_name or body.model_card.get("model_version") != body.model_version:
+        raise HTTPException(422, "Model card name and version must match the registry fields.")
+    if body.model_card.get("feature_schema_version") != body.feature_schema_version:
+        raise HTTPException(422, "Model card feature schema version does not match the registry fields.")
+    try:
+        artifact_meta = store.head_object(body.artifact_uri)
+    except Exception as exc:
+        raise HTTPException(422, "Unable to inspect the model artifact in configured object storage.") from exc
+    if not artifact_meta or artifact_meta.get("sha256") != body.artifact_sha256:
+        raise HTTPException(422, "Model artifact is missing or its SHA-256 does not match.")
+    try:
+        row = db.execute(text("""
+            INSERT INTO ml_model_versions
+              (model_name, model_version, task_type, framework, artifact_uri, artifact_sha256,
+               feature_schema_version, training_dataset_ref, validation_report_uri, model_card, status)
+            VALUES
+              (:model_name, :model_version, :task_type, :framework, :artifact_uri, :artifact_sha256,
+               :feature_schema_version, :training_dataset_ref, :validation_report_uri,
+               CAST(:model_card AS jsonb), 'REGISTERED')
+            RETURNING id, model_name, model_version, status, created_at
+        """), {**body.model_dump(exclude={"model_card"}), "model_card": __import__("json").dumps(body.model_card)}).mappings().one()
+        chain.record(db, actor_id=actor.id, action="ml_model.registered", entity="ml_model_version",
+                     entity_id=row["id"], details={"model_name": body.model_name,
+                     "model_version": body.model_version, "artifact_sha256": body.artifact_sha256})
+        db.commit()
+        return dict(row)
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(409, "This model name/version is already registered or violates a registry constraint.") from exc
+
+
+@router.post("/models/{model_id}/evaluations", status_code=201)
+def record_evaluation(
+    model_id: UUID,
+    body: EvaluationCreate,
+    actor: User = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    model = db.execute(text("""
+        SELECT status FROM ml_model_versions WHERE id=:model_id FOR UPDATE
+    """), {"model_id": model_id}).scalar_one_or_none()
+    if model is None:
+        raise HTTPException(404, "Model version not found.")
+    if model in {"REJECTED", "RETIRED"}:
+        raise HTTPException(409, "Evaluations cannot be added to a rejected or retired model.")
+    row = db.execute(text("""
+        INSERT INTO ml_evaluations
+          (model_version_id, evaluation_type, dataset_ref, metrics, slice_metrics, evaluator, passed, notes)
+        VALUES (:model_id, :evaluation_type, :dataset_ref, CAST(:metrics AS jsonb),
+                CAST(:slice_metrics AS jsonb), :evaluator, :passed, :notes)
+        RETURNING id, model_version_id, evaluation_type, passed, evaluated_at
+    """), {"model_id": model_id, "evaluation_type": body.evaluation_type,
+           "dataset_ref": body.dataset_ref, "metrics": __import__("json").dumps(body.metrics),
+           "slice_metrics": __import__("json").dumps(body.slice_metrics),
+           "evaluator": actor.username, "passed": body.passed, "notes": body.notes}).mappings().one()
+    chain.record(db, actor_id=actor.id, action="ml_model.evaluated", entity="ml_model_version",
+                 entity_id=model_id, details={"evaluation_id": str(row["id"]),
+                 "evaluation_type": body.evaluation_type, "passed": body.passed})
+    db.commit()
+    return dict(row)
 
 
 @router.get("/models")
