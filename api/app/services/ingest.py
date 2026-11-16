@@ -18,7 +18,6 @@ import json
 import uuid
 
 from lake_protect.intelligence.features import CandidateFeatures
-from lake_protect.intelligence.triage import baseline_triage
 
 from geoalchemy2.elements import WKTElement
 from pydantic import BaseModel, ConfigDict, Field
@@ -31,6 +30,7 @@ from app.enums import AlertState, ChangeType, Mode, SensorBasis, Stage
 from app.models import Alert, Asset, Candidate, Observation
 from app.rules import config as rules
 from app.rules import legal_check, priority
+from app.services.ml_inference import score_review_priority
 from app.services import boundaries as bsvc
 from app.storage import store
 from app.workflow import state_machine as sm
@@ -62,6 +62,7 @@ class CandidateIn(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
     asset_id: int
+    processing_run_id: uuid.UUID | None = None
     geometry: dict
     change_type: ChangeType
     stage_estimate: Stage | None = None
@@ -158,7 +159,7 @@ def _new_alert(db: Session, candidate: Candidate, asset: Asset, at: dt.datetime)
     return alert
 
 
-def _persist_platform_intelligence(db: Session, candidate: Candidate, asset: Asset, primary: dict, obs: list[Observation]) -> None:
+def _persist_platform_intelligence(db: Session, candidate: Candidate, asset: Asset, primary: dict, obs: list[Observation], processing_run_id: uuid.UUID | None = None) -> None:
     """Join the lake workflow to canonical platform identity and immutable triage provenance."""
     platform_asset_id = db.execute(text("""
       INSERT INTO public_assets
@@ -180,8 +181,8 @@ def _persist_platform_intelligence(db: Session, candidate: Candidate, asset: Ass
 
     db.execute(text("""
       INSERT INTO candidate_asset_links
-        (legacy_candidate_id, platform_asset_id, boundary_id, spatial_relation, overlap_area_sq_m)
-      SELECT c.id, :platform_asset_id, c.boundary_id,
+        (legacy_candidate_id, platform_asset_id, boundary_id, processing_run_id, spatial_relation, overlap_area_sq_m)
+      SELECT c.id, :platform_asset_id, c.boundary_id, :processing_run_id,
              CASE WHEN ST_Intersects(c.geom, b.geom) THEN 'INTERSECTS_BOUNDARY'
                   ELSE 'OUTSIDE_BOUNDARY' END,
              CASE WHEN ST_Intersects(c.geom, b.geom)
@@ -190,7 +191,8 @@ def _persist_platform_intelligence(db: Session, candidate: Candidate, asset: Ass
       FROM candidates c JOIN boundaries b ON b.id = c.boundary_id
       WHERE c.id = :candidate_id
       ON CONFLICT DO NOTHING
-    """), {"platform_asset_id": str(platform_asset_id), "candidate_id": candidate.id})
+    """), {"platform_asset_id": str(platform_asset_id), "candidate_id": candidate.id,
+           "processing_run_id": processing_run_id})
 
     times = sorted(o.acquired_at for o in obs)
     gap_days = max(0.0, (times[-1] - times[0]).total_seconds() / 86400.0)
@@ -224,7 +226,7 @@ def _persist_platform_intelligence(db: Session, candidate: Candidate, asset: Ass
         boundary_quality=boundary_quality,
         stage_preventability=preventability,
     )
-    result = baseline_triage(features)
+    result = score_review_priority(db, features)
     db.execute(text("""
       INSERT INTO candidate_predictions
         (candidate_id, score_type, score, model_name, model_version,
@@ -282,6 +284,11 @@ def ingest(db: Session, body: CandidateIn, *, at: dt.datetime | None = None) -> 
 
     if body.first_changed_at > at.date() or any(o.acquired_at > at for o in body.observations):
         raise IngestRefused("A candidate cannot use observations acquired after its ingest time")
+    if body.processing_run_id is not None:
+        run_status = db.execute(text("SELECT status FROM processing_runs WHERE id=:run_id"),
+                                {"run_id": body.processing_run_id}).scalar_one_or_none()
+        if run_status != "RUNNING":
+            raise IngestRefused("Candidate processing_run_id must reference a RUNNING processing run.", 409)
     obs = _observations(db, body.observations, asset.is_demo)
     _check_persistence(obs)
     candidate = Candidate(
@@ -305,7 +312,7 @@ def ingest(db: Session, body: CandidateIn, *, at: dt.datetime | None = None) -> 
     )
     db.add(candidate)
     db.flush()
-    _persist_platform_intelligence(db, candidate, asset, primary, obs)
+    _persist_platform_intelligence(db, candidate, asset, primary, obs, body.processing_run_id)
     check, decision = legal_check.run(db, candidate, asset, at)
 
     if decision.result.value in sm.SYSTEM_CLOSURES:
