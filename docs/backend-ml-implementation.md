@@ -32,8 +32,10 @@ A trained artifact must be uploaded to configured object storage with its SHA-25
 - `GET /api/v1/intelligence/candidates/{id}/predictions`: authorised prediction history.
 - `POST /api/v1/intelligence/models/{id}/approve`: admin-only approval after passing evaluation.
 - `POST /api/v1/intelligence/models/{id}/promote`: admin-only, audited production promotion; the prior production version moves to `SHADOW`.
+- `POST /api/v1/intelligence/models/{id}/promote`: admin-only, audited production promotion; the prior production version moves to `SHADOW`.
 - `POST /api/v1/ingestion/batches`: create a source ingestion batch (pipeline credential).
 - `POST /api/v1/ingestion/batches/{id}/records`: idempotent, versioned source-record intake.
+- `PATCH /api/v1/ingestion/batches/{id}/records/{record_id}`: validate a source record and derive batch completion counts/status.
 - `POST /api/v1/ingestion/scenes`: register STAC scene metadata and validated WGS84 footprints.
 - `POST /api/v1/ingestion/processing-runs` and `PATCH /api/v1/ingestion/processing-runs/{id}`: idempotent run creation and controlled lifecycle transitions.
 
