@@ -5,15 +5,14 @@ Inputs are metadata/provenance only; raster assets remain in object storage.
 """
 from __future__ import annotations
 
-import hashlib
 import hmac
 import json
 from datetime import datetime
 from typing import Any, Literal
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -115,7 +114,7 @@ def create_batch(body: BatchCreate, db: Session = Depends(get_db)):
 def add_source_record(batch_id: UUID, body: SourceRecordCreate, db: Session = Depends(get_db)):
     _pipeline_context(db)
     batch = db.execute(text("""
-        SELECT id, status FROM ingestion_batches WHERE id=:batch_id FOR UPDATE
+        SELECT id, status, source_system FROM ingestion_batches WHERE id=:batch_id FOR UPDATE
     """), {"batch_id": batch_id}).mappings().first()
     if batch is None:
         raise HTTPException(404, "Ingestion batch not found.")
@@ -135,16 +134,19 @@ def add_source_record(batch_id: UUID, body: SourceRecordCreate, db: Session = De
            "payload": json.dumps(body.payload)}).mappings().first()
     if row is None:
         existing = db.execute(text("""
-            SELECT id, validation_status, retrieved_at FROM source_records
+            SELECT id, validation_status, retrieved_at, checksum_sha256 FROM source_records
             WHERE source_system=:source_system AND source_record_id=:source_record_id
               AND source_version IS NOT DISTINCT FROM :source_version
-        """), {"source_system": batch["status"], "source_record_id": body.source_record_id,
+        """), {"source_system": batch["source_system"], "source_record_id": body.source_record_id,
                "source_version": body.source_version}).mappings().first()
+        if existing and existing["checksum_sha256"] != body.checksum_sha256:
+            db.rollback()
+            raise HTTPException(409, "Source record ID/version already exists with a different checksum.")
         db.rollback()
-        return {"duplicate": True, "record": dict(existing) if existing else None}
+        return {"duplicate": True, "record": {k: existing[k] for k in ("id", "validation_status", "retrieved_at")} if existing else None}
     db.execute(text("""
         UPDATE ingestion_batches
-        SET records_received=records_received+1, records_accepted=records_accepted+1
+        SET records_received=records_received+1
         WHERE id=:batch_id
     """), {"batch_id": batch_id})
     db.commit()
@@ -155,6 +157,12 @@ def add_source_record(batch_id: UUID, body: SourceRecordCreate, db: Session = De
 def register_scene(body: SceneCreate, db: Session = Depends(get_db)):
     _pipeline_context(db)
     geometry = json.dumps(body.footprint)
+    valid = db.execute(text("""
+        SELECT ST_IsValid(ST_SetSRID(ST_GeomFromGeoJSON(:footprint),4326))
+           AND GeometryType(ST_SetSRID(ST_GeomFromGeoJSON(:footprint),4326)) = 'POLYGON'
+    """), {"footprint": geometry}).scalar_one()
+    if not valid:
+        raise HTTPException(422, "Scene footprint must be a valid Polygon in WGS84.")
     row = db.execute(text("""
         INSERT INTO satellite_scenes
           (provider, collection_id, item_id, platform, instrument, acquired_at,
@@ -174,13 +182,6 @@ def register_scene(body: SceneCreate, db: Session = Depends(get_db)):
         """), body.model_dump(include={"provider", "collection_id", "item_id"})).mappings().one()
         db.commit()
         return {"duplicate": True, "scene": dict(existing)}
-    valid = db.execute(text("""
-        SELECT ST_IsValid(ST_SetSRID(ST_GeomFromGeoJSON(:footprint),4326))
-           AND GeometryType(ST_SetSRID(ST_GeomFromGeoJSON(:footprint),4326)) = 'POLYGON'
-    """), {"footprint": geometry}).scalar_one()
-    if not valid:
-        db.rollback()
-        raise HTTPException(422, "Scene footprint must be a valid Polygon in WGS84.")
     db.commit()
     return {"duplicate": False, "scene": dict(row)}
 
@@ -239,7 +240,7 @@ def update_processing_run(run_id: UUID, body: ProcessingRunUpdate, db: Session =
             error_code=:error_code, error_detail=:error_detail,
             attempt=attempt + CASE WHEN :status='RUNNING' AND status='QUEUED' THEN 1 ELSE 0 END,
             started_at=CASE WHEN :status='RUNNING' AND started_at IS NULL THEN now() ELSE started_at END,
-            finished_at=CASE WHEN :status IN ('SUCCEEDED','PARTIAL','FAILED','CANCELLED') THEN now() ELSE finished_at END
+            finished_at=CASE WHEN :status IN ('SUCCEEDED','PARTIAL','FAILED','CANCELLED') AND finished_at IS NULL THEN now() ELSE finished_at END
         WHERE id=:run_id
         RETURNING id, status, attempt, started_at, finished_at, error_code
     """), {"status": body.status, "output_manifest": json.dumps(body.output_manifest),
