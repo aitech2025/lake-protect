@@ -20,7 +20,7 @@ Install optional dependencies with `pip install -e ".[ml]"`. Train with:
 python -m lake_protect.intelligence.train_cli --dataset verified-labels.csv --artifact artifacts/change-review-priority.joblib --report reports/model-card.json --dataset-ref verified-labels-2026-11-v1
 ```
 
-A trained artifact must be placed in controlled object storage, registered in `ml_model_versions`, evaluated into `ml_evaluations`, and explicitly approved by an administrator. The API approval endpoint requires a valid artifact hash and a passing evaluation. Do not expose an artifact path from an untrusted source to the API.
+A trained artifact must be uploaded to configured object storage with its SHA-256 metadata, then registered through the admin API, evaluated into `ml_evaluations`, explicitly approved and separately promoted to `PRODUCTION`. Registration and promotion verify the object-store SHA-256. Only the promoted production model is readable by the pipeline database role under RLS. Candidate ingestion loads the verified artifact, caches it by immutable URI/hash, and records its model/version and feature snapshot. If no model is promoted, the transparent baseline remains active; if production inference fails, the baseline is used with a logged fallback marker. Do not expose an artifact path from an untrusted source to the API.
 
 ## API
 
@@ -31,6 +31,13 @@ A trained artifact must be placed in controlled object storage, registered in `m
 - `GET /api/v1/intelligence/processing-runs`: processing lineage and run status.
 - `GET /api/v1/intelligence/candidates/{id}/predictions`: authorised prediction history.
 - `POST /api/v1/intelligence/models/{id}/approve`: admin-only approval after passing evaluation.
+- `POST /api/v1/intelligence/models/{id}/promote`: admin-only, audited production promotion; the prior production version moves to `SHADOW`.
+- `POST /api/v1/ingestion/batches`: create a source ingestion batch (pipeline credential).
+- `POST /api/v1/ingestion/batches/{id}/records`: idempotent, versioned source-record intake.
+- `POST /api/v1/ingestion/scenes`: register STAC scene metadata and validated WGS84 footprints.
+- `POST /api/v1/ingestion/processing-runs` and `PATCH /api/v1/ingestion/processing-runs/{id}`: idempotent run creation and controlled lifecycle transitions.
+
+The ingestion endpoints register source and processing metadata; they do not themselves download Sentinel imagery, generate COGs, or execute the raster change-detection pipeline. Raster processing remains in the pipeline/worker layer and should call these endpoints to record lineage. Candidate payloads may include `processing_run_id`; it must refer to a run in `RUNNING` state and is stored on the canonical candidate-to-asset link.
 
 ## Production gates
 
