@@ -18,7 +18,6 @@ import json
 import uuid
 
 from lake_protect.intelligence.features import CandidateFeatures
-from lake_protect.intelligence.triage import baseline_triage
 
 from geoalchemy2.elements import WKTElement
 from pydantic import BaseModel, ConfigDict, Field
@@ -31,6 +30,7 @@ from app.enums import AlertState, ChangeType, Mode, SensorBasis, Stage
 from app.models import Alert, Asset, Candidate, Observation
 from app.rules import config as rules
 from app.rules import legal_check, priority
+from app.services.ml_inference import score_review_priority
 from app.services import boundaries as bsvc
 from app.storage import store
 from app.workflow import state_machine as sm
@@ -226,7 +226,7 @@ def _persist_platform_intelligence(db: Session, candidate: Candidate, asset: Ass
         boundary_quality=boundary_quality,
         stage_preventability=preventability,
     )
-    result = baseline_triage(features)
+    result = score_review_priority(db, features)
     db.execute(text("""
       INSERT INTO candidate_predictions
         (candidate_id, score_type, score, model_name, model_version,
