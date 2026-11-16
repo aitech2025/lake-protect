@@ -51,7 +51,7 @@ def list_evaluations(
         WHERE (:model_id IS NULL OR e.model_version_id = :model_id)
         ORDER BY e.evaluated_at DESC
         LIMIT :limit
-    """), {"model_id": str(model_version_id) if model_version_id else None, "limit": limit}).mappings()
+    """), {"model_id": model_version_id, "limit": limit}).mappings()
     return {"items": [dict(row) for row in rows]}
 
 
@@ -83,7 +83,7 @@ def approve_model(
         SELECT id, model_name, model_version, artifact_uri, artifact_sha256,
                feature_schema_version, status, model_card
         FROM ml_model_versions WHERE id = :model_id FOR UPDATE
-    """), {"model_id": str(model_id)}).mappings().first()
+    """), {"model_id": model_id}).mappings().first()
     if model is None:
         raise HTTPException(404, "Model version not found.")
     if not model["artifact_uri"] or not model["artifact_sha256"] or not _SHA256.fullmatch(model["artifact_sha256"]):
@@ -92,7 +92,7 @@ def approve_model(
         SELECT passed, metrics FROM ml_evaluations
         WHERE model_version_id = :model_id
         ORDER BY evaluated_at DESC LIMIT 1
-    """), {"model_id": str(model_id)}).mappings().first()
+    """), {"model_id": model_id}).mappings().first()
     if evaluation is None or not evaluation["passed"]:
         raise HTTPException(409, "A passing, recorded evaluation is required before approval.")
     if model["status"] == "APPROVED":
@@ -101,7 +101,7 @@ def approve_model(
         UPDATE ml_model_versions
         SET status = 'APPROVED', approved_by = :approver, approved_at = now()
         WHERE id = :model_id
-    """), {"approver": actor.username, "model_id": str(model_id)})
+    """), {"approver": actor.username, "model_id": model_id})
     chain.record(db, actor_id=actor.id, action="ml_model.approved", entity="ml_model_version",
                  entity_id=model_id, details={"model_name": model["model_name"],
                  "model_version": model["model_version"], "artifact_sha256": model["artifact_sha256"]})
