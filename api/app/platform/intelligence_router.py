@@ -16,6 +16,7 @@ from app.audit import chain
 from app.db import get_db
 from app.models import User
 from app.security import current_user, require_roles
+from app.storage import store
 
 router = APIRouter(prefix="/api/v1/intelligence", tags=["intelligence"])
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
@@ -23,7 +24,7 @@ _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
 @router.get("/models")
 def list_models(
-    _: User = Depends(require_roles("admin", "senior_officer", "analyst", "auditor")),
+    _: User = Depends(require_roles("admin")),
     db: Session = Depends(get_db),
 ):
     rows = db.execute(text("""
@@ -41,7 +42,7 @@ def list_models(
 def list_evaluations(
     model_version_id: UUID | None = None,
     limit: int = Query(50, ge=1, le=200),
-    _: User = Depends(require_roles("admin", "senior_officer", "analyst", "auditor")),
+    _: User = Depends(require_roles("admin")),
     db: Session = Depends(get_db),
 ):
     rows = db.execute(text("""
@@ -88,6 +89,14 @@ def approve_model(
         raise HTTPException(404, "Model version not found.")
     if not model["artifact_uri"] or not model["artifact_sha256"] or not _SHA256.fullmatch(model["artifact_sha256"]):
         raise HTTPException(409, "Model artifact URI and SHA-256 are required before approval.")
+    if model["status"] not in {"REGISTERED", "VALIDATING"}:
+        raise HTTPException(409, f"Model status {model['status']} cannot be approved.")
+    try:
+        artifact_meta = store.head_object(model["artifact_uri"])
+    except (OSError, ValueError):
+        artifact_meta = None
+    if not artifact_meta or artifact_meta.get("sha256") != model["artifact_sha256"]:
+        raise HTTPException(409, "Stored model artifact is missing or its SHA-256 metadata does not match.")
     evaluation = db.execute(text("""
         SELECT passed, metrics FROM ml_evaluations
         WHERE model_version_id = :model_id
