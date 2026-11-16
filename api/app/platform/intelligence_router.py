@@ -60,7 +60,7 @@ def list_evaluations(
 def list_processing_runs(
     status: str | None = None,
     limit: int = Query(50, ge=1, le=200),
-    _: User = Depends(require_roles("admin", "senior_officer", "analyst", "auditor")),
+    _: User = Depends(require_roles("admin")),
     db: Session = Depends(get_db),
 ):
     rows = db.execute(text("""
@@ -89,6 +89,8 @@ def approve_model(
         raise HTTPException(404, "Model version not found.")
     if not model["artifact_uri"] or not model["artifact_sha256"] or not _SHA256.fullmatch(model["artifact_sha256"]):
         raise HTTPException(409, "Model artifact URI and SHA-256 are required before approval.")
+    if model["status"] == "APPROVED":
+        return {"id": str(model_id), "status": "APPROVED", "already_approved": True}
     if model["status"] not in {"REGISTERED", "VALIDATING"}:
         raise HTTPException(409, f"Model status {model['status']} cannot be approved.")
     try:
@@ -104,8 +106,6 @@ def approve_model(
     """), {"model_id": model_id}).mappings().first()
     if evaluation is None or not evaluation["passed"]:
         raise HTTPException(409, "A passing, recorded evaluation is required before approval.")
-    if model["status"] == "APPROVED":
-        return {"id": str(model_id), "status": "APPROVED", "already_approved": True}
     db.execute(text("""
         UPDATE ml_model_versions
         SET status = 'APPROVED', approved_by = :approver, approved_at = now()
