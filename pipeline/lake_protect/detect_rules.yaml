@@ -1,0 +1,106 @@
+# Detection rules (CONTEXT.md section 8.4). detect-v0 was the section 8.4 starting values;
+# detect-v1 adds the novelty, established and merge rules and the radar check, from the five
+# tuning lakes (DECISIONS.md D-042, D-045, D-050, D-051). Every candidate stores `rule_version`.
+# Change any value only with a new version string, and tag it in git before a scored run
+# (section 8.6). Thresholds start from section 8.4 and change only on evidence from the tuning
+# lakes, which are never among the scored backtest cases (reports/m2-tuning/README.md).
+rule_version: detect-v1
+
+sentinel2:
+  stac_url: https://earth-search.aws.element84.com/v1
+  collection: sentinel-2-c1-l2a
+  # Scene-level cloud filter before any pixel is read. The per-asset clear fraction decides use.
+  max_scene_cloud_pct: 70
+  # Section 8.4: mask SCL classes 0, 1, 3, 8, 9 and 10.
+  scl_masked: [0, 1, 3, 8, 9, 10]
+  # A scene is used for an asset only if this share of the asset's area of interest is clear.
+  min_clear_fraction: 0.75
+  bands: [blue, green, red, nir, swir16]
+  licence_notice: "Contains modified Copernicus Sentinel data {year}"
+
+grid:
+  crs: EPSG:32644          # section 8.3: UTM 44N, 10 m
+  resolution_m: 10
+  pad_m: 60                # context around the watch ring, for image chips
+
+# Sampling: the clearest scene per period. Older years feed the seasonal control only, so a
+# monthly sample is enough there; the monitoring period is sampled every 10 days.
+sampling:
+  history_years: 2         # section 8.4 rule 3: the same months in the two previous years
+  history_period_days: 30
+  monitor_period_days: 10
+  monitor_lead_days: 120   # monitoring sampling starts this many days before the baseline
+
+# Section 8.4 class rules. Order of precedence: water, vegetation, bare soil, built, other.
+classes:
+  water_mndwi_gt: 0.0
+  veg_ndvi_gt: 0.4
+  bare_bsi_gt: 0.1
+  bare_ndvi_lt: 0.2
+  # Sentinel-2 alone cannot separate built-up from bare ground well. Without radar this is a
+  # weak class: candidates that rely on it carry the flag `built_without_radar`.
+  built_ndbi_gt: 0.0
+  built_ndvi_lt: 0.25
+
+# Section 8.4 transitions. Water loss alone never alerts (invariant 8).
+transitions:
+  water>bare: soil_fill
+  water>built: soil_fill
+  veg>bare: clearing
+  veg>built: building
+  bare>built: building
+stage_by_change:
+  soil_fill: soil_dumped
+  clearing: land_levelled
+  building: building_rises
+
+controls:
+  # 1. Persistence: two independent looks at least 5 days apart, no reversal between them.
+  persistence_min_obs: 2
+  persistence_min_days: 5
+  # The old state must hold in this many of the last looks before the change.
+  prior_stable_obs: 2
+  prior_window_obs: 3
+  # The newest look in the run must be this recent, or the change is not "current".
+  max_staleness_days: 75
+  # 2. Minimum area: 1,000 sq m (10 pixels), 8-connected.
+  min_area_sq_m: 1000
+  # Patches of change this close together are one change (one alert per place, D-051).
+  merge_distance_m: 30
+  # Share of a candidate's pixels that must agree, look by look, for the dated bracket.
+  bracket_agree_fraction: 0.5
+  bracket_min_coverage: 0.5
+  # 3. Seasonal control: the same calendar window in each of the two previous years.
+  seasonal_window_days: 45
+  seasonal_same_class_fraction: 0.5
+  # 3b. Novelty (DECISIONS.md D-042): the new state was rare at the pixel in the prior year.
+  novelty_window_days: 365
+  novelty_max_fraction: 0.2
+  # 3c. Established (DECISIONS.md D-050): the old state held in this share of that year's looks.
+  established_min_fraction: 0.6
+  # 4. Drought control, applied to soil fill only (DECISIONS.md D-040).
+  drought_neighbours: 5
+  drought_regional_pp: -10
+  drought_worse_by_pp: 10
+  # Soil fill must start at the shore: this share of the ring around it was land before.
+  soil_fill_shore_land_fraction: 0.2
+
+# Section 8.4: built needs radar, VV at least 3 dB above baseline (radar.py, D-049).
+radar:
+  stac_url: https://planetarycomputer.microsoft.com/api/stac/v1
+  collection: sentinel-1-rtc
+  built_min_rise_db: 3.0
+  before_days: 120
+  max_after_looks: 8
+  seasonal_pad_days: 30
+  licence_notice: "Contains modified Copernicus Sentinel data {year}"
+
+confidence:
+  base: 0.4
+  per_obs: 0.1
+  max_obs_counted: 4
+  large_area_sq_m: 2500
+  large_area_bonus: 0.1
+  missing_season_penalty: 0.1
+  built_without_radar_penalty: 0.1
+  cap: 0.95

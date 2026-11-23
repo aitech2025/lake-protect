@@ -33,6 +33,18 @@ the pitch stop presenting the solution as free-data based. Recorded in CONTEXT.m
   wording is extended to say so.
 - The citizen channel moves from "out of scope" to "solution design, not in the current build".
 
+### D-039: Real lakes use HYDRAA's policy cut-off as their baseline (owner, 23 Nov 2026)
+The owner chose 19 July 2024 as `baseline_date` for real lakes, replacing D-014's enrolment date
+(6 Nov 2026). Only change first seen after it can alert (rule 3), so the first screen looks back
+over the period HYDRAA says it acts on. The value is in `data/case_lake_search.yml` (`registry`)
+and in every asset feature. The loader updates an existing asset's baseline and writes an
+`asset.baseline_changed` audit event. D-014 still applies to any feature without a baseline.
+
+### D-044: Priorities for the jury round (owner, 23 Nov 2026)
+The proposal was shortlisted for the TISC 2026 jury, due within a week. The owner's order: real
+Sentinel-2 detections flowing into the existing app on real lakes first; radar, the scored
+backtest and production hardening after. This is M2 plus M10 (PROGRESS.md), ahead of M3.
+
 ## Errors and gaps found in CONTEXT.md
 
 ### E-001: `boundaries` is append-only but has `valid_to` (section 7, invariant 12)
@@ -237,5 +249,114 @@ and a case with the officer is the "Officer".
 The worker container runs the escalation job every 5 minutes. The weekly re-check from space needs
 the detection pipeline (M2 and M3), so it is not scheduled yet. The reopen logic it would feed
 already exists and is tested at ingest (D-020).
+
+### D-038: The real asset file is a lake registry, not only the case lakes
+`lp assets-osm` now writes every named lake or tank in the ORR box from the saved Overpass
+response with an area from 2 ha to 500 ha (rivers, drains, moats, pools and service reservoirs
+left out), plus every polygon that matches a section 13 case name whatever its size. Two outlines
+of one lake (intersection over union 0.8 or more) are one asset: the case-matched one, else the
+older OSM id. Result: 99 assets, 11 of them case-matched as before. Osman Sagar (about 1,800 ha, a
+drinking-water reservoir) is outside the limit. All are `derived`, cohort D, mode WATCH.
+
+### D-040: How the drought control is read (section 8.4 rule 4)
+"Require the lake's water anomaly to be at least 10 points worse than the median of its 5 nearest
+lakes", applied to every soil-fill candidate, would remove nearly all real fills: one fill of a
+quarter acre on a 30 ha lake moves its water share by well under a point. **Applied:** the control
+acts in a dry year. If the median anomaly of the 5 nearest lakes, at the candidate's first-changed
+date against the same window in the two previous years, is 10 points or more below normal, a
+soil-fill candidate stands only if its own lake is at least 10 points worse than that median.
+Otherwise the control removes nothing. With fewer than 3 neighbours measured, or when one lake is
+run alone, the candidate carries `drought_control_not_run`. Thresholds are in
+`pipeline/lake_protect/detect_rules.yaml`.
+
+### D-041: Pipeline libraries
+Section 11 lists `odc-stac`, `rioxarray`, `scikit-image` and `geopandas`. The pipeline needs only
+windowed reads, a few array operations and connected components, so it uses `pystac-client`,
+`rasterio`, `numpy`, `scipy`, `shapely` and `pyproj`. The install is smaller and fits a slim
+container. Nothing in the method depends on the choice.
+
+### D-042: A novelty control, and a scored lake seen once before tuning
+**What happened.** The first run of `lp detect` on 23 Nov 2026 was a smoke test on Durgam Cheruvu.
+It found 4 "building" candidates, all where bare ground reads as built in the wet months and as
+bare in the dry ones (BSI near its 0.1 threshold). Durgam Cheruvu is a section 13 case lake, so it
+will be among the scored backtest cases. **The M3 report must disclose this:** one scored lake was
+run and looked at once, before the rules were frozen, and the change below followed from it.
+Tuning then moved to five lakes outside the case list (D-045).
+
+**Applied:** a further control, novelty. At each pixel, the new class must have been seen in no
+more than 20% of the clear looks in the year before the change. It is general (any surface that
+flips with the seasons), not fitted to one lake, and it sits beside the section 8.4 seasonal
+control, which compares only a window of 45 days around one date. The section 8.4 rule that
+"built" needs radar (VV at least 3 dB above baseline) is not met by Sentinel-2 alone, so every
+candidate whose new class is built carries `built_without_radar` and a lower confidence until
+radar is added (M3).
+
+### D-043: Screening runs, coverage and the real/demo split
+Migration 0004 adds `screen_runs` and `asset_screens`, both append-only. `lp screen` reads the watch
+list from `GET /pipeline/watchlist`, sends candidates to `POST /candidates` and then the coverage
+of every asset to `POST /pipeline/runs`, all with the pipeline token (D-023). Coverage is one of
+`not_observed`, `no_usable_look`, `failed`, `no_candidate`, `candidate_found`: the screen never
+says that a lake has no change where it had no clear look. A run is refused if any look is dated
+after its `as_of` (invariant 10 at the API). `GET /screening/runs` shows the latest runs to the
+desk, and `GET /assets` carries each asset's latest coverage. `lp replay` resends a saved screen
+after a demo reset, with no internet.
+
+The desk has one switch, "Hyderabad lakes (real data)" or "Demo world (fictional)", for the queue,
+assets and monthly page, so real and demo records are never on one screen. It is remembered per
+browser only and starts on the demo world, so the section 14 script is unchanged. `GET /alerts`
+and `GET /assets` take `dataset=real|demo`.
+
+### D-045: Tuning lakes
+Five lakes outside the section 13 case list, of different sizes and settings: Saroor Nagar Lake
+(`osm-way-27934981`), Kapra lake (`osm-way-265159686`), Gangaram Cheruvu (`osm-way-158331211`),
+Peeran Cheruvu (`osm-way-28847688`) and Gopi Cheruvu (`osm-way-263825342`). Thresholds may change
+only on evidence from these five.
+
+### D-046: The Sentinel-2 archive on Earth Search starts late for Hyderabad
+Collection `sentinel-2-c1-l2a` holds only 6 Hyderabad scenes per tile for 2022, all in December.
+A change first seen in the second half of 2024 therefore has one previous year for the seasonal
+control, not two. A candidate with no look at all in either previous year's window carries
+`seasonal_history_partial` and a lower confidence. The older `sentinel-2-l2a` collection could fill
+2022, but its processing baselines differ and it is not harmonised here.
+
+### D-047: The offline base map for real lakes is Sentinel-2, at zoom 14 at most
+`lp basemap` takes the clearest recent scenes that cover the whole ORR box, removes clouds with the
+scene classification layer, takes a per-pixel median, and cuts JPEG tiles from zoom 9 to 14 on the
+Web Mercator grid (zoom 14 is about 9 m per pixel at Hyderabad, close to the data's 10 m). Closer
+views enlarge zoom 14, so the map never suggests detail the data lacks. Tiles go to the API with
+`POST /pipeline/basemap` and are served at `/tiles/s2/{z}/{x}/{y}.jpg` with the Copernicus notice.
+The real-lake maps need no internet, as the demo maps do (M9).
+
+### D-048: Real alerts stop at the watch list, by design
+Every real asset has an OpenStreetMap outline (`derived`, cohort D, mode WATCH), so every real
+candidate that passes the legal check goes to `WATCH_LIST` and never to field assignment (rule 2,
+invariant 2). This is the honest limit of public data: a real alert can move on only when an
+official boundary is loaded as a new version (D-021). The full path to an officer stays on the
+fictional demo world until HYDRAA shares boundaries.
+
+### D-049: Radar from Planetary Computer, with no account
+Section 8.1 lists Copernicus Data Space (free account and S3 keys) or Planetary Computer
+`sentinel-1-rtc` ("account needed"). On 23 Nov 2026 Planetary Computer issued read tokens for
+`sentinel-1-rtc` with no account, and its search returned a Hyderabad scene from 14 Nov 2026.
+M3 will try it first, so the Copernicus keys PROGRESS.md asked for are no longer a blocker.
+
+### D-050: An "established" control
+Tuning showed most survivors were vegetation turning bare. **Applied:** the old state must have
+held in at least 60% of the clear looks in the year before the change, so grass that greens in the
+monsoon and dries after it, or a lake edge wet for a few months, does not count as a change of
+land use. 85% was tried on the tuning lakes and reverted: the clearings turned out to be real
+earthworks (reports/m2-tuning/README.md).
+
+### D-051: One change per place
+Restoration works showed up as many small patches side by side. **Applied:** each 8-connected
+patch must reach 1,000 sq m on its own (rule 2 unchanged); patches within 30 m of each other are
+then one candidate, with one dated bracket. This keeps the queue to one alert per place.
+
+### D-052: detect-v1
+`detect_rules.yaml` is `detect-v1`: section 8.4's starting values plus D-042 (novelty), D-050,
+D-051 and the radar check (D-049), from the tuning lakes only. Every candidate and screening run
+stores the rule version, and every run also stores the SHA-256 of the rule file, so a run can be
+matched to the exact thresholds. It is not yet frozen: freezing is a git tag before the scored
+backtest (section 8.6).
 
 ## Defaults changed

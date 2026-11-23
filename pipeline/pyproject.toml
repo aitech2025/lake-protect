@@ -11,18 +11,18 @@ requires-python = ">=3.11"
 dependencies = ["typer>=0.12,<1"]
 
 [project.optional-dependencies]
+# DECISIONS.md D-041: rasterio, numpy and scipy do the work odc-stac, rioxarray, scikit-image and
+# geopandas were listed for, with a smaller install that also fits a slim container.
 geo = [
     "pystac-client>=0.8,<1",
-    "odc-stac>=0.3.10,<1",
-    "rioxarray>=0.17,<1",
     "rasterio>=1.4,<2",
-    "scikit-image>=0.24,<1",
-    "geopandas>=1.0,<2",
+    "scipy>=1.14,<2",
     "shapely>=2.0.6,<3",
     "numpy>=2,<3",
     "pillow>=11,<13",
     "pyproj>=3.7,<4",
     "httpx>=0.27,<1",
+    "pyyaml>=6,<7",
 ]
 osm = ["httpx>=0.27,<1", "shapely>=2.0.6,<3", "pyproj>=3.7,<4", "pyyaml>=6,<7"]
 dev = ["pytest>=8.3,<9"]
@@ -32,6 +32,9 @@ lp = "lake_protect.cli:app"
 
 [tool.setuptools.packages.find]
 include = ["lake_protect*"]
+
+[tool.setuptools.package-data]
+lake_protect = ["*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

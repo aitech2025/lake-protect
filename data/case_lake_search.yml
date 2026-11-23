@@ -49,3 +49,14 @@ lakes:
     patterns: ['\bthum+ ?kunta', '\bthumkunta']
   - case: Miyapur water body
     patterns: ['\bmiyapur']
+
+# The weekly screen's watch list (DECISIONS.md D-038): every named lake or tank in the bbox within
+# these limits. Rivers, drains, moats, pools and service reservoirs are not lakes. Osman Sagar
+# (about 1,800 ha) is a drinking-water reservoir with its own protection regime, so it is left out.
+registry:
+  min_area_ha: 2
+  max_area_ha: 500
+  exclude_water: [river, sewer, moat, pool, reservoir, canal, stream, wastewater]
+  # Owner's decision, 23 Nov 2026 (DECISIONS.md D-039): HYDRAA's policy cut-off, so the screen
+  # covers change since HYDRAA was formed.
+  baseline_date: "2024-07-19"

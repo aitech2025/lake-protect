@@ -2,7 +2,12 @@
 
 OpenStreetMap is a free, non-government source (CONTEXT.md section 8.2: "JRC maximum water
 extent, or OpenStreetMap water ... status `derived`"). Every asset produced here is cohort D
-(`derived`, mode WATCH): fine for a first backtest run, never for field action.
+(`derived`, mode WATCH): fine for screening and a first backtest run, never for field action.
+
+The file holds two kinds of feature (DECISIONS.md D-038):
+- every named lake or tank in the ORR box within the registry's size limits, the watch list for
+  the weekly screen; and
+- every polygon whose name matches a section 13 case lake, whatever its size.
 
 The Overpass response is saved next to the output with its retrieval time, so the asset file can
 be rebuilt and checked without querying again.
@@ -102,6 +107,30 @@ def area_sq_m(geom) -> float:
     return transform(to_utm, geom).area
 
 
+def _drop_duplicates(features: list[dict]) -> list[dict]:
+    """Two OSM outlines of the same lake (mapped twice) are one asset: keep a case-matched one,
+    else the older OSM id. Same lake means intersection over union of 0.8 or more."""
+
+    def rank(f):
+        p = f["properties"]
+        return (0 if p["matched_case_names"] else 1, int(p["asset_key"].rsplit("-", 1)[1]))
+
+    kept: list[dict] = []
+    for f in sorted(features, key=rank):
+        g = f["_geom"]
+        same = False
+        for k in kept:
+            h = k["_geom"]
+            if g.intersects(h):
+                inter = g.intersection(h).area
+                if inter / max(g.union(h).area, 1e-12) >= 0.8:
+                    same = True
+                    break
+        if not same:
+            kept.append(f)
+    return kept
+
+
 def build(search_path: Path, raw_path: Path, out_path: Path, refetch: bool) -> dict:
     from shapely.geometry import MultiPolygon, mapping
     from shapely.validation import make_valid
@@ -115,13 +144,16 @@ def build(search_path: Path, raw_path: Path, out_path: Path, refetch: bool) -> d
 
     compiled = [(l["case"], [re.compile(p) for p in l["patterns"]]) for l in spec["lakes"]]
     matches: dict[str, list[dict]] = {c: [] for c, _ in compiled}
+    registry = spec.get("registry") or {}
+    excluded_water = set(registry.get("exclude_water", []))
     features = []
     for el in elements:
         tags = el.get("tags", {})
         name = tags.get("name", "")
         norm = normalise(name + " " + tags.get("name:en", "") + " " + tags.get("alt_name", ""))
         hit_cases = [case for case, pats in compiled if any(p.search(norm) for p in pats)]
-        if not hit_cases:
+        in_registry = bool(registry) and tags.get("water") not in excluded_water
+        if not hit_cases and not in_registry:
             continue
         geom = element_geometry(el)
         if geom is None or geom.is_empty:
@@ -136,6 +168,8 @@ def build(search_path: Path, raw_path: Path, out_path: Path, refetch: bool) -> d
                 continue
             geom = MultiPolygon(polys)
         area = area_sq_m(geom)
+        if not hit_cases and not (registry["min_area_ha"] * 1e4 <= area <= registry["max_area_ha"] * 1e4):
+            continue
         osm_ref = f"{el['type']}/{el['id']}"
         for case in hit_cases:
             matches[case].append({"osm": osm_ref, "name": name, "area_acres": round(area / ACRE_SQ_M, 2)})
@@ -157,6 +191,7 @@ def build(search_path: Path, raw_path: Path, out_path: Path, refetch: bool) -> d
                     "custodian_agency": None,
                     "has_cctv": None,
                     "is_demo": False,
+                    "baseline_date": registry.get("baseline_date"),
                     "boundary": {
                         "kind": "ftl",
                         "status": "derived",
@@ -168,12 +203,16 @@ def build(search_path: Path, raw_path: Path, out_path: Path, refetch: bool) -> d
                     },
                     "osm_tags": {k: v for k, v in tags.items() if k in {"name", "name:te", "name:en", "alt_name", "natural", "water", "landuse", "wikidata"}},
                     "matched_case_names": hit_cases,
-                    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL. "
-                    "Name match only: not yet confirmed as the lake in any case report.",
+                    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+                    + (" Name match only: not yet confirmed as the lake in any case report." if hit_cases else ""),
                 },
+                "_geom": geom,
             }
         )
 
+    features = _drop_duplicates(features)
+    for f in features:
+        f.pop("_geom", None)
     features.sort(key=lambda f: f["properties"]["asset_key"])
     for case, hits in matches.items():
         for f in features:
@@ -185,7 +224,8 @@ def build(search_path: Path, raw_path: Path, out_path: Path, refetch: bool) -> d
         "type": "FeatureCollection",
         "name": "lake-protect-real-assets",
         "source": {
-            "description": "OpenStreetMap water polygons whose names match CONTEXT.md section 13 lakes",
+            "description": "OpenStreetMap water polygons: named lakes and tanks in the ORR box within the registry limits, plus every polygon whose name matches a CONTEXT.md section 13 lake",
+            "registry": registry,
             "licence": "Open Database Licence (ODbL). Attribution: (c) OpenStreetMap contributors",
             "overpass_endpoint": payload["endpoint"],
             "retrieved_at": payload["retrieved_at"],

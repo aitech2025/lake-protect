@@ -38,3 +38,6 @@ storage/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Screen payloads carry base64 chips; rebuildable with lp screen, resent with lp replay
+reports/**/payloads.jsonl

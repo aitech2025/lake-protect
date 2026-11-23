@@ -5,8 +5,10 @@
 Idempotent by asset_key. If a boundary geometry changed in the file, a new version is added and
 the old one stays retrievable. Real assets are never marked is_demo.
 
-baseline_date: monitoring starts on the date the boundary was retrieved, so only change after
-enrolment can alert (rule 3). The backtest sets its own per-case baseline (DECISIONS.md D-014).
+baseline_date: the feature's `baseline_date` when the file gives one (DECISIONS.md D-039: HYDRAA's
+policy cut-off, 19 July 2024), otherwise the date the boundary was retrieved (D-014). Only change
+first seen after it can alert (rule 3). A changed baseline on an existing asset is updated and
+logged. The backtest sets its own per-case baseline and does not read this value.
 """
 from __future__ import annotations
 
@@ -18,6 +20,7 @@ from pathlib import Path
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
+from app.audit import chain
 from app.models import Asset
 from app.services import boundaries as bsvc
 
@@ -26,7 +29,7 @@ REQUIRED_BOUNDARY_FIELDS = ("kind", "status", "source_name", "source_url", "sour
 
 def load(db: Session, path: Path) -> dict:
     collection = json.loads(path.read_text(encoding="utf-8"))
-    created = versioned = unchanged = 0
+    created = versioned = unchanged = rebased = 0
     for feature in collection["features"]:
         p = feature["properties"]
         b = p["boundary"]
@@ -36,6 +39,7 @@ def load(db: Session, path: Path) -> dict:
         if p.get("is_demo"):
             raise ValueError(f"{p['asset_key']}: demo data does not belong in the real asset file")
         source_date = dt.date.fromisoformat(b["source_date"])
+        baseline = dt.date.fromisoformat(p["baseline_date"]) if p.get("baseline_date") else source_date
         asset = db.scalar(select(Asset).where(Asset.asset_key == p["asset_key"]))
         if asset is None:
             asset = Asset(
@@ -51,7 +55,7 @@ def load(db: Session, path: Path) -> dict:
                 area_acres=p.get("area_acres"),
                 custodian_agency=p.get("custodian_agency"),
                 has_cctv=p.get("has_cctv"),
-                baseline_date=source_date,
+                baseline_date=baseline,
                 is_demo=False,
                 notes=p.get("notes"),
             )
@@ -59,6 +63,17 @@ def load(db: Session, path: Path) -> dict:
             db.flush()
             created += 1
         else:
+            if asset.baseline_date != baseline:
+                chain.record(
+                    db,
+                    actor_id=None,
+                    action="asset.baseline_changed",
+                    entity="asset",
+                    entity_id=asset.id,
+                    details={"from": asset.baseline_date.isoformat(), "to": baseline.isoformat(), "source": str(path.name)},
+                )
+                asset.baseline_date = baseline
+                rebased += 1
             current = bsvc.primary_of(bsvc.current_boundary_set(db, asset.id))
             same = current is not None and db.scalar(
                 text("SELECT ST_Equals(geom, ST_GeomFromGeoJSON(:g)) FROM boundaries WHERE id = :i"),
@@ -82,7 +97,10 @@ def load(db: Session, path: Path) -> dict:
             valid_from=source_date,
         )
     db.commit()
-    return {"created": created, "new_versions": versioned, "unchanged": unchanged}
+    out = {"created": created, "new_versions": versioned, "unchanged": unchanged}
+    if rebased:
+        out["baseline_changed"] = rebased
+    return out
 
 
 if __name__ == "__main__":
