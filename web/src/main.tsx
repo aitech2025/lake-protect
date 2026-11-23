@@ -11,6 +11,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { App } from "./App";
 import { AuthProvider } from "./auth";
+import { DatasetProvider } from "./dataset";
 import { DemoProvider } from "./demo";
 
 createRoot(document.getElementById("root")!).render(
@@ -18,7 +19,9 @@ createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <AuthProvider>
         <DemoProvider>
-          <App />
+          <DatasetProvider>
+            <App />
+          </DatasetProvider>
         </DemoProvider>
       </AuthProvider>
     </BrowserRouter>

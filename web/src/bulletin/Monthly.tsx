@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
+import { useDataset } from "../dataset";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { API_BASE, api, authHeaders, fmtDate } from "../api";
@@ -30,7 +31,7 @@ export function Monthly() {
   const lang = i18n.language;
   const choices = useMemo(() => months(4), []);
   const [month, setMonth] = useState(choices[0]);
-  const [dataset, setDataset] = useState<"demo" | "real">("demo");
+  const { dataset, setDataset } = useDataset();
   const { data, error, status, loading, reload } = useAsync(() => api<any>(`/bulletins/${month}?dataset=${dataset}`), [month, dataset]);
   useDemoOnScreen(dataset === "demo" && Boolean(data));
   usePageTitle(t("monthly.title", { month: monthName(month, lang) }));

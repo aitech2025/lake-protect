@@ -188,7 +188,8 @@
     "owner": "Owner: {{name}}",
     "acres": "{{acres}} acre",
     "reopened": "Reopened",
-    "cohort": "Asset group"
+    "cohort": "Asset group",
+    "empty_real": "No change on a real lake is open yet. The Assets page shows when each lake was last seen clearly from space."
   },
   "detail": {
     "back": "All alerts",
@@ -272,7 +273,7 @@
     "title": "Assets",
     "dataset_demo": "Demo world",
     "dataset_real": "Real lakes (OpenStreetMap)",
-    "real_note": "Real lakes use OpenStreetMap outlines. They are estimates for watching only, never for field action.",
+    "real_note": "Real lakes use OpenStreetMap outlines. They are estimates for watching only, never for field action. Every lake is screened from Sentinel-2 satellite images.",
     "versions": "Boundary versions",
     "source": "Source",
     "valid": "In force from {{from}}",
@@ -430,5 +431,49 @@
     "saved": "Record saved.",
     "recorded": "Action recorded. The land stays on weekly watch.",
     "records": "Officer records"
+  },
+  "dataset": {
+    "label": "Showing",
+    "real": "Hyderabad lakes (real data)",
+    "demo": "Demo world (fictional)"
+  },
+  "screen": {
+    "title": "Screen from space, as of {{date}}",
+    "assets": "{{count}} lakes watched",
+    "looks": "{{count}} clear looks used",
+    "seen": "{{count}} lakes seen clearly",
+    "with_candidates": "{{count}} with a candidate change",
+    "unseen": "{{count}} not seen clearly, so no finding for them",
+    "source": "Sentinel-2 L2A, rules {{rule}}",
+    "never_run": "No screen from space has run yet.",
+    "last_look": "Last clear look {{date}}",
+    "looks_since": "{{count}} looks since {{date}}",
+    "status": {
+      "never": "Not screened yet",
+      "not_observed": "Not observed",
+      "no_usable_look": "No clear look",
+      "failed": "Processing failed",
+      "no_candidate": "Screened, no candidate change",
+      "candidate_found": "Candidate change found"
+    }
+  },
+  "imagery": {
+    "title": "Images used",
+    "cloud": "{{pct}}% cloud in the scene",
+    "rules": "Detection rules {{v}}",
+    "sensor": {
+      "sentinel-2": "Sentinel-2 optical",
+      "sentinel-1": "Sentinel-1 radar",
+      "demo_synthetic_optical": "Demo image (synthetic)",
+      "demo_synthetic_radar": "Demo radar (synthetic)"
+    },
+    "flag": {
+      "seasonal_history_partial": "No clear look in the same months of earlier years",
+      "built_without_radar": "Built-up not confirmed by radar",
+      "radar_confirmed": "Radar confirms new built-up (3 dB or more)",
+      "radar_unavailable": "No radar look to confirm built-up",
+      "drought_control_not_run": "Drought check not run",
+      "water_to_built": "Water to built-up"
+    }
   }
 }

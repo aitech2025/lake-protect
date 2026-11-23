@@ -359,4 +359,17 @@ stores the rule version, and every run also stores the SHA-256 of the rule file,
 matched to the exact thresholds. It is not yet frozen: freezing is a git tag before the scored
 backtest (section 8.6).
 
+### D-053: The live screen covers the case lakes; its output never tunes the rules
+The weekly screen must watch every real lake, including those named in section 13, so their
+current output is visible on the desk. **Applied:** rules change only on tuning-lake evidence
+(D-045). The scored backtest steps through each case's own past dates with the rules frozen in a
+git tag, and its report will say that the live screen of 22 Nov 2026 also covered the case lakes.
+The repository is private; screen reports name real lakes as "candidate change", never as
+encroachments, and the large payload files stay out of git.
+
+### D-054: Areas are compared to the nearest square metre at ingest
+The first real screen sent a 10-pixel change, exactly 1,000 sq m on the pipeline's UTM grid, which
+measured 999.99999998 sq m after the lon/lat round trip and was refused. `POST /candidates` now
+rounds the area before comparing it with the minimum. The test reproduces the real case.
+
 ## Defaults changed

@@ -6,7 +6,9 @@ import { LineSwatch, StatePill, useAsync, usePageTitle } from "../components/Bit
 import { GROUP_COLOUR, GROUP_OF } from "../components/labels";
 import { MapView, type Pin } from "../components/MapView";
 import { PageState } from "../components/PageState";
+import { baseFor, useDataset } from "../dataset";
 import { useDemoOnScreen } from "../demo";
+import { ScreeningSummary } from "./Screening";
 
 const GROUPS = ["all", "review", "field", "legal", "officer", "watch", "closed", "overdue"] as const;
 
@@ -16,7 +18,8 @@ export function Queue() {
   const [group, setGroup] = useState<(typeof GROUPS)[number]>("all");
   const [mode, setMode] = useState("");
   const [cohort, setCohort] = useState("");
-  const { data, error, status, reload } = useAsync(() => api<{ items: AlertRow[]; has_demo: boolean }>("/alerts"), []);
+  const { dataset } = useDataset();
+  const { data, error, status, reload } = useAsync(() => api<{ items: AlertRow[]; has_demo: boolean }>(`/alerts?dataset=${dataset}`), [dataset]);
   useDemoOnScreen(Boolean(data?.has_demo));
   usePageTitle(t("queue.title"));
 
@@ -72,6 +75,7 @@ export function Queue() {
           </label>
         </div>
       </div>
+      {dataset === "real" && <ScreeningSummary />}
       <div className="chips" role="group" aria-label="State" style={{ marginBottom: "1rem" }}>
         {GROUPS.map((g) => (
           <button key={g} className="chip" aria-pressed={group === g} onClick={() => setGroup(g)} data-testid={`group-${g}`}>
@@ -82,7 +86,7 @@ export function Queue() {
       <PageState error={error} status={status} onRetry={reload} />
       <div className="queue">
         <div className="mapbox">
-          <MapView pins={pins} testId="queue-map" />
+          <MapView base={baseFor(dataset)} pins={pins} testId="queue-map" />
           <div className="legend">
             {(["review", "field", "legal", "officer", "watch"] as const).map((g) => (
               <span key={g}><i className="pin" style={{ width: 10, height: 10, borderWidth: 2, background: GROUP_COLOUR[g] }} />{t(`group.${g}`)}</span>
@@ -92,7 +96,7 @@ export function Queue() {
         </div>
         <div className="list" data-testid="alert-list">
           <PageState loading={!data && !error} />
-          {items.length === 0 && data && <p className="muted" style={{ padding: "1rem" }}>{t("queue.empty")}</p>}
+          {items.length === 0 && data && <p className="muted" style={{ padding: "1rem" }}>{t(dataset === "real" ? "queue.empty_real" : "queue.empty")}</p>}
           {items.map((r) => (
             <Link key={r.id} to={`/alerts/${r.id}`} className="row" data-testid={`alert-row-${r.code}`}>
               <span className="bar" style={{ background: r.overdue ? "#c4402f" : GROUP_COLOUR[GROUP_OF[r.state]] }} />

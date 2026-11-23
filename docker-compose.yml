@@ -80,6 +80,25 @@ services:
       api:
         condition: service_healthy
 
+  # The weekly screen from space (needs internet, so it has its own profile and is never part of
+  # the offline demo): docker compose --profile screen up -d screener
+  screener:
+    profiles: ["screen"]
+    build:
+      context: .
+      dockerfile: pipeline/Dockerfile
+    image: lakeprotect-screener:dev
+    environment:
+      LP_API_URL: http://api:8000
+      LP_PIPELINE_TOKEN: ${LP_PIPELINE_TOKEN:?set in .env}
+      LP_CACHE_DIR: /var/lp/cache
+    volumes:
+      - lp_cache:/var/lp/cache
+      - ./reports:/srv/repo/reports
+    depends_on:
+      api:
+        condition: service_healthy
+
   # Browser tests: docker compose --profile e2e run --rm e2e
   e2e:
     profiles: ["e2e"]
@@ -102,3 +121,4 @@ services:
 volumes:
   lp_pgdata:
   lp_storage:
+  lp_cache:

@@ -1,18 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api, fmtDate } from "../api";
 import { BoundarySeal, useAsync, usePageTitle } from "../components/Bits";
 import { MapView } from "../components/MapView";
 import { PageState, TableRegion } from "../components/PageState";
+import { baseFor, useDataset } from "../dataset";
 import { DemoTag, useDemoOnScreen } from "../demo";
+import { CoverageLine, ScreeningSummary } from "./Screening";
 
 export function Assets() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
-  const [dataset, setDataset] = useState<"demo" | "real">("demo");
+  const { dataset } = useDataset();
   const [selected, setSelected] = useState<number | null>(null);
-  const { data, error, status, loading, reload } = useAsync(() => api<{ features: any[] }>("/assets"), []);
+  useEffect(() => setSelected(null), [dataset]);
+  const { data, error, status, loading, reload } = useAsync(() => api<{ features: any[] }>(`/assets?dataset=${dataset}`), [dataset]);
   const features = useMemo(() => (data?.features ?? []).filter((f) => f.properties.is_demo === (dataset === "demo")), [data, dataset]);
   useDemoOnScreen(dataset === "demo" && features.length > 0);
   usePageTitle(t("assets.title"));
@@ -37,16 +40,13 @@ export function Assets() {
           <h1>{t("assets.title")}</h1>
           <p className="muted" aria-hidden={!data}>{data ? features.length : " "}</p>
         </div>
-        <div className="chips">
-          <button className="chip" aria-pressed={dataset === "demo"} onClick={() => { setDataset("demo"); setSelected(null); }}>{t("assets.dataset_demo")}</button>
-          <button className="chip" aria-pressed={dataset === "real"} onClick={() => { setDataset("real"); setSelected(null); }} data-testid="dataset-real">{t("assets.dataset_real")}</button>
-        </div>
       </div>
       {dataset === "real" && <p className="note" style={{ marginBottom: "1rem" }}>{t("assets.real_note")}</p>}
+      {dataset === "real" && <ScreeningSummary />}
       <PageState loading={loading && !data} error={error} status={status} onRetry={reload} />
       <div className="queue" style={{ height: "auto" }}>
         <div className="mapbox" style={{ height: 520 }}>
-          <MapView boundaries={selected ? selectedFc : mapFc} />
+          <MapView base={baseFor(dataset)} boundaries={selected ? selectedFc : mapFc} />
         </div>
         <div className="list" style={{ maxHeight: 520 }}>
           {features.map((f) => {
@@ -62,6 +62,7 @@ export function Assets() {
                     {p.area_acres !== null && <span>{t("assets.acres", { acres: p.area_acres })}</span>}
                     <span>{t("assets.baseline", { date: fmtDate(p.baseline_date, lang) })}</span>
                   </span>
+                  {!p.is_demo && <CoverageLine p={p} />}
                 </span>
                 <span><BoundarySeal status={p.boundary_status} version={p.boundary_version} /></span>
               </button>

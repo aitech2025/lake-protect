@@ -3,7 +3,9 @@
 Read this first at the start of every session, then continue from the first unfinished milestone.
 
 **Build order (owner's instruction, see DECISIONS.md D-001):** M0, M1, M4, M5, M6, M7, M8, M9,
-**stop and report**, M2, M3, report the backtest.
+**stop and report**, M2, M3, report the backtest. On 23 Nov 2026 the owner restarted work for the
+TISC 2026 jury round, due within a week, and asked for real data first (D-044): M2, then M10 (real
+data in the app), then M3.
 
 | Milestone | Status | Tests | Commit |
 |---|---|---|---|
@@ -15,9 +17,10 @@ Read this first at the start of every session, then continue from the first unfi
 | M7 Evidence pack | Done | API 217 passed, browser 10 passed | 3bd08bb |
 | M8 Officer record, escalation, monthly page | Done | API 232 passed, browser 13 passed | 30a287f |
 | M9 Demo | Done | API 235, pipeline 4, browser 14 passed | M9 commit |
-| **Stop: report to owner** | **Waiting for the owner** | | |
-| M2 Detection on Sentinel-2 | Not started | | |
-| M3 Radar and scored backtest | Not started | | |
+| Stop: report to owner | Owner replied 23 Nov 2026 (D-044) | | |
+| M2 Detection on Sentinel-2 | Done | Pipeline 25 passed | cf91bce |
+| M10 Real data in the app | Done | API 249, pipeline 25, browser 15 passed | M10 commit |
+| M3 Radar and scored backtest | Radar check for built-up done; backtest not started | | |
 
 ## M0 Scaffold: done
 
@@ -177,6 +180,61 @@ Done-check run on 6 Nov 2026 from empty volumes (`docker compose down -v`, then 
   demo, then the walkthrough on a second fresh demo).
 - A fresh demo, dated today, is left in the database for the owner.
 
+## M2 Detection on Sentinel-2: done
+
+Real data, five tuning lakes outside the case list (D-045). The full record, with what each control
+removed, is `reports/m2-tuning/README.md`.
+
+- `pipeline/lake_protect/`: `stac` (Earth Search `sentinel-2-c1-l2a`, one look per acquisition
+  date across the UTM 43/44 edge), `raster` (windowed COG reads onto a 10 m EPSG:32644 grid, cloud
+  mask first, cached in `C:\lp-cache`; each scene file is opened once for every lake),
+  `indices` (MNDWI, NDVI, NDBI, BSI and the section 8.4 classes), `change` (dated bracket and all
+  controls), `chips` (true colour, same stretch, hard pixel edges, Copernicus notice), `radar`
+  (Sentinel-1 RTC from Planetary Computer for built-up), `detect`, `screen`, `basemap`.
+- Rules: `pipeline/lake_protect/detect_rules.yaml`, now `detect-v1` (D-052): section 8.4 plus
+  novelty (D-042), established (D-050), one change per place (D-051), the drought control as read
+  in D-040, and radar for built-up (D-049). Not frozen yet.
+- `lp detect` produced candidates and before and after chips for the five tuning lakes
+  (`reports/m2-tuning/run4`): 14 candidates, all at Kapra lake and Gangaram Cheruvu, the two where
+  HYDRAA reported restoration works in 2026; none at Saroor Nagar, Peeran or Gopi Cheruvu. Radar
+  refused both Sentinel-2 "building" candidates (0.4 and 1.6 dB against 3 dB).
+- **No-look-ahead test passes (invariant 10):** the catalogue query ends at the end of the as_of
+  day, later items are dropped if returned anyway, and the readers refuse a later scene before any
+  pixel is read (`pipeline/tests/test_no_lookahead.py`). The API also refuses a screening run that
+  reports a look after its as_of date.
+- Disclosure for M3: Durgam Cheruvu, a scored case lake, was run once as a smoke test before
+  tuning (D-042).
+- Tests: pipeline 25 passed (no look-ahead, every control on synthetic stacks, merge, radar
+  arithmetic, classes, OSM registry).
+
+## M10 Real data in the app: done
+
+- Registry: 99 real lakes up to the ORR from the saved OpenStreetMap response (D-038), baseline
+  19 July 2024 (D-039), all `derived`, cohort D, watch only.
+- Migration 0004: `screen_runs` and `asset_screens`, append-only. `GET /pipeline/watchlist`,
+  `POST /pipeline/runs`, `POST /pipeline/basemap` (pipeline token), `GET /screening/runs`,
+  `GET /tiles/s2/...`, and `dataset=real|demo` on `GET /alerts` and `GET /assets` (D-043).
+- `lp screen` ran over all 99 lakes with scenes up to 22 Nov 2026 (`reports/screen/2026-11-22`):
+  7,652 clear looks from March 2022 to November 2026; every lake seen clearly, the newest look at
+  most 14 days old; 84 lakes with no candidate, 15 with candidates. 58 candidate changes (46
+  clearing, 11 soil fill, 1 building confirmed by radar at +5.3 dB), all on the watch list
+  (D-048); radar refused 25 Sentinel-2 building candidates. Fetch and detection took 28 minutes
+  the first time; a rerun from cache takes minutes. One candidate was first refused for an area
+  rounding error, now fixed (D-054); `lp replay` then put back all 58 after a demo reset.
+  Kapra lake (10) and Gangaram Cheruvu (5) are where HYDRAA reported restoration works in 2026.
+  No accuracy is claimed: that is M3's job.
+- Base map: `lp basemap` built 707 tiles, zoom 9 to 14, from four clear scenes of 29 September to
+  14 October 2026, and uploaded them (D-047). Real-lake maps work offline.
+- Desk: one switch in the side bar, "Hyderabad lakes (real data)" or "Demo world (fictional)",
+  for the queue, assets and monthly page; the latest screen in one line; each lake's coverage
+  ("Last clear look ..."); an "Images used" panel on every alert with scene, date, sensor and flags.
+- `lp replay reports/screen/<date>` puts a saved screen back after a demo reset, with no internet.
+- Scheduled container: `docker compose --profile screen up -d screener` runs `lp screen` weekly.
+- Tests: API 249 passed (watch list, runs and coverage, append-only, dataset split, base map
+  upload, the area rounding case). Browser 15 passed on fresh demos: `m10-real` (switch, no demo
+  record on the real side, Sentinel-2 tiles requested, 99 real lakes listed) with the M5 to M8
+  suites, then the M9 walkthrough with no internet.
+
 ## Stop: report to owner (after M9)
 
 The owner's order puts a stop here. M2 and M3 start when the owner replies.
@@ -217,5 +275,8 @@ The owner's order puts a stop here. M2 and M3 start when the owner replies.
 
 ## Next
 
-Waiting for the owner's reply. Then M2: detection on Sentinel-2 (5 tuning lakes, `lp fetch` and `lp detect`,
-no-look-ahead test, invariant 10), then M3.
+M3, after the jury round: confirm the case list from sources (locations, dates, areas), hand-trace
+the outlines OpenStreetMap lacks, step the screen weekly through 2017 to 2026 for each case, tag
+the frozen rules in git, run the 30 cases once and write the section 8.6 report, with the Durgam
+Cheruvu disclosure (D-042). Sentinel-1 needs no account (D-049); the Copernicus keys asked for
+above are no longer needed.

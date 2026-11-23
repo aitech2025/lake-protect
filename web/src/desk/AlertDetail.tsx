@@ -105,7 +105,7 @@ export function AlertDetail() {
           <section className="section">
             <h2 className="title-s">{t("detail.map_title")}</h2>
             <div className="mapbox" style={{ height: 380 }}>
-              <MapView boundaries={boundaries} changes={changes} testId="detail-map" />
+              <MapView base={a.is_demo ? "demo" : "s2"} boundaries={boundaries} changes={changes} testId="detail-map" />
               <div className="legend">
                 <span><LineSwatch colour="#1f6fa8" />{t("boundary.legend_solid")}</span>
                 <span><LineSwatch colour="#1f6fa8" dash="6 4" />{t("boundary.legend_dashed")}</span>
@@ -169,6 +169,25 @@ export function AlertDetail() {
               </dl>
             )}
             {lc && <p className="small muted" style={{ marginTop: "0.6rem" }}>{t("detail.rule_version", { v: lc.rule_version })}</p>}
+          </div>
+
+          <div className="panel" data-testid="imagery-panel">
+            <h2 className="title-s">{t("imagery.title")}</h2>
+            <ul className="obs-list">
+              {obs.map((o: any) => (
+                <li key={o.id}>
+                  <b>{t(`imagery.sensor.${o.sensor}`, { defaultValue: o.sensor })}</b>, {fmtDate(o.acquired_at, lang)}
+                  {o.cloud_pct !== null && o.cloud_pct !== undefined ? `, ${t("imagery.cloud", { pct: Math.round(o.cloud_pct) })}` : ""}
+                  <span className="small muted obs-id">{o.scene_id}</span>
+                </li>
+              ))}
+            </ul>
+            {cand.flags.length > 0 && (
+              <ul className="small flag-list">
+                {cand.flags.map((f: string) => <li key={f}>{t(`imagery.flag.${f}`, { defaultValue: f })}</li>)}
+              </ul>
+            )}
+            <p className="small muted" style={{ marginTop: "0.6rem" }}>{t("imagery.rules", { v: cand.rule_version })}</p>
           </div>
 
           <div className="panel">

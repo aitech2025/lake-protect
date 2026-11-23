@@ -2,6 +2,7 @@ import { useEffect, useRef, type MouseEvent } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth";
+import { DatasetSwitch } from "../dataset";
 import { DemoBand } from "../demo";
 
 const NAV: { to: string; key: string; roles: string[] }[] = [
@@ -58,6 +59,7 @@ export function Layout() {
           <b>{t("app.name")}</b>
           <span className="small">{t("app.tagline")}</span>
         </div>
+        {user && user.role !== "field_officer" && <DatasetSwitch />}
         {NAV.filter((n) => user && n.roles.includes(user.role)).map((n) => (
           <NavLink key={n.to} to={n.to}>
             {t(n.key)}

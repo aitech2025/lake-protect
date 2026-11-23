@@ -161,7 +161,9 @@ def ingest(db: Session, body: CandidateIn, *, at: dt.datetime | None = None) -> 
     except bsvc.BoundaryError as exc:
         raise IngestRefused(str(exc)) from exc
     area = db.scalar(text("SELECT ST_Area(ST_Transform(ST_GeomFromText(:w, 4326), 32644))"), {"w": geom.wkt})
-    if area < rules.rules()["min_candidate_area_sq_m"]:
+    # Compared to the nearest square metre: ten 10 m pixels are 1,000 sq m on the pipeline's grid,
+    # and a fraction of a metre is lost in the lon/lat round trip.
+    if round(area) < rules.rules()["min_candidate_area_sq_m"]:
         raise IngestRefused(f"Area {area:.0f} sq m is below the minimum of {rules.rules()['min_candidate_area_sq_m']} sq m")
     primary = bsvc.primary_of(bsvc.boundary_set_at(db, asset.id, at.date()))
     if primary is None:

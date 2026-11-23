@@ -344,3 +344,35 @@ class Bulletin(Base):
     stats: Mapped[dict] = mapped_column(JSONB)
     pdf_path: Mapped[str | None] = mapped_column(Text)
     generated_at: Mapped[dt.datetime] = mapped_column(TZ)
+
+
+class ScreenRun(Base):
+    """One run of the weekly screen from space (migration 0004). Append-only."""
+
+    __tablename__ = "screen_runs"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    as_of: Mapped[dt.date] = mapped_column(Date)
+    rule_version: Mapped[str] = mapped_column(Text)
+    rules_sha256: Mapped[str] = mapped_column(String(64))
+    collection: Mapped[str] = mapped_column(Text)
+    started_at: Mapped[dt.datetime] = mapped_column(TZ)
+    finished_at: Mapped[dt.datetime] = mapped_column(TZ)
+    received_at: Mapped[dt.datetime] = mapped_column(TZ, server_default="now()")
+    assets_total: Mapped[int] = mapped_column(Integer)
+    outcomes: Mapped[dict] = mapped_column(JSONB, default=dict)
+
+
+class AssetScreen(Base):
+    """Coverage of one asset in one run: never "no encroachment", only what was observed."""
+
+    __tablename__ = "asset_screens"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    run_id: Mapped[int] = mapped_column(ForeignKey("screen_runs.id"))
+    asset_id: Mapped[int] = mapped_column(ForeignKey("assets.id"))
+    status: Mapped[str] = mapped_column(Text)
+    looks: Mapped[int] = mapped_column(Integer)
+    first_look: Mapped[dt.date | None] = mapped_column(Date)
+    last_look: Mapped[dt.date | None] = mapped_column(Date)
+    candidates: Mapped[int] = mapped_column(Integer, default=0)
+    legacy_changes: Mapped[int] = mapped_column(Integer, default=0)
+    counts: Mapped[dict] = mapped_column(JSONB, default=dict)

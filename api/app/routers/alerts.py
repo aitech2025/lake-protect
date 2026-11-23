@@ -34,11 +34,14 @@ def list_alerts(
     mode: str | None = None,
     cohort: str | None = None,
     overdue: bool | None = None,
+    dataset: Literal["demo", "real"] | None = None,
     user: User = Depends(current_user),
     db: Session = Depends(get_db),
 ) -> dict:
     items = alert_view.list_alerts(db, user, state=state, mode=mode, cohort=cohort, overdue=overdue)
-    chain.record(db, actor_id=user.id, action="view.alerts", entity="alert", details={"filters": {"state": state, "mode": mode, "cohort": cohort, "overdue": overdue}, "count": len(items)})
+    if dataset is not None:
+        items = [i for i in items if i["is_demo"] == (dataset == "demo")]
+    chain.record(db, actor_id=user.id, action="view.alerts", entity="alert", details={"filters": {"state": state, "mode": mode, "cohort": cohort, "overdue": overdue, "dataset": dataset}, "count": len(items)})
     db.commit()
     return {"items": items, "count": len(items), "has_demo": any(i["is_demo"] for i in items)}
 

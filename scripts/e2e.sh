@@ -23,7 +23,7 @@ if [ "$#" -gt 0 ]; then
   run "$@"
 else
   reset
-  run m5-desk m6-field m7-evidence m8-monthly
+  run m5-desk m6-field m7-evidence m8-monthly m10-real
   # The section 14 walkthrough starts from a fresh demo, as a presenter would.
   reset
   run m9-demo

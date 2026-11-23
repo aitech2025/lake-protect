@@ -1,12 +1,16 @@
 # Ten-minute demo (CONTEXT.md section 14)
 
-For senior officials. Plain words throughout. **Everything on screen is demo data**: fictional
-places, people and records in a fictional world. Nothing shown is a finding.
+For senior officials. Plain words throughout. The desk shows two worlds, switched in its side
+bar, never mixed on one screen:
 
-**No detection result exists yet.** The blind backtest (Gate 1, section 8.6) has not been run, so do
-not open with a result and do not suggest the detection has been shown to work. Say: "This shows how
-the loop works. Whether the satellite screening finds real changes is being tested separately, on
-past cases, before anyone relies on it."
+- **Hyderabad lakes (real data):** 99 real lakes, real Sentinel-2 images, real changes found by the
+  screen from space. Outlines are from OpenStreetMap, so every real alert stops at the watch list.
+- **Demo world (fictional):** invented places and records, used to show the full loop to an officer.
+
+**No accuracy figure exists yet.** The blind backtest (Gate 1, section 8.6) has not been run. Never
+call a real change an encroachment, and never suggest the detection has been shown to work. Say:
+"The screen runs on real images today. How often it is right is being measured on past cases
+before anyone relies on it."
 
 ## Before the meeting
 
@@ -15,11 +19,29 @@ docker compose up -d --build                                   # once, with inte
 docker compose exec -e LP_ALLOW_RESET=true api python -m app.seed.reset   # fresh demo, dated today
 ```
 
-The laptop then needs no internet: the map tiles, image pairs, fonts and app are all local.
+Then put the real screen back, because the reset rebuilds the database (no internet needed):
+
+```powershell
+$env:LP_PIPELINE_TOKEN = "<value from .env>"
+C:\lp-cache\venv\Scripts\lp replay reports\screen\2026-11-22
+```
+
+The laptop then needs no internet: the map tiles (demo and Sentinel-2), image pairs, fonts and app
+are all local. To refresh the real screen with the newest scenes, run `lp screen` the day before,
+with internet.
 Open http://localhost:8180 in Chrome or Edge. For the phone view, open a second window at the same
 address and use the browser's device toolbar (a narrow phone width).
 
-## The script
+## Opening: real data (three minutes)
+
+| # | Screen and clicks | Say |
+|---|---|---|
+| R1 | Sign in as **Admin**. In the side bar choose **Hyderabad lakes (real data)**. Open **Assets**. Point at the blue strip: date of the screen, lakes watched, clear looks, lakes seen clearly. | "These are 99 real lakes up to the ORR, on real satellite images from the European Copernicus programme, screened on this laptop. Where a lake was not seen clearly, the system says so; it never claims a lake is untouched." |
+| R2 | Open **Alerts**. Open the alert at **Kapra lake** (or the highest-priority one). Point at the two images and "When the change happened". | "A real change: vegetation in the lake bed, then bare ground, first seen on this date, with the last clear image before it." |
+| R3 | Same screen: **Images used** (Sentinel-2 scenes and dates) and **What the system checked** (boundary estimated, watch only). | "HYDRAA started restoring Kapra lake in June 2026. This is why a works register is checked before anyone moves: your own works must not raise an alarm. And because this outline comes from OpenStreetMap, not an official FTL, the system will not send anyone. Share the boundary files and the works register, and this same alert becomes actionable or closes itself." |
+| R4 | Switch the side bar to **Demo world (fictional)**. | "Now the full loop, on invented places, because real cases need your boundaries first." |
+
+## The script (demo world)
 
 | # | Screen and clicks | Say |
 |---|---|---|
@@ -37,10 +59,15 @@ address and use the browser's device toolbar (a narrow phone width).
 
 ## What to say if asked
 
-- **"Are these real satellite images?"** No. They are drawn for the demo at the same 10 m detail as
-  the free Sentinel-2 data, and every image is marked "synthetic". The real pipeline is next.
+- **"Are these real satellite images?"** On the real-data side, yes: Sentinel-2 at 10 m, with the
+  scene name and date under every image, and Sentinel-1 radar to confirm built-up. On the demo
+  side, no: they are drawn at the same 10 m detail and marked "synthetic".
 - **"How accurate is it?"** Not known yet. The blind backtest on past public cases answers that, and
-  the result will be shown whatever it is.
+  the result will be shown whatever it is. What we can say: on five tuning lakes, every change it
+  raised was at the two lakes where HYDRAA reported works in 2026, and it raised nothing at the
+  other three (reports/m2-tuning/README.md).
+- **"Can it see a shed or a wall?"** No. Sentinel-2 cannot reliably see anything under about 10 by
+  10 metres. Those need sharper images on a cue, or a field visit, which the design provides.
 - **"Is the certificate ready to file?"** No. It is a template marked "Draft for counsel review"
   until counsel settles the wording and who signs Part B.
 - **"Can it work on our officers' phones?"** Yes, as a web app with no app store. Real phones need the

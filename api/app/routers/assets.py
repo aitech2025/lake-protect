@@ -26,7 +26,10 @@ _LIST_SQL = text(
            a.has_cctv, a.baseline_date, a.is_demo, a.notes,
            b.id AS boundary_id, b.version AS boundary_version, b.kind::text AS boundary_kind,
            b.status::text AS boundary_status, b.source_name AS boundary_source,
-           ST_AsGeoJSON(b.geom)::json AS geometry
+           ST_AsGeoJSON(b.geom)::json AS geometry,
+           sc.status AS screen_status, sc.looks AS screen_looks, sc.first_look AS screen_first_look,
+           sc.last_look AS screen_last_look, sc.candidates AS screen_candidates, sc.as_of AS screened_as_of,
+           sc.rule_version AS screen_rule_version
     FROM assets a
     LEFT JOIN LATERAL (
         SELECT bv.* FROM boundary_versions bv
@@ -35,9 +38,15 @@ _LIST_SQL = text(
           AND (bv.effective_valid_to IS NULL OR bv.effective_valid_to > CURRENT_DATE)
         ORDER BY bv.version DESC LIMIT 1
     ) b ON true
+    LEFT JOIN LATERAL (
+        SELECT s.status, s.looks, s.first_look, s.last_look, s.candidates, r.as_of, r.rule_version
+        FROM asset_screens s JOIN screen_runs r ON r.id = s.run_id
+        WHERE s.asset_id = a.id ORDER BY s.run_id DESC LIMIT 1
+    ) sc ON true
     WHERE (CAST(:area_user AS bigint) IS NULL
            OR ST_Intersects(b.geom, (SELECT u.area_geom FROM users u WHERE u.id = CAST(:area_user AS bigint))))
       AND (CAST(:asset_id AS bigint) IS NULL OR a.id = CAST(:asset_id AS bigint))
+      AND (CAST(:demo AS boolean) IS NULL OR a.is_demo = CAST(:demo AS boolean))
     ORDER BY a.is_demo DESC, a.name
     """
 )
@@ -56,9 +65,14 @@ def _area_user(user: User) -> int | None:
     return user.id if user.role == Role.field_officer.value else None
 
 
+def _demo_flag(dataset: str | None) -> bool | None:
+    return None if dataset is None else dataset == "demo"
+
+
 @router.get("/assets")
-def list_assets(user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    rows = db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": None}).mappings().all()
+def list_assets(dataset: Literal["demo", "real"] | None = None, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """`dataset` keeps real lakes and the fictional demo world apart (section 13, demo data rules)."""
+    rows = db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": None, "demo": _demo_flag(dataset)}).mappings().all()
     chain.record(db, actor_id=user.id, action="view.assets", entity="asset", details={"count": len(rows)})
     db.commit()
     return {"type": "FeatureCollection", "features": [_feature(dict(r)) for r in rows]}
@@ -66,7 +80,7 @@ def list_assets(user: User = Depends(current_user), db: Session = Depends(get_db
 
 @router.get("/assets/{asset_id}")
 def get_asset(asset_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    row = db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": asset_id}).mappings().first()
+    row = db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": asset_id, "demo": None}).mappings().first()
     if row is None:
         raise HTTPException(404, "Asset not found")
     chain.record(db, actor_id=user.id, action="view.asset", entity="asset", entity_id=asset_id)
@@ -76,7 +90,7 @@ def get_asset(asset_id: int, user: User = Depends(current_user), db: Session = D
 
 @router.get("/assets/{asset_id}/boundaries")
 def list_boundaries(asset_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    if db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": asset_id}).first() is None:
+    if db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": asset_id, "demo": None}).first() is None:
         raise HTTPException(404, "Asset not found")
     versions = bsvc.all_versions(db, asset_id)
     current = {r["id"] for r in bsvc.current_boundary_set(db, asset_id).values()}

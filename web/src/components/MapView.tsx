@@ -1,11 +1,13 @@
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { API_BASE } from "../api";
 
 export type Pin = { id: number | string; lon: number; lat: number; colour: string; label?: string; big?: boolean; onClick?: () => void };
 
 type Props = {
+  /** "s2": the Sentinel-2 mosaic of real Hyderabad; "demo": the drawn fictional world. */
+  base?: "demo" | "s2";
   boundaries?: GeoJSON.FeatureCollection; // features with properties.kind and properties.status
   changes?: GeoJSON.FeatureCollection;
   pins?: Pin[];
@@ -17,17 +19,39 @@ type Props = {
 const EMPTY: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
 const CONFIRMED = ["physically_marked", "final_notification", "surveyed_agency"];
 
-// Offline style: local demo tiles, no glyphs or sprites, so no request leaves the machine.
-const STYLE: maplibregl.StyleSpecification = {
-  version: 8,
-  sources: {
-    base: { type: "raster", tiles: [`${API_BASE}/tiles/demo/{z}/{x}/{y}.png`], tileSize: 256, maxzoom: 17, attribution: "Demo map (fictional)" },
+// Offline styles: local tiles, no glyphs or sprites, so no request leaves the machine.
+const STYLES: Record<"demo" | "s2", maplibregl.StyleSpecification> = {
+  demo: {
+    version: 8,
+    sources: {
+      base: { type: "raster", tiles: [`${API_BASE}/tiles/demo/{z}/{x}/{y}.png`], tileSize: 256, maxzoom: 17, attribution: "Demo map (fictional)" },
+    },
+    layers: [
+      { id: "bg", type: "background", paint: { "background-color": "#f0ece2" } },
+      { id: "base", type: "raster", source: "base" },
+    ],
   },
-  layers: [
-    { id: "bg", type: "background", paint: { "background-color": "#f0ece2" } },
-    { id: "base", type: "raster", source: "base" },
-  ],
+  // Real Hyderabad: Sentinel-2 at 10 m, made by `lp basemap`. Zoom 14 is the finest level made,
+  // so closer views enlarge it rather than suggest detail the data does not have.
+  s2: {
+    version: 8,
+    sources: {
+      base: {
+        type: "raster",
+        tiles: [`${API_BASE}/tiles/s2/{z}/{x}/{y}.jpg`],
+        tileSize: 256,
+        minzoom: 9,
+        maxzoom: 14,
+        attribution: "Contains modified Copernicus Sentinel data · Lake outlines © OpenStreetMap contributors",
+      },
+    },
+    layers: [
+      { id: "bg", type: "background", paint: { "background-color": "#262a28" } },
+      { id: "base", type: "raster", source: "base" },
+    ],
+  },
 };
+const CENTRE: Record<"demo" | "s2", [number, number]> = { demo: [81.5, 14.5], s2: [78.47, 17.41] };
 
 function withCertainty(fc: GeoJSON.FeatureCollection): GeoJSON.FeatureCollection {
   return {
@@ -52,15 +76,16 @@ function bboxOf(fcs: GeoJSON.FeatureCollection[]): [number, number, number, numb
   return Number.isFinite(w) ? [w, s, e, n] : null;
 }
 
-export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, height = "100%", testId }: Props) {
+export function MapView({ base = "demo", boundaries = EMPTY, changes = EMPTY, pins = [], fit, height = "100%", testId }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const markers = useRef<maplibregl.Marker[]>([]);
   const loaded = useRef(false);
+  const [generation, setGeneration] = useState(0);
 
   useEffect(() => {
     if (!ref.current) return;
-    const m = new maplibregl.Map({ container: ref.current, style: STYLE, center: [81.5, 14.5], zoom: 13, attributionControl: { compact: true }, maxZoom: 18 });
+    const m = new maplibregl.Map({ container: ref.current, style: STYLES[base], center: CENTRE[base], zoom: base === "s2" ? 10 : 13, attributionControl: { compact: true }, maxZoom: 18 });
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
     m.on("load", () => {
       m.addSource("boundaries", { type: "geojson", data: EMPTY });
@@ -80,12 +105,13 @@ export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, h
       m.fire("lp:data");
     });
     map.current = m;
+    setGeneration((g) => g + 1);
     return () => {
       m.remove();
       map.current = null;
       loaded.current = false;
     };
-  }, []);
+  }, [base]);
 
   useEffect(() => {
     const m = map.current;
@@ -101,7 +127,7 @@ export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, h
     };
     if (loaded.current) apply();
     else m.once("lp:data", apply);
-  }, [boundaries, changes, fit, pins]);
+  }, [boundaries, changes, fit, pins, generation]);
 
   useEffect(() => {
     const m = map.current;
@@ -125,7 +151,7 @@ export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, h
       }
       return new maplibregl.Marker({ element: el, anchor: "center" }).setLngLat([p.lon, p.lat]).addTo(m);
     });
-  }, [pins]);
+  }, [pins, generation]);
 
   return <div ref={ref} style={{ height, width: "100%" }} data-testid={testId} />;
 }

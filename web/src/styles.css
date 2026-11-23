@@ -313,3 +313,19 @@ aside > .panel:first-child { margin-top: 0; }
     radial-gradient(farthest-side at 100% 50%, rgb(28 43 51 / 0.22), rgb(28 43 51 / 0)) right center / 0.75rem 100% no-repeat scroll,
     var(--sheet); }
 .table-scroll > table.grid { border: 0; border-radius: 0; background: transparent; }
+
+/* Which world the desk shows: real lakes or the demo (dataset.tsx). */
+.dataset-switch { display: flex; flex-direction: column; gap: 0.35rem; padding: 0 0.6rem 1rem; }
+.dataset-switch .small { color: var(--text-on-inverse); opacity: 0.8; }
+.rail .dataset-switch .chip { background: transparent; color: var(--text-on-inverse); border-color: #4b6168; text-align: left; }
+.rail .dataset-switch .chip[aria-pressed="true"] { background: #7fb6dd; color: #0f2027; border-color: #7fb6dd; font-weight: 600; }
+
+/* The latest screen from space (desk/Screening.tsx). */
+.screen-summary { display: flex; flex-wrap: wrap; gap: 0.35rem 1rem; align-items: baseline; background: #eef4f8; border-left: 3px solid #1f6fa8; padding: 0.6rem 0.8rem; margin-bottom: 1rem; font-size: var(--step--1); }
+.screen-summary b { font-size: var(--step-0); }
+.flag { color: #8a5a00; font-weight: 700; }
+
+/* Images used, on the alert detail (provenance of every look). */
+.obs-list { list-style: none; padding: 0; margin: 0.75rem 0 0; display: grid; gap: 0.45rem; font-size: var(--step--1); }
+.obs-list .obs-id { display: block; overflow-wrap: anywhere; }
+.flag-list { margin: 0.6rem 0 0; padding-left: 1.1rem; color: #8a5a00; }
