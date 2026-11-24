@@ -11,7 +11,7 @@
   --violet:#b69aff;--pink:#f29ab6;--red:#ff8c8c;
 }
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle at 15% 0%,#152b45 0,#08111f 42%);color:var(--text);
+body{margin:0;background:radial-gradient(circle at 15% 0%,#152b45 0,#08111f 42%);background-color:#08111f;color:var(--text);
 font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
 .page{max-width:1680px;margin:auto;padding:30px 28px 60px}
 header{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;margin-bottom:24px}
@@ -23,7 +23,7 @@ h1{font-size:clamp(28px,4vw,48px);line-height:1.05;margin:9px 0 12px;letter-spac
 .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 22px}
 button{border:1px solid #35506e;background:#102139;color:#cfe0f5;padding:8px 12px;border-radius:8px;cursor:pointer;font:inherit;font-size:12px}
 button.active,button:hover{background:#1a3857;border-color:var(--cyan);color:white}
-.legend{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 20px;color:var(--muted);font-size:11px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 12px;color:var(--muted);font-size:11px}
 .legend span{display:flex;align-items:center;gap:6px}
 .dot{width:8px;height:8px;border-radius:2px;display:inline-block}
 .architecture{display:grid;grid-template-columns:1fr;gap:13px}
@@ -31,7 +31,7 @@ button.active,button:hover{background:#1a3857;border-color:var(--cyan);color:whi
 .layer:before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--accent,var(--cyan))}
 .layer-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:12px}
 .layer-title{display:flex;align-items:center;gap:10px}
-.num{width:28px;height:28px;border-radius:8px;background:color-mix(in srgb,var(--accent) 18%,transparent);border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);display:grid;place-items:center;color:var(--accent);font-weight:800}
+.num{width:28px;height:28px;border-radius:8px;background:color-mix(in srgb,var(--accent) 18%,transparent);border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);display:grid;place-items:center;color:var(--accent);font-weight:800;flex:none}
 .layer h2{font-size:16px;margin:0;letter-spacing:-.01em}
 .layer-head small{color:var(--muted);font-size:11px;text-align:right}
 .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
@@ -48,15 +48,25 @@ button.active,button:hover{background:#1a3857;border-color:var(--cyan);color:whi
 .subpanel{border:1px dashed #38516d;border-radius:12px;padding:12px;background:rgba(5,14,26,.25)}
 .subpanel h3{margin:0 0 9px;font-size:12px;color:#dbe9fa}
 .subpanel .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+.subpanel .cards.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.subpanel .cards.four{grid-template-columns:repeat(4,minmax(0,1fr))}
 .note{border:1px solid #6b5930;background:rgba(242,196,109,.08);color:#e8d7ac;border-radius:10px;padding:11px 13px;font-size:11px}
+.today{border:1px solid #2f6b52;background:rgba(105,214,163,.08);color:#cfeedd;border-radius:12px;padding:12px 14px;font-size:12px;margin:0 0 18px}
+.today strong{color:#9ff0c6}
 .footer{margin-top:18px;display:grid;grid-template-columns:1.3fr 1fr;gap:12px}
 .footer .layer{padding:14px}
 .small{color:var(--muted);font-size:11px}
 .hidden{display:none!important}
 .flowlabel{text-align:center;color:#7e9ab8;font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-top:-4px}
-@media(max-width:1050px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.cards.three{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:680px){.page{padding:22px 13px 40px}header{display:block}.pill{margin-top:14px}.cards,.cards.three,.cards.two{grid-template-columns:1fr}.split,.footer{grid-template-columns:1fr}.layer-head{align-items:flex-start}.layer-head small{max-width:45%}}
-@media print{body{background:#fff;color:#152337}.page{max-width:none;padding:12px}.layer{break-inside:avoid;box-shadow:none;background:#f8fbff;border-color:#b8c9dc}.card,.subpanel{background:#fff;border-color:#c8d5e3}.card h3,.layer h2,.subpanel h3{color:#14263d}.card p,.small,.layer-head small,.legend{color:#52677f}.tech{color:#126a80}.chip{background:#edf3f8;color:#344e68;border-color:#cbd7e4}.pill{background:#fff;color:#344e68}.toolbar{display:none}}
+.st{display:inline-block;margin:0 4px 6px 0;padding:2px 7px;border-radius:999px;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border:1px solid}
+.st.built{color:#69d6a3;border-color:#2f6b52;background:rgba(105,214,163,.1)}
+.st.pilot{color:#f2c46d;border-color:#6b5930;background:rgba(242,196,109,.08)}
+.st.later{color:#9eb1ca;border-color:#3a4f68;background:rgba(158,177,202,.08)}
+.status-legend{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 20px;color:var(--muted);font-size:11px;align-items:center}
+.status-legend .st{margin:0 6px 0 0}
+@media(max-width:1050px){.cards,.subpanel .cards.four{grid-template-columns:repeat(2,minmax(0,1fr))}.cards.three,.subpanel .cards.three{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){.page{padding:22px 16px 40px}header{display:block}.pill{margin-top:14px;white-space:normal}.cards,.cards.three,.cards.two,.subpanel .cards,.subpanel .cards.three,.subpanel .cards.four{grid-template-columns:1fr}.split,.footer{grid-template-columns:1fr}.layer-head{align-items:flex-start}.layer-head small{max-width:45%}}
+@media print{body{background:#fff;color:#152337}.page{max-width:none;padding:12px}.layer{break-inside:avoid;box-shadow:none;background:#f8fbff;border-color:#b8c9dc}.card,.subpanel{background:#fff;border-color:#c8d5e3}.card h3,.layer h2,.subpanel h3{color:#14263d}.card p,.small,.layer-head small,.legend,.status-legend{color:#52677f}.tech{color:#126a80}.chip{background:#edf3f8;color:#344e68;border-color:#cbd7e4}.pill{background:#fff;color:#344e68}.toolbar{display:none}.today{background:#f1fbf6;color:#1f4a37}.today strong{color:#14603f}.note{background:#fffaf0;color:#5c4a1e}.st.built{color:#14603f}.st.pilot{color:#7a5a12}.st.later{color:#4b5f76}}
 </style>
 </head>
 <body>
@@ -65,10 +75,12 @@ button.active,button:hover{background:#1a3857;border-color:var(--cyan);color:whi
   <div>
     <div class="eyebrow">Government geospatial intelligence platform</div>
     <h1>Telangana GeoGuard</h1>
-    <div class="sub">End-to-end logical and physical architecture — from satellite, government and citizen data sources through geospatial processing, AI intelligence, asset/legal records, notifications, dashboards and the Official AI Copilot.</div>
+    <div class="sub">End-to-end logical and physical architecture: from satellite, government and citizen sources, through change detection and an automatic legal check, to field verification, sealed evidence and the officer's decision. Each component is marked with what runs today and what comes next.</div>
   </div>
   <div class="pill"><i></i> Government-hosted · Pilot deployment · Joint operations</div>
 </header>
+
+<div class="today"><strong>Running today on real data:</strong> 99 Hyderabad lakes inside the ORR screened from Sentinel-2 and Sentinel-1 with images up to 22 Nov 2026: 7,652 clear looks, every lake seen clearly within the last 14 days, 58 candidate changes on 15 lakes. All 58 sit on the watch list because these lake outlines are derived, not notified. The officer loop (legal check, field app, evidence pack, monthly page) runs end to end, offline, on a labelled fictional demo world. No accuracy is claimed until the blind backtest on 30 public cases.</div>
 
 <div class="toolbar" aria-label="Architecture filters">
   <button class="active" data-filter="all">Show all layers</button>
@@ -85,129 +97,135 @@ button.active,button:hover{background:#1a3857;border-color:var(--cyan);color:whi
   <span><i class="dot" style="background:var(--violet)"></i> Legal and copilot intelligence</span>
   <span><i class="dot" style="background:var(--amber)"></i> Infrastructure and governance</span>
 </div>
+<div class="status-legend">
+  <span><span class="st built">Built</span>runs in the prototype today</span>
+  <span><span class="st pilot">Pilot</span>designed; for the 2027 demonstration and paid pilot</span>
+  <span><span class="st later">Later</span>added when the pilot shows a measured need</span>
+</div>
 
 <main class="architecture">
 <section class="layer" data-kind="source" style="--accent:var(--cyan)">
   <div class="layer-head"><div class="layer-title"><div class="num">01</div><h2>External data sources &amp; channels</h2></div><small>Authoritative, observational and citizen-generated inputs</small></div>
   <div class="cards">
-    <article class="card"><h3>Satellite &amp; aerial imagery</h3><p>Optical, radar, commercial high-resolution imagery, drone orthomosaics and elevation products; acquired by use-case rules rather than one fixed resolution.</p><span class="tech">Sentinel-1 / Sentinel-2 · NRSC / ISRO · Bhoonidhi · Commercial providers · UAV</span></article>
-    <article class="card"><h3>Government geospatial &amp; legal data</h3><p>FTL and buffer polygons, cadastral maps, survey parcels, notifications, land classification and master plans.</p><span class="tech">TGRAC · HMDA · HYDRAA · Revenue / Bhu Bharati · Irrigation · Municipal bodies</span></article>
-    <article class="card"><h3>Citizen reporting channels</h3><p>Geotagged reports, in-app camera images, WhatsApp location pins, descriptions and follow-up messages.</p><span class="tech">GeoGuard mobile app · WhatsApp Business Cloud API · Meta webhooks</span></article>
-    <article class="card"><h3>Public information &amp; social signals</h3><p>Authorised public posts, hashtags, news feeds, video metadata and community observations.</p><span class="tech">X API · Meta-approved access · YouTube Data API · RSS / licensed listening</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>Satellite &amp; aerial imagery</h3><p>Three tiers. <b>Screen:</b> every asset at least weekly with Sentinel-2 optical (10 m, 5-day revisit) and Sentinel-1 radar, which sees through monsoon cloud. <b>Confirm:</b> sub-metre images on priority cases only. <b>Verify:</b> field team, CCTV and drones.</p><span class="tech">Built: Sentinel-2 L2A · Sentinel-1 RTC · Pilot: ISRO Cartosat-3 via NRSC / Bhoonidhi · commercial 0.3–0.5 m tasking · UAV</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>Government land &amp; legal records</h3><p>Lake outlines with their boundary status (final, preliminary, derived), FTL and buffer versions, permits, authorised works, court cases, survey numbers, land category and the Section 22A list.</p><span class="tech">LPC / HMDA · HYDRAA Raksha · Irrigation · Bhu Bharati / SS&amp;LR · BuildNow · CCMS / eCourts · Registration (22A). Built: CSV import of permits, works and court register</span></article>
+    <article class="card"><span class="st pilot">Pilot</span><h3>Citizen reports</h3><p>Photo, map pin and a short note by web portal or WhatsApp chatbot. Name optional; a phone number is verified by one-time password only if the citizen wants updates. Calls to 1070 and Praja Vani complaints are entered by staff into the same intake.</p><span class="tech">Web portal · WhatsApp Business Platform on HYDRAA's number or MeeSeva on WhatsApp · English, Telugu, Urdu</span></article>
+    <article class="card"><span class="st pilot">Pilot</span><h3>Ground signals</h3><p>Eyes the State already has: HYDRAA's 900 CCTV cameras on 264 lakes, lake guards and Lake Protection Teams. News reports build the backtest case list; they never raise an alert.</p><span class="tech">CCTV event feed · TGICCC · Built: signals table, no intake yet</span></article>
   </div>
 </section>
-<div class="flow">↓ <span class="flowlabel">secure acquisition · consent / licence · source provenance</span></div>
+<div class="flow">↓ <span class="flowlabel">secure acquisition · licence and consent recorded · source and date on every record</span></div>
 
 <section class="layer" data-kind="ingest" style="--accent:var(--cyan)">
-  <div class="layer-head"><div class="layer-title"><div class="num">02</div><h2>Edge, API &amp; ingestion layer</h2></div><small>Validate · authenticate · normalise · persist · publish events</small></div>
+  <div class="layer-head"><div class="layer-title"><div class="num">02</div><h2>Edge, API &amp; ingestion layer</h2></div><small>Validate · authenticate · normalise · persist · deliver once</small></div>
   <div class="cards">
-    <article class="card"><h3>API gateway &amp; webhooks</h3><p>External API entry, request validation, throttling, authentication and routing.</p><span class="tech">Kong Gateway · FastAPI · REST · OGC API endpoints</span></article>
-    <article class="card"><h3>Channel adapters</h3><p>WhatsApp webhook, email intake, mobile app API, social connectors and government file exchange.</p><span class="tech">Python adapters · Meta Cloud API · SMTP / approved email relay</span></article>
-    <article class="card"><h3>Data validation &amp; media safety</h3><p>Schema checks, signature verification, deduplication, malware scan, EXIF parsing and coordinate validation.</p><span class="tech">Pydantic · SHA-256 · ClamAV / approved malware scanner</span></article>
-    <article class="card"><h3>Event and workflow backbone</h3><p>Durable asynchronous processing, retries, dead-letter queues and long-running workflows.</p><span class="tech">RabbitMQ · Temporal · Redis (cache / ephemeral state)</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>API entry &amp; authentication</h3><p>One FastAPI application behind the State's gateway and WAF: request validation, rate limits, a pipeline token for machine clients, and role checks on every call.</p><span class="tech">Built: FastAPI · Pydantic · Pilot: State API gateway or Kong · OGC API Features for department GIS</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>Channel adapters</h3><p>WhatsApp webhook, web portal, SMS and email relays, and file exchange with departments. Each adapter turns input into a signal or a record import.</p><span class="tech">Built: CSV record import · Pilot: WhatsApp Business Platform · DLT-registered SMS · State email relay · department APIs under MoU</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>Validation &amp; media integrity</h3><p>Schema, coordinate and distance checks; SHA-256 on every photo; a resend is ignored and a changed photo is refused. Citizen uploads are scanned for malware.</p><span class="tech">Built: Pydantic · SHA-256 · idempotent client IDs · Pilot: ClamAV or State scanner · EXIF parsing</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><span class="st later">Later</span><h3>Jobs &amp; reliable delivery</h3><p>One scheduled worker runs escalation every 5 minutes and the weekly screen from space. Notifications leave through a transactional outbox with idempotent consumers, retries and dead-lettering. A broker or workflow engine is added only when measured load needs it.</p><span class="tech">Built: worker container · Pilot: PostgreSQL outbox · Later: RabbitMQ / Kafka or Temporal</span></article>
   </div>
 </section>
-<div class="flow">↓ <span class="flowlabel">durable events · asynchronous jobs · idempotent consumers</span></div>
+<div class="flow">↓ <span class="flowlabel">outbox events · scheduled jobs · alerts keep working when imagery processing is down</span></div>
 
 <section class="layer" data-kind="ingest" style="--accent:var(--cyan)">
   <div class="layer-head"><div class="layer-title"><div class="num">03</div><h2>Data foundation &amp; authoritative registries</h2></div><small>One governed data foundation shared across all modules</small></div>
   <div class="cards">
-    <article class="card"><h3>Geospatial database</h3><p>Assets, survey parcels, versioned boundaries, incidents, assignments, inspections and spatial relationships.</p><span class="tech">PostgreSQL · PostGIS · PgBouncer · Patroni / managed HA PostgreSQL</span></article>
-    <article class="card"><h3>Object &amp; evidence storage</h3><p>Original imagery, citizen media, legal PDFs, derived rasters, reports, evidence packages and backups.</p><span class="tech">Government S3-compatible object storage · Versioning · Immutable retention / legal hold</span></article>
-    <article class="card"><h3>Imagery catalogue &amp; raster store</h3><p>Scene metadata, acquisition dates, footprints, licence details, cloud quality and derived products.</p><span class="tech">STAC API · Cloud Optimized GeoTIFF (COG) · GeoPackage · GeoParquet</span></article>
-    <article class="card"><h3>Document &amp; search index</h3><p>OCR text, metadata, legal-document chunks, full-text and vector retrieval indexes.</p><span class="tech">Apache Tika · PyMuPDF · OCR · OpenSearch / PostgreSQL FTS + pgvector</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>Asset registry &amp; geospatial database</h3><p>One permanent ID per public asset. Boundary versions are append-only, each with status and source; a case keeps the version it used. Alerts, field checks, decisions and a hash-chained audit log of every action, view and export.</p><span class="tech">Built: PostgreSQL 16 · PostGIS 3.4 · append-only triggers · Pilot: statewide registry · row-level security by department and area · Later: PgBouncer, Patroni HA</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>Object &amp; evidence storage</h3><p>Image chips, field photos, evidence packs and monthly pages, stored once and never overwritten. A regenerated pack is a new version.</p><span class="tech">Built: S3-style interface on local disk · Pilot: MinIO or State S3 with versioning, object lock and legal hold</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>Imagery catalogue &amp; screening record</h3><p>Scene ID, capture time, cloud and licence for every look used. Each weekly run records, per asset, its coverage status and the rules version and hash.</p><span class="tech">Built: public STAC catalogues · append-only screening runs · Pilot: own pgSTAC for NRSC and commercial scenes · COG archive</span></article>
+    <article class="card"><span class="st later">Later</span><h3>Document &amp; search index</h3><p>Notifications, government orders, court orders and survey records as searchable text. Telugu OCR text is checked by a person before it can be cited.</p><span class="tech">PyMuPDF · Indic OCR · PostgreSQL full-text + pgvector · OpenSearch only at scale</span></article>
   </div>
 </section>
-<div class="flow">↓ <span class="flowlabel">catalogued data · versioned boundaries · traceable source records</span></div>
+<div class="flow">↓ <span class="flowlabel">versioned boundaries · catalogued looks · traceable source records</span></div>
 
 <section class="layer" data-kind="core" style="--accent:var(--blue)">
-  <div class="layer-head"><div class="layer-title"><div class="num">04</div><h2>Core geospatial processing &amp; AI intelligence layer</h2></div><small>Scheduled monitoring + citizen-triggered investigation</small></div>
+  <div class="layer-head"><div class="layer-title"><div class="num">04</div><h2>Core geospatial processing &amp; intelligence layer</h2></div><small>Weekly screen of every asset + citizen-triggered re-checks</small></div>
   <div class="subpanel" style="margin-bottom:12px">
-    <h3>Rule-driven imagery selection &amp; acquisition orchestration</h3>
-    <div class="cards">
-      <article class="card"><h3>Rule management engine</h3><p>Classifies the use case and resolves versioned rules for sensor, preferred/accepted resolution, freshness, quality, model, spatial condition, thresholds and escalation.</p><span class="tech">Python rules engine · PostgreSQL rule master · Admin console · Rule version audit</span></article>
-      <article class="card"><h3>Imagery acquisition engine</h3><p>Searches existing archive first; evaluates coverage, acquisition date, cloud, viewing angle, GSD, licence and tasking feasibility; routes to commercial tasking only when justified.</p><span class="tech">STAC API · Provider adapters · Sentinel · NRSC/NSIL · Commercial APIs</span></article>
-      <article class="card"><h3>Suitability &amp; fallback controller</h3><p>Rejects imagery that is too coarse, stale, obscured or unsuitable. Creates pending-imagery, high-resolution tasking or field-verification work instead of a false negative.</p><span class="tech">Image quality service · Temporal · RabbitMQ · Audit trail</span></article>
+    <h3>Rule-driven imagery selection &amp; acquisition</h3>
+    <div class="cards three">
+      <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>Rule management</h3><p>Detection rules live in one versioned file; its SHA-256 is stored with every run. Legal-check rules, buffer widths, deadlines and priority weights are configuration, not code. Rules are frozen in a git tag before the blind backtest.</p><span class="tech">Built: YAML rules + hash · Pilot: admin console with approval and audit of every rule change</span></article>
+      <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>Imagery acquisition</h3><p>Archive first: one catalogue search for all assets, the newest suitable look per period. Sub-metre imagery is requested only for priority cases, with the estimated cost recorded before anyone orders.</p><span class="tech">Built: STAC search · imagery request with estimate, nothing ordered · Pilot: NRSC / NSIL and commercial provider adapters</span></article>
+      <article class="card"><span class="st built">Built</span><h3>Suitability &amp; coverage</h3><p>Cloud and shadow masked per pixel. A look is used only if 75% of the watched area is clear, and a change counts only while it is still seen within the last 75 days. Every asset gets one coverage status each run.</p><span class="tech">not observed · no usable look · processing failed · no candidate · candidate found</span></article>
     </div>
   </div>
   <div class="split">
     <div class="subpanel">
-      <h3>A. Imagery preparation &amp; geospatial analytics</h3>
+      <h3>A. Imagery preparation &amp; change detection</h3>
       <div class="cards">
-        <article class="card"><h3>Scene discovery &amp; preparation</h3><p>AOI clipping, reprojection, co-registration, cloud masking, compositing and quality checks.</p><span class="tech">STAC · GDAL · Rasterio · ESA SNAP</span></article>
-        <article class="card"><h3>Water &amp; land-cover analysis</h3><p>10 m Sentinel screening for water spread, broad vegetation and land cover; use finer imagery for localised confirmation.</p><span class="tech">NDWI / MNDWI · NDVI · BSI · SAR water classification · SegFormer / U-Net</span></article>
-        <article class="card"><h3>Construction &amp; object change</h3><p>Prefer 0.3–0.5 m commercial imagery; 1 m can support screening. Detect new structures, construction footprints, roads and localised land-use changes.</p><span class="tech">Building segmentation · YOLO · ChangeFormer · Siamese U-Net · PyTorch</span></article>
-        <article class="card"><h3>Land filling, excavation &amp; terrain</h3><p>10 m BSI screening for large exposed-soil areas; 0.3–1 m optical confirmation for localised dumping. Use stereo/ drone DEM or DSM for cut-fill only when vertical accuracy supports it.</p><span class="tech">BSI · Temporal classification · DEM / DSM differencing · GDAL · Rasterio</span></article>
+        <article class="card"><span class="st built">Built</span><span class="st later">Later</span><h3>Process each scene once</h3><p>Each scene file is opened once and every asset's window is read from it onto one 10 m grid. No scene after the run's date can be read; a test enforces it.</p><span class="tech">Built: rasterio windowed COG reads · pyproj · scipy · Later: Argo workflows by tile at state scale</span></article>
+        <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><span class="st later">Later</span><h3>Water &amp; land cover</h3><p>Water, vegetation, bare soil and built-up classes per look. Water loss alone never alerts: seasons and drought shrink lakes.</p><span class="tech">Built: MNDWI · NDVI · BSI · NDBI rules · Pilot: Sentinel-1 water mapping for the monsoon · Later: SegFormer / U-Net once labelled outcomes exist</span></article>
+        <article class="card"><span class="st built">Built</span><span class="st later">Later</span><h3>Building change</h3><p><b>Screen:</b> built-up change of 1,000 sq m or more, kept only if Sentinel-1 radar rises by 3 dB or more. <b>Confirm:</b> 0.3–0.5 m images on priority cases. Sheds and walls under 10 m are not claimed from Sentinel.</p><span class="tech">Built: NDBI + Sentinel-1 VV rise · Later: building segmentation / ChangeFormer on sub-metre images, trained on officer-verified outcomes</span></article>
+        <article class="card"><span class="st built">Built</span><span class="st later">Later</span><h3>Soil fill, clearing &amp; terrain</h3><p>Water to bare soil at the lake edge is soil fill; vegetation to bare soil is clearing. Cut-and-fill volume needs stereo or drone elevation, where its vertical accuracy supports it.</p><span class="tech">Built: transition rules · shore check · Later: DEM / DSM differencing</span></article>
       </div>
     </div>
     <div class="subpanel">
-      <h3>B. Spatial intelligence, correlation &amp; risk</h3>
+      <h3>B. Legal check, priority &amp; evidence</h3>
       <div class="cards">
-        <article class="card"><h3>Boundary &amp; parcel overlay</h3><p>Intersect changes with approved FTL, buffer, cadastral and government-land geometries.</p><span class="tech">PostGIS · GeoServer · OGC WMS / WFS</span></article>
-        <article class="card"><h3>Citizen &amp; social intelligence</h3><p>Language detection, classification, entity extraction, geolocation, duplicate detection and trend signals.</p><span class="tech">Python NLP · AI4Bharat / multilingual transformers</span></article>
-        <article class="card"><h3>Incident correlation &amp; prioritisation</h3><p>Correlate satellite events, reports and social signals; deduplicate and calculate operational priority.</p><span class="tech">Python rules engine · PostGIS · Temporal workflows</span></article>
-        <article class="card"><h3>Evidence &amp; provenance assembly</h3><p>Bind source scenes, model version, boundary version, media hashes and processing lineage to incidents.</p><span class="tech">Evidence service · SHA-256 · Audit events · MLflow</span></article>
+        <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>Automatic legal check</h3><p>Runs on every candidate before anyone moves. Outside the FTL, buffer and watch ring: closed. First changed before the baseline date (19 Jul 2024): legacy. Authorised work or valid permit: closed with its reference (a permit inside the FTL is flagged, never closed). Live court matter: legal hold. Boundary not notified: watch list. Otherwise: analyst triage.</p><span class="tech">Built: PostGIS overlay · rule and boundary versions stored · Pilot: survey-number overlap from Bhu Bharati · Section 22A</span></article>
+        <article class="card"><span class="st pilot">Pilot</span><h3>Citizen report triage</h3><p>Language, location, asset and survey-number match; duplicates merged. A report raises priority or opens a re-check and field check. It never creates a finding on its own.</p><span class="tech">Python NLP · AI4Bharat models for Telugu and Urdu · PostGIS</span></article>
+        <article class="card"><span class="st built">Built</span><span class="st later">Later</span><h3>Priority</h3><p>priority = 100 × (0.35 stage + 0.25 area + 0.20 growth + 0.20 cohort). Owner-blind; every factor stored; an override needs a logged reason.</p><span class="tech">Built: rule-based score · Later: a tested model once pilot outcomes exist</span></article>
+        <article class="card"><span class="st built">Built</span><h3>Evidence &amp; provenance</h3><p>Dated bracket (last clear look, first changed look), scene IDs, rules hash, boundary version, photo hashes and every human action, sealed in a pack with a SHA-256 manifest and a Section 63(4) BSA certificate.</p><span class="tech">Built: PDF + zip pack · lp verify-pack · certificate wording pending counsel</span></article>
       </div>
     </div>
   </div>
   <div class="subpanel" style="margin-top:12px">
-    <h3>C. Initial GeoGuard rule catalogue — sensor and method selected by use case</h3>
-    <div class="cards">
-      <article class="card"><h3>R01 · Lake water spread</h3><p>Sentinel-2 10 m + Sentinel-1 SAR; MNDWI/NDWI and SAR water classification; compare seasonal time series against lake asset context.</p></article>
-      <article class="card"><h3>R02/R03 · FTL &amp; buffer construction</h3><p>Commercial 0.3–0.5 m preferred; 1 m screening. Building segmentation/change detection, then intersect with the approved, versioned FTL/buffer polygon.</p></article>
-      <article class="card"><h3>R04 · Land filling / dumping</h3><p>10 m BSI for large-area screening; 0.3–1 m commercial imagery for local confirmation; persistent change and field/elevation checks where needed.</p></article>
-      <article class="card"><h3>R05 · Government parcel occupation</h3><p>Sentinel broad screening; 0.3–1 m commercial confirmation; building/land-cover change intersected with authenticated survey parcels.</p></article>
-      <article class="card"><h3>R06 · Vegetation / tree removal</h3><p>Sentinel-2 10 m NDVI time series for broad change; commercial 0.3–1 m imagery for individual tree/patch review where feasible.</p></article>
-      <article class="card"><h3>R07 · Levelling / excavation</h3><p>Commercial stereo or drone survey with DEM/DSM differencing; optical imagery alone indicates surface change, not reliable cut/fill volume.</p></article>
-      <article class="card"><h3>R08/R09 · Nala, feeder &amp; road change</h3><p>Commercial 0.3–1 m for narrow channel obstruction and local roads; Sentinel 10 m only for broad corridor screening.</p></article>
-      <article class="card"><h3>R10 · Citizen incident verification</h3><p>Classify report first, then resolve the relevant rule and search the latest suitable imagery. If unavailable, queue targeted acquisition or field inspection.</p></article>
+    <h3>C. GeoGuard rule catalogue: sensor and method chosen by use case</h3>
+    <div class="cards four">
+      <article class="card"><span class="st built">Built</span><h3>R01 · Lake water spread</h3><p>Context, not an alert: water loss alone never alerts. Feeds the season and drought controls and the lake's history.</p></article>
+      <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>R02/R03 · FTL &amp; buffer building</h3><p>Screen at 10 m with radar confirmation (1,000 sq m or more); confirm with 0.3–0.5 m images on priority cases; intersect with the boundary version in force.</p></article>
+      <article class="card"><span class="st built">Built</span><h3>R04 · Soil fill / dumping</h3><p>Water to bare soil at the lake edge, seen on two looks at least 5 days apart, with a shore check. Sub-metre images to confirm small dumps.</p></article>
+      <article class="card"><span class="st later">Later</span><h3>R05 · Government parcel occupation</h3><p>Agency-surveyed land (cohort E) from 2028. Revenue land known only by survey number (F) stays watch-only until a parcel boundary exists.</p></article>
+      <article class="card"><span class="st built">Built</span><h3>R06 · Vegetation clearing</h3><p>Vegetation to bare soil (stage: land levelled), checked against the previous year so seasonal fields and established clearings do not alert.</p></article>
+      <article class="card"><span class="st later">Later</span><h3>R07 · Levelling / excavation volume</h3><p>Stereo or drone DEM/DSM differencing. Optical images show surface change, not a reliable cut-and-fill volume.</p></article>
+      <article class="card"><span class="st later">Later</span><h3>R08/R09 · Nala, feeder &amp; road</h3><p>Sub-metre images for narrow channels and new roads (nala buffers are 2 m or 9 m); 10 m only for broad corridor screening.</p></article>
+      <article class="card"><span class="st pilot">Pilot</span><h3>R10 · Citizen report verification</h3><p>Match the report to an asset, re-check the latest suitable look; if there is none, queue sharper imagery or a field visit.</p></article>
     </div>
-    <p class="small" style="margin-top:9px">Rule parameters are configurable and versioned: preferred/accepted GSD, freshness, cloud and viewing quality, minimum mapping unit, model version, confidence thresholds, spatial condition, escalation and fallback. Example cloud thresholds are starting parameters to validate, not universal constants.</p>
+    <p class="small" style="margin-top:9px"><b>False-alarm controls, all required (built):</b> persistence over two looks at least 5 days apart with no reversal · minimum area 1,000 sq m · same season in the two previous years · drought (worse than the 5 nearest lakes by 10 points) · baseline date · radar confirmation for built-up. <b>Designed:</b> radar-only alerts in the monsoon marked "optical confirmation pending". Thresholds are starting values, tuned on separate lakes and frozen before the blind backtest.</p>
   </div>
-  <div class="note" style="margin-top:11px"><strong>Suitability and evidence guardrail:</strong> Select the newest suitable observation, not simply the newest scene. Keep image suitability, AI detection and spatial/legal-boundary match confidence separate. A coarse, stale, cloud-obscured or unlicensed image must not produce a “no change” conclusion.</div>
-  <div class="note" style="margin-top:11px"><strong>Decision boundary:</strong> AI and GIS identify potential changes and spatial overlaps. They do not independently determine legal encroachment. Legal interpretation, boundary approval and enforcement decisions remain with authorised government officers.</div>
+  <div class="note" style="margin-top:11px"><strong>Suitability guardrail:</strong> select the newest suitable observation, not simply the newest scene. Keep image suitability, change detection and boundary-match confidence separate. A coarse, stale, cloud-obscured or unlicensed image never produces a "no change" result: the asset is reported as not observed instead.</div>
+  <div class="note" style="margin-top:11px"><strong>Boundary status gates action:</strong> only a final notification or a physically marked boundary can lead to action (cohorts A and B). A preliminary boundary allows a field check only (C). A derived outline is watch-only (D). About 23% of HMDA lakes (765 of 3,342) have a final FTL notice, which is why boundary status is shown on every alert.</div>
+  <div class="note" style="margin-top:11px"><strong>Decision boundary:</strong> the system reports physical change and spatial overlap. It never labels a change illegal and never recommends demolition; legal interpretation, boundary approval and action stay with authorised officers. Detection is owner-blind: owner names appear only after a field check confirms the change, only to nodal, revenue and legal roles, and every view is logged.</div>
 </section>
-<div class="flow">↓ <span class="flowlabel">asset-linked intelligence · incidents · evidence · confidence · source lineage</span></div>
+<div class="flow">↓ <span class="flowlabel">asset-linked alerts · dated bracket · evidence · confidence · source lineage</span></div>
 
 <section class="layer" data-kind="downstream" style="--accent:var(--green)">
-  <div class="layer-head"><div class="layer-title"><div class="num">05</div><h2>Downstream government applications</h2></div><small>Operational visibility, communication and decision support</small></div>
+  <div class="layer-head"><div class="layer-title"><div class="num">05</div><h2>Downstream government applications</h2></div><small>Every alert has a named owner and a deadline</small></div>
   <div class="cards">
-    <article class="card"><h3>Asset 360 dashboard</h3><p>Unified asset profile, map, FTL/buffer, survey parcels, status, owner department and responsible officer.</p><span class="tech">React / TypeScript · MapLibre GL JS · GeoServer</span></article>
-    <article class="card"><h3>Historical imagery explorer</h3><p>Latest valid image, acquisition timeline, before/after swipe, change overlays and image-quality metadata.</p><span class="tech">STAC API · COG · MapLibre · Raster tiles</span></article>
-    <article class="card"><h3>Legal Asset Registry</h3><p>Government orders, notifications, court records, survey maps, legal status, verification and version history.</p><span class="tech">Document service · OCR · OpenSearch / pgvector · Object storage</span></article>
-    <article class="card"><h3>Incident &amp; enforcement workflow</h3><p>Incident triage, officer assignment, field inspection, evidence review, action, escalation and closure.</p><span class="tech">FastAPI · Temporal · RBAC · Audit trail</span></article>
-    <article class="card"><h3>Notification &amp; escalation</h3><p>Rule-based email and WhatsApp alerts, SLA reminders, supervisor escalation and delivery tracking.</p><span class="tech">SMTP / government relay · WhatsApp Business Cloud API</span></article>
-    <article class="card"><h3>Official AI Copilot</h3><p>Natural-language asset queries; grounded summaries of imagery, legal records, incidents and actions.</p><span class="tech">LLM · RAG · LlamaIndex / LangChain · pgvector · FastAPI</span></article>
-    <article class="card"><h3>Department &amp; leadership views</h3><p>Jurisdiction dashboards, asset risk trends, pending actions, SLA performance and programme reporting.</p><span class="tech">React dashboards · SQL / PostGIS read APIs · BI layer as approved</span></article>
-    <article class="card"><h3>Citizen status &amp; feedback</h3><p>Submission acknowledgement, tracking ID, status updates and closure communication where policy permits.</p><span class="tech">Mobile app · WhatsApp templates · SMS / push gateway</span></article>
+    <article class="card"><span class="st built">Built</span><h3>Analyst desk &amp; alert queue</h3><p>Map and list by priority. Before and after images with the dated bracket, the images used and the legal-check result. Confirming needs the pair compared; closing as not real needs two people.</p><span class="tech">React · TypeScript · MapLibre · i18next (English, Telugu)</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>Asset 360 &amp; imagery</h3><p>Each asset with its boundary versions, cohort, last clear look and alerts, on an offline Sentinel-2 base map. Pilot: a timeline of every look with before/after swipe, and the survey-number file.</p><span class="tech">Built: asset register · Sentinel-2 map tiles · Pilot: COG time-series viewer</span></article>
+    <article class="card"><span class="st built">Built</span><h3>Offline field app</h3><p>One alert on the phone, offline, in Telugu or English. Geotagged photos hashed on the device; a warning beyond 50 m from the change; "an observation, not a survey" on every alert.</p><span class="tech">PWA · Workbox · IndexedDB · sync on reconnect</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>Workflow, deadlines &amp; escalation</h3><p>A 24-rule state machine enforced by a database trigger. Missed deadlines escalate by themselves. A closed alert reopens when a re-check from space sees the change persist or grow.</p><span class="tech">Built: FastAPI · PostgreSQL trigger · worker · Pilot: full matrix with Revenue and Irrigation verifiers</span></article>
+    <article class="card"><span class="st built">Built</span><h3>Case file &amp; evidence pack</h3><p>A seven-point case-readiness checklist; PDF and zip with a hash manifest and the Section 63(4) certificate draft. Downloads are single-case and logged.</p><span class="tech">WeasyPrint · Noto Sans Telugu · lp verify-pack</span></article>
+    <article class="card"><span class="st pilot">Pilot</span><h3>Notifications</h3><p>In-app inbox, SMS, WhatsApp on a State-approved channel and a daily email digest. Unacknowledged in 24 hours: repeated and escalated.</p><span class="tech">Built: overdue flags and audit events · Pilot: DLT-registered SMS · WhatsApp templates · State email relay</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>Monthly page &amp; leadership views</h3><p>Five figures (watched, new, seen on site, actions, overdue) and the overdue list, built from the audit log. Pilot: drill-down from State to survey number; every number opens its cases; no bulk export.</p><span class="tech">Built: monthly page + PDF · Pilot: area-scoped dashboards · TGICCC tiles if wanted</span></article>
+    <article class="card"><span class="st pilot">Pilot</span><h3>Citizen status</h3><p>A reference number at once, then received, checked and closed with a reason. Citizens never see officer names, owner names or evidence.</p><span class="tech">Web portal · WhatsApp templates · one-time password</span></article>
   </div>
 </section>
 
 <section class="layer" data-kind="downstream" style="--accent:var(--violet)">
-  <div class="layer-head"><div class="layer-title"><div class="num">06</div><h2>Official AI Copilot — retrieval and answer path</h2></div><small>Three grounded retrieval paths; one permission-aware answer</small></div>
+  <div class="layer-head"><div class="layer-title"><div class="num">06</div><h2>Official AI Copilot: retrieval and answer path</h2></div><small><span class="st later">Later</span> Read-only · after the pilot gates · one permission-aware answer</small></div>
   <div class="cards three">
-    <article class="card"><h3>Structured asset retrieval</h3><p>Fetch asset profile, incidents, actions, parcel links, approved boundary version and officer permissions.</p><span class="tech">Authorised FastAPI APIs · PostgreSQL / PostGIS</span></article>
-    <article class="card"><h3>Legal document retrieval</h3><p>Hybrid semantic and keyword retrieval; citations to document, page, issuing authority and verification status.</p><span class="tech">RAG · OCR text · OpenSearch / pgvector · Legal Registry</span></article>
-    <article class="card"><h3>Imagery retrieval</h3><p>Resolve latest valid scene and historical observations; return image, date, resolution, quality and detected changes.</p><span class="tech">STAC · COG · GeoServer · Change-event API</span></article>
+    <article class="card"><h3>Structured asset retrieval</h3><p>Calls the same permission-checked APIs as the signed-in officer, never the database directly, so role, area scope and owner-blind rules still hold.</p><span class="tech">FastAPI with the user's own token · PostgreSQL / PostGIS</span></article>
+    <article class="card"><h3>Legal document retrieval</h3><p>Keyword and semantic search over verified documents, citing document, page, issuing authority and verification status. Unverified OCR text is never cited.</p><span class="tech">PostgreSQL full-text + pgvector · document registry</span></article>
+    <article class="card"><h3>Imagery retrieval</h3><p>Latest valid look, coverage status, dated bracket and candidate changes, each with its date and resolution.</p><span class="tech">Screening record · STAC · image chips</span></article>
   </div>
   <div class="flow">↓ <span class="flowlabel">retrieved evidence + access policy + freshness + uncertainty</span></div>
   <div class="cards two">
-    <article class="card"><h3>Grounded response composer</h3><p>Summarise the asset, latest imagery, potential changes, legal position and open actions with source references.</p><span class="tech">Approved LLM · Prompt / response guardrails · Citation validation</span></article>
-    <article class="card"><h3>Copilot audit &amp; safety controls</h3><p>Log user, query, retrieved sources, model/version and response; prohibit unauthorised actions and unsupported legal conclusions.</p><span class="tech">RBAC / ABAC · Audit service · SIEM · Human review</span></article>
+    <article class="card"><h3>Grounded response composer</h3><p>Summarises the asset, latest look, candidate changes, boundary status and open actions, with sources and observation dates. It never says whether a change is legal and never suggests an action.</p><span class="tech">LLM hosted in India in the State tenancy · citation check · the same wording test as the desk</span></article>
+    <article class="card"><h3>Copilot audit &amp; safety controls</h3><p>Logs user, query, sources retrieved, model version and answer. No write actions. Personal data never leaves the State tenancy.</p><span class="tech">RBAC / ABAC · audit service · SIEM · human review of samples</span></article>
   </div>
 </section>
 
 <section class="layer" data-kind="platform" style="--accent:var(--amber)">
-  <div class="layer-head"><div class="layer-title"><div class="num">07</div><h2>Government hosting, physical deployment &amp; platform operations</h2></div><small>Government-controlled tenancy / state data centre / approved government cloud</small></div>
+  <div class="layer-head"><div class="layer-title"><div class="num">07</div><h2>Government hosting, physical deployment &amp; platform operations</h2></div><small>State Data Centre or an approved Indian government cloud</small></div>
   <div class="cards">
-    <article class="card"><h3>Network &amp; perimeter</h3><p>Internet/partner connectivity, DMZ, WAF, firewall, load balancer, API ingress and private subnets.</p><span class="tech">Government firewall · WAF · Load balancer · Private endpoints</span></article>
-    <article class="card"><h3>Container platform</h3><p>Separate node pools for application, integration, GIS and GPU inference; namespace and workload isolation.</p><span class="tech">Kubernetes / OpenShift · Helm · Container registry</span></article>
-    <article class="card"><h3>Compute &amp; acceleration</h3><p>General application nodes, GIS CPU/RAM nodes, GPU inference node and isolated scratch storage.</p><span class="tech">Linux · NVIDIA GPU / CUDA where approved · NVMe scratch</span></article>
-    <article class="card"><h3>Identity &amp; secrets</h3><p>Government SSO, MFA, service identities, secrets, encryption keys and privileged access controls.</p><span class="tech">OIDC / SAML · Government IAM · KMS / HSM · Vault if approved</span></article>
-    <article class="card"><h3>Observability &amp; security operations</h3><p>Metrics, logs, traces, alerts, vulnerability management, SOC/SIEM integration and audit retention.</p><span class="tech">Prometheus · Grafana · OpenTelemetry · OpenSearch / SIEM</span></article>
-    <article class="card"><h3>Resilience &amp; disaster recovery</h3><p>Database HA/PITR, object replication, immutable backup, restore testing and DR runbooks.</p><span class="tech">PostgreSQL PITR · Object replication · Backup vault · IaC</span></article>
-    <article class="card"><h3>DevSecOps &amp; model governance</h3><p>CI/CD, image scanning, infrastructure as code, model registry, evaluation and controlled releases.</p><span class="tech">GitLab CI / approved CI · Terraform · MLflow · CVAT</span></article>
-    <article class="card"><h3>Joint operating model</h3><p>Government owns data, keys, tenancy, legal approvals and enforcement; partner operates under time-bound audited access.</p><span class="tech">RACI · PAM · Ticket-based access · Release/change board</span></article>
+    <article class="card"><span class="st pilot">Pilot</span><h3>Network &amp; perimeter</h3><p>Internet and partner connectivity, DMZ, WAF, firewall, load balancer, API ingress and private subnets.</p><span class="tech">Government firewall · WAF · load balancer · private endpoints</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st later">Later</span><h3>Container platform</h3><p>Today: Docker Compose on one machine, which runs the whole demo with no internet. Kubernetes when the State's operations team is ready for it.</p><span class="tech">Built: Docker Compose · Later: Kubernetes / OpenShift · Helm · registry</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st later">Later</span><h3>Compute</h3><p>The pilot runs on CPU: the first screen of 99 lakes, with looks from March 2022 to November 2026, took 28 minutes on one laptop; reruns take minutes. A GPU only when deep-learning confirmation on sub-metre images is approved.</p><span class="tech">Linux · NVMe scratch for the imagery cache · Later: NVIDIA GPU node</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st pilot">Pilot</span><h3>Identity &amp; secrets</h3><p>Today: role checks on every request, demo accounts only. Pilot: State SSO with MFA for privileged roles, department and area scope enforced inside PostgreSQL, keys held by the State.</p><span class="tech">OIDC / SAML · State IdP or Keycloak · KMS / HSM · Vault if approved</span></article>
+    <article class="card"><span class="st pilot">Pilot</span><h3>Observability &amp; security operations</h3><p>Metrics, logs, traces, alerts, vulnerability management, SOC/SIEM integration and audit retention.</p><span class="tech">Prometheus · Grafana · OpenTelemetry · SIEM</span></article>
+    <article class="card"><span class="st pilot">Pilot</span><h3>Resilience &amp; disaster recovery</h3><p>Database point-in-time recovery, object replication, immutable backup and tested restores. Alerts and cases keep working when imagery processing is down.</p><span class="tech">PostgreSQL PITR · object replication · backup vault · IaC</span></article>
+    <article class="card"><span class="st built">Built</span><span class="st later">Later</span><h3>Rule &amp; model governance</h3><p>Rules versioned and hashed on every run; no look-ahead, tested. Gate 1 is a blind backtest on 30 public cases with frozen rules. Field-confirmed and not-real outcomes become labelled data; unverified alerts never count as truth.</p><span class="tech">Built: git tags · rules SHA-256 · pytest · Later: MLflow · CVAT · versioned datasets</span></article>
+    <article class="card"><span class="st pilot">Pilot</span><h3>Joint operating model</h3><p>The State owns data, keys, tenancy, boundary approvals and decisions; the partner operates under time-bound, audited access. Vendor staff declare conflicts, and the contract bars selling or sharing alert data.</p><span class="tech">RACI · PAM · ticket-based access · release and change board</span></article>
   </div>
 </section>
 </main>
@@ -215,14 +233,14 @@ button.active,button:hover{background:#1a3857;border-color:var(--cyan);color:whi
 <div class="footer">
   <section class="layer" style="--accent:var(--cyan)">
     <div class="layer-head"><div class="layer-title"><div class="num">↔</div><h2>Cross-cutting governance</h2></div></div>
-    <p class="small">Data classification · Source/licence provenance · Data quality and freshness · Boundary version control · Privacy and retention · Role-based access · Evidence integrity · Model validation · Human-in-the-loop legal review · Auditability · API contracts.</p>
+    <p class="small">Boundary status on every alert · Baseline date: change first seen after 19 Jul 2024 · Owner-blind detection · Source, licence and date on every record (Copernicus attribution; commercial licences must allow use in court) · Section 63(4) Bharatiya Sakshya Adhiniyam certificate for electronic evidence · DPDP Act 2023: the Rules were notified in November 2025, and notice, consent and security duties apply from May 2027, during the paid pilot · Drone flights follow the Drone Rules 2021 airspace map: zones near operational airports need air traffic control permission · Single-case downloads, no bulk export · Two-person closure · Hash-chained audit · Wording: "change", never "violation".</p>
   </section>
   <section class="layer" style="--accent:var(--green)">
     <div class="layer-head"><div class="layer-title"><div class="num">✓</div><h2>Key architectural principles</h2></div></div>
-    <p class="small">Event-driven, asynchronous processing · Modular backend before microservices sprawl · One asset registry · Separate original evidence from derived analysis · Latest valid image, not merely latest scene · Legal conclusions reserved for authorised officials · Pilot sized for 10–15 lakes and expandable.</p>
+    <p class="small">Modular monolith with an outbox first; brokers, Kubernetes or microservices only on measured need · One asset registry · Process each scene once, match every asset · Latest valid look, never merely the latest scene · Only confirmed boundaries lead to action · Officers decide · Each phase earns the next: backtest (Dec 2026), demonstration on about 20 recovered assets (Jan–Mar 2027), paid pilot of 100 lakes and 10 parcels through one monsoon (Apr–Sep 2027), core urban region of 900+ lakes (from Oct 2027).</p>
   </section>
 </div>
-<p class="small" style="margin-top:16px">Architecture is a logical reference design. Specific government hosting services, external API permissions, imagery licences, data-sharing agreements, security controls and final capacity must be validated during discovery and procurement. Sentinel revisit is not continuous monitoring; citizen-triggered analysis uses the latest suitable available observation or routes the case for field / higher-resolution verification.</p>
+<p class="small" style="margin-top:16px">Architecture is a logical reference design. Specific government hosting services, external API permissions, imagery licences, data-sharing agreements, security controls and final capacity must be validated during discovery and procurement. Sentinel revisit is not continuous monitoring: an asset is only as current as its last clear look, which every alert and asset page shows. Citizen-triggered analysis uses the latest suitable observation or routes the case for sharper imagery or a field visit. "Built" means running in the prototype: detection on real Sentinel data for 99 Hyderabad lakes, and the officer loop on a labelled fictional demo world.</p>
 </div>
 <script>
 document.querySelectorAll('[data-filter]').forEach(btn=>{

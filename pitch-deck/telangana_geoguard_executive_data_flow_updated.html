@@ -6,18 +6,25 @@
 <title>Telangana GeoGuard — Executive Data Flow</title>
 <style>
 :root{--bg:#071321;--panel:#102238;--panel2:#142b43;--line:#294760;--txt:#edf5ff;--muted:#a8bbcf;--cyan:#51d5e5;--blue:#78aaff;--green:#70d6a5;--violet:#bba0ff;--gold:#efc779}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -10%,#1a3855 0,#071321 55%);color:var(--txt);font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -10%,#1a3855 0,#071321 55%);background-color:#071321;color:var(--txt);font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
 .wrap{max-width:1500px;margin:auto;padding:30px 26px 50px}header{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:24px}
 .kicker{font-size:11px;letter-spacing:.17em;text-transform:uppercase;color:var(--cyan);font-weight:800}h1{font-size:clamp(28px,4vw,46px);letter-spacing:-.04em;line-height:1.05;margin:8px 0 10px}.desc{max-width:930px;color:var(--muted);font-size:15px}
 .tag{border:1px solid #42617c;background:#102840;color:#c9d9e9;border-radius:999px;padding:8px 12px;font-size:11px;white-space:nowrap}
-.legend{display:flex;flex-wrap:wrap;gap:14px;margin:20px 0 18px;color:var(--muted);font-size:11px}.legend span{display:flex;align-items:center;gap:6px}.sw{width:9px;height:9px;border-radius:3px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin:20px 0 10px;color:var(--muted);font-size:11px}.legend span{display:flex;align-items:center;gap:6px}.sw{width:9px;height:9px;border-radius:3px}
+.status-legend{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 18px;color:var(--muted);font-size:11px;align-items:center}.status-legend .st{margin:0 6px 0 0}
+.today{border:1px solid #2f6b52;background:rgba(112,214,165,.08);color:#cfeedd;border-radius:12px;padding:12px 14px;font-size:12px;margin:0 0 6px}.today strong{color:#9ff0c6}
 .flow{display:grid;grid-template-columns:1fr 56px 1.18fr 56px 1fr 56px 1fr;align-items:stretch;gap:0}
 .lane{border:1px solid var(--line);border-radius:16px;background:linear-gradient(160deg,rgba(20,43,67,.97),rgba(10,25,41,.97));padding:15px;min-width:0;box-shadow:0 14px 36px rgba(0,0,0,.16);position:relative}
 .lane:before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:4px;border-radius:0 5px 5px 0;background:var(--c)}
 .lane h2{font-size:16px;margin:0 0 4px}.lane .lead{color:var(--muted);font-size:11px;min-height:34px;margin-bottom:13px}
 .step{border:1px solid #2b4965;background:rgba(5,17,30,.55);border-radius:11px;padding:11px;margin:9px 0;position:relative}
 .step strong{display:block;font-size:12px;margin-bottom:4px}.step p{margin:0;color:var(--muted);font-size:10.5px}
+.step.key{border-color:#5d7fa3;background:rgba(120,170,255,.08)}
 .tech{display:block;color:var(--c);font-size:10px;font-weight:700;margin-top:6px}
+.st{display:inline-block;margin:0 4px 5px 0;padding:2px 7px;border-radius:999px;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border:1px solid}
+.st.built{color:#70d6a5;border-color:#2f6b52;background:rgba(112,214,165,.1)}
+.st.pilot{color:#efc779;border-color:#6b5930;background:rgba(239,199,121,.08)}
+.st.later{color:#a8bbcf;border-color:#3a4f68;background:rgba(168,187,207,.08)}
 .flow-arrow{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:7px;color:#83a5c4;text-align:center}
 .flow-arrow .shaft{width:100%;height:2px;background:linear-gradient(90deg,#42627d,#81b6d3);position:relative}
 .flow-arrow .shaft:after{content:"";position:absolute;right:-1px;top:-5px;border-left:9px solid #81b6d3;border-top:6px solid transparent;border-bottom:6px solid transparent}
@@ -37,8 +44,8 @@
 .gov{border:1px solid #514b3a;border-radius:12px;background:rgba(50,43,27,.22);padding:12px}.gov strong{font-size:11px;color:var(--gold);display:block;margin-bottom:5px}.gov p{font-size:10px;color:var(--muted);margin:0}
 .principle{margin-top:15px;text-align:center;color:#9fb5cb;font-size:10px}
 @media(max-width:1050px){.flow{grid-template-columns:1fr;gap:9px}.flow-arrow{height:28px;flex-direction:row}.flow-arrow .shaft{width:2px;height:23px;background:linear-gradient(#42627d,#81b6d3)}.flow-arrow .shaft:after{right:-4px;top:auto;bottom:-1px;border-top:9px solid #81b6d3;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:0}.flow-arrow small{max-width:150px}.outputs{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:650px){.wrap{padding:20px 12px 35px}header{display:block}.tag{display:inline-block;margin-top:14px}.outputs{grid-template-columns:1fr}.copilot,.governance{grid-template-columns:1fr}.lane .lead{min-height:0}}
-@media print{body{background:white;color:#13263a}.wrap{max-width:none;padding:8px}.lane,.downstream,.data-core,.out,.gov,.copilot{background:#fff;box-shadow:none;break-inside:avoid}.lane{border-color:#9fb2c6}.step{background:#f8fbff;border-color:#c5d2df}.step p,.desc,.lane .lead,.out p,.gov p,.copilot p,.data-core p{color:#4e647a}.tag{background:white;color:#304a63}.flow-arrow{color:#42627d}.flow-arrow .shaft{background:#6a8ba9}.flow-arrow .shaft:after{border-left-color:#6a8ba9}.toolbar{display:none}}
+@media(max-width:650px){.wrap{padding:20px 16px 35px}header{display:block}.tag{display:inline-block;margin-top:14px;white-space:normal}.outputs{grid-template-columns:1fr}.copilot,.governance{grid-template-columns:1fr}.lane .lead{min-height:0}.down-head{display:block}.down-head span{display:block;margin-top:4px}}
+@media print{body{background:white;color:#13263a}.wrap{max-width:none;padding:8px}.lane,.downstream,.data-core,.out,.gov,.copilot{background:#fff;box-shadow:none;break-inside:avoid}.lane{border-color:#9fb2c6}.step{background:#f8fbff;border-color:#c5d2df}.step p,.desc,.lane .lead,.out p,.gov p,.copilot p,.data-core p,.status-legend{color:#4e647a}.tag{background:white;color:#304a63}.flow-arrow{color:#42627d}.flow-arrow .shaft{background:#6a8ba9}.flow-arrow .shaft:after{border-left-color:#6a8ba9}.toolbar{display:none}.today{background:#f1fbf6;color:#1f4a37}.today strong{color:#14603f}.st.built{color:#14603f}.st.pilot{color:#7a5a12}.st.later{color:#4b5f76}}
 </style>
 </head>
 <body>
@@ -46,9 +53,10 @@
 <header>
  <div><div class="kicker">Executive architecture · End-to-end information flow</div>
  <h1>Telangana GeoGuard</h1>
- <div class="desc">A high-level view of how information enters the platform, is analysed and correlated, becomes trusted asset intelligence, and reaches government officials and decision-makers.</div></div>
+ <div class="desc">How information enters the platform, is checked against land records and boundaries, becomes a verified and dated case, and reaches the officer who decides.</div></div>
  <div class="tag">Government-hosted · Jointly operated · Pilot scale</div>
 </header>
+<div class="today"><strong>Running today on real data:</strong> 99 Hyderabad lakes screened weekly from Sentinel-2 and Sentinel-1; 58 candidate changes on 15 lakes, all on the watch list because their outlines are derived, not notified. The officer loop runs end to end, offline, on a labelled fictional demo world. No accuracy is claimed before the blind backtest.</div>
 <div class="legend">
  <span><i class="sw" style="background:var(--cyan)"></i> Upstream sources</span>
  <span><i class="sw" style="background:var(--blue)"></i> Processing &amp; intelligence</span>
@@ -56,80 +64,85 @@
  <span><i class="sw" style="background:var(--green)"></i> Government-facing services</span>
  <span><i class="sw" style="background:var(--gold)"></i> Governance &amp; trust</span>
 </div>
+<div class="status-legend">
+ <span><span class="st built">Built</span>runs in the prototype today</span>
+ <span><span class="st pilot">Pilot</span>designed for the 2027 pilot</span>
+ <span><span class="st later">Later</span>on measured need</span>
+</div>
 
 <div class="flow">
  <section class="lane" style="--c:var(--cyan)">
   <h2>1. Upstream data sources</h2><div class="lead">What GeoGuard receives from the outside world</div>
-  <div class="step"><strong>Satellite &amp; aerial imagery</strong><p>Optical, radar, commercial high-resolution scenes, drone imagery and elevation data.</p><span class="tech">Sentinel-1 / 2 · NRSC / ISRO · Bhoonidhi · Commercial imagery · UAV</span></div>
-  <div class="step"><strong>Government records &amp; GIS</strong><p>Lake assets, FTL and buffer boundaries, survey parcels, ownership, land use, notifications and court records.</p><span class="tech">TGRAC · HMDA · HYDRAA · Revenue / Bhu Bharati · Irrigation</span></div>
-  <div class="step"><strong>Citizen channels</strong><p>Geotagged app submissions, photographs, descriptions and WhatsApp location pins.</p><span class="tech">GeoGuard mobile app · WhatsApp Business</span></div>
-  <div class="step"><strong>Public information signals</strong><p>Authorised social content, hashtags, news and community observations.</p><span class="tech">X API · Meta-approved access · YouTube API · RSS / licensed feeds</span></div>
+  <div class="step"><span class="st built">Built</span><span class="st pilot">Pilot</span><strong>Satellite &amp; aerial imagery</strong><p>Screen every asset weekly with Sentinel-2 and Sentinel-1 radar; sub-metre images only for priority cases; drones and field visits to verify.</p><span class="tech">Sentinel-1 / 2 · NRSC / ISRO · Bhoonidhi · commercial imagery · UAV</span></div>
+  <div class="step"><span class="st built">Built</span><span class="st pilot">Pilot</span><strong>Government records &amp; GIS</strong><p>Lake outlines with boundary status, FTL and buffer versions, permits, authorised works, court cases, survey numbers, land category and the Section 22A list.</p><span class="tech">LPC / HMDA · HYDRAA · Irrigation · Bhu Bharati · BuildNow · CCMS</span></div>
+  <div class="step"><span class="st pilot">Pilot</span><strong>Citizen reports</strong><p>Photo, map pin and a short note by web portal or WhatsApp; 1070 calls and Praja Vani complaints enter the same intake.</p><span class="tech">Web portal · WhatsApp Business Platform · English, Telugu, Urdu</span></div>
+  <div class="step"><span class="st pilot">Pilot</span><strong>Ground signals</strong><p>HYDRAA's 900 CCTV cameras on 264 lakes, lake guards and Lake Protection Teams.</p><span class="tech">CCTV event feed · TGICCC</span></div>
  </section>
  <div class="flow-arrow"><small>CONNECT<br>INGEST<br>VALIDATE</small><div class="shaft"></div></div>
 
  <section class="lane" style="--c:var(--blue)">
-  <h2>2. Processing &amp; intelligence</h2><div class="lead">Turn raw observations into structured, reviewable signals</div>
-  <div class="step"><strong>Ingestion &amp; orchestration</strong><p>Secure APIs, data validation, media checks, event routing and scheduled workflows.</p><span class="tech">FastAPI · Kong · RabbitMQ · Temporal</span></div>
-  <div class="step"><strong>Rule-based use-case classification</strong><p>Identify the change type and apply versioned rules for sensor, resolution, image quality, analytics, thresholds and escalation.</p><span class="tech">GeoGuard Rule Engine · Python · PostgreSQL rule master</span></div>
-  <div class="step"><strong>Intelligent imagery selection &amp; acquisition</strong><p>Search the archive first; request commercial tasking only when required. Select optical, SAR or elevation data by use case.</p><span class="tech">STAC · Sentinel-1/2 · NRSC/NSIL · Commercial provider adapters</span></div>
-  <div class="step"><strong>Satellite &amp; GIS analytics</strong><p>Run use-case-specific pipelines: water indices, building segmentation, bare-soil analysis, vegetation change, SAR water mapping and DEM/DSM differencing.</p><span class="tech">GDAL · Rasterio · ESA SNAP · PostGIS · GeoServer</span></div>
-  <div class="step"><strong>AI &amp; citizen intelligence</strong><p>Classify reports, extract locations, detect duplicates and identify visual changes.</p><span class="tech">PyTorch · YOLO · ChangeFormer / U-Net · NLP models</span></div>
-  <div class="step"><strong>Spatial correlation &amp; prioritisation</strong><p>Compare detected changes with approved FTL, buffer and parcel boundaries; correlate complaints and observations.</p><span class="tech">PostGIS spatial rules · Python risk / correlation services</span></div>
-  <div class="step"><strong>Incident &amp; evidence creation</strong><p>Create asset-linked incidents with source imagery, model outputs, boundary versions and evidence provenance.</p><span class="tech">Incident service · SHA-256 · MLflow · Audit events</span></div>
+  <h2>2. Processing &amp; intelligence</h2><div class="lead">Turn raw observations into checked, reviewable candidates</div>
+  <div class="step"><span class="st built">Built</span><span class="st pilot">Pilot</span><strong>Ingestion &amp; jobs</strong><p>Secure APIs, validation, photo hashes, a scheduled worker, and an outbox so every notification is delivered once.</p><span class="tech">FastAPI · Pydantic · PostgreSQL outbox · worker</span></div>
+  <div class="step"><span class="st built">Built</span><strong>Imagery selection &amp; coverage</strong><p>Archive first; newest suitable look, not newest scene. Each scene processed once for every asset. Every asset gets a coverage status; nothing is reported as "no change" without a valid look.</p><span class="tech">STAC · rasterio · Sentinel-1/2 · versioned rules with hash</span></div>
+  <div class="step"><span class="st built">Built</span><strong>Change detection with false-alarm controls</strong><p>Soil fill, clearing and building transitions; two looks at least 5 days apart, 1,000 sq m minimum, season and drought checks, radar confirmation for built-up. Water loss alone never alerts.</p><span class="tech">MNDWI · NDVI · BSI · NDBI · Sentinel-1 VV</span></div>
+  <div class="step key"><span class="st built">Built</span><strong>Legal check before anyone moves</strong><p>Outside the boundary, before the 19 Jul 2024 baseline, or matching an authorised work or permit: closed with a reference. Live court matter: legal hold. Boundary not notified: watch list. Otherwise: analyst triage.</p><span class="tech">PostGIS · boundary and rule versions stored</span></div>
+  <div class="step"><span class="st built">Built</span><span class="st pilot">Pilot</span><strong>Priority &amp; citizen triage</strong><p>Owner-blind priority with every factor stored. Citizen reports matched to asset and survey number; they raise priority or open a check, never a finding alone.</p><span class="tech">Rule-based score · PostGIS · Indic NLP (pilot)</span></div>
+  <div class="step"><span class="st built">Built</span><strong>Alert &amp; evidence creation</strong><p>Asset-linked alert with dated bracket (last clear look, first changed look), scene IDs, rules hash and boundary version.</p><span class="tech">Alert service · SHA-256 · hash-chained audit</span></div>
  </section>
  <div class="flow-arrow"><small>ENRICH<br>LINK TO ASSET<br>RETAIN EVIDENCE</small><div class="shaft"></div></div>
 
  <section class="lane" style="--c:var(--violet)">
   <h2>3. Governed data foundation</h2><div class="lead">The trusted, connected record behind every asset</div>
-  <div class="step"><strong>Asset &amp; boundary registry</strong><p>Unique asset profiles, survey parcel relationships, approved FTL/buffer polygons and boundary versions.</p><span class="tech">PostgreSQL · PostGIS</span></div>
-  <div class="step"><strong>Imagery &amp; change history</strong><p>Latest valid observations, historical scenes, derived maps, detected changes and image-quality metadata.</p><span class="tech">STAC · COG · Object storage</span></div>
-  <div class="step"><strong>Legal document repository</strong><p>Notifications, government orders, survey records, ownership evidence, court orders and verified document versions.</p><span class="tech">Object storage · OCR · OpenSearch / pgvector</span></div>
-  <div class="step"><strong>Incident &amp; action history</strong><p>Citizen reports, alerts, assigned officers, field inspections, departmental decisions and closure records.</p><span class="tech">PostgreSQL · Evidence vault · Audit trail</span></div>
-  <div class="step"><strong>Unified asset context</strong><p>One connected view of physical changes, legal position, source records and government action over time.</p><span class="tech">Asset 360 APIs · Governed metadata</span></div>
+  <div class="step"><span class="st built">Built</span><strong>Asset &amp; boundary registry</strong><p>One permanent ID per asset; append-only boundary versions with status (final, preliminary, derived, marked) and source.</p><span class="tech">PostgreSQL · PostGIS</span></div>
+  <div class="step"><span class="st built">Built</span><strong>Imagery &amp; screening record</strong><p>Every look used, each weekly run's coverage per asset, candidate changes and image chips.</p><span class="tech">STAC metadata · append-only runs · object storage</span></div>
+  <div class="step"><span class="st built">Built</span><span class="st later">Later</span><strong>Records &amp; legal documents</strong><p>Permits, authorised works and the court register (built, by import); notifications and orders as verified, searchable documents (later).</p><span class="tech">PostgreSQL · object storage · full-text + pgvector</span></div>
+  <div class="step"><span class="st built">Built</span><strong>Alert &amp; action history</strong><p>Reviews, field visits, checklists, evidence packs, officer decisions and closures, in a hash-chained audit log.</p><span class="tech">PostgreSQL · evidence store · audit chain</span></div>
+  <div class="step"><span class="st built">Built</span><span class="st pilot">Pilot</span><strong>Unified asset context</strong><p>One view of physical change, boundary status, legal position and government action over time.</p><span class="tech">Asset APIs · role and area scope</span></div>
  </section>
  <div class="flow-arrow"><small>DELIVER<br>INSIGHT<br>TRIGGER ACTION</small><div class="shaft"></div></div>
 
  <section class="lane" style="--c:var(--green)">
   <h2>4. Downstream &amp; interfaces</h2><div class="lead">How intelligence is consumed and acted upon</div>
-  <div class="step"><strong>Official dashboard</strong><p>State, district and asset views; incident status, maps, evidence and action tracking.</p><span class="tech">React · TypeScript · MapLibre · GeoServer</span></div>
-  <div class="step"><strong>Asset 360 &amp; imagery explorer</strong><p>Latest satellite image, historical comparison, legal records and complete asset timeline.</p><span class="tech">Asset APIs · STAC · COG · Document viewer</span></div>
-  <div class="step"><strong>Email &amp; WhatsApp alerts</strong><p>Priority-based notifications, officer assignment, SLA reminders and escalation.</p><span class="tech">Government email relay · WhatsApp Business API</span></div>
-  <div class="step"><strong>Official AI Copilot</strong><p>Ask natural-language questions; receive asset summaries, image context and legal citations.</p><span class="tech">LLM · RAG · FastAPI · pgvector / OpenSearch</span></div>
-  <div class="step"><strong>Departmental workflows</strong><p>Review, field verification, inspection reports, action decisions and closure.</p><span class="tech">Workflow service · Role-based access · Audit</span></div>
+  <div class="step"><span class="st built">Built</span><strong>Analyst desk</strong><p>Queue and map by priority; image pair with dated bracket; two people to close as not real.</p><span class="tech">React · TypeScript · MapLibre</span></div>
+  <div class="step"><span class="st built">Built</span><strong>Offline field app</strong><p>One alert on the phone, in Telugu or English, offline; geotagged, hashed photos; distance warning.</p><span class="tech">PWA · IndexedDB · sync on reconnect</span></div>
+  <div class="step"><span class="st built">Built</span><strong>Case file &amp; evidence pack</strong><p>Checklist, PDF and zip sealed by hash, Section 63(4) certificate draft; single-case downloads.</p><span class="tech">WeasyPrint · lp verify-pack</span></div>
+  <div class="step"><span class="st built">Built</span><span class="st pilot">Pilot</span><strong>Deadlines, escalation &amp; alerts</strong><p>Named owner and deadline at every step; missed deadlines escalate. Pilot: SMS, WhatsApp and email digest with acknowledgement.</p><span class="tech">Worker · DLT SMS · WhatsApp templates · email relay</span></div>
+  <div class="step"><span class="st built">Built</span><span class="st pilot">Pilot</span><strong>Monthly page &amp; dashboards</strong><p>Five monthly figures and the overdue list; pilot drill-down from State to survey number.</p><span class="tech">Monthly page PDF · area-scoped dashboards</span></div>
+  <div class="step"><span class="st later">Later</span><strong>Official AI Copilot</strong><p>Read-only questions about an asset, answered with sources and dates.</p><span class="tech">Indian-hosted LLM · RAG over permission-checked APIs</span></div>
  </section>
 </div>
 
 <div class="data-core">
- <h3>Rule-driven imagery strategy — match the sensor to the question</h3>
- <p><strong>10 m Sentinel-1/2:</strong> lake water spread, broad vegetation and large-area land-cover screening. <strong>0.3–1 m commercial optical:</strong> construction, FTL/buffer structures, parcel occupation, nala obstruction and small-area dumping confirmation. <strong>Commercial stereo / drone elevation:</strong> cut-fill, excavation and land-levelling assessment. Each rule specifies preferred/accepted resolution, freshness, cloud/viewing quality, model, spatial test, confidence and fallback.</p>
- <p style="margin-top:7px"><strong>Fail-safe:</strong> if no suitable observation exists, create a pending-imagery or field-verification task. Never treat a coarse, stale or cloud-obscured image as proof that no change occurred.</p>
+ <h3>Three imagery tiers: screen, confirm, verify</h3>
+ <p><strong>Screen, every asset weekly:</strong> Sentinel-2 at 10 m and Sentinel-1 radar for soil fill, clearing, water context and built-up change of 1,000 sq m or more (radar-confirmed). <strong>Confirm, priority cases only:</strong> 0.3–0.5 m commercial tasking or ISRO Cartosat-3 through NRSC, for buildings, sheds, nala obstruction and small dumps. <strong>Verify:</strong> field team with geotagged photos, plus CCTV and drones where they exist; stereo or drone elevation for cut-and-fill. Sheds and walls under 10 m are never claimed from Sentinel.</p>
+ <p style="margin-top:7px"><strong>Fail-safe:</strong> if no suitable observation exists, the asset is reported as not observed and a sharper-imagery or field task is created. A coarse, stale or cloud-obscured image is never treated as proof that no change occurred.</p>
 </div>
 <div class="data-core">
- <h3>Shared platform backbone — connects every stage</h3>
- <p><strong>Common asset ID</strong> links imagery, legal records, boundaries, citizen reports, AI detections, incidents, notifications and official actions. Event-driven integration (RabbitMQ + Temporal) moves work between components; PostgreSQL/PostGIS and governed object storage preserve the authoritative records.</p>
+ <h3>Shared platform backbone: connects every stage</h3>
+ <p><strong>One permanent asset ID</strong> links imagery, boundaries, legal records, citizen reports, detections, alerts, notifications and official actions. A modular FastAPI application with a PostgreSQL outbox and one scheduled worker moves work between components; a message broker, workflow engine or Kubernetes is added only when measured load needs it. PostgreSQL/PostGIS and governed object storage hold the authoritative records, and alerts keep working when imagery processing is down.</p>
 </div>
 
 <section class="downstream">
- <div class="down-head"><h2>Official AI Copilot — one question, multiple trusted sources</h2><span>Read-only decision support · Sources shown with every answer</span></div>
+ <div class="down-head"><h2>Official AI Copilot: one question, multiple trusted sources</h2><span><span class="st later">Later</span> Read-only decision support · sources with every answer</span></div>
  <div class="copilot">
-  <div><h3>Example official query</h3><p>“Summarise the current status of this lake. Show the latest satellite image, potential changes, applicable FTL records and pending actions.”</p></div>
-  <div class="pills"><span>Asset &amp; incident records</span><span>Latest valid satellite image</span><span>Historical change timeline</span><span>Verified legal documents</span><span>Boundary / parcel context</span><span>Officer action history</span></div>
+  <div><h3>Example official query</h3><p>"Summarise the current status of this lake. Show the latest satellite image, candidate changes, applicable FTL records and pending actions."</p></div>
+  <div class="pills"><span>Asset &amp; alert records</span><span>Latest valid satellite look</span><span>Historical change timeline</span><span>Verified legal documents</span><span>Boundary status &amp; version</span><span>Officer action history</span></div>
  </div>
  <div class="outputs" style="margin-top:12px">
-  <div class="out"><div class="ico">🛰️</div><strong>Latest imagery &amp; change summary</strong><p>Actual platform image, acquisition date, image quality and detected changes.</p><em>Imagery catalogue + AI results</em></div>
-  <div class="out"><div class="ico">⚖️</div><strong>Legal summary with sources</strong><p>Relevant orders, notifications, survey records and page-level citations.</p><em>Verified legal repository</em></div>
-  <div class="out"><div class="ico">📍</div><strong>Spatial &amp; asset context</strong><p>FTL / buffer overlap, parcel references and approved boundary version.</p><em>Asset registry + PostGIS</em></div>
-  <div class="out"><div class="ico">📋</div><strong>Incident &amp; action status</strong><p>Open complaints, inspections, assignments, escalations and closure history.</p><em>Incident management</em></div>
-  <div class="out"><div class="ico">🔎</div><strong>Traceable answer</strong><p>Source links, freshness, uncertainty and clear distinction between detection and legal finding.</p><em>RAG + audit + human review</em></div>
+  <div class="out"><div class="ico">🛰️</div><strong>Latest imagery &amp; change summary</strong><p>Latest valid look, its date and quality, and candidate changes with their dated bracket.</p><em>Screening record + image chips</em></div>
+  <div class="out"><div class="ico">⚖️</div><strong>Legal summary with sources</strong><p>Relevant orders, notifications, survey records and page-level citations, from verified documents only.</p><em>Verified document registry</em></div>
+  <div class="out"><div class="ico">📍</div><strong>Spatial &amp; asset context</strong><p>FTL and buffer overlap, boundary status and version, parcel references.</p><em>Asset registry + PostGIS</em></div>
+  <div class="out"><div class="ico">📋</div><strong>Alert &amp; action status</strong><p>Open alerts, field visits, assignments, escalations and closure history.</p><em>Workflow records</em></div>
+  <div class="out"><div class="ico">🔎</div><strong>Traceable answer</strong><p>Sources, freshness and uncertainty. It never says whether a change is legal; owner names follow the same rules as the desk.</p><em>Permission-checked APIs + audit</em></div>
  </div>
 </section>
 
 <div class="governance">
- <div class="gov"><strong>Government ownership &amp; control</strong><p>Government-controlled hosting, data, identity, encryption keys, legal boundary approvals, officer decisions and enforcement actions.</p></div>
- <div class="gov"><strong>Security &amp; resilience</strong><p>WAF / firewall, IAM / MFA, encryption, audit, SIEM, backup, disaster recovery and controlled partner access.</p></div>
- <div class="gov"><strong>Technology foundation</strong><p>Kubernetes / OpenShift · Python / FastAPI · PostgreSQL / PostGIS · Object storage · RabbitMQ / Temporal · React · PyTorch.</p></div>
+ <div class="gov"><strong>Government ownership &amp; control</strong><p>The State owns hosting, data, identity, keys, boundary approvals, officer decisions and actions. Owner names appear only after a field check confirms a change, to authorised roles, and every view is logged.</p></div>
+ <div class="gov"><strong>Security, privacy &amp; resilience</strong><p>WAF and firewall, State SSO with MFA, role and area scope inside the database, hash-chained audit, single-case downloads, DPDP Act minimisation for reporters, backup and disaster recovery.</p></div>
+ <div class="gov"><strong>Technology foundation</strong><p>Python / FastAPI · PostgreSQL 16 / PostGIS 3.4 · S3-compatible storage · outbox + worker · React / MapLibre PWA · rasterio · Docker, then Kubernetes when ready.</p></div>
 </div>
-<div class="principle">Important: GeoGuard flags potential changes and spatial overlaps for authorised review. It does not independently declare legal encroachment. Satellite availability is periodic, not continuous; the dashboard must show observation date and freshness.</div>
+<div class="principle">Important: GeoGuard flags physical changes and spatial overlaps for authorised review. It does not decide legality, and only confirmed boundaries lead to action. Satellite availability is periodic, not continuous; every alert and asset shows its last clear look.</div>
 </div>
 </body>
 </html>
