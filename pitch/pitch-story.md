@@ -30,19 +30,20 @@ It already screens 99 real Hyderabad lakes. The next step is a blind backtest on
 | 4 | 1 | Act while the change is still reversible | Five-stage timeline with icons; the alert window bracketed |
 | 5 | 1 | Screen every lake weekly, sharpen only where it matters | Three tiers with pixel-size pictograms; index colour key |
 | 6 | 1 | Every alert dates the change | Real Sentinel-2 before and after pair, 70 days apart |
-| 7 | 2 | One core decides what deserves an officer's time | Channels in, core flow, portals out, with icons |
-| 8 | 2 | Officers get the picture, the dates and what was checked | Real desk screenshot (Kapra lake) and the Telugu field app on a phone |
-| 9 | 3 | A legal check runs before anyone moves | Decision ladder with coloured outcomes; boundary-status key |
-| 10 | 3 | Six rules no one can switch off | Six icon cards, each with how it is enforced in code |
-| 11 | 3 | Controls cut 124,203 changed pixels to 58 candidates | Funnel bars (log scale) from the real screen |
-| 12 | 4 | Optical, radar and sub-metre imagery, each with one job | Four sensor cards with resolution and source |
-| 13 | 4 | An open, portable stack the State can host and own | Four layers marked Built; Pilot and Later cards |
-| 14 | 4 | Already screening 99 real Hyderabad lakes | Six metrics beside the 99 lakes drawn on the mosaic |
-| 15 | Next | Each phase must earn the next | Four-phase timeline with gates and costs; pilot targets; stop conditions |
-| 16 | Close | Recovered land stays recovered, and every action stands up in court | Lakes mosaic; four-step icon chain |
-| A1–A4 | Appendix | Detection rules; boundary status; built, pilot and later; monthly page | Icon lists and the monthly-page screenshot |
+| 7 | 2 | One core decides what deserves an officer's time | Channels in, core flow, portals out, with icons; the boundary register as the system of record |
+| 8 | 2 | Load each lake's boundary once from the State's records, then watch it weekly | Five-step load pipeline; nested-zone lake drawing (core, FTL, buffer, watch ring, parcels); weekly comparison against the baseline |
+| 9 | 2 | Officers get the picture, the dates and what was checked | Real desk screenshot (Kapra lake) and the Telugu field app on a phone |
+| 10 | 3 | A legal check runs before anyone moves | Decision ladder with coloured outcomes; boundary-status key |
+| 11 | 3 | Six rules no one can switch off | Six icon cards, each with how it is enforced in code |
+| 12 | 3 | Controls cut 124,203 changed pixels to 58 candidates | Funnel bars (log scale) from the real screen |
+| 13 | 4 | Optical, radar and sub-metre imagery, each with one job | Four sensor cards with resolution and source |
+| 14 | 4 | An open, portable stack the State can host and own | Four layers marked Built; Pilot and Later cards |
+| 15 | 4 | Already screening 99 real Hyderabad lakes | Six metrics beside the 99 lakes drawn on the mosaic |
+| 16 | Next | Each phase must earn the next | Four-phase timeline with gates and costs; pilot targets; stop conditions |
+| 17 | Close | Recovered land stays recovered, and every action stands up in court | Lakes mosaic; five-step icon chain starting from certified boundaries |
+| A1–A5 | Appendix | Detection rules; boundary status; built, pilot and later; monthly page; survey-number maps | Icon lists, the monthly-page screenshot, and private apps compared with our boundary load |
 
-About 9 minutes in total, plus time for a live demo.
+About 10 minutes in total, plus time for a live demo.
 
 ## Where the images come from
 
@@ -92,6 +93,14 @@ The owner's layout is kept: channels on the left, core processing in the middle,
 6. **The citizen portal shows status only.** It never shows the person accused or any owner names.
 7. **A feedback loop.** Field outcomes tune detection, and only verified outcomes ever count as truth.
 
+## Owner's asset-load plan (24 November 2026)
+
+The owner's plan is to load every lake's core, FTL and buffer from the State's records first, then compare weekly against a baseline. Slide 8 and appendix A5 show it, and the full proposal is in `docs/asset-load.md` (decision D-055).
+
+On the same day, appendix A2 was corrected to match the code (`api/app/rules/config.yaml`):
+- a preliminary notification (cohort C) allows a field check but no officer path;
+- a lake without notification (cohort D) is watch only.
+
 ## Checks before sending
 
 Every number on the slides was checked against its source:
@@ -104,3 +113,5 @@ Every number on the slides was checked against its source:
 | 124,203 → 102,758 → 8,750 pixels → 83 patches → 58 | Sums of `px_changed_any`, `px_alerting_type`, `px_kept`, `candidates` and `candidates_dropped_radar` in `summary.json` |
 | 249 API tests and 15 browser tests | PROGRESS.md (M10) |
 | Phases, gates, costs and pilot targets | Proposal (indicative estimates; targets, not results) |
+| 2,577 lakes without a final notice | 3,342 minus 765 (proposal) |
+| 30 m and 9 m buffers; 19 July 2024 cut-off | CONTEXT.md §4 (G.O. Ms. No. 168 of 2012); D-039 |

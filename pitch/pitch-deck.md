@@ -274,7 +274,7 @@ encroachment from space, so the legal check looks for authorised works before an
 <div class="flow"><div class="nd"><i class="ic ic-scan-search"></i>Detect change</div><div class="fx">›</div><div class="nd key"><i class="ic ic-scale"></i>Legal check</div><div class="fx">›</div><div class="nd"><i class="ic ic-gauge"></i>Set priority</div><div class="fx">›</div><div class="nd"><i class="ic ic-user-check"></i>Analyst review</div></div>
 <div class="lb">Act</div>
 <div class="flow"><div class="nd"><i class="ic ic-route"></i>Route, with a deadline</div><div class="fx">›</div><div class="nd"><i class="ic ic-map-pin"></i>Field check</div><div class="fx">›</div><div class="nd key"><i class="ic ic-file-lock"></i>Seal evidence</div></div>
-<div class="base"><i class="ic ic-database"></i><div><b>Asset registry</b> with versioned boundaries and their status · imagery record · case history</div></div>
+<div class="base"><i class="ic ic-database"></i><div><b>Boundary register</b>, the system of record: core, FTL, buffer and survey numbers, certified and versioned · imagery record · case history</div></div>
 <div class="base"><i class="ic ic-shield-check"></i><div><b>Every layer:</b> access by role and area · every action in a hash-chained log · missed deadlines escalate</div></div>
 <div class="loop"><i class="ic ic-refresh-cw"></i> Field outcomes feed back to tune detection</div>
 </div>
@@ -298,6 +298,76 @@ Four things the core guarantees:
 3. The citizen portal shows status only: never the accused, never owner names.
 4. The field app is both a channel (photos in) and a portal (tasks out).
 Heavy pieces (message brokers, Kubernetes, deep learning) come only when measured load needs them.
+-->
+
+---
+
+<div class="kicker"><b>02</b>Solution architecture</div>
+
+## Load each lake's boundary once from the State's records, *then watch it weekly*
+
+<style scoped>
+.steps { display: grid; grid-template-columns: 1fr 20px 1fr 20px 1fr 20px 1fr 20px 1fr; align-items: stretch; }
+.stp { background: #fff; border-radius: 16px; box-shadow: var(--shadow); padding: 13px 14px 14px; display: flex; flex-direction: column; gap: 7px; }
+.stp .hd { display: flex; align-items: center; justify-content: space-between; }
+.stp .n { font: 800 12px "Manrope"; letter-spacing: .14em; color: var(--muted); }
+.stp h3 { font-size: 18px; }
+.stp p { font-size: 13.5px; color: var(--muted); line-height: 1.33; }
+.chev { display: flex; align-items: center; justify-content: center; color: var(--teal); font-size: 20px; }
+.low { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; margin-top: 16px; }
+.zones { display: grid; grid-template-columns: 250px 1fr; gap: 16px; align-items: center; padding: 14px 18px; }
+.zones svg { width: 250px; height: 196px; display: block; }
+.zt { font: 800 12px "Manrope"; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+.zl { display: flex; flex-direction: column; gap: 8px; }
+.zl .z { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; font-size: 13px; line-height: 1.3; color: var(--muted); }
+.zl .z b { display: block; font: 800 14.5px "Manrope"; color: var(--ink); }
+.zl .k { height: 0; border-top: 4px solid; margin-top: 8px; }
+.wk { background: var(--ink); color: #fff; border-radius: 18px; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 16px 34px rgba(11,31,51,.22); }
+.wk .zt { color: var(--cyan); }
+.wk .r { display: flex; gap: 12px; align-items: flex-start; font-size: 13px; line-height: 1.3; color: rgba(255,255,255,.72); }
+.wk .r b { color: #fff; display: block; font: 700 14.5px "Manrope"; }
+.wk .r .ic { font-size: 19px; color: var(--cyan); margin-top: 2px; }
+</style>
+
+<div class="steps">
+<div class="stp"><div class="hd"><span class="n">STEP 1</span><div class="bi sm t-sand"><i class="ic ic-folder-open"></i></div></div><h3>Collect</h3><p>FTL notices, village maps, Record of Rights, Sethwar, 1954-55 Khasra Pahani</p></div>
+<div class="chev"><i class="ic ic-chevron-right"></i></div>
+<div class="stp"><div class="hd"><span class="n">STEP 2</span><div class="bi sm t-sky"><i class="ic ic-crosshair"></i></div></div><h3>Georeference</h3><p>Scanned sheets pinned to satellite control points; the error kept in metres</p></div>
+<div class="chev"><i class="ic ic-chevron-right"></i></div>
+<div class="stp"><div class="hd"><span class="n">STEP 3</span><div class="bi sm t-violet"><i class="ic ic-link"></i></div></div><h3>Link survey numbers</h3><p>Land category, extent and Bhudhaar for each parcel; no owner names</p></div>
+<div class="chev"><i class="ic ic-chevron-right"></i></div>
+<div class="stp"><div class="hd"><span class="n">STEP 4</span><div class="bi sm t-green"><i class="ic ic-git-compare"></i></div></div><h3>Reconcile</h3><p>Notice, village map and old imagery compared; gaps go to a boundary desk</p></div>
+<div class="chev"><i class="ic ic-chevron-right"></i></div>
+<div class="stp"><div class="hd"><span class="n">STEP 5</span><div class="bi sm t-teal"><i class="ic ic-badge-check"></i></div></div><h3>Certify, version</h3><p>Irrigation signs the FTL, Revenue the survey numbers; never overwritten</p></div>
+</div>
+
+<div class="low">
+<div class="card zones">
+<svg viewBox="14 20 226 154" xmlns="http://www.w3.org/2000/svg"><defs><path id="lkc" d="M70,96 C68,78 86,66 104,70 C114,60 134,56 148,64 C164,70 182,74 180,92 C192,100 186,118 168,120 C160,132 138,136 122,128 C106,134 82,126 80,112 C70,110 66,102 70,96 Z"/><clipPath id="lkclip"><use href="#lkc" transform="translate(126 96) scale(1.7) translate(-126 -96)"/></clipPath><linearGradient id="lkg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4b93cf"/><stop offset="1" stop-color="#22649f"/></linearGradient></defs><use href="#lkc" transform="translate(126 96) scale(1.7) translate(-126 -96)" fill="#f7f9fb" stroke="#8a99a8" stroke-width="1.6" stroke-dasharray="2 3" vector-effect="non-scaling-stroke"/><use href="#lkc" transform="translate(126 96) scale(1.43) translate(-126 -96)" fill="#fbe7e5" stroke="#d2453f" stroke-width="1.6" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"/><use href="#lkc" transform="translate(126 96) scale(1.22) translate(-126 -96)" fill="#e6f0fa" stroke="#2f80c9" stroke-width="2.4" vector-effect="non-scaling-stroke"/><g clip-path="url(#lkclip)" stroke="#9fb0c0" stroke-width="1" fill="none"><path d="M58,10 L52,190"/><path d="M100,10 L95,190"/><path d="M150,10 L158,190"/><path d="M198,10 L192,190"/><path d="M10,58 L240,52"/><path d="M10,136 L240,142"/></g><g font-family="Inter, sans-serif" font-size="7.5" fill="#6b7a8c"><text x="192" y="76">87/A</text><text x="202" y="126">90</text><text x="118" y="44">101</text></g><use href="#lkc" fill="url(#lkg)"/><text x="126" y="99" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="9" letter-spacing="1.2" fill="#fff">LAKE BED</text></svg>
+<div class="zl"><div class="zt">What each lake holds</div>
+<div class="z"><i class="k" style="border-color:#2f6fa8;border-top-width:8px;border-radius:3px"></i><div><b>Core</b>Survey numbers recorded as tank or shikam: government land</div></div>
+<div class="z"><i class="k" style="border-color:#2f80c9"></i><div><b>FTL</b>The notified line; patta land inside stays private but cannot be built on</div></div>
+<div class="z"><i class="k" style="border-color:#d2453f;border-top-style:dashed"></i><div><b>Buffer</b>30 m, or 9 m for small lakes; computed from the FTL</div></div>
+<div class="z"><i class="k" style="border-color:#8a99a8;border-top-style:dotted"></i><div><b>Watch ring</b>100 m beyond, for early warning</div></div>
+<div class="z"><i class="k" style="border-color:#9fb0c0;border-top-width:1.5px"></i><div><b>Parcels</b>Every survey number that crosses a zone</div></div>
+</div>
+</div>
+<div class="wk"><div class="zt">Every week, against the baseline</div>
+<div class="r"><i class="ic ic-calendar-check"></i><div><b>Cut-off: 19 July 2024</b>Policy date, to confirm with HYDRAA. Older change is recorded, not alerted</div></div>
+<div class="r"><i class="ic ic-image"></i><div><b>Reference image frozen</b>Proof of what stood on each lake at the cut-off</div></div>
+<div class="r"><i class="ic ic-satellite"></i><div><b>New optical and radar looks</b>Every lake, at least weekly</div></div>
+<div class="r"><i class="ic ic-git-compare"></i><div><b>Compared twice</b>With the year before, to date the change; with the reference, to catch slow change</div></div>
+<div class="r"><i class="ic ic-scale"></i><div><b>Legal check, then the alert</b>Zone, permits, works, court cases, boundary status</div></div>
+</div>
+</div>
+
+<!--
+The owner's plan in one slide: the State's own records become one register, the system of record,
+before any alert is trusted. The pipeline is the one private land-record apps use (appendix A5), but
+the source is the State's files and the departments certify the result. Detail: docs/asset-load.md.
+Built today: append-only boundary versions, computed buffer and ring, cohorts, the dated bracket and
+the legal check. Proposed: the core layer, certification step, frozen reference image and edge band.
+The cut-off is the prototype's value (HYDRAA's July 2024 position); HYDRAA and counsel must confirm it.
 -->
 
 ---
@@ -646,7 +716,7 @@ of recovered land (HYDRAA's estimate for Ailapur: ₹17.4 crore an acre).
 
 <h1 style="margin-top:24px;max-width:860px">Recovered land stays recovered, and every action <em>stands up in court</em></h1>
 
-<div class="chain"><div class="s"><i class="ic ic-satellite"></i>Weekly watch</div><i class="ic ic-chevron-right"></i><div class="s"><i class="ic ic-scale"></i>Legal check</div><i class="ic ic-chevron-right"></i><div class="s"><i class="ic ic-map-pin"></i>Field visit</div><i class="ic ic-chevron-right"></i><div class="s"><i class="ic ic-file-lock"></i>Sealed case file</div></div>
+<div class="chain"><div class="s"><i class="ic ic-badge-check"></i>Certified boundaries</div><i class="ic ic-chevron-right"></i><div class="s"><i class="ic ic-satellite"></i>Weekly watch</div><i class="ic ic-chevron-right"></i><div class="s"><i class="ic ic-scale"></i>Legal check</div><i class="ic ic-chevron-right"></i><div class="s"><i class="ic ic-map-pin"></i>Field visit</div><i class="ic ic-chevron-right"></i><div class="s"><i class="ic ic-file-lock"></i>Sealed case file</div></div>
 
 <div class="credit">99 watched lakes · Contains modified Copernicus Sentinel data 2026 · outlines © OpenStreetMap contributors</div>
 
@@ -707,8 +777,8 @@ Pause for questions; use the appendix.
 <div class="hd"><span></span><span>Asset</span><span>Boundary</span><span>Alert may</span></div>
 <div class="c"><div class="L">A</div><div>Recovered land in State hands</div><div class="bd"><i></i>Physically marked</div><span class="res go">Act: full officer path</span></div>
 <div class="c"><div class="L">B</div><div>Lake with final notification</div><div class="bd"><i></i>Final notice</div><span class="res go">Act</span></div>
-<div class="c"><div class="L">C</div><div>Lake with preliminary notification</div><div class="bd"><i style="border-color:#7fb3e0"></i>Preliminary</div><span class="res go">Act</span></div>
-<div class="c"><div class="L" style="background:var(--violet)">D</div><div>Lake without notification</div><div class="bd"><i style="border-top-style:dashed"></i>Derived</div><span class="res ver">Verify: field check only</span></div>
+<div class="c"><div class="L">C</div><div>Lake with preliminary notification</div><div class="bd"><i style="border-color:#7fb3e0"></i>Preliminary</div><span class="res ver">Verify: field check, no officer path</span></div>
+<div class="c"><div class="L" style="background:var(--grey)">D</div><div>Lake without notification</div><div class="bd"><i style="border-top-style:dashed"></i>Derived</div><span class="res wat">Watch: logged, no field action</span></div>
 <div class="c"><div class="L" style="background:var(--grey)">E</div><div>Surveyed agency land</div><div class="bd"><i style="border-color:var(--sand)"></i>Agency survey</div><span class="res go">Act, via the owning agency (2028)</span></div>
 <div class="c"><div class="L" style="background:var(--grey)">F</div><div>Revenue land by survey number only</div><div class="bd"><i style="border-top-style:dotted;border-color:var(--grey)"></i>Survey number</div><span class="res wat">Watch</span></div>
 </div>
@@ -785,3 +855,51 @@ they are designed, not built. This slide is the accurate version: use it if the 
 <div class="row"><div class="bi sm t-violet"><i class="ic ic-printer"></i></div><div><b>Print one page</b>For the monthly review meeting</div></div>
 </div>
 </div>
+
+---
+
+<div class="kicker"><b>A5</b>Appendix</div>
+
+## Survey-number maps: *the private apps' method, the State's own source*
+
+<style scoped>
+.cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.cmp .card { padding: 18px 22px; display: flex; flex-direction: column; gap: 13px; }
+.cmp h3 { display: flex; align-items: center; gap: 10px; font-size: 20px; margin-bottom: 2px; }
+.cmp .it { display: grid; grid-template-columns: 38px 1fr; gap: 12px; align-items: center; font-size: 15px; line-height: 1.33; color: var(--muted); }
+.cmp .it b { color: var(--ink); }
+.cmp .ft { margin-top: auto; font-size: 14.5px; border-radius: 10px; padding: 10px 13px; display: flex; gap: 10px; align-items: flex-start; line-height: 1.35; }
+.cmp .ft .ic { font-size: 18px; margin-top: 1px; }
+.ft.bad { background: var(--grey-50); color: var(--ink-3); }
+.ft.good { background: var(--teal-50); color: var(--teal-600); }
+.gap { margin-top: 14px; display: flex; gap: 16px; align-items: center; background: var(--violet-50); color: #4a2f91; border-radius: 14px; padding: 12px 18px; font-size: 15px; line-height: 1.35; }
+.gap .v { font: 800 30px/1 "Manrope"; color: var(--violet); }
+</style>
+
+<div class="cmp fill">
+<div class="card" style="border-top:5px solid var(--line)"><h3><div class="bi sm t-grey"><i class="ic ic-smartphone"></i></div>Private land-record apps</h3>
+<div class="it"><div class="bi sm t-grey"><i class="ic ic-folder-open"></i></div><div><b>Gather</b> village maps and records from portals, offices and old scans</div></div>
+<div class="it"><div class="bi sm t-grey"><i class="ic ic-crosshair"></i></div><div><b>Pin</b> each scanned sheet onto satellite images</div></div>
+<div class="it"><div class="bi sm t-grey"><i class="ic ic-hash"></i></div><div><b>Key</b> every plot by district, mandal, village and survey number</div></div>
+<div class="it"><div class="bi sm t-grey"><i class="ic ic-search"></i></div><div><b>Sell look-ups</b> from a point to a survey number; certified copies fetched by agents</div></div>
+<div class="ft bad"><i class="ic ic-triangle-alert"></i><div>Useful to a buyer, but uncertified: no court will take it as a lake boundary</div></div>
+</div>
+<div class="card" style="border-top:5px solid var(--teal)"><h3><div class="bi sm t-teal"><i class="ic ic-shield-check"></i></div>Lake Protect</h3>
+<div class="it"><div class="bi sm"><i class="ic ic-handshake"></i></div><div><b>Ask through HYDRAA</b>: CCLA (Survey and Land Records), Irrigation and HMDA</div></div>
+<div class="it"><div class="bi sm t-sky"><i class="ic ic-map"></i></div><div><b>Start from the State's own vectors</b>: most village maps reported digitised; re-surveyed villages added as they arrive</div></div>
+<div class="it"><div class="bi sm t-violet"><i class="ic ic-eye-off"></i></div><div><b>Same keys, plus Bhudhaar</b>: land category and extent; owner names withheld</div></div>
+<div class="it"><div class="bi sm t-green"><i class="ic ic-badge-check"></i></div><div><b>Certified by the departments</b>, versioned and hashed</div></div>
+<div class="ft good"><i class="ic ic-gavel"></i><div>The certified government map is the only boundary that can start an action</div></div>
+</div>
+</div>
+
+<div class="gap"><div class="v">2,577</div><div>of HMDA's 3,342 lakes have no final FTL notice. Their outlines, derived from imagery, run in watch mode, and the file built for each can support the Lake Protection Committee's notification work</div></div>
+
+<!--
+Private apps such as Landeed and Telangana LandGrid sell survey-number maps; Landeed says its village
+maps come from the District Survey and Land Records office through the Bhu Bharati back end. None
+publishes its method; the left column is our reading of what they offer. We copy the method, not
+the source: no scraping, no bought maps. The State reports most village maps digitised and
+georeferenced (to confirm with Survey and Land Records). 2,577 = 3,342 minus the 765 with a final
+notice (HMDA, January 2025). Detail: docs/asset-load.md.
+-->

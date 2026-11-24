@@ -45,6 +45,22 @@ The proposal was shortlisted for the TISC 2026 jury, due within a week. The owne
 Sentinel-2 detections flowing into the existing app on real lakes first; radar, the scored
 backtest and production hardening after. This is M2 plus M10 (PROGRESS.md), ahead of M3.
 
+### D-055: Government records become the boundary system of record (owner, 24 Nov 2026)
+The owner's plan: first load each government lake's core, FTL and buffer from Bhu Bharati, CCLA
+and revenue records (cadastral and survey-number maps), use that as the system of record, then
+compare satellite images weekly against a baseline date that is not yet final. The proposal is in
+`docs/asset-load.md`, with how private land-record apps build survey-number maps and what is copied
+from them (the pipeline, not the sourcing: no portal scraping, no bought app data).
+
+It keeps section 6.1 cohorts, append-only boundary versions (D-011) and the section 8.2 sources.
+**Proposed, not built:**
+- a `core` boundary kind: the lake bed, from survey numbers classed as tank or shikam;
+- certification by Irrigation (FTL) and Revenue (survey numbers) as a maker-checker step;
+- a positional accuracy per boundary and a `near_edge` flag near zone lines;
+- a frozen reference image per asset at the cut-off.
+
+The baseline stays 19 July 2024 (D-039) until HYDRAA and counsel confirm it (section 15).
+
 ## Errors and gaps found in CONTEXT.md
 
 ### E-001: `boundaries` is append-only but has `valid_to` (section 7, invariant 12)

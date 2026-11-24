@@ -75,6 +75,14 @@ These are indicative planning estimates, not quotes. One year of watch for the c
 **What does the State have to give?**
 A named officer, the official FTL boundary files, and the register of authorised works. Without official boundary access by March 2027, we stop.
 
+**Where will the lake boundaries come from? Why not use the survey maps in apps like Landeed?**
+From the State's own records, loaded once and certified (slide 8, appendix A5, `docs/asset-load.md`):
+- the Lake Protection Committee's FTL notices;
+- Irrigation's FTL surveys;
+- village maps and the Record of Rights through CCLA, keyed by survey number.
+
+The apps likely run the same kind of pipeline on the same government maps. But their maps carry no certificate, and no court will accept them as a boundary. Until official files arrive, outlines derived from imagery run in watch mode only.
+
 **Is the State locked in to you or to one imagery provider?**
 No. The stack is open source (FastAPI, PostgreSQL and PostGIS, React) and runs in Docker on State hardware. Each imagery tier can use free, ISRO or commercial images, chosen per phase.
 
