@@ -133,7 +133,7 @@ def _screen_once(api, token, as_of, asset, out, workers, dry_run) -> None:
 
     import httpx
 
-    from lake_protect.screen import aois_from_watchlist, api_payload, asset_summary, run, write_report
+    from lake_protect.screen import aois_from_watchlist, api_payload, asset_summary, image_payload, run, write_report
 
     day = _date(as_of) or dt.date.today()
     headers = {"X-Pipeline-Token": token}
@@ -148,6 +148,7 @@ def _screen_once(api, token, as_of, asset, out, workers, dry_run) -> None:
         _print_results(results, meta)
         outcomes: dict[str, int] = {}
         sent = []
+        changes: dict[str, list[dict]] = {}
         for r in results:
             for c in r.candidates:
                 if dry_run:
@@ -157,6 +158,7 @@ def _screen_once(api, token, as_of, asset, out, workers, dry_run) -> None:
                     body = resp.json()
                     outcomes[body["outcome"]] = outcomes.get(body["outcome"], 0) + 1
                     sent.append({"asset_key": r.aoi.asset_key, **{k: body[k] for k in ("outcome", "alert_code", "state")}})
+                    changes.setdefault(r.aoi.asset_key, []).append({k: body[k] for k in ("candidate_id", "alert_id", "outcome")})
                     typer.echo(f"  -> {r.aoi.name}: {body['alert_code']} {body['outcome']} {body['state']}")
                 else:
                     outcomes[f"refused_{resp.status_code}"] = outcomes.get(f"refused_{resp.status_code}", 0) + 1
@@ -167,7 +169,8 @@ def _screen_once(api, token, as_of, asset, out, workers, dry_run) -> None:
                 "started_at": started.isoformat(),
                 "finished_at": dt.datetime.now(dt.timezone.utc).isoformat(),
                 "outcomes": outcomes,
-                "assets": [{k: v for k, v in asset_summary(r).items() if k not in ("asset_key", "name")} for r in results],
+                "assets": [{k: v for k, v in asset_summary(r).items() if k not in ("asset_key", "name")}
+                           | image_payload(r) | {"changes": changes.get(r.aoi.asset_key, [])} for r in results],
             }
             resp = client.post("/pipeline/runs", json=run_body)
             typer.echo(f"Run recorded: {resp.status_code} {resp.text[:200]}")
@@ -208,10 +211,16 @@ def replay(
             outcomes[key] = outcomes.get(key, 0) + 1
             if resp.status_code != 201:
                 typer.echo(f"  {item['asset_key']}: {resp.status_code} {resp.text[:160]}")
+        import base64
+
         assets = []
         for a in summary["assets"]:
             if a["asset_key"] in ids:
-                assets.append({k: v for k, v in a.items() if k not in ("asset_key", "name")} | {"asset_id": ids[a["asset_key"]]})
+                row = {k: v for k, v in a.items() if k not in ("asset_key", "name", "image_file")} | {"asset_id": ids[a["asset_key"]]}
+                image = folder / a["image_file"] if a.get("image_file") else None
+                if image is not None and image.is_file():
+                    row["image_png_b64"] = base64.b64encode(image.read_bytes()).decode()
+                assets.append(row)
         now = dt.datetime.now(dt.timezone.utc).isoformat()
         body = {k: summary[k] for k in ("as_of", "rule_version", "rules_sha256", "collection")}
         body |= {"started_at": summary.get("started_at", now), "finished_at": summary.get("finished_at", now), "outcomes": outcomes, "assets": assets}

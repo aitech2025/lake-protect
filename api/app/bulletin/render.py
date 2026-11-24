@@ -22,7 +22,7 @@ def month_label(month: str) -> str:
 
 
 def map_svg(db: Session, stats: dict, *, demo: bool, width: int = 640, height: int = 400) -> str:
-    """Every lake and parcel, with this month's new alerts and the overdue ones marked."""
+    """Every lake and parcel, with this month's new incidents and those waiting for a decision marked."""
     rows = db.execute(text(
         """
         SELECT a.name, a.type::text AS type, ST_AsGeoJSON(ST_SimplifyPreserveTopology(b.geom, 0.00002))::json AS g
@@ -56,9 +56,9 @@ def map_svg(db: Session, stats: dict, *, demo: bool, width: int = 640, height: i
     for p in stats["new_alert_points"]:
         x, y = xy(p["lon"], p["lat"]).split(",")
         parts.append(f'<circle cx="{x}" cy="{y}" r="6" fill="#b07219" stroke="#fff" stroke-width="2"><title>{escape(p["code"])}</title></circle>')
-    for o in stats["overdue"]:
+    for o in stats["waiting"]:
         x, y = xy(o["lon"], o["lat"]).split(",")
-        parts.append(f'<circle cx="{x}" cy="{y}" r="10" fill="none" stroke="#c4402f" stroke-width="2.5"><title>{escape(o["code"])} overdue</title></circle>')
+        parts.append(f'<circle cx="{x}" cy="{y}" r="10" fill="none" stroke="#c4402f" stroke-width="2.5"><title>{escape(o["code"])} waiting</title></circle>')
     parts.append("</svg>")
     return "".join(parts)
 
@@ -71,8 +71,11 @@ def render_pdf(stats: dict, svg: str) -> bytes:
         "label": month_label(stats["month"]),
         "last_label": month_label(stats["last_month"]["month"]),
         "map_uri": "data:image/svg+xml;base64," + base64.b64encode(svg.encode()).decode(),
-        "overdue_shown": stats["overdue"][:8],
-        "overdue_more": max(0, len(stats["overdue"]) - 8),
+        "waiting_shown": stats["waiting"][:8],
+        "waiting_more": max(0, len(stats["waiting"]) - 8),
+        "state_labels": {"OPEN": "Open, not yet reviewed", "UNDER_REVIEW": "Under review"},
+        "change_labels": {"building": "Construction", "small_structure": "Construction", "soil_fill": "Land fill",
+                          "levelling": "Levelling", "clearing": "Clearing", "other": "Other change"},
         "fonts": {"regular": (FONTS / "NotoSans-Regular.ttf").as_uri(), "bold": (FONTS / "NotoSans-Bold.ttf").as_uri()},
     }
     return HTML(string=_env.get_template("monthly.html").render(**ctx), base_url=str(TEMPLATES)).write_pdf()

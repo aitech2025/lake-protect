@@ -28,6 +28,7 @@ SENSOR_BASIS = pg_enum(enums.SensorBasis, "sensor_basis")
 ALERT_CLASS = pg_enum(enums.AlertClass, "alert_class")
 MODE = pg_enum(enums.Mode, "mode")
 ALERT_STATE = pg_enum(enums.AlertState, "alert_state")
+INCIDENT_STATE = pg_enum(enums.IncidentState, "incident_state")
 FIELD_OUTCOME = pg_enum(enums.FieldOutcome, "field_outcome")
 ROLE = pg_enum(enums.Role, "role")
 READINESS_STATUS = pg_enum(enums.ReadinessStatus, "readiness_status")
@@ -194,13 +195,16 @@ class LegalCheck(Base):
 
 
 class Alert(Base):
-    """`state` changes only through app.workflow.state_machine (section 6.5). No owner fields."""
+    """An incident. `state` changes only through app.workflow.incidents (migration 0006). No owner fields."""
 
     __tablename__ = "alerts"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     code: Mapped[str] = mapped_column(Text, unique=True)
     candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id"), unique=True)
-    state: Mapped[str] = mapped_column(ALERT_STATE)
+    state: Mapped[str] = mapped_column(INCIDENT_STATE)
+    resolution: Mapped[str | None] = mapped_column(Text)
+    closed_at: Mapped[dt.datetime | None] = mapped_column(TZ)
+    related_alert_id: Mapped[int | None] = mapped_column(ForeignKey("alerts.id"))
     priority_score: Mapped[Decimal | None] = mapped_column(Numeric(6, 2))
     priority_factors: Mapped[dict] = mapped_column(JSONB, default=dict)
     owner_user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
@@ -354,6 +358,7 @@ class ScreenRun(Base):
 
     __tablename__ = "screen_runs"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
     as_of: Mapped[dt.date] = mapped_column(Date)
     rule_version: Mapped[str] = mapped_column(Text)
     rules_sha256: Mapped[str] = mapped_column(String(64))
@@ -379,6 +384,12 @@ class AssetScreen(Base):
     candidates: Mapped[int] = mapped_column(Integer, default=0)
     legacy_changes: Mapped[int] = mapped_column(Integer, default=0)
     counts: Mapped[dict] = mapped_column(JSONB, default=dict)
+    # Migration 0006: the week, that week's image of the asset, and what changed.
+    week: Mapped[str | None] = mapped_column(Text)
+    image_key: Mapped[str | None] = mapped_column(Text)
+    image_date: Mapped[dt.date | None] = mapped_column(Date)
+    image_scene_id: Mapped[str | None] = mapped_column(Text)
+    changes: Mapped[list] = mapped_column(JSONB, default=list)
 
 
 class SourceSnapshot(Base):
@@ -454,3 +465,39 @@ class LandParcel(Base):
     positional_accuracy_m: Mapped[Decimal | None] = mapped_column(Numeric(8, 2))
     geom = mapped_column(MULTIPOLYGON)
     is_sample: Mapped[bool] = mapped_column(Boolean)
+
+
+class IncidentReview(Base):
+    """A viewer's review of an incident (migration 0006). Append-only."""
+
+    __tablename__ = "incident_reviews"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    alert_id: Mapped[int] = mapped_column(ForeignKey("alerts.id"))
+    reviewer_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    outcome: Mapped[str] = mapped_column(Text)
+    note: Mapped[str] = mapped_column(Text)
+    reviewed_at: Mapped[dt.datetime] = mapped_column(TZ)
+
+
+class AssetDocument(Base):
+    """A legal document tagged to an asset: a file with its hash, or a reference (0006). Append-only."""
+
+    __tablename__ = "asset_documents"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    asset_id: Mapped[int] = mapped_column(ForeignKey("assets.id"))
+    doc_type: Mapped[str] = mapped_column(Text)
+    title: Mapped[str] = mapped_column(Text)
+    reference: Mapped[str | None] = mapped_column(Text)
+    issued_on: Mapped[dt.date | None] = mapped_column(Date)
+    issued_by: Mapped[str | None] = mapped_column(Text)
+    file_key: Mapped[str | None] = mapped_column(Text)
+    file_name: Mapped[str | None] = mapped_column(Text)
+    content_type: Mapped[str | None] = mapped_column(Text)
+    sha256: Mapped[str | None] = mapped_column(String(64))
+    byte_size: Mapped[int | None] = mapped_column(BigInteger)
+    source_url: Mapped[str | None] = mapped_column(Text)
+    source_snapshot_id: Mapped[int | None] = mapped_column(ForeignKey("source_snapshots.id"))
+    supersedes_id: Mapped[int | None] = mapped_column(ForeignKey("asset_documents.id"))
+    added_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    added_at: Mapped[dt.datetime] = mapped_column(TZ, server_default="now()")
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)

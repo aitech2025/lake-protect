@@ -4,7 +4,7 @@
     "tagline": "Weekly screening of lakes and recovered land"
   },
   "nav": {
-    "queue": "Alerts",
+    "queue": "Incidents",
     "assets": "Assets",
     "records": "Records",
     "audit": "Audit",
@@ -21,62 +21,31 @@
     "explain": "Fictional places, people and records. Nothing here is a finding."
   },
   "login": {
-    "title": "Sign in with a demo role",
-    "intro": "Each account is a fictional role. Pick the role you want to show.",
+    "title": "Sign in with a demo account",
+    "intro": "Each account is fictional. The admin runs the application; officials see everything and record reviews.",
     "role": {
-      "analyst": "Reviews candidate changes from the image pair",
-      "reviewer": "Second signature on closures",
-      "field_officer": "Checks one alert on site, works offline",
-      "nodal_officer": "Assigns alerts and watches deadlines",
-      "legal_officer": "Case files, court holds and officer actions",
-      "senior_officer": "Reads the monthly page",
-      "auditor": "Reads the full log and checks closures",
-      "admin": "Assets, boundaries and record imports"
+      "admin": "Runs the application: sources, documents and decisions on incidents",
+      "viewer": "Sees every lake, week and incident, and records reviews"
     }
   },
   "role": {
-    "analyst": "Analyst",
-    "reviewer": "Reviewer",
-    "field_officer": "Field officer",
-    "nodal_officer": "Nodal officer",
-    "legal_officer": "Legal officer",
-    "senior_officer": "Senior officer",
-    "auditor": "Auditor",
     "admin": "Admin",
+    "viewer": "Official (viewer)",
     "system": "System"
   },
   "state": {
-    "CANDIDATE": "New candidate",
-    "CLOSED_OUT_OF_SCOPE": "Closed: outside the boundary",
-    "CLOSED_LEGACY": "Closed: older than the baseline",
-    "CLOSED_AUTHORISED": "Closed: authorised work or permit",
-    "HOLD_LEGAL": "With legal team: court case",
-    "WATCH_LIST": "Watch list",
-    "TRIAGE": "Waiting for review",
-    "CLOSED_NOT_REAL": "Closed: not a real change",
-    "CONFIRMED": "Confirmed, to assign",
-    "ASSIGNED": "With field team",
-    "CLOSED_FALSE_ALARM": "Closed: false alarm on site",
-    "FIELD_CONFIRMED": "Seen on site",
-    "AWAITING_BOUNDARY": "Waiting for final boundary",
-    "PACK_READY": "Case file ready",
-    "WITH_OFFICER": "With officer",
-    "ACTION_RECORDED": "Officer action recorded",
-    "CLOSED_NO_ACTION": "Closed: no action",
-    "POST_ACTION_WATCH": "Watched after action"
+    "OPEN": "Open",
+    "UNDER_REVIEW": "Under review",
+    "CONFIRMED": "Confirmed",
+    "DISMISSED": "Dismissed",
+    "CLOSED": "Closed"
   },
   "group": {
-    "review": "Needs review",
-    "field": "In the field",
-    "legal": "With legal",
-    "officer": "With officer",
-    "watch": "Watch list",
-    "closed": "Closed",
-    "overdue": "Overdue",
+    "active": "Not closed",
     "all": "All"
   },
   "action": {
-    "CONFIRMED": "Confirm the change",
+    "CONFIRMED": "Confirm: a real change",
     "CLOSED_NOT_REAL": "Close as not real",
     "ASSIGNED": "Assign to a field officer",
     "TRIAGE": "Release for review",
@@ -90,11 +59,17 @@
     "first_signature": "You sign first. A second person must agree before it closes.",
     "second_signature": "A first signature is waiting. Your signature closes it.",
     "waiting": "Waiting for a second person to sign",
-    "none": "There is nothing for your role to do on this alert now.",
-    "done": "Done",
+    "none": "No step for you here.",
+    "done": "Saved.",
     "awaiting": "Signed. Waiting for a second person.",
-    "submit": "Confirm",
-    "cancel": "Cancel"
+    "submit": "Save",
+    "cancel": "Cancel",
+    "UNDER_REVIEW": "Start the review",
+    "DISMISSED": "Dismiss: not a real change",
+    "CLOSED": "Close the incident",
+    "note": "Note (required)",
+    "closed": "This incident is closed.",
+    "wait_review": "Waiting for an official's review. You can also start the review yourself."
   },
   "form": {
     "reason": "Reason",
@@ -152,10 +127,11 @@
     "F_REVENUE": "F: revenue land"
   },
   "change": {
-    "soil_fill": "Soil fill",
-    "clearing": "Land cleared",
-    "small_structure": "Small structure",
-    "building": "Building",
+    "soil_fill": "Land fill",
+    "clearing": "Clearing",
+    "levelling": "Levelling",
+    "building": "Construction",
+    "small_structure": "Construction (small structure)",
     "water_loss": "Water loss",
     "other": "Other change"
   },
@@ -179,10 +155,10 @@
     "pending": "Optical confirmation pending"
   },
   "queue": {
-    "title": "Alerts",
-    "count": "{{count}} alerts",
-    "sorted": "Highest priority first",
-    "empty": "No alerts match these filters.",
+    "title": "Incidents",
+    "count": "{{count}} incidents",
+    "sorted": "Open first, then by priority",
+    "empty": "No incidents match these filters.",
     "priority": "Priority {{score}}",
     "due": "Due {{date}}",
     "overdue": "Overdue since {{date}}",
@@ -190,10 +166,17 @@
     "acres": "{{acres}} acre",
     "reopened": "Reopened",
     "cohort": "Asset group",
-    "empty_real": "No change on a real lake is open yet. The Assets page shows when each lake was last seen clearly from space."
+    "empty_real": "No change on a real lake yet. The Assets page shows each lake week by week.",
+    "what_changed": "What changed",
+    "state": "State",
+    "first_seen": "First seen {{date}}",
+    "reviews": "Reviews: {{count}}",
+    "court": "Court case",
+    "boundary_unconfirmed": "Boundary not confirmed",
+    "seen_again": "Seen again"
   },
   "detail": {
-    "back": "All alerts",
+    "back": "All incidents",
     "before": "Before",
     "after": "After",
     "last_clear": "Last clear",
@@ -236,20 +219,22 @@
     "owner": "Owner"
   },
   "timeline": {
-    "alert.created": "Candidate change recorded",
+    "alert.created": "Change found, incident opened",
     "alert.transition": "Moved to: {{to}}",
     "closure.requested": "First signature to close",
     "timer.missed": "Deadline missed, {{notify}} told",
     "field_check.synced": "Field check received",
     "readiness.recorded": "Checklist item recorded",
     "owner_claim.added": "Title claim entered",
-    "recheck.persisting": "Re-check: change still there",
+    "recheck.persisting": "Seen again",
     "imagery.requested": "Sharper imagery requested",
     "priority.override": "Priority changed by hand",
     "evidence.generated": "Evidence pack generated",
     "officer_record.added": "Officer record added",
     "reopened": "Reopened: change persists",
-    "by": "by {{name}}"
+    "by": "by {{name}}",
+    "incident.reviewed": "Reviewed: {{outcome}}",
+    "document.added": "Document added"
   },
   "notify": {
     "reviewer": "reviewer",
@@ -309,7 +294,7 @@
     "court-cases": "Court cases",
     "import": "Import CSV",
     "imported": "Imported {{n}} records",
-    "held": "{{n}} alerts moved to the legal team",
+    "held": "{{n}} open incidents now have a court case",
     "empty": "No records yet.",
     "col": {
       "ref": "Reference",
@@ -393,9 +378,9 @@
     "step_refused": "Saved as a record. {{msg}}"
   },
   "pack": {
-    "title": "Case file",
+    "title": "Evidence pack",
     "generate": "Generate evidence pack",
-    "version": "Version {{v}}, {{date}}",
+    "version": "Version {{v}}",
     "draft": "Certificate is a draft for counsel review",
     "reviewed": "Counsel reviewed",
     "open_pdf": "Open PDF",
@@ -405,7 +390,11 @@
     "bad": "Does not match: {{problems}}",
     "none": "No evidence pack yet.",
     "needs_field": "A pack can be made once the change is confirmed on site.",
-    "made": "Evidence pack version {{v}} generated."
+    "made": "Evidence pack version {{v}} generated.",
+    "pdf": "Open PDF",
+    "zip": "Download zip",
+    "regenerate": "Generate a new version",
+    "working": "Working…"
   },
   "checklist_ui": {
     "save": "Save",
@@ -419,21 +408,27 @@
     "to_date": "Month to date, as of {{date}}.",
     "compared": "Compared with {{month}}.",
     "watched": "lakes and parcels watched",
-    "new_alerts": "new alerts",
+    "new_alerts": "new incidents",
     "verified": "seen on site",
     "action_taken": "officer actions recorded",
     "overdue": "overdue",
     "was": "{{n}} in {{month}}",
     "was_end": "{{n}} at the end of {{month}}",
-    "map_legend": "Blue: lakes. Beige: recovered parcels. Amber dot: new alert this month. Red ring: overdue.",
+    "map_legend": "Blue: lakes. Beige: recovered parcels. Amber dot: new incident this month. Red ring: waiting over {{days}} days for a decision.",
     "by_who": "Overdue, by who must act",
-    "list": "Overdue alerts",
+    "list": "Waiting over {{days}} days for a decision",
     "days_late": "{{n}} days late",
-    "none": "Nothing is overdue.",
+    "none": "Nothing has waited over {{days}} days.",
     "print": "Print one page",
     "source": "Every figure comes from the system's records with no hand edits.",
     "dataset_demo": "Demo world",
-    "dataset_real": "Real lakes"
+    "dataset_real": "Real lakes",
+    "reviewed": "reviewed by officials",
+    "confirmed": "confirmed as real changes",
+    "waiting": "waiting over {{days}} days",
+    "what_changed": "What changed this month",
+    "no_new": "No new incidents.",
+    "days_waiting": "{{n}} days"
   },
   "officer": {
     "title": "Officer record",
@@ -576,5 +571,90 @@
     "wakf": "Wakf",
     "forest": "Forest",
     "unknown": "Not recognised"
+  },
+  "resolution": {
+    "confirmed": "Confirmed as a real change",
+    "dismissed": "Dismissed: not a real change",
+    "auto": "Closed by the legal check"
+  },
+  "review": {
+    "title": "Reviews by officials",
+    "none": "No review yet.",
+    "form_title": "Your review",
+    "outcome": {
+      "real_change": "A real change",
+      "not_real": "Not a real change",
+      "needs_site_visit": "Needs a site visit"
+    },
+    "note": "Why (required)",
+    "submit": "Record review",
+    "saved": "Review recorded.",
+    "already": "You have reviewed this already. Another review adds to it."
+  },
+  "incident": {
+    "summary": "{{change}} of about {{area}} sq m {{zone}}, first seen {{date}}",
+    "where": {
+      "inside_ftl": "inside the boundary",
+      "parcel_inside": "inside the parcel",
+      "buffer": "in the buffer zone",
+      "watch_ring": "in the 100 m watch ring",
+      "outside": "outside the watched zones"
+    },
+    "court": "A live court case covers this land. The legal team should see this first.",
+    "boundary_unconfirmed": "The boundary is not confirmed. Weigh this before any action.",
+    "related": "Seen again after an earlier incident was closed:",
+    "documents": "Legal documents",
+    "documents_count": "{{count}} on this asset",
+    "auto": {
+      "CLOSED_LEGACY": "Closed by the legal check: first seen on or before the baseline date. Recorded, not an incident.",
+      "CLOSED_AUTHORISED": "Closed by the legal check: it matches authorised works or a permit.",
+      "CLOSED_OUT_OF_SCOPE": "Closed by the legal check: outside the boundary, buffer and watch ring."
+    }
+  },
+  "weeks": {
+    "title": "Week by week",
+    "lede": "Every weekly screen of this asset: whether it was seen clearly, that week's image, and what changed.",
+    "none": "No weekly screen yet.",
+    "week": "Week {{week}}, {{year}}",
+    "status": {
+      "no_candidate": "No change seen",
+      "candidate_found": "Change found",
+      "no_usable_look": "No clear look",
+      "not_observed": "Not observed",
+      "failed": "Screen failed"
+    },
+    "image_alt": "This asset in week {{week}}",
+    "no_image": "No clear image this week",
+    "look": "Image of {{date}}",
+    "as_of": "Screen of {{date}}",
+    "area": "About {{area}} sq m",
+    "continues": "seen again"
+  },
+  "docs": {
+    "title": "Legal documents",
+    "none": "No legal documents yet.",
+    "col": {
+      "type": "Type",
+      "title": "Document",
+      "reference": "Reference",
+      "issued": "Issued",
+      "file": "File"
+    },
+    "type": {
+      "notification": "FTL notification",
+      "survey_map": "Map or outline",
+      "land_record": "Land record",
+      "government_order": "Government order",
+      "court_order": "Court case or order",
+      "recovery_order": "Recovery order",
+      "other": "Other"
+    },
+    "superseded": "Replaced by a later document",
+    "link": "Link",
+    "open": "Open",
+    "no_file": "Reference only",
+    "add": "Add a document",
+    "file_hint": "File (PDF, PNG or JPEG)",
+    "save": "Save document"
   }
 }

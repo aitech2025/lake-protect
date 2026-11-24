@@ -85,7 +85,7 @@ export function Sources() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const { user } = useAuth();
-  const canRun = Boolean(user && ["admin", "nodal_officer"].includes(user.role));
+  const canRun = user?.role === "admin";
   const { data, error, status, loading, reload } = useAsync(() => api<{ items: Source[] }>("/sources"), []);
   const runs = useAsync(() => api<{ items: RunSummary[] }>("/sources/runs?limit=10"), []);
   const [report, setReport] = useState<Report | null>(null);

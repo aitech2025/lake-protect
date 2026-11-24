@@ -1,39 +1,38 @@
-"""Seed the fictional demo (CONTEXT.md section 13, "Demo data rules").
+"""Seed the fictional demo (CONTEXT.md section 13, "Demo data rules"; DECISIONS.md D-057).
 
     python -m app.seed.demo            # seed relative to today
     python -m app.seed.demo --no-tiles
 
-Everything is invented, marked is_demo, and placed in open sea (DECISIONS.md D-015). Alerts are
-not written directly: each scenario runs through the real ingest, legal check, priority and state
-machine, in time order, so the demo shows the system's actual behaviour.
+Everything is invented, marked is_demo, and placed in open sea (DECISIONS.md D-015). Incidents
+are not written directly: each scenario runs through the real ingest, legal check and incident
+lifecycle, in time order, so the demo shows the system's actual behaviour. Then every demo asset
+gets its legal documents and eight weeks of weekly records, each with that week's image.
 """
 from __future__ import annotations
 
 import argparse
 import base64
 import datetime as dt
+import hashlib
 import json
-import uuid
 from collections.abc import Callable
 
 from geoalchemy2.elements import WKTElement
-from shapely.geometry import box as shp_box
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
-from app.enums import AlertState
-from app.models import Alert, Asset, AuthorisedWork, CourtCase, Permit, User
-from app.rules import config as rules
+from app.audit import chain
 from app.evidence import pack as pack_svc
-from app.services import boundaries as bsvc
-from app.services import field as field_svc
-from app.services import officer, readiness
-from app.services import ingest as ingest_svc
+from app.models import Alert, Asset, AssetScreen, AuthorisedWork, CourtCase, Permit, ScreenRun, User
+from app.seed import demo_docs
 from app.seed import demo_render as render
 from app.seed.demo_world import World
+from app.services import boundaries as bsvc
+from app.services import documents as doc_svc
+from app.services import ingest as ingest_svc
+from app.services import weeks as weeks_svc
 from app.storage import store
-from app.workflow import escalation
-from app.workflow import state_machine as sm
+from app.workflow import incidents as lifecycle
 
 STATUS_BY_COHORT = {
     "A_RECOVERED": "physically_marked",
@@ -44,6 +43,10 @@ STATUS_BY_COHORT = {
 ACRE = 4046.86
 DEMO_RULES = "demo-synthetic-v0"
 LICENCE = "Synthetic demo image. Not satellite data."
+WEEKS = 8
+# A cloudy week: two assets had no clear look, so the record says so instead of "no change".
+CLOUDY_WEEK = 5
+CLOUDY_ASSETS = {"demo-kunta-7", "demo-kunta-8"}
 
 
 class Seeder:
@@ -54,6 +57,7 @@ class Seeder:
         self.users: dict[str, User] = {}
         self.assets: dict[str, Asset] = {}
         self.alerts: dict[str, Alert] = {}
+        self.ingests: dict[str, list[dict]] = {}  # scenario key -> ingest results, in order
         self.plan: list[tuple[dt.datetime, int, str, Callable[[], None]]] = []
 
     def day(self, n: float, minutes: int = 0) -> dt.datetime:
@@ -61,13 +65,8 @@ class Seeder:
 
     # Users, assets and records ------------------------------------------------------------------
     def seed_users(self) -> None:
-        w, s, e, n = self.world.bounds_lonlat(margin_m=2000)
-        south = self.world.to_lonlat(0, 0)[1]
-        areas = {"demo.field1": shp_box(w, s, e, n), "demo.field2": shp_box(w, s, e, south + 0.004)}
         for spec in self.world.spec["users"]:
             user = User(username=spec["username"], name=spec["name"], role=spec["role"], language=spec.get("language", "en"), is_demo=True)
-            if spec["username"] in areas:
-                user.area_geom = WKTElement(f"MULTIPOLYGON((({', '.join(f'{x} {y}' for x, y in areas[spec['username']].exterior.coords)})))", srid=4326)
             self.db.add(user)
             self.db.flush()
             self.users[spec["username"]] = user
@@ -113,6 +112,25 @@ class Seeder:
                                   next_hearing=self.day(c["next_hearing_days"]).date(), last_checked_at=self.T, is_demo=True))
         self.db.flush()
 
+    def seed_documents(self) -> None:
+        """Every demo asset carries its fictional legal documents (D-057)."""
+        b_day = (self.T - dt.timedelta(days=self.world.spec["boundary_days_ago"])).date()
+        courts = {c["asset"]: c for c in self.world.spec.get("court_cases", [])}
+        admin = self.users.get("demo.admin")
+        for spec in self.world.spec["assets"]:
+            asset = self.assets[spec["key"]]
+            for d in demo_docs.documents_for(spec, spec["cohort"], b_day.isoformat(), courts.get(spec["key"])):
+                content = None
+                if d["pdf"]:
+                    content = demo_docs.simple_pdf(d["title"], d["pdf"] + [f"Issued by: {d['issued_by']}", f"Reference: {d['reference'] or 'none'}"])
+                doc_svc.add(
+                    self.db, asset, doc_type=d["doc_type"], title=d["title"], reference=d["reference"],
+                    issued_on=dt.date.fromisoformat(d["issued_on"]) if d["issued_on"] else None, issued_by=d["issued_by"],
+                    content=content, file_name=f"{d['doc_type']}-{spec['key']}.pdf" if content else None,
+                    content_type="application/pdf" if content else None, actor_id=admin.id if admin else None,
+                    at=self.T - dt.timedelta(days=self.world.spec["boundary_days_ago"]),
+                )
+
     # Scenarios ----------------------------------------------------------------------------------
     def _candidate(self, sc: dict, *, first_changed: int, last_clear: int, grow: float = 1.0, sensor_basis: str = "optical_only", confidence: float = 0.8) -> ingest_svc.CandidateIn:
         fc, lc = self.day(first_changed).date(), self.day(last_clear).date()
@@ -147,78 +165,121 @@ class Seeder:
                                    sensor_basis=det.get("sensor_basis", "optical_only"), confidence=det.get("confidence", 0.8))
             out = ingest_svc.ingest(self.db, body, at=self.day(det["day"]))
             self.alerts[sc["key"]] = self.db.get(Alert, out["alert_id"])
+            self.ingests.setdefault(sc["key"], []).append({**out, "day": det["day"], "grow": 1.0, "first_changed": det["first_changed"]})
 
         self._add(self.day(det["day"]), f"{sc['key']}: detect", detect)
         for i, step in enumerate(sc.get("steps", [])):
             when = self.day(step["day"], minutes=30 + 20 * i)
-            self._add(when, f"{sc['key']}: {step['do']}", self._step(sc, step, when, i))
+            self._add(when, f"{sc['key']}: {step['do']}", self._step(sc, step, when))
 
-    def _step(self, sc: dict, step: dict, when: dt.datetime, i: int) -> Callable[[], None]:
+    def _step(self, sc: dict, step: dict, when: dt.datetime) -> Callable[[], None]:
         def run() -> None:
             alert = self.alerts[sc["key"]]
             by = self.users.get(step.get("by", ""))
             do = step["do"]
-            if do == "confirm":
-                sm.transition(self.db, alert, "CONFIRMED", actor=by, data={"image_pair_reviewed": True}, at=when)
-            elif do == "assign":
-                sm.transition(self.db, alert, "ASSIGNED", actor=by, data={"owner_user_id": self.users[step["to"]].id}, at=when)
-            elif do == "close_not_real":
-                sm.transition(self.db, alert, "CLOSED_NOT_REAL", actor=by, reason=step["reason"], data={"reason_code": step["code"]}, at=when)
-                sm.transition(self.db, alert, "CLOSED_NOT_REAL", actor=self.users[step["cosign"]], at=when + dt.timedelta(hours=3))
-            elif do in ("field", "false_alarm"):
-                outcome = step.get("outcome", "false_alarm")
-                self._field(sc, alert, by, outcome, step.get("stage"), step.get("reason"), when, i)
-                if do == "false_alarm":
-                    sm.transition(self.db, alert, "CLOSED_FALSE_ALARM", actor=self.users[step["cosign"]], at=when + dt.timedelta(hours=5))
-            elif do == "recheck":
-                body = self._candidate(sc, first_changed=step["first_changed"], last_clear=step["last_clear"], grow=step["grow"])
-                ingest_svc.ingest(self.db, body, at=when)
-            elif do == "checklist":
-                for n, (key, (status, ref)) in enumerate(step["items"].items()):
-                    readiness.record(self.db, alert, by, key, status, ref, at=when + dt.timedelta(minutes=n))
+            if do == "review":
+                lifecycle.review(self.db, alert, by, step["outcome"], step["note"], at=when)
+            elif do == "decide":
+                if alert.state == "OPEN":
+                    lifecycle.transition(self.db, alert, "UNDER_REVIEW", actor=by, note="Review started", at=when - dt.timedelta(minutes=5))
+                lifecycle.transition(self.db, alert, step["to"], actor=by, note=step["note"], at=when)
+            elif do == "close":
+                lifecycle.transition(self.db, alert, "CLOSED", actor=by, note=step["note"], at=when)
             elif do == "pack":
                 pack_svc.build(self.db, alert, by, at=when)
-            elif do == "officer":
-                fields = {k: (self.day(v).date() if k.endswith("_date") else v) for k, v in step["record"].items()}
-                officer.add(self.db, alert, by, fields, record_action=step.get("record_action", False), at=when)
-            elif do == "transition":
-                sm.transition(self.db, alert, step["to"], actor=by, reason=step.get("reason"), data=step.get("data", {}), at=when)
+            elif do == "recheck":
+                body = self._candidate(sc, first_changed=step["first_changed"], last_clear=step["last_clear"], grow=step["grow"])
+                out = ingest_svc.ingest(self.db, body, at=when)
+                self.alerts[sc["key"]] = self.db.get(Alert, out["alert_id"])
+                self.ingests[sc["key"]].append({**out, "day": step["day"], "grow": step["grow"], "first_changed": step["first_changed"]})
             else:
                 raise ValueError(f"Unknown demo step {do}")
 
         return run
 
-    def _field(self, sc: dict, alert: Alert, officer: User, outcome: str, stage: str | None, reason: str | None, when: dt.datetime, i: int) -> None:
-        centre = self.world.change_m(sc).centroid
-        lon, lat = self.world.to_lonlat(centre.x + 8, centre.y - 6)  # standing at the edge of the change
-        meta = field_svc.FieldCheckMeta(
-            client_uuid=uuid.uuid5(uuid.NAMESPACE_URL, f"lake-protect-demo/{sc['key']}/{i}"),
-            observed_at=when, lat=lat, lon=lon, gps_accuracy_m=6.0, outcome=outcome, observed_stage=stage,
-            notes=reason or "Change seen on site (demo record).", reason=reason, device_time=when - dt.timedelta(seconds=40),
-        )
-        photos = [render.render_field_photo(self.assets[sc["asset"]].name, when, stage or "none", n) for n in (1, 2)]
-        field_svc.submit(self.db, alert, officer, meta, photos, at=when + dt.timedelta(minutes=50))
+    # Weekly records -----------------------------------------------------------------------------
+    def _open_on(self, alert_id: int, day: dt.date) -> bool:
+        """Was this incident still open (not yet dismissed or closed) at the end of that day?"""
+        ended = self.db.scalar(text(
+            "SELECT min(at) FROM audit_log WHERE entity = 'alert' AND entity_id = :i AND action = 'alert.transition' "
+            "AND details->>'to' IN ('DISMISSED', 'CLOSED')"), {"i": str(alert_id)})
+        return ended is None or ended.date() > day
+
+    def seed_weeks(self) -> int:
+        """Eight weekly screens of the demo world, each with every asset's week (D-057)."""
+        by_asset: dict[str, list[tuple[dict, dict]]] = {}
+        for sc in self.world.spec["scenarios"]:
+            for result in self.ingests.get(sc["key"], []):
+                by_asset.setdefault(sc["asset"], []).append((sc, result))
+        rows = 0
+        for k in range(WEEKS - 1, -1, -1):
+            as_of = (self.T - dt.timedelta(days=7 * k)).date()
+            week = weeks_svc.iso_week(as_of)
+            started = dt.datetime.combine(as_of, dt.time(2, 0), tzinfo=dt.timezone.utc)
+            run = ScreenRun(as_of=as_of, rule_version=DEMO_RULES, rules_sha256=hashlib.sha256(DEMO_RULES.encode()).hexdigest(),
+                            collection="demo-synthetic", started_at=started, finished_at=started + dt.timedelta(minutes=12),
+                            assets_total=len(self.assets), outcomes={}, is_demo=True)
+            self.db.add(run)
+            self.db.flush()
+            coverage: dict[str, int] = {}
+            for key, asset in self.assets.items():
+                cloudy = k == CLOUDY_WEEK and key in CLOUDY_ASSETS
+                changes, drawn = [], []
+                for sc, result in by_asset.get(key, []):
+                    seen = self.day(result["day"]).date()
+                    # Drawn from the week the screen found it, so each image agrees with its week's record.
+                    if seen <= as_of and result["outcome"] != "closed_by_legal_check":
+                        drawn.append((sc, result["grow"]))
+                    if cloudy or seen > as_of:
+                        continue
+                    if as_of - dt.timedelta(days=7) < seen:
+                        changes.append({"candidate_id": result["candidate_id"], "alert_id": result["alert_id"], "outcome": result["outcome"]})
+                    elif result["outcome"] in ("created", "recorded_on_open_incident") and self._open_on(result["alert_id"], as_of):
+                        changes.append({"candidate_id": result["candidate_id"], "alert_id": result["alert_id"], "outcome": "recorded_on_open_incident"})
+                if cloudy:
+                    status, image, looks = "no_usable_look", None, 0
+                else:
+                    look = as_of - dt.timedelta(days=2)
+                    png = render.render_week(self.world, key, when=look, week=week, changes=drawn)
+                    image = weeks_svc.store_image(asset, as_of, base64.b64encode(png).decode())
+                    status, looks = ("candidate_found" if changes else "no_candidate"), 2
+                coverage[status] = coverage.get(status, 0) + 1
+                self.db.add(AssetScreen(
+                    run_id=run.id, asset_id=asset.id, status=status, looks=looks,
+                    first_look=None if cloudy else as_of - dt.timedelta(days=7), last_look=None if cloudy else as_of - dt.timedelta(days=2),
+                    candidates=len(changes), legacy_changes=0, counts={}, week=week, image_key=image,
+                    image_date=None if cloudy else as_of - dt.timedelta(days=2),
+                    image_scene_id=None if cloudy else f"DEMO-WEEK-{week}-{key}",
+                    changes=weeks_svc.change_entries(self.db, asset.id, changes),
+                ))
+                rows += 1
+            self.db.flush()
+            chain.record(self.db, actor_id=None, action="screen.run", entity="screen_run", entity_id=run.id,
+                         details={"as_of": as_of.isoformat(), "rule_version": DEMO_RULES, "coverage": coverage, "demo": True},
+                         at=run.finished_at)
+        return rows
 
     # Run ------------------------------------------------------------------------------------------
     def run(self) -> dict:
         self.seed_users()
         self.seed_assets()
         self.seed_records()
+        self.seed_documents()
         for sc in self.world.spec["scenarios"]:
             self.plan_scenario(sc)
         for when, _, label, fn in sorted(self.plan, key=lambda p: (p[0], p[1])):
             try:
                 fn()
-            except sm.Refused as exc:
+            except lifecycle.Refused as exc:
                 raise RuntimeError(f"Demo step refused ({label}): {exc.message}") from exc
-        misses = escalation.run(self.db, now=self.T)
+        weeks = self.seed_weeks()
         self.db.flush()
         return {
             "seed_date": self.T.date().isoformat(),
             "users": len(self.users),
             "assets": len(self.assets),
-            "alerts": {k: a.state for k, a in self.alerts.items()},
-            "timer_misses": len(misses),
+            "incidents": {k: f"{a.state}{'/' + a.resolution if a.resolution else ''}" for k, a in self.alerts.items()},
+            "weekly_records": weeks,
         }
 
 

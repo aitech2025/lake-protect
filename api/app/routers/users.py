@@ -1,4 +1,4 @@
-"""GET /users: names and roles for assignment. Nodal officers and admins only."""
+"""GET /users: names and roles. Admin only."""
 from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -12,7 +12,7 @@ router = APIRouter(tags=["users"])
 
 
 @router.get("/users")
-def list_users(role: str | None = None, user: User = Depends(require_roles(Role.nodal_officer, Role.admin)), db: Session = Depends(get_db)) -> list[dict]:
+def list_users(role: str | None = None, user: User = Depends(require_roles(Role.admin)), db: Session = Depends(get_db)) -> list[dict]:
     q = select(User).where(User.is_active.is_(True)).order_by(User.name)
     if role:
         q = q.where(User.role == role)

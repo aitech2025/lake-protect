@@ -6,8 +6,8 @@
 import { expect, test } from "@playwright/test";
 import { login, shot } from "./helpers";
 
-test("a nodal officer previews the fictional lake register without writing anything", async ({ page }) => {
-  await login(page, "demo.nodal");
+test("the admin previews the fictional lake register without writing anything", async ({ page }) => {
+  await login(page, "demo.admin");
   await page.getByRole("link", { name: "Sources" }).click();
   await expect(page).toHaveURL(/\/sources$/);
   for (const name of ["hmda_lpc", "irrigation", "bhu_bharati", "hydraa"]) {
@@ -32,8 +32,8 @@ test("a nodal officer previews the fictional lake register without writing anyth
   expect(runsAfter).toBe(runsBefore);
 });
 
-test("an analyst sees the sources but cannot load them", async ({ page }) => {
-  await login(page, "demo.analyst");
+test("a viewer sees the sources but cannot load them", async ({ page }) => {
+  await login(page, "demo.viewer1");
   await page.goto("/sources");
   await expect(page.getByTestId("source-hydraa")).toBeVisible();
   await expect(page.locator('[data-testid^="run-"]')).toHaveCount(0);

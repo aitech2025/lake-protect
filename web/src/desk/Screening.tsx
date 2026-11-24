@@ -21,7 +21,7 @@ type Run = {
  */
 export function ScreeningSummary() {
   const { t, i18n } = useTranslation();
-  const { data } = useAsync(() => api<{ items: Run[] }>("/screening/runs?limit=1"), []);
+  const { data } = useAsync(() => api<{ items: Run[] }>("/screening/runs?limit=1&dataset=real"), []);
   const run = data?.items?.[0];
   if (!data) return null;
   if (!run) return <p className="note" data-testid="screening-summary">{t("screen.never_run")}</p>;

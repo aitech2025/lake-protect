@@ -61,7 +61,7 @@ def test_dry_run_reports_the_plan_and_writes_nothing(db, isolated_storage):
     before = (count(db, Asset), count(db, SourceSnapshot), count(db, ImportRun), count(db, Boundary))
     report = engine.run(db, "hmda_lpc", transport="sample", dry_run=True)
     assert report["dry_run"] is True and report["run_id"] is None
-    assert report["counts"] == {"assets_created": 3, "links_added": 3, "rejected": 1, "waiting": 1}
+    assert report["counts"] == {"assets_created": 3, "documents_tagged": 3, "links_added": 3, "rejected": 1, "waiting": 1}
     assert all("asset_id" not in i for i in report["items"])
     assert (count(db, Asset), count(db, SourceSnapshot), count(db, ImportRun), count(db, Boundary)) == before
     assert not (isolated_storage.root / "sources").exists()
@@ -69,7 +69,7 @@ def test_dry_run_reports_the_plan_and_writes_nothing(db, isolated_storage):
 
 def test_lake_register_creates_assets_with_cohort_and_provenance(db, isolated_storage):
     report = apply(db, "hmda_lpc")
-    assert report["counts"] == {"assets_created": 3, "links_added": 3, "rejected": 1, "waiting": 1}
+    assert report["counts"] == {"assets_created": 3, "documents_tagged": 3, "links_added": 3, "rejected": 1, "waiting": 1}
     assert "reference" in items(report, "rejected")["hmda_lpc:S-004"]["reason"]
     assert "outline" in items(report, "waiting")["hmda_lpc:S-005"]["reason"]
 
@@ -148,7 +148,7 @@ def test_hydraa_upgrades_a_preliminary_lake_and_adds_recovered_land(db, client, 
     assert (parcel.type, parcel.cohort) == ("recovered_parcel", "A_RECOVERED")
     assert parcel.survey_numbers == ["41", "42"]
 
-    analyst = make_user(db, "analyst")
+    analyst = make_user(db, "viewer")
     listed = {f["properties"]["asset_key"]: f["properties"] for f in client.get("/assets?dataset=demo", headers=auth(analyst)).json()["features"]}
     assert listed["sample-hydraa-hyd-rec-s-01"]["mode"] == "ACTION"
     assert listed["sample-lpc-s-002"]["boundary_status"] == "final_notification"
@@ -181,7 +181,7 @@ def test_land_records_load_without_owner_names_and_fill_survey_numbers(db, clien
     assert len(a.survey_numbers) > 3
 
     team = Team(db)
-    reg = client.get(f"/assets/{a.id}/register", headers=auth(team.analyst))
+    reg = client.get(f"/assets/{a.id}/register", headers=auth(team.viewer))
     assert reg.status_code == 200, reg.text
     body = reg.json()
     assert body["core_area_sq_m"] > 0 and any(p["core"] for p in body["parcels"])
@@ -189,7 +189,7 @@ def test_land_records_load_without_owner_names_and_fill_survey_numbers(db, clien
     assert body["links"][0]["connector"] == "hmda_lpc" and body["links"][0]["external_id"] == "S-001"
     assert body["boundary_source"]["connector"] == "hmda_lpc"
     assert "FICTIONAL-NAME" not in reg.text
-    assert client.get(f"/assets/{a.id}/register", headers=auth(team.field)).status_code == 403
+    assert client.get(f"/assets/{a.id}/register").status_code == 401
 
 
 def test_the_order_of_sources_does_not_create_duplicates(db, isolated_storage):
@@ -249,7 +249,7 @@ def _api(client=None, agreement="TEST/AGREEMENT/1", base="https://data.example.t
 def test_api_transport_needs_an_agreement_and_refuses_web_pages(db, client, monkeypatch, isolated_storage):
     with pytest.raises(AgreementRequired, match="no data-sharing agreement"):
         _api(agreement=None).fetch(CONNECTORS["hmda_lpc"])
-    nodal = make_user(db, "nodal_officer")
+    nodal = make_user(db, "admin")
     res = client.post("/sources/hmda_lpc/runs", json={"transport": "api"}, headers=auth(nodal))
     assert res.status_code == 409 and "agreement" in res.json()["detail"]
 
@@ -272,26 +272,26 @@ def test_api_transport_needs_an_agreement_and_refuses_web_pages(db, client, monk
 
 def test_sources_api_roles_and_listing(db, client, isolated_storage):
     team = Team(db)
-    listing = client.get("/sources", headers=auth(team.analyst))
+    listing = client.get("/sources", headers=auth(team.viewer))
     assert listing.status_code == 200
     by_name = {s["name"]: s for s in listing.json()["items"]}
     assert set(by_name) == {"hmda_lpc", "irrigation", "bhu_bharati", "hydraa"}
     assert all(s["sample_available"] and s["agreement_ref"] is None and not s["api_configured"] for s in by_name.values())
     assert [d["file_name"] for d in by_name["bhu_bharati"]["datasets"]] == ["village_parcels.geojson", "ror_extract.csv"]
-    assert client.get("/sources", headers=auth(team.field)).status_code == 403
+    assert client.get("/sources").status_code == 401
 
     body = {"transport": "sample", "dry_run": True}
-    assert client.post("/sources/hmda_lpc/runs", json=body, headers=auth(team.analyst)).status_code == 403
-    assert client.post("/sources/nowhere/runs", json=body, headers=auth(team.nodal)).status_code == 404
-    preview = client.post("/sources/hmda_lpc/runs", json=body, headers=auth(team.nodal))
+    assert client.post("/sources/hmda_lpc/runs", json=body, headers=auth(team.viewer)).status_code == 403
+    assert client.post("/sources/nowhere/runs", json=body, headers=auth(team.admin)).status_code == 404
+    preview = client.post("/sources/hmda_lpc/runs", json=body, headers=auth(team.admin))
     assert preview.status_code == 200 and preview.json()["counts"]["assets_created"] == 3
 
     applied = client.post("/sources/hmda_lpc/runs", json={"transport": "sample", "dry_run": False}, headers=auth(team.admin))
     assert applied.status_code == 200 and applied.json()["run_id"]
-    runs = client.get("/sources/runs", headers=auth(team.auditor)).json()["items"]
+    runs = client.get("/sources/runs", headers=auth(team.viewer)).json()["items"]
     assert runs[0]["id"] == applied.json()["run_id"] and runs[0]["actor_id"] == team.admin.id
     assert any(i["action"] == "created" for i in runs[0]["items"])
-    after = {s["name"]: s for s in client.get("/sources", headers=auth(team.nodal)).json()["items"]}
+    after = {s["name"]: s for s in client.get("/sources", headers=auth(team.admin)).json()["items"]}
     assert after["hmda_lpc"]["last_run"]["id"] == runs[0]["id"]
 
 

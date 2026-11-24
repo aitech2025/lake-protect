@@ -33,7 +33,8 @@ transport ──► files ──► privacy filter ──► snapshot (hash, sto
                                                                              │
    publish ◄── reconcile ◄── match to an asset ◄── validate ◄─────────────────┘
       │
-      └─► new asset or new boundary version (append-only), links, parcels, survey numbers, run record, audit log
+      └─► new asset or new boundary version (append-only), links, parcels, survey numbers, legal documents
+          tagged from the files it came from (M12), run record, audit log
 ```
 
 | Part | File |

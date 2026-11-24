@@ -28,14 +28,14 @@ import numpy as np
 from lake_protect.indices import BARE, BUILT, CLASS_CODES, MASKED, OTHER, VEG, WATER
 from lake_protect.rules import rules
 
-NONE, SOIL_FILL, CLEARING, BUILDING, WATER_LOSS = 0, 1, 2, 3, 9
-CHANGE_NAMES = {SOIL_FILL: "soil_fill", CLEARING: "clearing", BUILDING: "building", WATER_LOSS: "water_loss"}
-ALERTING = (SOIL_FILL, CLEARING, BUILDING)
+NONE, SOIL_FILL, CLEARING, BUILDING, LEVELLING, WATER_LOSS = 0, 1, 2, 3, 4, 9
+CHANGE_NAMES = {SOIL_FILL: "soil_fill", CLEARING: "clearing", BUILDING: "building", LEVELLING: "levelling", WATER_LOSS: "water_loss"}
+ALERTING = (SOIL_FILL, CLEARING, BUILDING, LEVELLING)
 
 
 def transition_table(cfg: dict | None = None) -> np.ndarray:
     cfg = cfg or rules()["transitions"]
-    codes = {"soil_fill": SOIL_FILL, "clearing": CLEARING, "building": BUILDING}
+    codes = {"soil_fill": SOIL_FILL, "clearing": CLEARING, "building": BUILDING, "levelling": LEVELLING}
     table = np.zeros((6, 6), dtype=np.uint8)
     for key, name in cfg.items():
         x, y = key.split(">")

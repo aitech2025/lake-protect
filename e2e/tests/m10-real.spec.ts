@@ -10,7 +10,7 @@ test("the desk shows real lakes on the Sentinel-2 map, apart from the demo world
   page.on("request", (r) => {
     if (r.url().includes("/api/tiles/")) tiles.push(r.url());
   });
-  await login(page, "demo.analyst");
+  await login(page, "demo.viewer2");
 
   // Demo world first (the default): demo band on screen, demo tiles only.
   await expect(page.getByTestId("dataset-demo")).toHaveAttribute("aria-pressed", "true");

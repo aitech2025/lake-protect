@@ -1,4 +1,4 @@
-"""Enumerations from CONTEXT.md section 7. Values must match migration 0002."""
+"""Enumerations from CONTEXT.md section 7. Values must match the migrations (0002, 0006)."""
 from enum import StrEnum
 
 
@@ -44,6 +44,7 @@ class Zone(StrEnum):
 class ChangeType(StrEnum):
     soil_fill = "soil_fill"
     clearing = "clearing"
+    levelling = "levelling"
     small_structure = "small_structure"
     building = "building"
     water_loss = "water_loss"
@@ -78,6 +79,8 @@ class Mode(StrEnum):
 
 
 class AlertState(StrEnum):
+    """The legal check's verdict (legal_checks.result). Incidents use IncidentState since 0006."""
+
     CANDIDATE = "CANDIDATE"
     CLOSED_OUT_OF_SCOPE = "CLOSED_OUT_OF_SCOPE"
     CLOSED_LEGACY = "CLOSED_LEGACY"
@@ -105,14 +108,41 @@ class FieldOutcome(StrEnum):
 
 
 class Role(StrEnum):
-    analyst = "analyst"
-    reviewer = "reviewer"
-    field_officer = "field_officer"
-    nodal_officer = "nodal_officer"
-    legal_officer = "legal_officer"
-    senior_officer = "senior_officer"
-    auditor = "auditor"
+    """Two roles since 24 Nov 2026 (DECISIONS.md D-057): the admin runs the application; viewers
+    are the officials, who see everything and record reviews of incidents."""
+
     admin = "admin"
+    viewer = "viewer"
+
+
+class IncidentState(StrEnum):
+    OPEN = "OPEN"
+    UNDER_REVIEW = "UNDER_REVIEW"
+    CONFIRMED = "CONFIRMED"
+    DISMISSED = "DISMISSED"
+    CLOSED = "CLOSED"
+
+
+class Resolution(StrEnum):
+    confirmed = "confirmed"
+    dismissed = "dismissed"
+    auto = "auto"  # closed at once by the legal check: outside the zones, before the baseline, authorised
+
+
+class ReviewOutcome(StrEnum):
+    real_change = "real_change"
+    not_real = "not_real"
+    needs_site_visit = "needs_site_visit"
+
+
+class DocumentType(StrEnum):
+    notification = "notification"
+    survey_map = "survey_map"
+    land_record = "land_record"
+    government_order = "government_order"
+    court_order = "court_order"
+    recovery_order = "recovery_order"
+    other = "other"
 
 
 class ReadinessStatus(StrEnum):

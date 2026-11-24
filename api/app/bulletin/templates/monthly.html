@@ -34,28 +34,28 @@
 
 <div class="counts">
   <div class="count"><b>{{ counts.watched }}</b>lakes and parcels watched<div class="was">{{ last_month.counts.watched }} in {{ last_label }}</div></div>
-  <div class="count"><b>{{ counts.new_alerts }}</b>new alerts<div class="was">{{ last_month.counts.new_alerts }} in {{ last_label }}</div></div>
-  <div class="count"><b>{{ counts.verified }}</b>seen on site<div class="was">{{ last_month.counts.verified }} in {{ last_label }}</div></div>
-  <div class="count"><b>{{ counts.action_taken }}</b>officer actions recorded<div class="was">{{ last_month.counts.action_taken }} in {{ last_label }}</div></div>
-  <div class="count overdue"><b>{{ counts.overdue }}</b>overdue<div class="was">{{ last_month.counts.overdue }} at the end of {{ last_label }}</div></div>
+  <div class="count"><b>{{ counts.new_alerts }}</b>new incidents<div class="was">{{ last_month.counts.new_alerts }} in {{ last_label }}</div></div>
+  <div class="count"><b>{{ counts.reviewed }}</b>reviewed by officials<div class="was">{{ last_month.counts.reviewed }} in {{ last_label }}</div></div>
+  <div class="count"><b>{{ counts.confirmed }}</b>confirmed as real changes<div class="was">{{ last_month.counts.confirmed }} in {{ last_label }}</div></div>
+  <div class="count overdue"><b>{{ counts.waiting }}</b>waiting over {{ wait_days }} days<div class="was">{{ last_month.counts.waiting }} at the end of {{ last_label }}</div></div>
 </div>
 
 <img class="map" src="{{ map_uri }}" alt="Map of watched lakes and parcels">
-<p class="legend">Blue: lakes. Beige: recovered parcels. Amber dot: new alert this month. Red ring: overdue.</p>
+<p class="legend">Blue: lakes. Beige: recovered parcels. Amber dot: new incident this month. Red ring: waiting over {{ wait_days }} days for a decision.</p>
 
 <div class="cols">
   <div>
-    <h2>Overdue, by who must act</h2>
+    <h2>What changed this month</h2>
     <table>
-      {% for r in overdue_by_responsible %}<tr><td>{{ r.responsible }}</td><td>{{ r.count }}</td></tr>{% else %}<tr><td>Nothing is overdue.</td></tr>{% endfor %}
+      {% for k, n in change_types.items() %}<tr><td>{{ change_labels.get(k, k) }}</td><td>{{ n }}</td></tr>{% else %}<tr><td>No new incidents.</td></tr>{% endfor %}
     </table>
   </div>
   <div>
-    <h2>Overdue alerts</h2>
+    <h2>Waiting for a decision</h2>
     <table>
-      <tr><th>Alert</th><th>Place</th><th>Days late</th></tr>
-      {% for o in overdue_shown %}<tr><td>{{ o.code }}</td><td>{{ o.asset_name }}</td><td>{{ o.days_overdue }}</td></tr>{% endfor %}
-      {% if overdue_more %}<tr><td colspan="3">and {{ overdue_more }} more in the desk</td></tr>{% endif %}
+      <tr><th>Incident</th><th>Place</th><th>Days</th></tr>
+      {% for o in waiting_shown %}<tr><td>{{ o.code }}</td><td>{{ o.asset_name }}</td><td>{{ o.days_waiting }}</td></tr>{% else %}<tr><td colspan="3">Nothing has waited over {{ wait_days }} days.</td></tr>{% endfor %}
+      {% if waiting_more %}<tr><td colspan="3">and {{ waiting_more }} more in the desk</td></tr>{% endif %}
     </table>
   </div>
 </div>

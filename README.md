@@ -24,10 +24,14 @@ docker compose exec -e LP_ALLOW_RESET=true api python -m app.seed.reset   # real
 
 | Service | Address |
 |---|---|
-| Desk and field app | http://localhost:8180 (field app at `/field`) |
+| Desk | http://localhost:8180 |
 | API | http://localhost:8100/health (also under `/api` on the app's address) |
 | Database | localhost:5544, bound to this machine only |
-| Worker | Escalation job every 5 minutes (`docker compose logs worker`) |
+
+Two roles (DECISIONS.md D-057): **admin**, who runs the application and decides on incidents, and
+**viewer**, the officials, who see everything and record reviews. The demo accounts are
+`demo.admin`, `demo.viewer1` (Telugu) and `demo.viewer2`. How the weekly record, incidents and
+legal documents work: [docs/weekly-processing.md](docs/weekly-processing.md).
 
 The demo script is in [docs/DEMO.md](docs/DEMO.md). After the first build the laptop needs no
 internet: tiles, image pairs, fonts and the app are all local.
@@ -60,7 +64,7 @@ Rules are in `pipeline/lake_protect/detect_rules.yaml`; the tuning record is `re
 ## Test
 
 ```powershell
-docker compose exec api pytest                 # API: invariants, workflow, packs, monthly page
+docker compose exec api pytest                 # API: invariants, incidents, weeks, documents, packs, monthly page
 C:\lp-cache\venv\Scripts\python -m pytest pipeline/tests -p no:cacheprovider
 sh scripts/e2e.sh                              # browser tests on a fresh demo (Chromium in Docker)
 ```
@@ -69,7 +73,7 @@ To prove the demo runs with no internet, start the stack on an internal network 
 
 ```powershell
 $env:COMPOSE_PATH_SEPARATOR=":"; $env:COMPOSE_FILE="docker-compose.yml:docker-compose.offline.yml"
-docker compose down; docker compose up -d --wait db api worker web
+docker compose down; docker compose up -d --wait db api web
 sh scripts/e2e.sh m9-demo
 Remove-Item Env:COMPOSE_FILE; docker compose -f docker-compose.yml -f docker-compose.offline.yml down; docker compose up -d
 ```

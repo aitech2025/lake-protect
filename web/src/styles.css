@@ -340,3 +340,24 @@ aside > .panel:first-child { margin-top: 0; }
 .contract { list-style: none; padding: 0; margin: 0.5rem 0 0; display: grid; gap: 0.5rem; font-size: var(--step--1); }
 .contract li { overflow-wrap: anywhere; }
 .source-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+/* Incidents, the weekly record and legal documents (D-057). */
+.change-summary { font-size: var(--step-0); font-weight: 600; margin: 0.25rem 0 0.75rem; }
+.change-type { font-weight: 700; }
+.flags { display: grid; gap: 0.5rem; margin-bottom: 1rem; }
+.flags:empty { display: none; }
+.review-list { list-style: none; padding: 0; margin: 0.6rem 0 0; display: grid; gap: 0.6rem; }
+.review-list li { display: grid; gap: 0.15rem; border-left: 3px solid var(--rule); padding-left: 0.6rem; }
+.review-list li[data-outcome="real_change"] { border-color: var(--buffer); }
+.review-list li[data-outcome="needs_site_visit"] { border-color: var(--amber); }
+.review-form .choices { border: 0; padding: 0; margin: 0; display: grid; gap: 0.35rem; }
+.week-strip { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 11.5rem), 1fr)); gap: 0.75rem; }
+.week { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-m); padding: 0.5rem; display: grid; gap: 0.35rem; align-content: start; font-size: var(--step--1); }
+.week.changed { border-color: var(--amber); box-shadow: inset 0 3px 0 var(--amber); }
+.week-head { display: flex; justify-content: space-between; gap: 0.4rem; align-items: baseline; flex-wrap: wrap; }
+.week img, .week .evidence-frame { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-s); }
+.week-noimage { aspect-ratio: 1; display: grid; place-items: center; background: #eef1ec; color: var(--ink-2); border-radius: var(--radius-s); text-align: center; padding: 0.5rem; }
+.week-change { display: grid; gap: 0.1rem; border-top: 1px solid var(--rule); padding-top: 0.3rem; }
+.ok { color: #2d7a57; font-weight: 600; }
+tr.superseded td { color: var(--ink-2); text-decoration: line-through; text-decoration-thickness: 1px; }
+.doc-form { margin-top: 0.75rem; max-width: 32rem; }

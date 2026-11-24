@@ -21,7 +21,8 @@ data in the app), then M3.
 | M2 Detection on Sentinel-2 | Done | Pipeline 25 passed | cf91bce |
 | M10 Real data in the app | Done | API 249, pipeline 25, browser 15 passed | M10 commit |
 | M3 Radar and scored backtest | Radar check for built-up done; backtest not started | | |
-| M11 Asset creation engine (templates) | Done | API 284, browser 2 new (m11-sources) | M11 commit |
+| M11 Asset creation engine (templates) | Done | API 284, browser 2 new (m11-sources) | 507d359 |
+| M12 Weekly record, incidents, documents, two roles | Done | API 263, pipeline 27, browser 4 | M12 commit |
 
 ## M0 Scaffold: done
 
@@ -235,6 +236,52 @@ removed, is `reports/m2-tuning/README.md`.
   upload, the area rounding case). Browser 15 passed on fresh demos: `m10-real` (switch, no demo
   record on the real side, Sentinel-2 tiles requested, 99 real lakes listed) with the M5 to M8
   suites, then the M9 walkthrough with no internet.
+
+## M12 Weekly record, incidents, legal documents, two roles: done
+
+Owner's request, 24 Nov 2026 (D-057, D-058). Design: `docs/weekly-processing.md`.
+
+- Migration 0006:
+  - roles reduced to `admin` and `viewer`;
+  - alerts become incidents (OPEN, UNDER_REVIEW, CONFIRMED, DISMISSED, CLOSED) with a
+    resolution, and existing rows are mapped across;
+  - `incident_reviews`;
+  - `asset_screens` gains the week, the image and the changes;
+  - `asset_documents`;
+  - change type `levelling`.
+
+  Migrating down to 0005 and up again works.
+- API:
+  - the incident lifecycle replaces the state machine;
+  - viewers record reviews and the admin decides;
+  - incidents say what changed in plain words;
+  - endpoints for the weekly record, its images and documents;
+  - the source engine tags documents;
+  - the evidence pack holds reviews, decisions and documents;
+  - the monthly page counts new, reviewed, confirmed and waiting.
+- Removed: the field app, field checks, two-person closures, escalation timers, the worker,
+  officer records and the readiness checklist.
+- Pipeline (detect-v2):
+  - levelling (`other>bare`) is a change type of its own;
+  - a weekly image for every asset;
+  - each change's incident is sent with the run;
+  - `lp replay` resends images.
+
+  On the preview stack, `lp screen` of Kapra lake and Saroor Nagar Lake drew both weekly images
+  and linked Kapra's ten continuing changes to their open incidents.
+- Demo: one admin and two viewers; 19 incidents across every state; fictional PDF documents on
+  all 20 assets; eight weeks of weekly records with images (one cloudy week for two assets).
+- Desk:
+  - an incident list filtered by state and what changed;
+  - an incident page with a review form for viewers and decision steps for the admin;
+  - a week-by-week strip and legal documents on Assets;
+  - the monthly page in the new figures;
+  - Telugu drafts for all new strings.
+- Tests: API 263 passed; pipeline 27 passed; browser 4 passed (`m9-demo` walkthrough with no
+  internet, `m10-real`, `m11-sources`). These ran on a separate preview stack
+  (`docker compose -p lakeprotect-preview`, ports 5545/8101/8181): the reset of the dev database
+  was not run, because it wipes it. The dev database needs that reset, then `lp replay`, before
+  the dev desk works (README).
 
 ## M11 Asset creation engine (templates): done
 

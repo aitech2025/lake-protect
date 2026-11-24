@@ -48,7 +48,7 @@ def test_real_assets_load_once_and_reload_unchanged(db, client, collection):
     rows = db.scalar(select(func.count()).select_from(Boundary).where(Boundary.asset_id.in_([a.id for a in assets])))
     assert rows == 3 * n  # ftl, buffer and watch ring, version 1
 
-    analyst = make_user(db, "analyst")
+    analyst = make_user(db, "viewer")
     listed = {
         f["properties"]["asset_key"]: f["properties"]
         for f in client.get("/assets", headers=auth(analyst)).json()["features"]

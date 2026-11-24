@@ -13,7 +13,9 @@ One run reads one source and, for every record:
    two sources disagree at the same status it keeps the current boundary and reports a conflict;
 5. publishes: a new asset, or a new boundary version (append-only), with the cohort following the
    status. Survey-number parcels are stored with land category and extent, and each asset's survey
-   numbers are refreshed from the parcels it touches.
+   numbers are refreshed from the parcels it touches;
+6. tags each asset with the document its record came from: the notification, the recovery order,
+   the outline file or the land-record extract (DECISIONS.md D-057).
 
 A dry run does all of this inside a savepoint and rolls it back, so the preview is exactly what an
 applied run would do. Every applied run is recorded in `import_runs` with what it did to each
@@ -40,6 +42,7 @@ from app.enums import BoundaryStatus
 from app.models import Asset, AssetSourceLink, ImportRun, LandParcel, SourceSnapshot
 from app.rules import config as rules
 from app.services import boundaries as bsvc
+from app.services import documents as doc_svc
 from app.sources import connectors as registry
 from app.sources import privacy
 from app.sources.base import AssetRecord, Connector, Payload, SourceError
@@ -109,6 +112,7 @@ class _Run:
         self.snapshots: dict[str, SourceSnapshot] = {}
         self.reused: set[str] = set()
         self.touched_assets: set[int] = set()
+        self.parcel_assets: set[int] = set()
         bbox = self.cfg["sample_bbox"] if self.is_sample else self.cfg["real_bbox"]
         self.area = box(*bbox)
         self.area_name = "the open-sea sample area" if self.is_sample else "Telangana"
@@ -251,12 +255,40 @@ class _Run:
 
     def _add_version(self, asset: Asset, rec: AssetRecord, valid_from: dt.date) -> list:
         b = rec.boundary
-        return bsvc.add_version(
+        rows = bsvc.add_version(
             self.db, asset, kind=b.kind, status=b.status, geometry=b.geometry, source_name=b.source_name,
             source_url=b.source_url, source_date=b.source_date, notification_ref=b.notification_ref,
             certified_by=b.certified_by, valid_from=valid_from, actor_id=self.actor_id, at=self.now,
             source_snapshot_id=self.snapshots[b.dataset].id, positional_accuracy_m=b.positional_accuracy_m,
         )
+        self._tag_boundary(asset, rec)
+        return rows
+
+    def _tag(self, asset: Asset, snap: SourceSnapshot, *, doc_type: str, title: str, reference: str | None,
+             issued_on: dt.date | None = None, source_url: str | None = None) -> None:
+        doc = doc_svc.tag_once(
+            self.db, asset, doc_type=doc_type, title=title, reference=reference, source_snapshot_id=snap.id,
+            issued_on=issued_on, issued_by=self.c.agency, source_url=source_url, file_key=snap.storage_key,
+            file_sha256=snap.sha256, file_name=snap.file_name, content_type=snap.content_type,
+            actor_id=self.actor_id, at=self.now,
+        )
+        if doc is not None:
+            self.count("documents_tagged")
+
+    def _tag_boundary(self, asset: Asset, rec: AssetRecord) -> None:
+        """The document behind a boundary: its notification, its recovery order, or the outline file."""
+        b = rec.boundary
+        snap = self.snapshots[b.dataset]
+        if b.status in (BoundaryStatus.final_notification.value, BoundaryStatus.preliminary_notification.value) and b.notification_ref:
+            kind = "Final" if b.status == BoundaryStatus.final_notification.value else "Preliminary"
+            self._tag(asset, snap, doc_type="notification", title=f"{kind} FTL notification {b.notification_ref}",
+                      reference=b.notification_ref, issued_on=b.source_date, source_url=b.source_url)
+        elif b.status == BoundaryStatus.physically_marked.value and b.notification_ref:
+            self._tag(asset, snap, doc_type="recovery_order", title=f"Recovery order {b.notification_ref}",
+                      reference=b.notification_ref, issued_on=b.source_date, source_url=b.source_url)
+        else:
+            self._tag(asset, snap, doc_type="survey_map", title=f"Outline from {self.c.agency}, not a notification",
+                      reference=None, issued_on=b.source_date, source_url=b.source_url)
 
     def _fill_blanks(self, asset: Asset, rec: AssetRecord) -> list[str]:
         """Add what the asset lacks. Never overwrite another source's values."""
@@ -409,14 +441,27 @@ class _Run:
                 self.count("warnings")
                 self.item("warning", f"{self.c.name}:{row['village']}/{label}",
                           reason=f"drawn area differs from the recorded extent by {diff:+.0f}%")
-        # Every asset these parcels touch gets its survey numbers refreshed.
-        self.touched_assets |= set(self.db.scalars(text(
+        # Every asset these parcels touch gets its survey numbers refreshed and its land records tagged.
+        self.parcel_assets = set(self.db.scalars(text(
             """
             SELECT DISTINCT b.asset_id FROM boundaries b JOIN assets a ON a.id = b.asset_id
             WHERE a.is_demo = :demo AND b.kind IN ('ftl', 'parcel', 'buffer')
               AND ST_Intersects(b.geom, (SELECT ST_Union(geom) FROM land_parcels WHERE snapshot_id = :s))
             """
         ), {"demo": self.is_sample, "s": snap.id}))
+        self.touched_assets |= self.parcel_assets
+
+    def tag_land_records(self) -> None:
+        """Each asset the new parcels touch carries the village map and the Record of Rights extract."""
+        for asset_id in sorted(self.parcel_assets):
+            asset = self.db.get(Asset, asset_id)
+            for snap in self.snapshots.values():
+                if snap.dataset == "ror":
+                    self._tag(asset, snap, doc_type="land_record", title="Record of Rights extract (land category and extent, no names)",
+                              reference=None, issued_on=snap.source_date)
+                elif snap.dataset == "parcels":
+                    self._tag(asset, snap, doc_type="survey_map", title="Village cadastral map (survey-number parcels)",
+                              reference=None, issued_on=snap.source_date)
 
     def refresh_survey_numbers(self) -> None:
         for asset_id in sorted(self.touched_assets):
@@ -492,6 +537,7 @@ def run(
             r.asset(rec)
         r.parcels(parsed.parcels)
         r.refresh_survey_numbers()
+        r.tag_land_records()
 
         finished = max(dt.datetime.now(dt.timezone.utc), started)
         report = {

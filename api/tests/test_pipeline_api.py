@@ -68,7 +68,7 @@ def test_run_is_recorded_with_coverage_and_shown_on_assets(client, db):
     resp = client.post("/pipeline/runs", json=_run([real.id]), headers=TOKEN)
     assert resp.status_code == 201, resp.text
     assert resp.json()["coverage"] == {"no_candidate": 1}
-    analyst = make_user(db, "analyst")
+    analyst = make_user(db, "viewer")
     feats = client.get("/assets?dataset=real", headers=auth(analyst)).json()["features"]
     mine = next(f for f in feats if f["id"] == real.id)["properties"]
     assert mine["screen_status"] == "no_candidate"
@@ -107,7 +107,7 @@ def test_screening_tables_are_append_only(client, db):
 def test_dataset_filter_keeps_real_and_demo_apart(client, db):
     real = _real(db)
     demo = make_asset(db)
-    analyst = make_user(db, "analyst")
+    analyst = make_user(db, "viewer")
     real_ids = {f["id"] for f in client.get("/assets?dataset=real", headers=auth(analyst)).json()["features"]}
     demo_ids = {f["id"] for f in client.get("/assets?dataset=demo", headers=auth(analyst)).json()["features"]}
     assert real.id in real_ids and real.id not in demo_ids
@@ -151,3 +151,69 @@ def test_ten_pixels_on_the_pipeline_grid_meet_the_minimum_area(db):
     strip = json.loads(db.scalar(text("SELECT ST_AsGeoJSON(ST_Transform(ST_MakeEnvelope(:x, :y, :x + 100, :y + 9.999999999, 32644), 4326), 15)"), {"x": x, "y": y}))
     out = ingest_svc.ingest(db, candidate_in(asset, geometry=strip), at=dt.datetime(2025, 6, 20, 6, tzinfo=dt.timezone.utc))
     assert out["outcome"] in {"created", "closed_by_legal_check"}
+
+
+# The weekly record of each asset (DECISIONS.md D-057) -----------------------------------------
+
+def _png() -> str:
+    from tests.factories import PNG_B64
+
+    return PNG_B64
+
+
+def test_weekly_record_keeps_the_image_and_names_the_change(client, db):
+    from app.services import ingest as ingest_svc
+    from tests.factories import candidate_in
+
+    real = _real(db)
+    out = ingest_svc.ingest(db, candidate_in(real, change_type="levelling", first_changed=dt.date(2026, 11, 1), last_clear=dt.date(2026, 10, 25)),
+                            at=dt.datetime(2026, 11, 20, 10, 1, tzinfo=dt.timezone.utc))
+    body = _run([real.id])
+    body["assets"][0] |= {"status": "candidate_found", "image_png_b64": _png(), "image_date": "2026-11-18", "image_scene_id": "S2-TEST",
+                          "changes": [{"candidate_id": out["candidate_id"], "alert_id": out["alert_id"], "outcome": out["outcome"]}]}
+    assert client.post("/pipeline/runs", json=body, headers=TOKEN).status_code == 201
+    viewer = make_user(db, "viewer")
+    weeks = client.get(f"/assets/{real.id}/weeks", headers=auth(viewer)).json()["items"]
+    assert len(weeks) == 1
+    w = weeks[0]
+    assert w["week"] == "2026-W47" and w["has_image"] and w["image_scene_id"] == "S2-TEST" and w["status_label"] == "Change found"
+    assert w["changes"][0]["change_label"] == "Levelling" and w["changes"][0]["alert_code"] == out["alert_code"]
+    image = client.get(f"/assets/{real.id}/weeks/{w['screen_id']}/image", headers=auth(viewer))
+    assert image.status_code == 200 and image.content.startswith(b"\x89PNG")
+
+
+def test_weekly_record_finds_changes_the_screen_did_not_list(client, db):
+    from app.services import ingest as ingest_svc
+    from tests.factories import candidate_in
+
+    real = _real(db)
+    out = ingest_svc.ingest(db, candidate_in(real, first_changed=dt.date(2026, 11, 1), last_clear=dt.date(2026, 10, 25)),
+                            at=dt.datetime(2026, 11, 20, 10, 2, tzinfo=dt.timezone.utc))
+    body = _run([real.id])
+    body["assets"][0]["status"] = "candidate_found"
+    assert client.post("/pipeline/runs", json=body, headers=TOKEN).status_code == 201
+    weeks = client.get(f"/assets/{real.id}/weeks", headers=auth(make_user(db, "viewer"))).json()["items"]
+    assert [c["candidate_id"] for c in weeks[0]["changes"]] == [out["candidate_id"]]
+
+
+def test_weekly_record_refuses_an_image_after_as_of_or_a_foreign_change(client, db):
+    from app.services import ingest as ingest_svc
+    from tests.factories import candidate_in
+
+    real, other = _real(db), _real(db)
+    body = _run([real.id])
+    body["assets"][0] |= {"image_png_b64": _png(), "image_date": "2026-11-21"}
+    assert client.post("/pipeline/runs", json=body, headers=TOKEN).status_code == 422
+    out = ingest_svc.ingest(db, candidate_in(other, first_changed=dt.date(2026, 11, 1), last_clear=dt.date(2026, 10, 25)),
+                            at=dt.datetime(2026, 11, 20, 10, 3, tzinfo=dt.timezone.utc))
+    body = _run([real.id])
+    body["assets"][0] |= {"status": "candidate_found", "changes": [{"candidate_id": out["candidate_id"]}]}
+    assert client.post("/pipeline/runs", json=body, headers=TOKEN).status_code == 422
+
+
+def test_screening_runs_are_listed_per_dataset(client, db):
+    real = _real(db)
+    client.post("/pipeline/runs", json=_run([real.id]), headers=TOKEN)
+    viewer = make_user(db, "viewer")
+    assert len(client.get("/screening/runs?dataset=real", headers=auth(viewer)).json()["items"]) >= 1
+    assert client.get("/screening/runs?dataset=demo", headers=auth(viewer)).json()["items"] == []

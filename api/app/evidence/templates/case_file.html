@@ -90,25 +90,25 @@
   {% for f in hashed_files %}<tr><td>{{ f.path }}</td><td>{{ f.kind }}</td><td>{{ f.sha256 }}</td></tr>{% endfor %}
 </table>
 
-<h2>5. Field record</h2>
-{% for f in field_checks %}
+<h2>5. Reviews by officials</h2>
+{% for r in reviews %}
 <table>
-  <tr><th>Officer</th><td>{{ f.officer }}</td></tr>
-  <tr><th>Outcome</th><td>{{ f.outcome_label }}{% if f.observed_stage %}, {{ f.stage_label }}{% endif %}</td></tr>
-  <tr><th>Observed at</th><td>{{ f.observed_at }} (device clock {{ f.device_time or "not sent" }}; received by the server {{ f.synced_at }})</td></tr>
-  <tr><th>Geotag</th><td>{{ f.lat }}, {{ f.lon }} (accuracy {{ f.gps_accuracy_m }} m), {{ f.distance_to_candidate_m }} m from the change</td></tr>
-  <tr><th>Notes</th><td>{{ f.notes or "None" }}</td></tr>
+  <tr><th>Reviewer</th><td>{{ r.reviewer }}, {{ r.reviewed_at }}</td></tr>
+  <tr><th>Review</th><td>{{ r.outcome_label }}</td></tr>
+  <tr><th>Note</th><td>{{ r.note }}</td></tr>
 </table>
-<div class="photos">{% for p in f.photos %}<img src="{{ p }}" alt="Field photo">{% endfor %}</div>
-{% else %}<p class="gap">No field record yet.</p>{% endfor %}
+{% else %}<p class="gap">No review recorded.</p>{% endfor %}
 
-<h2>6. Case-readiness checklist</h2>
-<p class="muted">The checklist informs the officer. It does not replace the officer's judgement.</p>
+<h2>6. Decision</h2>
 <table>
-  <tr><th>Item</th><td><b>Status, evidence and who checked it</b></td></tr>
-  {% for r in checklist %}<tr><th>{{ r.label }}</th><td>{% if r.status %}<b{% if r.status == "no" %} class="gap"{% endif %}>{{ r.status_label }}</b>{% if r.evidence_ref %}. {{ r.evidence_ref }}{% endif %}. {{ r.checked_by }}, {{ r.checked_at }}{% else %}<span class="gap">Not recorded</span>{% endif %}</td></tr>{% endfor %}
+  <tr><th>Step</th><td><b>Who, when and why</b></td></tr>
+  {% for d in decisions %}<tr><th>{{ d.step }}</th><td>{{ d.actor }}, {{ d.at }}{% if d.note %}. {{ d.note }}{% endif %}</td></tr>{% endfor %}
 </table>
-{% if title_claims %}<p>Title claims entered after field confirmation: {{ title_claims | join(", ") }}. Claimant details are held in the system for the legal officer.</p>{% endif %}
+<h3>Legal documents tagged to this asset</h3>
+{% if documents %}<table>
+  <tr><th>Document</th><td><b>Reference, date and file hash</b></td></tr>
+  {% for d in documents %}<tr><th>{{ d.title }}</th><td>{{ d.reference or "No reference" }}{% if d.issued_on %}, {{ d.issued_on }}{% endif %}{% if d.sha256 %}. SHA-256 {{ d.sha256 }}{% else %}. <span class="gap">No file held</span>{% endif %}</td></tr>{% endfor %}
+</table>{% else %}<p class="gap">No legal documents are tagged to this asset.</p>{% endif %}
 
 <div class="cert">
 <h2>7. Section 63(4) certificate (template)</h2>

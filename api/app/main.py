@@ -4,10 +4,10 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.db import get_db
-from app.routers import alerts, assets, audit, auth, bulletins, candidates, pipeline, records, sources, tiles, users
+from app.routers import alerts, assets, audit, auth, bulletins, candidates, documents, pipeline, records, sources, tiles, users
 
 app = FastAPI(title="Lake Protect API", version="0.1.0")
-for module in (auth, assets, candidates, pipeline, alerts, records, sources, audit, users, tiles, bulletins):
+for module in (auth, assets, candidates, pipeline, alerts, records, sources, documents, audit, users, tiles, bulletins):
     app.include_router(module.router)
 
 

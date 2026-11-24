@@ -1,10 +1,11 @@
 # Detection rules (CONTEXT.md section 8.4). detect-v0 was the section 8.4 starting values;
 # detect-v1 adds the novelty, established and merge rules and the radar check, from the five
-# tuning lakes (DECISIONS.md D-042, D-045, D-050, D-051). Every candidate stores `rule_version`.
+# tuning lakes (DECISIONS.md D-042, D-045, D-050, D-051). detect-v2 adds levelling: bare earth
+# exposed on ground that had no dense vegetation (D-058). Every candidate stores `rule_version`.
 # Change any value only with a new version string, and tag it in git before a scored run
 # (section 8.6). Thresholds start from section 8.4 and change only on evidence from the tuning
 # lakes, which are never among the scored backtest cases (reports/m2-tuning/README.md).
-rule_version: detect-v1
+rule_version: detect-v2
 
 sentinel2:
   stac_url: https://earth-search.aws.element84.com/v1
@@ -47,11 +48,15 @@ transitions:
   water>bare: soil_fill
   water>built: soil_fill
   veg>bare: clearing
+  # Levelling: ground that was neither water nor dense vegetation (scrub, grass, mixed cover)
+  # scraped to bare earth. Clearing removes dense vegetation first; levelling exposes earth.
+  other>bare: levelling
   veg>built: building
   bare>built: building
 stage_by_change:
   soil_fill: soil_dumped
   clearing: land_levelled
+  levelling: land_levelled
   building: building_rises
 
 controls:

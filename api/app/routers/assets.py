@@ -4,7 +4,7 @@ from __future__ import annotations
 import datetime as dt
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -16,6 +16,8 @@ from app.models import Asset, User
 from app.rules import config as rules
 from app.security import current_user, require_roles
 from app.services import boundaries as bsvc
+from app.services import weeks as weeks_svc
+from app.storage import store
 
 router = APIRouter(tags=["assets"])
 
@@ -61,8 +63,8 @@ def _feature(row: dict) -> dict:
 
 
 def _area_user(user: User) -> int | None:
-    # Field officers see only their area (section 10).
-    return user.id if user.role == Role.field_officer.value else None
+    # Every role sees every asset since the roles were reduced to admin and viewer (D-057).
+    return None
 
 
 def _demo_flag(dataset: str | None) -> bool | None:
@@ -122,7 +124,7 @@ class BoundaryIn(BaseModel):
 def add_boundary(
     asset_id: int,
     body: BoundaryIn,
-    user: User = Depends(require_roles(Role.admin, Role.nodal_officer)),
+    user: User = Depends(require_roles(Role.admin)),
     db: Session = Depends(get_db),
 ) -> dict:
     """New version, never an update."""
@@ -143,3 +145,25 @@ def add_boundary(
         "version": rows[0].version,
         "boundaries": [{"id": r.id, "kind": r.kind, "version": r.version, "status": r.status, "sha256": r.sha256} for r in rows],
     }
+
+
+@router.get("/assets/{asset_id}/weeks")
+def asset_weeks(asset_id: int, limit: int = Query(26, ge=1, le=260), user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """The asset week by week: seen or not, the week's image, and what changed (D-057)."""
+    asset = db.get(Asset, asset_id)
+    if asset is None:
+        raise HTTPException(404, "Asset not found")
+    items = weeks_svc.weeks_for_asset(db, asset_id, limit)
+    chain.record(db, actor_id=user.id, action="view.asset_weeks", entity="asset", entity_id=asset_id, details={"weeks": len(items)})
+    db.commit()
+    return {"asset_id": asset_id, "asset_key": asset.asset_key, "is_demo": asset.is_demo, "items": items}
+
+
+@router.get("/assets/{asset_id}/weeks/{screen_id}/image")
+def asset_week_image(asset_id: int, screen_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> Response:
+    key = weeks_svc.image_key(db, asset_id, screen_id)
+    if not key or store.head_object(key) is None:
+        raise HTTPException(404, "No image for this week")
+    chain.record(db, actor_id=user.id, action="view.week_image", entity="asset", entity_id=asset_id, details={"screen_id": screen_id})
+    db.commit()
+    return Response(store.get_object(key), media_type="image/png", headers={"Cache-Control": "private, max-age=86400"})

@@ -23,9 +23,9 @@ function monthName(month: string, lang: string): string {
   return new Date(month + "-01T00:00:00Z").toLocaleDateString(lang === "te" ? "te-IN" : "en-IN", { month: "long", year: "numeric", timeZone: "UTC" });
 }
 
-const FIGURES = ["watched", "new_alerts", "verified", "action_taken", "overdue"] as const;
+const FIGURES = ["watched", "new_alerts", "reviewed", "confirmed", "waiting"] as const;
 
-/** Section 9.4: one page a month for senior officers, from the database only. */
+/** Section 9.4: one page a month for the officials, from the database only (incidents since D-057). */
 export function Monthly() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
@@ -73,31 +73,32 @@ export function Monthly() {
         <>
           <div className="figures">
             {FIGURES.map((k) => (
-              <div key={k} className={`figure ${k === "overdue" && data.counts.overdue > 0 ? "late" : ""}`} data-testid={`figure-${k}`}>
+              <div key={k} className={`figure ${k === "waiting" && data.counts.waiting > 0 ? "late" : ""}`} data-testid={`figure-${k}`}>
                 <b>{data.counts[k]}</b>
-                <span>{t(`monthly.${k}`)}</span>
-                <small>{t(k === "overdue" ? "monthly.was_end" : "monthly.was", { n: data.last_month.counts[k], month: monthName(data.last_month.month, lang) })}</small>
+                <span>{t(`monthly.${k}`, { days: data.wait_days })}</span>
+                <small>{t(k === "waiting" ? "monthly.was_end" : "monthly.was", { n: data.last_month.counts[k], month: monthName(data.last_month.month, lang) })}</small>
               </div>
             ))}
           </div>
           <div className="monthly-grid">
             <figure className="monthly-map">
               <div dangerouslySetInnerHTML={{ __html: data.map_svg }} />
-              <figcaption className="small muted">{t("monthly.map_legend")}</figcaption>
+              <figcaption className="small muted">{t("monthly.map_legend", { days: data.wait_days })}</figcaption>
             </figure>
             <div>
-              <h2>{t("monthly.by_who")}</h2>
-              {data.overdue_by_responsible.length === 0 && <p className="muted">{t("monthly.none")}</p>}
-              <ul className="who-list">
-                {data.overdue_by_responsible.map((r: any) => <li key={r.responsible}><span>{r.responsible}</span><b>{r.count}</b></li>)}
+              <h2>{t("monthly.what_changed")}</h2>
+              {Object.keys(data.change_types).length === 0 && <p className="muted">{t("monthly.no_new")}</p>}
+              <ul className="who-list" data-testid="change-types">
+                {Object.entries(data.change_types).map(([k, n]) => <li key={k}><span>{t(`change.${k}`)}</span><b>{n as number}</b></li>)}
               </ul>
-              <h2 style={{ marginTop: "1.5rem" }}>{t("monthly.list")}</h2>
-              <ul className="overdue-list" data-testid="overdue-list">
-                {data.overdue.map((o: any) => (
+              <h2 style={{ marginTop: "1.5rem" }}>{t("monthly.list", { days: data.wait_days })}</h2>
+              {data.waiting.length === 0 && <p className="muted">{t("monthly.none", { days: data.wait_days })}</p>}
+              <ul className="overdue-list" data-testid="waiting-list">
+                {data.waiting.map((o: any) => (
                   <li key={o.alert_id}>
                     <Link to={`/alerts/${o.alert_id}`}>{o.asset_name}</Link>
-                    <span className="small muted">{o.code}, {t(`state.${o.state}`)}, {o.responsible}</span>
-                    <b className="flag-overdue">{t("monthly.days_late", { n: o.days_overdue })}</b>
+                    <span className="small muted">{o.code}, {t(`state.${o.state}`)}</span>
+                    <b className="flag-overdue">{t("monthly.days_waiting", { n: o.days_waiting })}</b>
                   </li>
                 ))}
               </ul>

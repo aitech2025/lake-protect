@@ -2,18 +2,44 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
-import { api, fmtDate, fmtDateTime } from "../api";
-import { useAuth } from "../auth";
+import { API_BASE, api, authHeaders, fmtDate, fmtDateTime } from "../api";
+import { isAdmin, useAuth } from "../auth";
 import { AuthImage, BoundarySeal, LineSwatch, StatePill, useAsync, usePageTitle } from "../components/Bits";
 import { DatedBracket } from "../components/DatedBracket";
 import { MapView } from "../components/MapView";
 import { PageState } from "../components/PageState";
 import { useDemoOnScreen } from "../demo";
-import { CaseFilePanel, Checklist } from "./CaseFile";
-import { OfficerRecordPanel } from "./OfficerRecord";
 
-type Action = { to: string; label: string; two_person: boolean; signer: string; enabled: boolean; blocked_reason: string | null; needs: string[] };
-const REASON_CODES = ["cloud_shadow", "seasonal_water", "transient_object", "crop_cycle", "image_artefact", "other"];
+const OUTCOMES = ["real_change", "not_real", "needs_site_visit"] as const;
+
+async function download(path: string): Promise<void> {
+  const res = await fetch(API_BASE + path, { headers: authHeaders() });
+  if (!res.ok) throw new Error(String(res.status));
+  const url = URL.createObjectURL(await res.blob());
+  const a = document.createElement("a");
+  a.href = url;
+  a.target = "_blank";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
+
+/** One plain sentence: what changed, how big, where, and when it was first seen. */
+export function ChangeSummary({ a }: { a: any }) {
+  const { t, i18n } = useTranslation();
+  const zone = a.zone ? t(a.asset_type === "recovered_parcel" && a.zone === "inside_ftl" ? "incident.where.parcel_inside" : `incident.where.${a.zone}`) : "";
+  return (
+    <p className="change-summary" data-testid="change-summary">
+      {t("incident.summary", {
+        change: t(`change.${a.change_type}`),
+        area: Math.round(a.area_sq_m).toLocaleString("en-IN"),
+        zone,
+        date: fmtDate(a.first_changed_at, i18n.language),
+      })}
+    </p>
+  );
+}
 
 export function AlertDetail() {
   const { id } = useParams();
@@ -27,7 +53,6 @@ export function AlertDetail() {
     () => ({ type: "FeatureCollection" as const, features: a ? [{ type: "Feature" as const, properties: {}, geometry: a.candidate.geometry }] : [] }),
     [a],
   );
-
   const titleName = a ? (lang === "te" && a.asset.name_te ? a.asset.name_te : a.asset.name) : null;
   usePageTitle(titleName ? `${titleName} · ${t("nav.queue")}` : t("nav.queue"));
 
@@ -54,20 +79,17 @@ export function AlertDetail() {
           <h1 style={{ marginTop: "0.35rem" }}>{assetName}</h1>
           <div className="sub">
             <StatePill state={a.state} />
-            <span>{t(`change.${cand.change_type}`)}</span>
+            {a.resolution && <span data-testid="resolution">{t(`resolution.${a.resolution}`)}</span>}
+            <span className="change-type" data-testid="change-type">{t(`change.${cand.change_type}`)}</span>
             <span>{t("queue.acres", { acres: a.area_acres })}</span>
             {cand.stage_estimate && <span>{t(`stage.${cand.stage_estimate}`)}</span>}
-            {a.overdue && <span className="flag-overdue">{t("queue.overdue", { date: fmtDate(a.due_at, lang) })}</span>}
-            {!a.overdue && a.due_at && <span>{t("queue.due", { date: fmtDate(a.due_at, lang) })}</span>}
-            {a.escalation_level > 0 && <span>{t("detail.escalated", { n: a.escalation_level })}</span>}
-            {a.owner_name && <span>{t("queue.owner", { name: a.owner_name })}</span>}
           </div>
         </div>
         <BoundarySeal status={a.boundary.status} version={a.boundary.version} />
       </div>
+      <ChangeSummary a={a} />
+      <Flags a={a} />
 
-      {/* The decision panel comes first in the page order: beside the evidence on wide screens,
-          directly under the header on narrow ones (UI audit A8). */}
       <div className="detail">
         <section className="panel detail-decision" aria-labelledby="next-step-title">
           <h2 id="next-step-title" className="title-s">{t("detail.actions_title")}</h2>
@@ -90,7 +112,7 @@ export function AlertDetail() {
               <div className="img-legend">
                 <span><LineSwatch colour="#46a0ff" />{isParcel ? t("zone_parcel.inside_ftl") : t("zone.inside_ftl")}</span>
                 {!isParcel && <span><LineSwatch colour="#e6463c" dash="4 3" />{t("zone.buffer")}</span>}
-                <span><LineSwatch colour="#ffd640" dash="3 3" />{t("detail.type")}</span>
+                <span><LineSwatch colour="#ffd640" dash="3 3" />{t(`change.${cand.change_type}`)}</span>
                 <span>{t("detail.sensor")}: {t(`sensor.${cand.sensor_basis}`)}{cand.optical_confirmation_pending ? `, ${t("sensor.pending")}` : ""}</span>
                 {obs[0] && <span>{obs[0].licence_notice}</span>}
               </div>
@@ -115,47 +137,34 @@ export function AlertDetail() {
             </div>
           </section>
 
-          {a.field_checks.length > 0 && (
-            <section className="section panel">
-              <h2 className="title-s">{t("detail.field_title")}</h2>
-              {a.field_checks.map((f: any) => (
-                <p key={f.id} className="small" style={{ marginTop: "0.5rem" }}>
-                  <b>{f.officer}</b>, {fmtDateTime(f.observed_at, lang)}: {f.outcome === "confirmed" ? t("state.FIELD_CONFIRMED") : f.outcome === "false_alarm" ? t("state.CLOSED_FALSE_ALARM") : t("form.reason")}
-                  {f.observed_stage ? `, ${t(`stage.${f.observed_stage}`)}` : ""}. {t("detail.photos", { count: f.photo_count })}.{" "}
-                  {f.distance_to_candidate_m !== null && t("detail.distance", { m: Math.round(f.distance_to_candidate_m) })}
-                  {f.notes ? ` ${f.notes}` : ""}
-                  <span className="photo-row">
-                    {Array.from({ length: f.photo_count }, (_, n) => (
-                      <AuthImage key={n} path={`/alerts/${a.id}/field-checks/${f.id}/photos/${n + 1}`} alt={`${t("detail.field_title")} ${n + 1}`} className="photo-thumb" />
-                    ))}
-                  </span>
-                </p>
+          <section className="section panel" data-testid="reviews">
+            <h2 className="title-s">{t("review.title")}</h2>
+            {a.reviews.length === 0 && <p className="muted small" style={{ marginTop: "0.5rem" }}>{t("review.none")}</p>}
+            <ul className="review-list">
+              {a.reviews.map((r: any) => (
+                <li key={r.id} data-outcome={r.outcome}>
+                  <b>{t(`review.outcome.${r.outcome}`)}</b>
+                  <span className="small muted">{r.reviewer}, {fmtDateTime(r.reviewed_at, lang)}</span>
+                  <span>{r.note}</span>
+                </li>
               ))}
-            </section>
-          )}
-
-          <Checklist alert={a} onChange={reload} />
+            </ul>
+          </section>
 
           <p className="statement" data-testid="statement">{t("statement.imagery")}</p>
         </div>
 
         <aside className="detail-side">
-          <OfficerRecordPanel alert={a} onChange={reload} />
-
-          <CaseFilePanel alert={a} onChange={reload} />
+          <EvidencePanel alert={a} onChange={reload} />
 
           <div className="panel" data-testid="legal-panel">
             <h2 className="title-s">{t("detail.checks_title")}</h2>
-            {lc?.permit_conflict && <p className="banner warn" style={{ marginTop: "0.6rem" }}>{t("detail.permit_conflict")}</p>}
-            {lc?.live_court_matter_now && <p className="banner stop" style={{ marginTop: "0.6rem" }}>{t("detail.live_court", { id: lc.live_court_matter_now })}</p>}
             {lc && (
               <dl className="facts" style={{ marginTop: "0.75rem" }}>
                 <dt>{t("detail.zone")}</dt>
                 <dd>{t(isParcel && lc.zone === "inside_ftl" ? "zone_parcel.inside_ftl" : `zone.${lc.zone}`)}</dd>
                 <dt>{t("detail.boundary")}</dt>
                 <dd>{t(`boundary.${lc.boundary_status}`)}, {t("boundary.version", { v: lc.boundary_version })}</dd>
-                <dt>{t("detail.mode")}</dt>
-                <dd>{t(`mode.${a.asset.mode}`)}</dd>
                 <dt>{t("detail.class")}</dt>
                 <dd>{t(`class.${lc.alert_class}`)}</dd>
                 <dt>{t("detail.permits")}</dt>
@@ -166,6 +175,8 @@ export function AlertDetail() {
                 <dd>{lc.matched_court_case_id || lc.live_court_matter_now ? t("detail.live_court", { id: lc.matched_court_case_id ?? lc.live_court_matter_now }) : t("detail.none_found")}</dd>
                 <dt>{t("detail.confidence")}</dt>
                 <dd>{Math.round(cand.confidence * 100)}%</dd>
+                <dt>{t("incident.documents")}</dt>
+                <dd><Link to={`/assets?asset=${a.asset.id}`}>{t("incident.documents_count", { count: a.asset.documents })}</Link></dd>
               </dl>
             )}
             {lc && <p className="small muted" style={{ marginTop: "0.6rem" }}>{t("detail.rule_version", { v: lc.rule_version })}</p>}
@@ -194,10 +205,10 @@ export function AlertDetail() {
             <h2 className="title-s">{t("detail.timeline_title")}</h2>
             <ol className="timeline" style={{ marginTop: "0.75rem" }} data-testid="timeline">
               {a.timeline.slice().reverse().map((e: any) => (
-                <li key={e.id} className={e.action === "timer.missed" ? "miss" : undefined}>
+                <li key={e.id}>
                   <b>{timelineText(e, t)}</b>
                   {fmtDateTime(e.at, lang)}{e.actor_role !== "system" ? `, ${t("timeline.by", { name: e.actor })}` : ""}
-                  {e.details?.reason ? <span className="muted">. {e.details.reason}</span> : null}
+                  {e.details?.note ? <span className="muted">. {e.details.note}</span> : null}
                 </li>
               ))}
             </ol>
@@ -208,12 +219,23 @@ export function AlertDetail() {
   );
 }
 
+function Flags({ a }: { a: any }) {
+  const { t } = useTranslation();
+  const lc = a.legal_check;
+  return (
+    <div className="flags" data-testid="flags">
+      {lc?.auto_close_reason && <p className="banner info">{t(`incident.auto.${lc.verdict}`, { defaultValue: lc.auto_close_reason })}</p>}
+      {(a.court_matter || lc?.live_court_matter_now) && <p className="banner stop">{t("incident.court")}</p>}
+      {!a.boundary_confirmed && <p className="banner warn">{t("incident.boundary_unconfirmed")}</p>}
+      {lc?.permit_conflict && <p className="banner warn">{t("detail.permit_conflict")}</p>}
+      {a.related && <p className="banner info">{t("incident.related")} <Link to={`/alerts/${a.related.id}`}>{a.related.code}</Link></p>}
+    </div>
+  );
+}
+
 function timelineText(e: any, t: (k: string, o?: any) => string): string {
-  if (e.action === "alert.transition") {
-    if (e.details?.reopened) return t("timeline.reopened");
-    return t("timeline.alert.transition", { to: t(`state.${e.details?.to}`) });
-  }
-  if (e.action === "timer.missed") return t("timeline.timer.missed", { notify: t(`notify.${e.details?.notify}`) });
+  if (e.action === "alert.transition") return t("timeline.alert.transition", { to: t(`state.${e.details?.to}`) });
+  if (e.action === "incident.reviewed") return t("timeline.incident.reviewed", { outcome: t(`review.outcome.${e.details?.outcome}`) });
   const key = `timeline.${e.action}`;
   const text = t(key);
   return text === key ? e.action : text;
@@ -222,34 +244,29 @@ function timelineText(e: any, t: (k: string, o?: any) => string): string {
 function Actions({ alert, onDone }: { alert: any; onDone: () => void }) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const actions: Action[] = alert.allowed_actions;
-  // A counter makes the same message text count as a new result, so focus still moves to it.
   const [message, setMessage] = useState<{ text: string; n: number } | null>(null);
   const messageRef = useRef<HTMLParagraphElement>(null);
-  const canRequestImagery = user && ["analyst", "nodal_officer"].includes(user.role) && !alert.state.startsWith("CLOSED");
   const show = (text: string) => setMessage((m) => ({ text, n: (m?.n ?? 0) + 1 }));
-
-  // After an action, focus its result: the button that started it may be gone (UI audit A4).
   useEffect(() => {
     if (message) messageRef.current?.focus();
   }, [message]);
 
-  // Owner decision D1: forward steps first, closures after. Every action the server allows is
-  // still shown with its own label; only the order changes (the sort is stable within each group).
-  const shown = actions
-    .filter((x) => !x.needs.some((n) => n.startsWith("field_check")))
-    .sort((x, y) => Number(x.to.startsWith("CLOSED")) - Number(y.to.startsWith("CLOSED")));
+  const actions: any[] = alert.allowed_actions;
+  const review = actions.find((x) => x.action === "review");
+  const steps = actions.filter((x) => x.action === "transition");
+  const admin = isAdmin(user);
+  const open = !["CLOSED"].includes(alert.state);
 
   return (
     <div className="actions" style={{ marginTop: "0.75rem" }} data-testid="actions">
-      {alert.pending_closures.map((p: any) => (
-        <p key={p.id} className="banner info">{t("detail.pending_closure", { name: p.requested_by, reason: p.reason })}</p>
+      {actions.length === 0 && (
+        <p className="muted small">{alert.state === "CLOSED" ? t("action.closed") : admin ? t("action.wait_review") : t("action.none")}</p>
+      )}
+      {review && <ReviewForm alertId={alert.id} already={review.already_reviewed} onDone={(msg) => { show(msg); onDone(); }} />}
+      {steps.map((x) => (
+        <DecisionForm key={x.to} alertId={alert.id} to={x.to} onDone={(msg) => { show(msg); onDone(); }} />
       ))}
-      {actions.length === 0 && <p className="muted small">{t("action.none")}</p>}
-      {shown.map((x) => (
-        <ActionForm key={x.to + x.signer} alertId={alert.id} action={x} onDone={(msg) => { show(msg); onDone(); }} />
-      ))}
-      {canRequestImagery && (
+      {admin && open && (
         <button className="btn quiet" onClick={() => api(`/alerts/${alert.id}/imagery-request`, { json: { provider: "commercial_archive" } }).then(() => show(t("detail.imagery_done")))}>
           {t("detail.imagery")}
         </button>
@@ -259,114 +276,128 @@ function Actions({ alert, onDone }: { alert: any; onDone: () => void }) {
   );
 }
 
-function ActionForm({ alertId, action, onDone }: { alertId: number; action: Action; onDone: (msg: string) => void }) {
+function ReviewForm({ alertId, already, onDone }: { alertId: number; already: boolean; onDone: (msg: string) => void }) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const [reason, setReason] = useState("");
-  const [code, setCode] = useState("");
-  const [reviewed, setReviewed] = useState(false);
-  const [owner, setOwner] = useState("");
-  const [due, setDue] = useState("");
-  const [caseRef, setCaseRef] = useState("");
-  const [gapReason, setGapReason] = useState("");
+  const [outcome, setOutcome] = useState<string>("");
+  const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const returnFocus = useRef(false);
-
-  // Opening the form moves focus into it; cancelling returns focus to the button that opened it,
-  // so keyboard users never land on the page body (UI audit A4).
-  useEffect(() => {
-    if (open) headingRef.current?.focus();
-    else if (returnFocus.current) {
-      returnFocus.current = false;
-      triggerRef.current?.focus();
-    }
-  }, [open]);
-  const cancel = () => {
-    returnFocus.current = true;
-    setOpen(false);
-  };
-  const { data: officers } = useAsync(
-    () => (action.needs.includes("field_owner") ? api<any[]>("/users?role=field_officer") : Promise.resolve([])),
-    [action.needs.join()],
-  );
-  const needs = new Set(action.needs);
-  const second = action.signer === "second";
-
-  if (!action.enabled) {
-    return (
-      <div className="action">
-        <button className="btn secondary" disabled>{t(`action.${action.to}`)}</button>
-        <p className="why">{action.blocked_reason}</p>
-      </div>
-    );
-  }
-
   const submit = async () => {
     setError(null);
-    const data: Record<string, unknown> = {};
-    if (needs.has("reason_code") && !second) data.reason_code = code;
-    if (needs.has("image_pair_reviewed")) data.image_pair_reviewed = reviewed;
-    if (needs.has("field_owner")) {
-      data.owner_user_id = Number(owner);
-      if (due) data.due_at = new Date(due + "T12:00:00Z").toISOString();
-    }
-    if (needs.has("case_status_ref")) data.case_status_ref = caseRef;
-    if (needs.has("gap_reason")) data.gap_reason = gapReason;
     try {
-      const out = await api<any>(`/alerts/${alertId}/transitions`, { json: { to: action.to, reason: reason || null, data } });
-      onDone(out.status === "awaiting_second_signature" ? t("action.awaiting") : t("action.done"));
-      setOpen(false);
+      await api(`/alerts/${alertId}/reviews`, { json: { outcome, note } });
+      setOutcome("");
+      setNote("");
+      onDone(t("review.saved"));
     } catch (e) {
       setError((e as Error).message);
     }
   };
+  return (
+    <form className="action review-form" data-testid="review-form" onSubmit={(e) => { e.preventDefault(); void submit(); }}>
+      <h3 className="title-xs">{t("review.form_title")}</h3>
+      {already && <p className="why">{t("review.already")}</p>}
+      <fieldset className="choices">
+        <legend className="sr-only">{t("review.form_title")}</legend>
+        {OUTCOMES.map((o) => (
+          <label key={o} className="check">
+            <input type="radio" name="outcome" value={o} checked={outcome === o} onChange={() => setOutcome(o)} data-testid={`review-${o}`} />
+            {t(`review.outcome.${o}`)}
+          </label>
+        ))}
+      </fieldset>
+      <label className="field">{t("review.note")}<textarea rows={3} value={note} onChange={(e) => setNote(e.target.value)} data-testid="review-note" /></label>
+      {error && <p className="error" role="alert">{error}</p>}
+      <button className="btn" type="submit" disabled={!outcome || !note.trim()} data-testid="review-submit">{t("review.submit")}</button>
+    </form>
+  );
+}
 
-  const danger = action.to.startsWith("CLOSED");
+function DecisionForm({ alertId, to, onDone }: { alertId: number; to: string; onDone: (msg: string) => void }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const [note, setNote] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (open) headingRef.current?.focus();
+  }, [open]);
+  const danger = to === "DISMISSED";
   if (!open) {
     return (
-      <button ref={triggerRef} className={`btn ${danger ? "danger" : ""}`} onClick={() => setOpen(true)} data-testid={`action-${action.to}`}>
-        {t(`action.${action.to}`)}
+      <button className={`btn ${danger ? "danger" : to === "CLOSED" ? "secondary" : ""}`} onClick={() => setOpen(true)} data-testid={`action-${to}`}>
+        {t(`action.${to}`)}
       </button>
     );
   }
+  const submit = async () => {
+    setError(null);
+    try {
+      await api(`/alerts/${alertId}/transitions`, { json: { to, note } });
+      setOpen(false);
+      setNote("");
+      onDone(t("action.done"));
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  };
   return (
-    <div className="action" data-testid={`form-${action.to}`}>
-      <h3 className="title-xs" tabIndex={-1} ref={headingRef}>{t(`action.${action.to}`)}</h3>
-      {action.two_person && <p className="why">{second ? t("action.second_signature") : t("action.first_signature")}</p>}
-      {needs.has("image_pair_reviewed") && (
-        <label className="check"><input type="checkbox" checked={reviewed} onChange={(e) => setReviewed(e.target.checked)} data-testid="input-reviewed" />{t("form.image_pair_reviewed")}</label>
-      )}
-      {needs.has("reason_code") && !second && (
-        <label className="field">{t("form.reason_code")}
-          <select value={code} onChange={(e) => setCode(e.target.value)} data-testid="input-code">
-            <option value="">{t("form.choose")}</option>
-            {REASON_CODES.map((c) => <option key={c} value={c}>{t(`form.codes.${c}`)}</option>)}
-          </select>
-        </label>
-      )}
-      {needs.has("field_owner") && (
-        <>
-          <label className="field">{t("form.owner")}
-            <select value={owner} onChange={(e) => setOwner(e.target.value)} data-testid="input-owner">
-              <option value="">{t("form.choose")}</option>
-              {(officers ?? []).map((o: any) => <option key={o.id} value={o.id}>{o.name}</option>)}
-            </select>
-          </label>
-          <label className="field">{t("form.due")}<input type="date" value={due} onChange={(e) => setDue(e.target.value)} /></label>
-        </>
-      )}
-      {needs.has("case_status_ref") && <label className="field">{t("form.case_status_ref")}<input value={caseRef} onChange={(e) => setCaseRef(e.target.value)} /></label>}
-      {needs.has("gap_reason") && <label className="field">{t("form.gap_reason")}<textarea rows={2} value={gapReason} onChange={(e) => setGapReason(e.target.value)} /></label>}
-      {(needs.has("reason") || second) && (
-        <label className="field">{t("form.reason")}<textarea rows={2} value={reason} onChange={(e) => setReason(e.target.value)} data-testid="input-reason" /></label>
-      )}
+    <div className="action" data-testid={`form-${to}`}>
+      <h3 className="title-xs" tabIndex={-1} ref={headingRef}>{t(`action.${to}`)}</h3>
+      <label className="field">{t("action.note")}<textarea rows={3} value={note} onChange={(e) => setNote(e.target.value)} data-testid="input-note" /></label>
       {error && <p className="error" role="alert">{error}</p>}
       <div style={{ display: "flex", gap: "0.5rem" }}>
-        <button className={`btn ${danger ? "danger" : ""}`} onClick={() => void submit()} data-testid="submit-action">{t("action.submit")}</button>
-        <button className="btn secondary" onClick={cancel}>{t("action.cancel")}</button>
+        <button className={`btn ${danger ? "danger" : ""}`} disabled={!note.trim()} onClick={() => void submit()} data-testid="submit-action">{t("action.submit")}</button>
+        <button className="btn secondary" onClick={() => setOpen(false)}>{t("action.cancel")}</button>
       </div>
+    </div>
+  );
+}
+
+function EvidencePanel({ alert, onChange }: { alert: any; onChange: () => void }) {
+  const { t, i18n } = useTranslation();
+  const { user } = useAuth();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const packs: any[] = alert.evidence_packs;
+  const latest = packs[packs.length - 1];
+  const canMake = isAdmin(user) && alert.resolution === "confirmed";
+  if (!latest && !canMake) return null;
+  const make = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await api(`/alerts/${alert.id}/evidence-pack`, { method: "POST" });
+      onChange();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="panel" data-testid="evidence-panel">
+      <h2 className="title-s">{t("pack.title")}</h2>
+      {latest ? (
+        <>
+          <p className="small" style={{ marginTop: "0.5rem" }}>
+            {t("pack.version", { v: latest.version })}, {fmtDateTime(latest.generated_at, i18n.language)}
+            <span className="obs-id small muted">SHA-256 {latest.manifest_sha256.slice(0, 16)}…</span>
+          </p>
+          {!latest.counsel_reviewed && <p className="small flag">{t("pack.draft")}</p>}
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
+            <button className="btn secondary" onClick={() => void download(`/alerts/${alert.id}/evidence-pack/pdf`)} data-testid="pack-pdf">{t("pack.pdf")}</button>
+            <button className="btn secondary" onClick={() => void download(`/alerts/${alert.id}/evidence-pack`)} data-testid="pack-zip">{t("pack.zip")}</button>
+          </div>
+        </>
+      ) : (
+        <p className="muted small" style={{ marginTop: "0.5rem" }}>{t("pack.none")}</p>
+      )}
+      {canMake && (
+        <button className="btn" style={{ marginTop: "0.6rem" }} disabled={busy} onClick={() => void make()} data-testid="pack-generate">
+          {busy ? t("pack.working") : latest ? t("pack.regenerate") : t("pack.generate")}
+        </button>
+      )}
+      {error && <p className="error" role="alert">{error}</p>}
     </div>
   );
 }

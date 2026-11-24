@@ -52,7 +52,7 @@ def test_buffer_width_follows_lake_size():
 @pytest.mark.parametrize("cohort,mode", MODE_BY_COHORT)
 def test_api_reports_mode_for_each_cohort(db, client, cohort, mode):
     asset = make_asset(db, cohort=cohort)
-    analyst = make_user(db, "analyst")
+    analyst = make_user(db, "viewer")
     body = client.get(f"/assets/{asset.id}", headers=auth(analyst)).json()
     assert body["properties"]["cohort"] == cohort
     assert body["properties"]["mode"] == mode

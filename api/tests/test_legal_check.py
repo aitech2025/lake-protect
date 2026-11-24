@@ -60,7 +60,7 @@ def test_zone_is_located_against_the_boundary_version(db, geometry, zone):
     asset = make_asset(db, cohort="B_FINAL", geometry=BIG_LAKE)
     out, alert = ingest(db, asset, geometry=geometry)
     assert out["legal_check"]["zone"] == zone
-    assert alert.state == ("CLOSED_OUT_OF_SCOPE" if zone == "outside" else "TRIAGE")
+    assert alert.state == ("CLOSED" if zone == "outside" else "OPEN")
 
 
 def test_result_stores_rule_version_boundary_version_and_matches(db):
@@ -70,7 +70,7 @@ def test_result_stores_rule_version_boundary_version_and_matches(db):
     db.flush()
     out, alert = ingest(db, asset, geometry=square(side_m=40))
     lc = db.query(LegalCheck).filter_by(candidate_id=alert.candidate_id).one()
-    assert alert.state == "CLOSED_AUTHORISED" and lc.matched_work_id == work.id
+    assert (alert.state, alert.resolution, lc.result) == ("CLOSED", "auto", "CLOSED_AUTHORISED") and lc.matched_work_id == work.id
     assert lc.rule_version == rules.rule_version() and lc.boundary_version == 1 and lc.boundary_status == "physically_marked"
     assert lc.alert_class == "GOVT_LAND"
 
@@ -80,7 +80,7 @@ def test_work_outside_its_dates_does_not_authorise(db):
     db.add(AuthorisedWork(agency="Test", description="Old work", ref="TEST-OLD", geom=wkt(IN_FTL), starts_on=dt.date(2023, 1, 1), ends_on=dt.date(2023, 12, 31), is_demo=True))
     db.flush()
     _, alert = ingest(db, asset, geometry=square(side_m=40))
-    assert alert.state == "TRIAGE"
+    assert alert.state == "OPEN"
 
 
 def test_court_register_hit_holds_and_marks_disputed(db):
@@ -89,7 +89,7 @@ def test_court_register_hit_holds_and_marks_disputed(db):
     db.flush()
     _, alert = ingest(db, asset)
     lc = db.query(LegalCheck).filter_by(candidate_id=alert.candidate_id).one()
-    assert alert.state == "HOLD_LEGAL" and lc.alert_class == "DISPUTED" and lc.matched_court_case_id is not None
+    assert alert.state == "OPEN" and lc.result == "HOLD_LEGAL" and lc.alert_class == "DISPUTED" and lc.matched_court_case_id is not None
 
 
 def test_disposed_court_case_is_not_a_live_matter(db):
@@ -97,7 +97,7 @@ def test_disposed_court_case_is_not_a_live_matter(db):
     db.add(CourtCase(court="Test court", case_no="TEST-2", status="disposed", asset_id=asset.id, is_demo=True))
     db.flush()
     _, alert = ingest(db, asset)
-    assert alert.state == "TRIAGE"
+    assert alert.state == "OPEN"
 
 
 def test_permit_must_be_valid_on_the_change_date(db):
@@ -105,4 +105,4 @@ def test_permit_must_be_valid_on_the_change_date(db):
     db.add(Permit(source="Test", ref="TEST-P-EXPIRED", kind="building", geom=wkt(IN_RING), valid_from=dt.date(2020, 1, 1), valid_to=dt.date(2021, 1, 1), is_demo=True))
     db.flush()
     _, alert = ingest(db, asset, geometry=IN_RING)
-    assert alert.state == "TRIAGE"
+    assert alert.state == "OPEN"

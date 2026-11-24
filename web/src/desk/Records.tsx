@@ -17,14 +17,15 @@ export function Records() {
   const { data, error, status, loading, reload } = useAsync(() => api<{ items: any[]; has_demo: boolean }>(`/records/${kind}`), [kind]);
   useDemoOnScreen(Boolean(data?.has_demo));
   usePageTitle(t("records.title"));
-  const canImport = user && ["admin", "legal_officer"].includes(user.role);
+  const canImport = user?.role === "admin";
 
   const upload = async (file: File) => {
     const form = new FormData();
     form.append("file", file);
     try {
       const out = await api<any>(`/records/${kind}/import`, { body: form, method: "POST" });
-      setMessage(`${t("records.imported", { n: out.imported })}${out.alerts_put_on_hold.length ? `. ${t("records.held", { n: out.alerts_put_on_hold.length })}` : ""}`);
+      const court = out.open_incidents_with_court_matter ?? [];
+      setMessage(`${t("records.imported", { n: out.imported })}${court.length ? `. ${t("records.held", { n: court.length })}` : ""}`);
       reload();
     } catch (e) {
       setMessage((e as Error).message);

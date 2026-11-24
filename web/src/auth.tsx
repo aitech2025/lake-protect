@@ -66,9 +66,11 @@ export function useAuth(): AuthState {
   return useContext(AuthContext);
 }
 
-export function homeFor(role: string): string {
-  if (role === "field_officer") return "/field";
-  if (role === "senior_officer") return "/monthly";
-  if (role === "auditor") return "/audit";
+export function homeFor(_role: string): string {
   return "/alerts";
+}
+
+/** Two roles (D-057): the admin runs the application, viewers are the officials. */
+export function isAdmin(user: { role: string } | null | undefined): boolean {
+  return user?.role === "admin";
 }

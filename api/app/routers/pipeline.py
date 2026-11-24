@@ -1,7 +1,8 @@
 """The detection pipeline's side of the API (pipeline token, DECISIONS.md D-023).
 
 - GET  /pipeline/watchlist   real assets with the boundary set in force, for `lp screen`
-- POST /pipeline/runs        a screening run and the coverage of every asset in it
+- POST /pipeline/runs        a screening run and, for every asset, its week: coverage, the week's
+                             image and what changed (DECISIONS.md D-057)
 - POST /pipeline/basemap     a zip of Sentinel-2 base-map tiles (`lp basemap`)
 
 And the desk's read side:
@@ -27,6 +28,7 @@ from app.models import Asset, AssetScreen, ScreenRun, User
 from app.routers.candidates import pipeline_token
 from app.security import current_user
 from app.services import boundaries as bsvc
+from app.services import weeks as weeks_svc
 from app.storage import store
 
 router = APIRouter(tags=["pipeline"])
@@ -55,6 +57,13 @@ def watchlist(db: Session = Depends(get_db)) -> dict:
     return {"assets": out, "count": len(out)}
 
 
+class ChangeIn(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    candidate_id: int
+    alert_id: int | None = None
+    outcome: str | None = None
+
+
 class AssetScreenIn(BaseModel):
     model_config = ConfigDict(extra="ignore")
     asset_id: int
@@ -65,6 +74,12 @@ class AssetScreenIn(BaseModel):
     candidates: int = 0
     legacy_changes: int = 0
     counts: dict = {}
+    # The week's image of the asset: its clearest latest look, boundary drawn (PNG, base64).
+    image_png_b64: str | None = None
+    image_date: dt.date | None = None
+    image_scene_id: str | None = None
+    # The changes this screen sent for the asset, with what ingest did with each.
+    changes: list[ChangeIn] = []
 
 
 class RunIn(BaseModel):
@@ -85,6 +100,8 @@ def record_run(body: RunIn, db: Session = Depends(get_db)) -> dict:
         raise HTTPException(422, "A run cannot be dated in the future")
     if any(a.last_look and a.last_look > body.as_of for a in body.assets):
         raise HTTPException(422, "A look acquired after the run's as_of date is not allowed (invariant 10)")
+    if any(a.image_date and a.image_date > body.as_of for a in body.assets):
+        raise HTTPException(422, "A weekly image acquired after the run's as_of date is not allowed (invariant 10)")
     known = set(db.scalars(select(Asset.id).where(Asset.is_demo.is_(False))))
     unknown = sorted({a.asset_id for a in body.assets} - known)
     if unknown:
@@ -102,8 +119,22 @@ def record_run(body: RunIn, db: Session = Depends(get_db)) -> dict:
         )
         db.add(run)
         db.flush()
+        week = weeks_svc.iso_week(body.as_of)
         for a in body.assets:
-            db.add(AssetScreen(run_id=run.id, **a.model_dump()))
+            asset = db.get(Asset, a.asset_id)
+            try:
+                image = weeks_svc.store_image(asset, body.as_of, a.image_png_b64)
+                if a.changes:
+                    changes = weeks_svc.change_entries(db, asset.id, [c.model_dump() for c in a.changes])
+                elif a.status == "candidate_found":
+                    changes = weeks_svc.changes_since(db, asset.id, body.started_at)
+                else:
+                    changes = []
+            except ValueError as exc:
+                db.rollback()
+                raise HTTPException(422, f"Asset {a.asset_id}: {exc}") from exc
+            fields = a.model_dump(exclude={"image_png_b64", "changes"})
+            db.add(AssetScreen(run_id=run.id, week=week, image_key=image, changes=changes, **fields))
         statuses: dict[str, int] = {}
         for a in body.assets:
             statuses[a.status] = statuses.get(a.status, 0) + 1
@@ -149,7 +180,7 @@ async def upload_basemap(file: UploadFile = File(...), db: Session = Depends(get
 
 
 @router.get("/screening/runs")
-def list_runs(limit: int = 10, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+def list_runs(limit: int = 10, dataset: Literal["demo", "real"] = "real", user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
     rows = db.execute(
         text(
             """
@@ -158,10 +189,10 @@ def list_runs(limit: int = 10, user: User = Depends(current_user), db: Session =
                    (SELECT jsonb_object_agg(status, n) FROM (SELECT status, count(*) AS n FROM asset_screens s
                      WHERE s.run_id = r.id GROUP BY status) x) AS coverage,
                    (SELECT sum(looks) FROM asset_screens s WHERE s.run_id = r.id) AS looks
-            FROM screen_runs r ORDER BY r.id DESC LIMIT :n
+            FROM screen_runs r WHERE r.is_demo = :demo ORDER BY r.as_of DESC, r.id DESC LIMIT :n
             """
         ),
-        {"n": max(1, min(limit, 100))},
+        {"n": max(1, min(limit, 100)), "demo": dataset == "demo"},
     ).mappings().all()
     chain.record(db, actor_id=user.id, action="view.screening_runs", entity="screen_run", details={"count": len(rows)})
     db.commit()

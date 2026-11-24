@@ -42,6 +42,10 @@ class AssetResult:
     candidates: list[dict] = field(default_factory=list)
     legacy: list[dict] = field(default_factory=list)
     water: list[tuple[dt.date, float]] = field(default_factory=list)
+    # The week's image: the latest clear look, boundary drawn, this run's changes outlined (D-057).
+    week_image_png: bytes | None = None
+    week_image_date: dt.date | None = None
+    week_image_scene_id: str | None = None
 
 
 def load_looks(aoi: AssetAOI, picks: list[tuple[Scene, float]], as_of: dt.date) -> Looks:
@@ -156,7 +160,27 @@ def detect_asset(
         pairs = [(c, p) for c, p in pairs if p not in dropped]
     out.candidates = [p for _, p in pairs]
     out.legacy = [_payload(c, looks, aoi, False) for c in res.legacy]
+    if with_chips and looks.scenes:
+        _week_image(out, looks, aoi, [c for c, p in pairs])
     return out
+
+
+def _week_image(out: AssetResult, looks: Looks, aoi: AssetAOI, kept: list) -> None:
+    from shapely.ops import unary_union
+
+    last = len(looks.scenes) - 1
+    scene = looks.scenes[last]
+    year, week, _ = out.as_of.isocalendar()
+    changes = unary_union([_polygon(c.component, aoi) for c in kept]) if kept else None
+    try:
+        out.week_image_png = chips.render_week(
+            looks.bands[last], grid=aoi.grid, primary_utm=aoi.primary_utm, buffer_outer_utm=aoi.buffer_outer_utm,
+            changes_utm=changes, when=scene.acquired_at, scene_id=scene.id, week=f"{year}-W{week:02d}",
+        )
+        out.week_image_date = scene.date
+        out.week_image_scene_id = scene.id
+    except Exception as exc:  # an image that cannot be drawn never stops the screen; it is reported
+        out.counts["week_image_error"] = f"{type(exc).__name__}: {exc}"[:200]
 
 
 def apply_drought_control(results: list[AssetResult]) -> None:

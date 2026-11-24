@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api, fmtDate } from "../api";
 import { BoundarySeal, useAsync, usePageTitle } from "../components/Bits";
@@ -7,14 +8,20 @@ import { MapView } from "../components/MapView";
 import { PageState, TableRegion } from "../components/PageState";
 import { baseFor, useDataset } from "../dataset";
 import { DemoTag, useDemoOnScreen } from "../demo";
+import { Documents, WeeklyRecord } from "./AssetRecord";
 import { CoverageLine, ScreeningSummary } from "./Screening";
 
 export function Assets() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const { dataset } = useDataset();
-  const [selected, setSelected] = useState<number | null>(null);
-  useEffect(() => setSelected(null), [dataset]);
+  const [params] = useSearchParams();
+  const linked = params.get("asset");
+  const [selected, setSelected] = useState<number | null>(linked ? Number(linked) : null);
+  const [firstDataset] = useState(dataset);
+  useEffect(() => {
+    if (dataset !== firstDataset) setSelected(null);
+  }, [dataset, firstDataset]);
   const { data, error, status, loading, reload } = useAsync(() => api<{ features: any[] }>(`/assets?dataset=${dataset}`), [dataset]);
   const features = useMemo(() => (data?.features ?? []).filter((f) => f.properties.is_demo === (dataset === "demo")), [data, dataset]);
   useDemoOnScreen(dataset === "demo" && features.length > 0);
@@ -100,6 +107,8 @@ export function Assets() {
           </TableRegion>
         </section>
       )}
+      {selected && <WeeklyRecord assetId={selected} />}
+      {selected && <Documents assetId={selected} />}
       {register && (
         <section className="section" data-testid="asset-register">
           <h2>{t("assets.register")}</h2>

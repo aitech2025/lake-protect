@@ -9,7 +9,6 @@ import { Login } from "./desk/Login";
 import { Queue } from "./desk/Queue";
 import { Records } from "./desk/Records";
 import { Sources } from "./desk/Sources";
-import { FieldApp } from "./field/FieldApp";
 import { Monthly } from "./bulletin/Monthly";
 
 function RequireUser({ children }: { children: ReactNode }) {
@@ -36,7 +35,6 @@ export function App() {
         <Route path="/audit" element={<Audit />} />
         <Route path="/monthly" element={<Monthly />} />
       </Route>
-      <Route path="/field/*" element={<RequireUser><FieldApp /></RequireUser>} />
       <Route path="*" element={<Home />} />
     </Routes>
   );

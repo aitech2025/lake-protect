@@ -1,7 +1,7 @@
 """Government sources and the asset creation engine (docs/asset-engine.md).
 
 GET  /sources                   each connector, its data contract and whether files are waiting
-POST /sources/{name}/runs       run the engine; a dry run by default (admin or nodal officer)
+POST /sources/{name}/runs       run the engine; a dry run by default (admin only)
 GET  /sources/runs              recent applied runs, with what they did to each record
 GET  /assets/{id}/register      where an asset's record came from, and the survey numbers it touches
 """
@@ -26,10 +26,9 @@ from app.sources.transports import SampleTransport
 
 router = APIRouter(tags=["sources"])
 
-READ_ROLES = (Role.admin, Role.nodal_officer, Role.analyst, Role.auditor, Role.senior_officer)
-RUN_ROLES = (Role.admin, Role.nodal_officer)
-REGISTER_ROLES = (Role.analyst, Role.reviewer, Role.nodal_officer, Role.legal_officer, Role.senior_officer,
-                  Role.auditor, Role.admin)
+READ_ROLES = (Role.admin, Role.viewer)
+RUN_ROLES = (Role.admin,)
+REGISTER_ROLES = (Role.admin, Role.viewer)
 
 
 def _run_summary(run: ImportRun | None, with_items: bool = False) -> dict | None:

@@ -51,7 +51,7 @@ def _sources() -> list[Path]:
 
 def test_scan_covers_the_text_sources():
     names = {p.name for p in _sources()}
-    assert {"config.yaml", "state_machine.py", "0002_data_model.py"} <= names
+    assert {"config.yaml", "incidents.py", "0002_data_model.py"} <= names
 
 
 @pytest.mark.parametrize("path", _sources(), ids=lambda p: str(p.relative_to(REPO)))

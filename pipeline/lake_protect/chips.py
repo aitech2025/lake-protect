@@ -51,6 +51,24 @@ def stretch_pair(before: dict, after: dict, win) -> tuple[np.ndarray, np.ndarray
     return out[0], out[1]
 
 
+def stretch_one(bands: dict) -> np.ndarray:
+    """A 2-98% stretch of one look, for the weekly image of a whole asset."""
+    rgb = np.dstack([bands["red"], bands["green"], bands["blue"]])
+    flat = rgb.reshape(-1, 3)
+    flat = flat[np.all(np.isfinite(flat), axis=1)]
+    lo, hi = (np.percentile(flat, 2, axis=0), np.percentile(flat, 98, axis=0)) if len(flat) else (np.zeros(3), np.full(3, 0.3))
+    x = np.clip((rgb - lo) / np.maximum(hi - lo, 1e-3), 0, 1) ** 0.85
+    return (np.where(np.isfinite(x), x, 0) * 255).astype(np.uint8)
+
+
+def render_week(bands: dict, *, grid, primary_utm, buffer_outer_utm, changes_utm, when: dt.datetime, scene_id: str, week: str) -> bytes:
+    """The whole asset as this week's clearest latest look saw it, boundary and buffer drawn, and any
+    change found this week outlined (DECISIONS.md D-057)."""
+    rgb = stretch_one(bands)
+    return render(rgb, win=(0, grid.height, 0, grid.width), grid=grid, primary_utm=primary_utm,
+                  buffer_outer_utm=buffer_outer_utm, change_utm=changes_utm, label=f"Week {week}", when=when, scene_id=scene_id)
+
+
 def window_for(component: np.ndarray, min_side_px: int = 64, grow: float = 3.0) -> tuple[int, int, int, int]:
     """Square window around a change, at least `min_side_px` wide, clipped to the grid."""
     H, W = component.shape

@@ -9,15 +9,9 @@ baseline_days_ago: 365      # monitoring started a year before the seed date
 boundary_days_ago: 400
 
 users:
-  - {username: demo.analyst,  name: Demo Analyst,         role: analyst}
-  - {username: demo.reviewer, name: Demo Reviewer,        role: reviewer}
-  - {username: demo.field1,   name: Demo Field Officer 1, role: field_officer, language: te}
-  - {username: demo.field2,   name: Demo Field Officer 2, role: field_officer}
-  - {username: demo.nodal,    name: Demo Nodal Officer,   role: nodal_officer}
-  - {username: demo.legal,    name: Demo Legal Officer,   role: legal_officer}
-  - {username: demo.senior,   name: Demo Senior Officer,  role: senior_officer}
-  - {username: demo.auditor,  name: Demo Auditor,         role: auditor}
-  - {username: demo.admin,    name: Demo Admin,           role: admin}
+  - {username: demo.admin,   name: Demo Admin,      role: admin}
+  - {username: demo.viewer1, name: Demo Official 1, role: viewer, language: te}
+  - {username: demo.viewer2, name: Demo Official 2, role: viewer}
 
 assets:
   # Cohort A: recovered land, physically marked
@@ -66,7 +60,9 @@ works:
 court_cases:
   - {asset: demo-cheruvu-7, court: Demo High Court, case_no: DEMO-WP-1234/2026, status: pending, next_hearing_days: 21}
 
-# Alert scenarios. Each covers one path from CONTEXT.md section 13. Change shapes:
+# Incident scenarios (DECISIONS.md D-057). Each runs through the real ingest, legal check and
+# incident lifecycle, in time order. Steps: review (a viewer), decide (the admin: CONFIRMED or
+# DISMISSED), close (the admin), pack (evidence pack), recheck (the change seen again). Shapes:
 #   edge:   blob centred on the boundary edge at `angle` degrees (part inside, part buffer)
 #   inside: blob at `offset` metres from the centre
 #   ring:   blob in the watch ring at `angle`
@@ -74,123 +70,112 @@ court_cases:
 scenarios:
   - key: headline
     asset: demo-cheruvu-1
-    note: Demo script step 2. Fresh soil fill at the lake edge, left in TRIAGE for the live walkthrough.
+    note: Fresh land fill at the lake edge, found this week. Open, waiting for review.
     change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 35, size: [95, 60]}
     detect: {first_changed: -14, last_clear: -19, day: -2}
     steps: []
 
   - key: full_path
     asset: demo-cheruvu-2
-    note: Full path to the officer. Seed continues it through pack and officer record (M7, M8).
+    note: Reviewed, confirmed, evidence pack made, then closed once the land was restored.
     change: {type: soil_fill, stage: land_levelled, shape: edge, angle: 200, size: [110, 70]}
     detect: {first_changed: -52, last_clear: -58, day: -45}
     steps:
-      - {day: -44, do: confirm, by: demo.analyst}
-      - {day: -44, do: assign, by: demo.nodal, to: demo.field1}
-      - {day: -40, do: field, by: demo.field1, outcome: confirmed, stage: land_levelled}
-      - day: -38
-        do: checklist
-        by: demo.legal
-        items:
-          boundary_confirmed: ["yes", Boundary marked on the ground (demo boundary version 1)]
-          joint_survey_done: ["yes", DEMO/JS/2026/014]
-          survey_notice_given: ["yes", DEMO/NOTICE/SURVEY/014]
-          no_live_court_matter: ["yes", Demo court register checked]
-          title_permits_reviewed: ["yes", No permit or title claim on record]
-          notice_and_hearing: ["no", Notice and hearing are for the officer to arrange]
-          construction_dated: ["yes", Change bracket falls after the policy cut-off]
-      - {day: -37, do: pack, by: demo.legal}
-      - {day: -37, do: transition, to: PACK_READY, by: demo.nodal}
-      - {day: -36, do: transition, to: WITH_OFFICER, by: demo.nodal, data: {gap_reason: Notice and hearing are the officer's next step}}
+      - {day: -44, do: review, by: demo.viewer1, outcome: real_change, note: Fresh earth at the south-west edge on both images.}
+      - {day: -43, do: decide, to: CONFIRMED, by: demo.admin, note: Real change. Fill inside the boundary of recovered land.}
+      - {day: -42, do: pack, by: demo.admin}
+      - {day: -10, do: close, by: demo.admin, note: The demo agency removed the fill under order DEMO/ORDER/2026/012. The lake stays on weekly watch.}
 
   - key: building
     asset: demo-cheruvu-4
-    note: Building rising inside the lake. Confirmed and waiting for assignment.
+    note: Construction inside the lake. Two officials have reviewed it; it waits for the admin's decision.
     change: {type: building, stage: building_rises, shape: inside, offset: [60, -40], size: [55, 45]}
     detect: {first_changed: -22, last_clear: -30, day: -9}
     steps:
-      - {day: -8, do: confirm, by: demo.analyst}
+      - {day: -8, do: review, by: demo.viewer1, outcome: real_change, note: A roofed structure where there was water.}
+      - {day: -7, do: review, by: demo.viewer2, outcome: needs_site_visit, note: Looks like construction. A site visit should confirm it before any notice.}
 
   - key: not_real
     asset: demo-cheruvu-5
-    note: Cloud shadow. Closed as not real by two people.
+    note: Cloud shadow. Reviewed as not real, dismissed and closed.
     change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 120, size: [80, 55]}
     detect: {first_changed: -33, last_clear: -38, day: -27}
     steps:
-      - {day: -26, do: close_not_real, by: demo.analyst, cosign: demo.reviewer, reason: Cloud shadow on one date only, code: cloud_shadow}
+      - {day: -26, do: review, by: demo.viewer2, outcome: not_real, note: Cloud shadow on one date only.}
+      - {day: -26, do: decide, to: DISMISSED, by: demo.admin, note: Cloud shadow. The next clear image shows water.}
+      - {day: -25, do: close, by: demo.admin, note: Dismissed as not a real change.}
 
   - key: false_alarm
     asset: demo-cheruvu-6
-    note: Field visit found a seasonal crop. Closed as false alarm by two people.
+    note: Clearing that a site visit found to be a seasonal crop. Dismissed, not yet closed.
     change: {type: clearing, stage: land_levelled, shape: edge, angle: 300, size: [90, 60]}
     detect: {first_changed: -30, last_clear: -36, day: -24}
     steps:
-      - {day: -23, do: confirm, by: demo.analyst}
-      - {day: -23, do: assign, by: demo.nodal, to: demo.field2}
-      - {day: -19, do: false_alarm, by: demo.field2, cosign: demo.nodal, reason: Seasonal crop on the lake bed, no fill or structure}
+      - {day: -23, do: review, by: demo.viewer1, outcome: needs_site_visit, note: Vegetation gone at the edge. It could be a crop.}
+      - {day: -19, do: decide, to: DISMISSED, by: demo.admin, note: The demo agency's site visit found a seasonal crop on the lake bed. No fill or structure.}
 
   - key: court_hold
     asset: demo-cheruvu-7
-    note: A live court case on the lake. Held for the legal team.
+    note: A live court case on the lake. Open, flagged for the legal team.
     change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 80, size: [85, 60]}
     detect: {first_changed: -18, last_clear: -24, day: -11}
     steps: []
 
   - key: watch_list
     asset: demo-kunta-5
-    note: Lake with no notification. Logged on the watch list, no field action.
+    note: Lake with no notification. Open, flagged because its boundary is not confirmed.
     change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 150, size: [70, 50]}
     detect: {first_changed: -16, last_clear: -22, day: -8}
     steps: []
 
   - key: authorised_work
     asset: demo-cheruvu-3
-    note: Earth-moving by the demo restoration programme. Closed as authorised work.
+    note: Earth-moving by the demo restoration programme. Closed at once as authorised works.
     change: {type: soil_fill, stage: land_levelled, shape: edge, angle: 250, size: [120, 70]}
     detect: {first_changed: -20, last_clear: -27, day: -13}
     steps: []
 
   - key: permit_conflict
     asset: demo-cheruvu-8
-    note: A building permit that overlaps the buffer. Flagged as a permit conflict, not closed.
+    note: Clearing under a building permit that overlaps the buffer. Open, flagged as a permit conflict.
     change: {type: clearing, stage: land_levelled, shape: edge, angle: 0, size: [90, 60]}
     detect: {first_changed: -12, last_clear: -17, day: -5}
     steps: []
 
-  - key: overdue
+  - key: waiting
     asset: demo-cheruvu-9
-    note: Assigned 20 days ago with a 7-day timer. Overdue and escalated to the nodal officer.
+    note: Reviewed three weeks ago and still waiting for a decision. Listed on the monthly page.
     change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 60, size: [80, 60]}
     detect: {first_changed: -30, last_clear: -35, day: -22}
     steps:
-      - {day: -21, do: confirm, by: demo.analyst}
-      - {day: -20, do: assign, by: demo.nodal, to: demo.field2}
+      - {day: -21, do: review, by: demo.viewer2, outcome: real_change, note: Fill spreading from the bund.}
 
-  - key: overdue_triage
+  - key: levelling
     asset: demo-parcel-c
-    note: Waiting for review past its 3-day timer. The reviewer has been notified.
-    change: {type: clearing, stage: land_levelled, shape: inside, offset: [20, 10], size: [70, 55]}
+    note: Levelling on recovered land, found this week. Open.
+    change: {type: levelling, stage: land_levelled, shape: inside, offset: [20, 10], size: [70, 55]}
     detect: {first_changed: -15, last_clear: -21, day: -6}
     steps: []
 
   - key: reopened
     asset: demo-parcel-b
-    note: Closed as not real, then a re-check from space found the change persisting and larger.
+    note: Dismissed as not real, then seen again and larger. A new incident links to the old one.
     change: {type: soil_fill, stage: soil_dumped, shape: inside, offset: [-30, 20], size: [70, 50]}
     detect: {first_changed: -48, last_clear: -54, day: -41}
     steps:
-      - {day: -40, do: close_not_real, by: demo.analyst, cosign: demo.reviewer, reason: Looked like a parked truck convoy, code: transient_object}
+      - {day: -40, do: review, by: demo.viewer1, outcome: not_real, note: Looks like a parked truck convoy.}
+      - {day: -40, do: decide, to: DISMISSED, by: demo.admin, note: Vehicles, not a change of the land.}
+      - {day: -39, do: close, by: demo.admin, note: Dismissed.}
       - {day: -4, do: recheck, grow: 1.6, first_changed: -12, last_clear: -40}
 
   - key: awaiting_boundary
     asset: demo-kunta-1
-    note: Cohort C. Field-confirmed, waiting for the final notification before any officer step.
+    note: Cohort C. Confirmed as a real change; the boundary is preliminary, so action waits for the final notification.
     change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 220, size: [70, 50]}
     detect: {first_changed: -34, last_clear: -40, day: -28}
     steps:
-      - {day: -27, do: confirm, by: demo.analyst}
-      - {day: -27, do: assign, by: demo.nodal, to: demo.field1}
-      - {day: -24, do: field, by: demo.field1, outcome: confirmed, stage: soil_dumped}
+      - {day: -27, do: review, by: demo.viewer1, outcome: real_change, note: Soil dumped at the edge.}
+      - {day: -26, do: decide, to: CONFIRMED, by: demo.admin, note: Real change. The boundary is preliminary, so action waits for the final notification.}
 
   - key: radar_only
     asset: demo-kunta-2
@@ -201,61 +186,44 @@ scenarios:
 
   - key: legacy
     asset: demo-parcel-a
-    note: The change dates from before the asset's baseline. Logged as legacy, never alerted.
+    note: The change dates from before the asset's baseline. Closed at once, recorded only.
     change: {type: building, stage: occupied, shape: inside, offset: [40, -20], size: [60, 50]}
     detect: {first_changed: -380, last_clear: -420, day: -30}
     steps: []
 
   - key: out_of_scope
     asset: demo-kunta-6
-    note: Change well outside the lake's watch ring. Closed as out of scope.
+    note: Change well outside the lake's watch ring. Closed at once as out of scope.
     change: {type: clearing, stage: land_levelled, shape: far, angle: 30, size: [80, 60]}
     detect: {first_changed: -25, last_clear: -31, day: -18}
     steps: []
 
   - key: last_month_1
     asset: demo-kunta-3
-    note: Last month's alert for the trend line, assigned and field-confirmed.
+    note: Last month's incident, confirmed and waiting for action outside the app.
     change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 10, size: [60, 45]}
     detect: {first_changed: -66, last_clear: -72, day: -58}
     steps:
-      - {day: -57, do: confirm, by: demo.analyst}
-      - {day: -56, do: assign, by: demo.nodal, to: demo.field1}
-      - {day: -52, do: field, by: demo.field1, outcome: confirmed, stage: soil_dumped}
+      - {day: -57, do: review, by: demo.viewer2, outcome: real_change, note: Soil dumped at the north edge.}
+      - {day: -56, do: decide, to: CONFIRMED, by: demo.admin, note: Real change on a preliminary boundary.}
 
   - key: last_month_2
     asset: demo-kunta-4
-    note: Last month's alert for the trend line, closed as not real.
+    note: Last month's incident, dismissed and closed.
     change: {type: clearing, stage: land_levelled, shape: edge, angle: 280, size: [60, 45]}
     detect: {first_changed: -63, last_clear: -69, day: -50}
     steps:
-      - {day: -49, do: close_not_real, by: demo.analyst, cosign: demo.reviewer, reason: Seasonal drawdown of the water edge, code: seasonal_water}
+      - {day: -49, do: review, by: demo.viewer1, outcome: not_real, note: Seasonal drawdown of the water edge.}
+      - {day: -49, do: decide, to: DISMISSED, by: demo.admin, note: Water level, not land use.}
+      - {day: -48, do: close, by: demo.admin, note: Dismissed.}
 
   - key: action_recorded
     asset: demo-cheruvu-5
-    note: The full path, finished. The officer served notice, held a hearing and recorded an order. The land stays on weekly watch.
+    note: An older case, finished. Confirmed, pack made, closed after the fill was removed.
     change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 300, size: [90, 60]}
     detect: {first_changed: -78, last_clear: -84, day: -72}
     steps:
-      - {day: -71, do: confirm, by: demo.analyst}
-      - {day: -71, do: assign, by: demo.nodal, to: demo.field1}
-      - {day: -68, do: field, by: demo.field1, outcome: confirmed, stage: soil_dumped}
-      - day: -66
-        do: checklist
-        by: demo.legal
-        items:
-          boundary_confirmed: ["yes", Final notification DEMO/FINAL/005]
-          joint_survey_done: ["yes", DEMO/JS/2026/009]
-          survey_notice_given: ["yes", DEMO/NOTICE/SURVEY/009]
-          no_live_court_matter: ["yes", Demo court register checked]
-          title_permits_reviewed: ["yes", No permit or title claim on record]
-          notice_and_hearing: ["not_applicable", To be done by the officer]
-          construction_dated: ["yes", Change bracket falls after the policy cut-off]
-      - {day: -65, do: pack, by: demo.legal}
-      - {day: -65, do: transition, to: PACK_READY, by: demo.nodal}
-      - {day: -64, do: transition, to: WITH_OFFICER, by: demo.nodal}
-      - day: -40
-        do: officer
-        by: demo.legal
-        record_action: true
-        record: {notice_ref: DEMO/NOTICE/2026/031, notice_date: -60, hearing_date: -50, order_ref: DEMO/ORDER/2026/012, order_date: -45, action_date: -40, action_summary: Fill removed under the demo order; the land stays on weekly watch.}
+      - {day: -71, do: review, by: demo.viewer1, outcome: real_change, note: Fill at the east edge.}
+      - {day: -70, do: decide, to: CONFIRMED, by: demo.admin, note: Real change inside the notified FTL.}
+      - {day: -66, do: pack, by: demo.admin}
+      - {day: -40, do: close, by: demo.admin, note: Fill removed under demo order DEMO/ORDER/2026/012. The land stays on weekly watch.}

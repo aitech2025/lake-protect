@@ -25,19 +25,17 @@ from app.config import settings
 from app.models import (
     Alert,
     Asset,
+    AssetDocument,
     Candidate,
     EvidencePack,
-    FieldCheck,
+    IncidentReview,
     LegalCheck,
     Observation,
-    OwnerClaim,
-    ReadinessItem,
     User,
 )
 from app.rules import config as rules
 from app.services import boundaries as bsvc
 from app.storage import store
-from app.workflow.state_machine import FIELD_CONFIRMED_OR_LATER, READINESS_KEYS
 
 STATEMENT = "Imagery shows physical change. It does not establish title or legality."
 TEMPLATES = Path(__file__).with_name("templates")
@@ -52,20 +50,11 @@ LABELS = {
                "surveyed_agency": "Surveyed agency land", "survey_number_only": "Survey number only"},
     "zone": {"inside_ftl": "Inside the lake boundary (FTL) or parcel", "buffer": "In the buffer zone", "watch_ring": "In the 100 m watch ring", "outside": "Outside"},
     "class": {"GOVT_LAND": "Government land", "RESTRICTED_PRIVATE": "Private title claim in a restricted zone", "DISPUTED": "Disputed: court case", "UNKNOWN": "Not yet known"},
-    "change": {"soil_fill": "Soil fill", "clearing": "Land cleared", "small_structure": "Small structure", "building": "Building", "other": "Other change"},
+    "change": {"soil_fill": "Land fill", "clearing": "Clearing", "levelling": "Levelling", "small_structure": "Construction (small structure)",
+               "building": "Construction", "other": "Other change"},
     "stage": {"soil_dumped": "Soil dumped", "land_levelled": "Land levelled", "sheds_fences": "Sheds or fences", "building_rises": "Building rising", "occupied": "Occupied"},
     "sensor": {"optical_and_radar": "Optical and radar", "optical_only": "Optical", "radar_only": "Radar only"},
-    "outcome": {"confirmed": "The change is there", "false_alarm": "No change on the ground", "cannot_access": "Could not reach the place"},
-    "readiness": {"yes": "Yes", "no": "No", "not_applicable": "Not applicable"},
-    "checklist": {
-        "boundary_confirmed": "Boundary confirmed by final notification or certified survey",
-        "joint_survey_done": "Joint boundary survey done",
-        "survey_notice_given": "Survey carried out with prior notice",
-        "no_live_court_matter": "No live court matter or undertaking",
-        "title_permits_reviewed": "Title claims and local permissions reviewed",
-        "notice_and_hearing": "Notice served and hearing held",
-        "construction_dated": "Dated bracket shown against the policy cut-off",
-    },
+    "review": {"real_change": "A real change", "not_real": "Not a real change", "needs_site_visit": "Needs a site visit"},
 }
 
 
@@ -100,8 +89,8 @@ def _render_pdf(html: str) -> bytes:
 
 
 def build(db: Session, alert: Alert, user: User, at: dt.datetime | None = None) -> EvidencePack:
-    if alert.state not in FIELD_CONFIRMED_OR_LATER:
-        raise PackRefused(f"A pack needs a field-confirmed change (alert is {alert.state})")
+    if alert.resolution != "confirmed":
+        raise PackRefused(f"A pack is made for a confirmed change (incident is {alert.state})")
     at = as_utc(at)
     cand = db.get(Candidate, alert.candidate_id)
     asset = db.get(Asset, cand.asset_id)
@@ -110,9 +99,8 @@ def build(db: Session, alert: Alert, user: User, at: dt.datetime | None = None) 
     lc = db.scalar(select(LegalCheck).where(LegalCheck.candidate_id == cand.id).order_by(LegalCheck.id.desc()).limit(1))
     observations = db.scalars(select(Observation).where(Observation.id.in_(cand.observation_ids or [0])).order_by(Observation.acquired_at)).all()
     users = {u.id: u for u in db.scalars(select(User))}
-    checks = db.scalars(select(FieldCheck).where(FieldCheck.alert_id == alert.id).order_by(FieldCheck.id)).all()
-    readiness = {r.item_key: r for r in db.scalars(select(ReadinessItem).where(ReadinessItem.alert_id == alert.id))}
-    claims = sorted({c.claim_type for c in db.scalars(select(OwnerClaim).where(OwnerClaim.alert_id == alert.id))})
+    reviews = db.scalars(select(IncidentReview).where(IncidentReview.alert_id == alert.id).order_by(IncidentReview.id)).all()
+    documents = db.scalars(select(AssetDocument).where(AssetDocument.asset_id == asset.id).order_by(AssetDocument.id)).all()
     version = (db.scalar(select(func.max(EvidencePack.version)).where(EvidencePack.alert_id == alert.id)) or 0) + 1
     counsel_reviewed = bool(settings.counsel_reviewed_template)
 
@@ -123,22 +111,14 @@ def build(db: Session, alert: Alert, user: User, at: dt.datetime | None = None) 
         files["evidence/before.png"] = (before, "derived", f"Last clear image chip, {cand.last_clear_at}, boundary drawn on top")
     if after:
         files["evidence/after.png"] = (after, "derived", f"First changed image chip, {cand.first_changed_at}, same window")
-    field_view = []
-    for fc in checks:
-        photos = []
-        for n, (path, digest) in enumerate(zip(fc.photo_paths, fc.photo_sha256), start=1):
-            data = store.get_object(path)
-            if _sha(data) != digest:
-                raise PackRefused(f"Field photo {path} no longer matches the hash recorded when it arrived")
-            name = f"evidence/field/check-{fc.id}-photo-{n}{Path(path).suffix}"
-            files[name] = (data, "original", f"Field photo {n}, field check {fc.id}")
-            photos.append(_data_uri(data, "image/png" if path.endswith(".png") else "image/jpeg"))
-        field_view.append({
-            "officer": users[fc.officer_id].name, "outcome_label": LABELS["outcome"][fc.outcome], "observed_stage": fc.observed_stage,
-            "stage_label": LABELS["stage"].get(fc.observed_stage or "", ""), "observed_at": _iso(fc.observed_at), "device_time": _iso(fc.device_time),
-            "synced_at": _iso(fc.synced_at), "lat": f"{fc.lat:.6f}" if fc.lat is not None else "none", "lon": f"{fc.lon:.6f}" if fc.lon is not None else "none",
-            "gps_accuracy_m": fc.gps_accuracy_m, "distance_to_candidate_m": fc.distance_to_candidate_m, "notes": fc.notes, "photos": photos,
-        })
+    doc_view = []
+    for d in documents:
+        if d.file_key:
+            data = store.get_object(d.file_key)
+            if _sha(data) != d.sha256:
+                raise PackRefused(f"Document {d.id} no longer matches the hash recorded when it was added")
+            files[f"documents/{d.id}-{d.file_name or 'document'}"] = (data, "original", f"Legal document: {d.title}")
+        doc_view.append({"title": d.title, "reference": d.reference, "issued_on": _iso(d.issued_on), "sha256": d.sha256})
 
     boundary_fc = {"type": "FeatureCollection", "features": [
         {"type": "Feature", "geometry": b["geometry"], "properties": {k: _iso(v) if isinstance(v, (dt.date, dt.datetime)) else v for k, v in b.items() if k != "geometry"}}
@@ -150,14 +130,13 @@ def build(db: Session, alert: Alert, user: User, at: dt.datetime | None = None) 
         "candidate_id": cand.id, "area_sq_m": float(cand.area_sq_m), "change_type": cand.change_type, "last_clear_at": cand.last_clear_at,
         "first_changed_at": cand.first_changed_at, "sensor_basis": cand.sensor_basis, "rule_version": cand.rule_version}}), "derived", "Outline of the change")
     files["records/legal_check.json"] = (_json({c.name: getattr(lc, c.name) for c in LegalCheck.__table__.columns}), "derived", "Legal check result")
-    checklist = [
-        {"item_key": k, "label": LABELS["checklist"][k], "status": readiness[k].status if k in readiness else None,
-         "status_label": LABELS["readiness"].get(readiness[k].status, "") if k in readiness else "", "evidence_ref": readiness[k].evidence_ref if k in readiness else None,
-         "checked_by": users[readiness[k].checked_by].name if k in readiness else None, "checked_at": _iso(readiness[k].checked_at) if k in readiness else None}
-        for k in READINESS_KEYS
-    ]
-    files["records/checklist.json"] = (_json(checklist), "derived", "Case-readiness checklist")
+    review_view = [{"reviewer": users[r.reviewer_id].name, "outcome": r.outcome, "outcome_label": LABELS["review"][r.outcome],
+                    "note": r.note, "reviewed_at": _iso(r.reviewed_at)} for r in reviews]
+    files["records/reviews.json"] = (_json(review_view), "derived", "Reviews recorded by officials")
     history = db.execute(text("SELECT id, actor_id, action, details, at, hash FROM audit_log WHERE entity = 'alert' AND entity_id = :i AND action NOT LIKE 'view.%' ORDER BY id"), {"i": str(alert.id)}).mappings().all()
+    decisions = [{"step": h["details"].get("step", h["details"].get("to")), "actor": users[h["actor_id"]].name if h["actor_id"] in users else "System",
+                  "at": _iso(h["at"]), "note": h["details"].get("note")}
+                 for h in history if h["action"] == "alert.transition"]
     files["records/history.json"] = (_json([dict(h) for h in history]), "derived", "Every logged step on this alert, with its audit hash")
     processing = {
         "software": f"Lake Protect API {app_version}",
@@ -169,7 +148,8 @@ def build(db: Session, alert: Alert, user: User, at: dt.datetime | None = None) 
             f"Minimum area {rules.rules()['min_candidate_area_sq_m']} sq m.",
             f"Legal check against boundary version {lc.boundary_version if lc else '?'}: zone, baseline date, authorised works, permits, court register, asset mode.",
             "Image chips: true colour, same window for both dates, boundary drawn on top.",
-            "Field record: photos hashed on arrival and checked again when this pack was built.",
+            "Reviews by officials and the admin's decision are taken from the hash-chained audit log.",
+            "Legal documents tagged to the asset: each file's hash was recorded when it was added and checked again here.",
         ],
     }
     files["records/processing_note.json"] = (_json(processing), "derived", "Processing note")
@@ -191,9 +171,9 @@ def build(db: Session, alert: Alert, user: User, at: dt.datetime | None = None) 
         "chips": {"before": _data_uri(before, "image/png") if before else "", "after": _data_uri(after, "image/png") if after else ""},
         "processing": processing,
         "hashed_files": hashed,
-        "field_checks": field_view,
-        "checklist": checklist,
-        "title_claims": claims,
+        "reviews": review_view,
+        "decisions": decisions,
+        "documents": doc_view,
         "policy_cutoff": rules.policy_cutoff_date().isoformat(),
         "statement": STATEMENT,
         "counsel_reviewed": counsel_reviewed,

@@ -134,7 +134,7 @@ def test_boundary_post_needs_admin_or_nodal_role(db, client):
     asset = make_asset(db)
     body = {"kind": "ftl", "status": "final_notification", "geometry": square(), "source_name": "x"}
     assert client.post(f"/assets/{asset.id}/boundaries", json=body).status_code == 401
-    analyst = make_user(db, "analyst")
+    analyst = make_user(db, "viewer")
     assert client.post(f"/assets/{asset.id}/boundaries", json=body, headers=auth(analyst)).status_code == 403
 
 

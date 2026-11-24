@@ -1,4 +1,6 @@
-"""Audit view (section 9.1): the full log, the chain check, and a random sample of closures."""
+"""Audit view (section 9.1): the full log, the chain check, and a random sample of closed incidents.
+
+Both roles may read it: the officials can see every step taken on their lakes (D-057)."""
 import random
 
 from fastapi import APIRouter, Depends
@@ -12,7 +14,7 @@ from app.models import User
 from app.security import require_roles
 
 router = APIRouter(prefix="/audit", tags=["audit"])
-READERS = (Role.auditor, Role.admin)
+READERS = (Role.admin, Role.viewer)
 
 
 @router.get("")
@@ -58,13 +60,13 @@ def verify(user: User = Depends(require_roles(*READERS)), db: Session = Depends(
 
 @router.get("/closure-sample")
 def closure_sample(month: str, n: int = 5, user: User = Depends(require_roles(*READERS)), db: Session = Depends(get_db)) -> dict:
-    """Section 10: a monthly random sample of closures to re-check. Seeded by month, so it is repeatable."""
+    """Section 10: a monthly random sample of closed incidents to re-check. Seeded by month, so it is repeatable."""
     rows = db.execute(
         text(
             """
-            SELECT DISTINCT ON (l.entity_id) l.entity_id::bigint AS alert_id, a.code, l.details->>'to' AS closed_as, l.at
+            SELECT DISTINCT ON (l.entity_id) l.entity_id::bigint AS alert_id, a.code, l.details->>'resolution' AS closed_as, l.at
             FROM audit_log l JOIN alerts a ON a.id = l.entity_id::bigint
-            WHERE l.entity = 'alert' AND l.action = 'alert.transition' AND l.details->>'to' LIKE 'CLOSED_%'
+            WHERE l.entity = 'alert' AND l.action = 'alert.transition' AND l.details->>'to' = 'CLOSED'
               AND to_char(l.at, 'YYYY-MM') = :month
             ORDER BY l.entity_id, l.id DESC
             """

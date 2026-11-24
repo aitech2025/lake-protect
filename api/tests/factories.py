@@ -95,54 +95,36 @@ def ingest(db, asset, *, at: dt.datetime | None = None, **kw):
 
 
 class Team:
-    """One fictional account per role."""
+    """One fictional account per role (D-057): an admin and two viewers."""
 
-    def __init__(self, db, area: dict | None = None):
-        self.analyst = make_user(db, "analyst")
-        self.reviewer = make_user(db, "reviewer")
-        self.field = make_user(db, "field_officer", area=area)
-        self.field2 = make_user(db, "field_officer")
-        self.nodal = make_user(db, "nodal_officer")
-        self.legal = make_user(db, "legal_officer")
-        self.senior = make_user(db, "senior_officer")
-        self.auditor = make_user(db, "auditor")
+    def __init__(self, db):
         self.admin = make_user(db, "admin")
+        self.viewer = make_user(db, "viewer")
+        self.viewer2 = make_user(db, "viewer")
 
 
-def field_check(db, alert, officer, *, outcome: str = "confirmed", photos: int = 1, at: dt.datetime | None = None, near: bool = True):
-    """Submit a field check through the real intake path."""
-    import uuid
+def review(db, alert, user, outcome: str = "real_change", note: str = "Test review", at: dt.datetime | None = None):
+    from app.workflow import incidents
 
-    from app.services import field as field_svc
+    return incidents.review(db, alert, user, outcome, note, at=at or dt.datetime(2025, 6, 21, 6, tzinfo=dt.timezone.utc))
 
-    at = at or dt.datetime(2025, 6, 25, 6, tzinfo=dt.timezone.utc)
-    lon, lat = (TEST_LON, TEST_LAT) if near else offset(TEST_LON, TEST_LAT, 400, 0)
-    meta = field_svc.FieldCheckMeta(
-        client_uuid=uuid.uuid4(), observed_at=at, lat=lat, lon=lon, gps_accuracy_m=5, outcome=outcome,
-        observed_stage="soil_dumped" if outcome == "confirmed" else None,
-        reason=None if outcome == "confirmed" else "Test reason", device_time=at,
-    )
-    import base64
 
-    return field_svc.submit(db, alert, officer, meta, [base64.b64decode(PNG_B64)] * photos, at=at)
+def decide(db, alert, admin, to: str = "CONFIRMED", note: str = "Test decision", at: dt.datetime | None = None):
+    """Admin decision, starting the review first if no viewer has."""
+    from app.workflow import incidents
+
+    at = at or dt.datetime(2025, 6, 22, 6, tzinfo=dt.timezone.utc)
+    if alert.state == "OPEN":
+        incidents.transition(db, alert, "UNDER_REVIEW", actor=admin, note="Review started", at=at - dt.timedelta(minutes=5))
+    return incidents.transition(db, alert, to, actor=admin, note=note, at=at)
 
 
 def add_pack_row(db, alert, user):
-    """Stand-in for a generated pack until M7: the guard only checks that a pack exists."""
+    """Stand-in for a generated pack: the guard only checks that a pack exists."""
     from app.models import EvidencePack
 
     db.add(EvidencePack(alert_id=alert.id, version=1, pdf_path="test.pdf", zip_path="test.zip", manifest_sha256="0" * 64,
                         generated_by=user.id, generated_at=dt.datetime(2025, 6, 26, tzinfo=dt.timezone.utc)))
-    db.flush()
-
-
-def record_checklist(db, alert, user, status: str = "yes"):
-    from app.models import ReadinessItem
-    from app.workflow.state_machine import READINESS_KEYS
-
-    for key in READINESS_KEYS:
-        db.add(ReadinessItem(alert_id=alert.id, item_key=key, status=status, evidence_ref="test", checked_by=user.id,
-                             checked_at=dt.datetime(2025, 6, 26, tzinfo=dt.timezone.utc)))
     db.flush()
 
 

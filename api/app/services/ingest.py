@@ -1,12 +1,14 @@
-"""Candidate ingest (section 9.5 POST /candidates): pipeline output in, legal check and priority run.
+"""Change ingest (POST /candidates): the weekly screen's output in; legal check, priority and incident out.
 
-Order matters:
+Order matters (DECISIONS.md D-057):
 1. Refuse water loss alone (invariant 8) and anything below the minimum area or persistence rule.
-2. Store the candidate and run the legal check.
-3. A system closure (out of scope, legacy, authorised) is logged as a closed alert and goes no further.
-4. Otherwise, if the change overlaps an alert closed by people and persists, reopen that alert.
-   If it overlaps an alert still open, record the re-check on it and create nothing new.
-5. Otherwise create the alert and move it to the legal check's result.
+2. Store the change and run the legal check.
+3. If the change overlaps an incident still open (open, under review or confirmed), it is the same
+   change seen again: record it on that incident and create nothing new.
+4. Otherwise create an incident. A legal-check verdict of out of scope, before the baseline or
+   authorised closes it at once, with the reason. A court matter or an unconfirmed boundary keeps
+   it open, flagged. A change seen again after an earlier incident was closed or dismissed links
+   to that incident.
 """
 from __future__ import annotations
 
@@ -21,13 +23,13 @@ from sqlalchemy.orm import Session
 
 from app.audit import chain
 from app.clock import as_utc
-from app.enums import AlertState, ChangeType, Mode, SensorBasis, Stage
+from app.enums import ChangeType, IncidentState, SensorBasis, Stage
 from app.models import Alert, Asset, Candidate, Observation
 from app.rules import config as rules
 from app.rules import legal_check, priority
 from app.services import boundaries as bsvc
 from app.storage import store
-from app.workflow import state_machine as sm
+from app.workflow import incidents as lifecycle
 
 PERSISTENCE_MIN_DAYS = 5
 
@@ -115,11 +117,11 @@ def _overlapping_alerts(db: Session, candidate: Candidate, states: frozenset[str
     return [db.get(Alert, i) for i in ids]
 
 
-def _new_alert(db: Session, candidate: Candidate, asset: Asset, at: dt.datetime) -> Alert:
+def _new_alert(db: Session, candidate: Candidate, asset: Asset, at: dt.datetime, related_id: int | None = None) -> Alert:
     alert = Alert(
         code=f"pending-{candidate.id}",
         candidate_id=candidate.id,
-        state=AlertState.CANDIDATE.value,
+        state=IncidentState.OPEN.value,
         is_demo=asset.is_demo,
         created_at=at,
         updated_at=at,
@@ -128,6 +130,7 @@ def _new_alert(db: Session, candidate: Candidate, asset: Asset, at: dt.datetime)
     db.add(alert)
     db.flush()
     alert.code = f"{'DEMO' if asset.is_demo else 'LP'}-{at.year}-{alert.id:04d}"
+    alert.related_alert_id = related_id
     score, factors = priority.score(
         stage=candidate.stage_estimate,
         area_sq_m=float(candidate.area_sq_m),
@@ -143,7 +146,8 @@ def _new_alert(db: Session, candidate: Candidate, asset: Asset, at: dt.datetime)
         action="alert.created",
         entity="alert",
         entity_id=alert.id,
-        details={"code": alert.code, "candidate_id": candidate.id, "priority": score},
+        details={"code": alert.code, "candidate_id": candidate.id, "priority": score, "change_type": candidate.change_type,
+                 "related_alert_id": related_id},
         at=at,
     )
     return alert
@@ -195,36 +199,30 @@ def ingest(db: Session, body: CandidateIn, *, at: dt.datetime | None = None) -> 
     db.add(candidate)
     db.flush()
     check, decision = legal_check.run(db, candidate, asset, at)
+    verdict = decision.result.value
 
-    if decision.result.value in sm.SYSTEM_CLOSURES:
-        alert = _new_alert(db, candidate, asset, at)
-        sm.transition(db, alert, decision.result.value, at=at)
+    if verdict not in lifecycle.AUTO_CLOSE:
+        open_alerts = _overlapping_alerts(db, candidate, lifecycle.OPEN_STATES)
+        if open_alerts:
+            alert = open_alerts[0]
+            chain.record(
+                db,
+                actor_id=None,
+                action="recheck.persisting",
+                entity="alert",
+                entity_id=alert.id,
+                details={"recheck_candidate_id": candidate.id, "area_sq_m": float(candidate.area_sq_m),
+                         "change_type": candidate.change_type},
+                at=at,
+            )
+            return _out(alert, candidate, check, "recorded_on_open_incident")
+
+    earlier = _overlapping_alerts(db, candidate, frozenset({IncidentState.CLOSED.value, IncidentState.DISMISSED.value}))
+    related = next((a.id for a in earlier if a.resolution != "auto"), None)
+    alert = _new_alert(db, candidate, asset, at, related)
+    if verdict in lifecycle.AUTO_CLOSE:
+        lifecycle.auto_close(db, alert, verdict, at=at)
         return _out(alert, candidate, check, "closed_by_legal_check")
-
-    if rules.mode_for_cohort(asset.cohort) != Mode.WATCH:
-        closed = _overlapping_alerts(db, candidate, sm.REOPENABLE)
-        if closed:
-            alert = closed[0]
-            sm.transition(db, alert, AlertState.TRIAGE.value, data={"recheck_candidate_id": candidate.id}, at=at)
-            if legal_check.live_court_case(db, alert.candidate_id) is not None:
-                sm.transition(db, alert, AlertState.HOLD_LEGAL.value, at=at)
-            return _out(alert, candidate, check, "reopened")
-    open_alerts = _overlapping_alerts(db, candidate, sm.OPEN_STATES | {AlertState.HOLD_LEGAL.value})
-    if open_alerts:
-        alert = open_alerts[0]
-        chain.record(
-            db,
-            actor_id=None,
-            action="recheck.persisting",
-            entity="alert",
-            entity_id=alert.id,
-            details={"recheck_candidate_id": candidate.id, "area_sq_m": float(candidate.area_sq_m)},
-            at=at,
-        )
-        return _out(alert, candidate, check, "recorded_on_open_alert")
-
-    alert = _new_alert(db, candidate, asset, at)
-    sm.transition(db, alert, decision.result.value, at=at)
     return _out(alert, candidate, check, "created")
 
 
@@ -235,5 +233,8 @@ def _out(alert: Alert, candidate: Candidate, check, outcome: str) -> dict:
         "alert_code": alert.code,
         "state": alert.state,
         "candidate_id": candidate.id,
+        "change_type": candidate.change_type,
+        "area_sq_m": float(candidate.area_sq_m),
+        "first_changed_at": candidate.first_changed_at.isoformat(),
         "legal_check": {"zone": check.zone, "result": check.result, "flags": check.flags, "rule_version": check.rule_version},
     }

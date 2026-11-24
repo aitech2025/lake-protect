@@ -12,9 +12,9 @@ export default defineConfig({
       injectRegister: "auto",
       includeAssets: ["favicon.svg"],
       manifest: {
-        name: "Lake Protect field app",
+        name: "Lake Protect",
         short_name: "Lake Protect",
-        start_url: "/field",
+        start_url: "/alerts",
         scope: "/",
         display: "standalone",
         background_color: "#ffffff",

@@ -61,6 +61,49 @@ It keeps section 6.1 cohorts, append-only boundary versions (D-011) and the sect
 
 The baseline stays 19 July 2024 (D-039) until HYDRAA and counsel confirm it (section 15).
 
+### D-057: Two roles, a simple incident lifecycle, a weekly record per asset, legal documents (owner, 24 Nov 2026)
+The owner asked for four things:
+- a processor layer that screens every asset weekly and keeps each week's result, change or not;
+- each change named plainly (construction, land fill, levelling, clearing) and opened as an
+  incident for officials to review;
+- legal documents tagged to every asset;
+- only two personas: admin, who runs the application, and viewer.
+
+The owner chose that viewers record reviews, that a simple lifecycle replaces the workflow, and
+that every asset gets an image every week. Built as M12 (`docs/weekly-processing.md`):
+- **Roles.** `admin` and `viewer`; migration 0006 maps every other account to viewer.
+  - The field app, field assignment, two-person closures, escalation timers, the officer record
+    and the readiness checklist are removed (code in git history).
+  - Section 6.5's state machine is replaced by `app/workflow/incidents.py`: OPEN, UNDER_REVIEW,
+    CONFIRMED or DISMISSED, CLOSED. The database keeps its guards: start open, change only
+    through the lifecycle, resolution matching state.
+- **Legal check.** It runs as before. Its verdict now decides only whether a change closes at once
+  (out of scope, legacy, authorised: resolution `auto`). A court matter or an unconfirmed
+  boundary keeps the incident open and flagged.
+  - Invariants 1, 2, 3 and 5 guarded steps that no longer exist.
+  - Rule 2 ("only confirmed boundaries can lead to action") becomes a flag on the incident:
+    action is decided outside the application.
+- **Weekly record.** `asset_screens` gains the ISO week, the week's image and the changes, each
+  linked to its incident. Demo runs are marked `is_demo` so the real summary never shows them.
+- **Documents.** `asset_documents` is append-only, holding a file with its hash or a reference.
+  The source engine tags what each record came from.
+- **Deliberately kept:**
+  - the evidence pack, now holding reviews, decisions and documents;
+  - the hash-chained audit log;
+  - the monthly page, now counting new, reviewed, confirmed and waiting over 14 days;
+  - the alert table and URL names (`/alerts`), so links and audit entries stay stable.
+
+### D-058: detect-v2 adds levelling (owner, 24 Nov 2026)
+**The rule.** Levelling is `other>bare`: ground that was neither water nor dense vegetation becomes
+bare earth. Clearing stays `veg>bare`. It owns stage `land_levelled`, as clearing does.
+
+**Not tuned yet.** The rule was not tuned on the tuning lakes (D-045), so it may raise more false
+changes on dry scrub. The novelty, established and seasonal controls apply to it as to every
+other change type.
+
+**Freeze before scoring.** The rule file must be frozen with a git tag before the scored backtest
+(section 8.6), and M3 must report levelling separately.
+
 ### D-056: The asset creation engine is built as templates (owner, 24 Nov 2026)
 The owner asked for two things: compare the solution with the code, then build the data source
 layer that collects records from Bhu Bharati and other government sources and creates assets. No

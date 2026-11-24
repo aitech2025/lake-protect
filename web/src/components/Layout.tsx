@@ -5,13 +5,15 @@ import { useAuth } from "../auth";
 import { DatasetSwitch } from "../dataset";
 import { DemoBand } from "../demo";
 
+// Both roles see every page (D-057); what each may change is decided by the server.
+const BOTH = ["admin", "viewer"];
 const NAV: { to: string; key: string; roles: string[] }[] = [
-  { to: "/alerts", key: "nav.queue", roles: ["analyst", "reviewer", "nodal_officer", "legal_officer", "senior_officer", "admin", "auditor"] },
-  { to: "/assets", key: "nav.assets", roles: ["admin", "nodal_officer", "analyst", "legal_officer"] },
-  { to: "/records", key: "nav.records", roles: ["admin", "legal_officer", "nodal_officer", "analyst"] },
-  { to: "/sources", key: "nav.sources", roles: ["admin", "nodal_officer", "analyst", "auditor", "senior_officer"] },
-  { to: "/monthly", key: "nav.monthly", roles: ["senior_officer", "nodal_officer", "legal_officer", "admin", "auditor"] },
-  { to: "/audit", key: "nav.audit", roles: ["auditor", "admin"] },
+  { to: "/alerts", key: "nav.queue", roles: BOTH },
+  { to: "/assets", key: "nav.assets", roles: BOTH },
+  { to: "/records", key: "nav.records", roles: BOTH },
+  { to: "/sources", key: "nav.sources", roles: BOTH },
+  { to: "/monthly", key: "nav.monthly", roles: BOTH },
+  { to: "/audit", key: "nav.audit", roles: BOTH },
 ];
 
 export function Mark() {
@@ -60,7 +62,7 @@ export function Layout() {
           <b>{t("app.name")}</b>
           <span className="small">{t("app.tagline")}</span>
         </div>
-        {user && user.role !== "field_officer" && <DatasetSwitch />}
+        {user && <DatasetSwitch />}
         {NAV.filter((n) => user && n.roles.includes(user.role)).map((n) => (
           <NavLink key={n.to} to={n.to}>
             {t(n.key)}

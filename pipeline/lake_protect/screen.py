@@ -117,6 +117,7 @@ def coverage_status(r: AssetResult) -> str:
 
 
 def asset_summary(r: AssetResult) -> dict:
+    """Coverage for one asset. The week's image travels separately (image_payload)."""
     stale = None
     if r.last_look:
         stale = (r.as_of - r.last_look).days
@@ -133,7 +134,13 @@ def asset_summary(r: AssetResult) -> dict:
         "candidates": len(r.candidates),
         "legacy_changes": len(r.legacy),
         "counts": r.counts,
+        "image_date": r.week_image_date.isoformat() if r.week_image_date else None,
+        "image_scene_id": r.week_image_scene_id,
     }
+
+
+def image_payload(r: AssetResult) -> dict:
+    return {"image_png_b64": base64.b64encode(r.week_image_png).decode()} if r.week_image_png else {}
 
 
 def api_payload(cand: dict) -> dict:
@@ -157,7 +164,16 @@ def write_report(results: list[AssetResult], meta: dict, out_dir: Path) -> Path:
                     props[f"{which}_chip"] = name
             features.append({"type": "Feature", "geometry": c["geometry"], "properties": props})
     (out_dir / "candidates.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": features}, indent=1), encoding="utf-8")
-    summary = {**meta, "assets": [asset_summary(r) for r in results], "candidates": len(features)}
+    assets = []
+    for r in results:
+        row = asset_summary(r)
+        if r.week_image_png:
+            (out_dir / "weeks").mkdir(exist_ok=True)
+            name = f"weeks/{r.aoi.asset_key}.png"
+            (out_dir / name).write_bytes(r.week_image_png)
+            row["image_file"] = name
+        assets.append(row)
+    summary = {**meta, "assets": assets, "candidates": len(features)}
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=1, default=str), encoding="utf-8")
     # Full API payloads, chips included, keyed by asset_key so `lp replay` can resend them after a
     # demo reset with no internet. Not committed (see .gitignore): it is large and rebuildable.
