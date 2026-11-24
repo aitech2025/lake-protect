@@ -41,3 +41,7 @@ desktop.ini
 
 # Screen payloads carry base64 chips; rebuildable with lp screen, resent with lp replay
 reports/**/payloads.jsonl
+
+# Proposal PDFs carry personal contact details: keep them out of git
+/*.pdf
+pitch-deck/*.pdf
