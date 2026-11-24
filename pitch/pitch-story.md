@@ -1,6 +1,6 @@
 # Lake Protect: executive deck, story and design brief
 
-Prepared 24 November 2026 for the TISC 2026 jury round.
+Prepared 24 November 2026 for the TISC 2026 jury round. Redesigned the same day as a visual deck: real satellite imagery, real app screenshots, icons and diagrams in place of text tables.
 
 The deck follows the four sections the owner asked for. It is a jury deck, not a fundraising deck, so it has no team, market-size or raise slides. The facts come from these sources, not from a founder interview:
 
@@ -20,47 +20,65 @@ Hyderabad has lost 61% of its lake area since 1979. Telangana can already see it
 
 It already screens 99 real Hyderabad lakes. The next step is a blind backtest on 30 public cases.
 
-## Headlines
+## Slides
 
-The headlines alone should tell the story.
-
-| # | Section | Headline | Class |
+| # | Section | Headline | Visual |
 |---|---|---|---|
-| 1 | Title | Lake Protect: a weekly satellite watch that reaches the field, and cases that hold up | lead |
-| 2 | Why | 61% of Hyderabad's lake area lost between 1979 and 2024 | big-number |
-| 3 | 1 | Encroachment takes six forms, and each leaves a different trace | table |
-| 4 | 1 | Screen every lake weekly, sharpen only where it matters | steps |
-| 5 | 1 | Every alert dates the change: last clear image, first changed image | real image pair |
-| 6 | 2 | One core decides what deserves an officer's time | architecture diagram |
-| 7 | 3 | A legal check runs before anyone moves | table |
-| 8 | 3 | Six rules no one can switch off | grid |
-| 9 | 3 | Controls cut 124,203 changed pixels to 58 candidates | metrics + list |
-| 10 | 4 | Optical, radar and sub-metre imagery, each with one job | table |
-| 11 | 4 | An open, portable stack the State can host and own | grid |
-| 12 | 4 | Already screening 99 real Hyderabad lakes | metrics |
-| 13 | Next | Each phase must earn the next | steps |
-| 14 | Close | Recovered land stays recovered, and every action stands up in court | lead |
-| A1 | Appendix | Detection rules, and what is live today | table |
-| A2 | Appendix | Boundary status decides what an alert may do | table |
-| A3 | Appendix | What exists, what the pilot adds, what comes later | table |
+| 1 | Title | A weekly satellite watch that reaches the field, and cases that hold up | Full-bleed Sentinel-2 mosaic of Hyderabad |
+| 2 | Problem | Hyderabad has lost 61% of its lake area, and the watch has not kept up | 61% with a 10-drop pictograph; four stat cards |
+| 3 | 1 | Encroachment takes six forms, and each leaves a different trace | Six icon cards, each tagged with the sensor that catches it |
+| 4 | 1 | Act while the change is still reversible | Five-stage timeline with icons; the alert window bracketed |
+| 5 | 1 | Screen every lake weekly, sharpen only where it matters | Three tiers with pixel-size pictograms; index colour key |
+| 6 | 1 | Every alert dates the change | Real Sentinel-2 before and after pair, 70 days apart |
+| 7 | 2 | One core decides what deserves an officer's time | Channels in, core flow, portals out, with icons |
+| 8 | 2 | Officers get the picture, the dates and what was checked | Real desk screenshot (Kapra lake) and the Telugu field app on a phone |
+| 9 | 3 | A legal check runs before anyone moves | Decision ladder with coloured outcomes; boundary-status key |
+| 10 | 3 | Six rules no one can switch off | Six icon cards, each with how it is enforced in code |
+| 11 | 3 | Controls cut 124,203 changed pixels to 58 candidates | Funnel bars (log scale) from the real screen |
+| 12 | 4 | Optical, radar and sub-metre imagery, each with one job | Four sensor cards with resolution and source |
+| 13 | 4 | An open, portable stack the State can host and own | Four layers marked Built; Pilot and Later cards |
+| 14 | 4 | Already screening 99 real Hyderabad lakes | Six metrics beside the 99 lakes drawn on the mosaic |
+| 15 | Next | Each phase must earn the next | Four-phase timeline with gates and costs; pilot targets; stop conditions |
+| 16 | Close | Recovered land stays recovered, and every action stands up in court | Lakes mosaic; four-step icon chain |
+| A1–A4 | Appendix | Detection rules; boundary status; built, pilot and later; monthly page | Icon lists and the monthly-page screenshot |
 
-## Timing
+About 9 minutes in total, plus time for a live demo.
 
-About 8 minutes in total, plus time for a live demo:
+## Where the images come from
 
-- slides 1–2: 30 seconds;
-- section 1: 2 minutes;
-- section 2: 1.5 minutes;
-- section 3: 2 minutes;
-- section 4: 1.5 minutes;
-- close: 30 seconds.
+All imagery is the project's own. There is no stock photography.
 
-## Design notes
+- **Satellite backgrounds** (`img/hero-hyderabad.jpg`, `img/lakes-wide.jpg`, `img/lakes-tall.jpg`) are stitched from the app's offline Sentinel-2 base map (zoom 14, clear scenes from 29 September to 14 October 2026). The 99 lake outlines come from `data/assets.geojson` (OpenStreetMap). Each slide carries "Contains modified Copernicus Sentinel data 2026" and "© OpenStreetMap contributors".
+- **Before and after pair** (`img/candidate-*.png`) is a real candidate chip from the 22 November screen. It is labelled as a candidate whose cause is not verified.
+- **App screenshots** (`img/app-*.jpg`) were captured from the running prototype, read-only:
+  - the analyst desk on the real Kapra lake alert;
+  - the field app in Telugu on the demo world;
+  - the monthly page on the demo world.
 
-- Each content slide carries a small section label (for example "1 · Encroachment and how we detect it") instead of a separate divider slide. This keeps the deck short.
-- Slides 3, 7 and 10 are reference tables and go over the 30-word guideline. That is deliberate: the owner asked for these details. Everything else stays near 30 words.
-- Slide 5 uses a real Sentinel-2 pair from the prototype's own screen. It is labelled as a candidate whose cause is not verified, and the lake is named only in the speaker notes.
-- Speaker notes are in the Marp source as HTML comments. They hold the sources, the caveats and the numbers not shown on the slides.
+  The demo screens show the app's own purple "Demo data" band, and the slides label them as demo data.
+- **Icons** are Lucide (ISC licence). **Fonts** are Manrope and Inter (SIL Open Font Licence). Both are embedded in `theme.css`, so the deck renders with no internet.
+
+## How to rebuild
+
+Run these in a scratch folder outside OneDrive:
+
+```bash
+npm install @marp-team/marp-cli@4.5.1 lucide-static@0.460.0 @fontsource/inter@5.1.0 @fontsource/manrope@5.1.0
+```
+
+Then, from the project root:
+
+```bash
+# 1. Only if the imagery or screenshots change
+py -I pitch/build/mosaic.py C:/lp-cache/basemap/s2_2026-11-22.zip data/assets.geojson <work dir>
+py -I pitch/build/deck_images.py <work dir> <screenshot dir>
+# 2. Theme: inlines fonts and the icons the deck uses
+py -I pitch/build/build_theme.py <scratch>/node_modules
+# 3. PDF (use Chrome: Edge hung on this machine)
+cd pitch && marp --no-stdin --theme ./theme.css --html --allow-local-files --browser chrome --pdf pitch-deck.md -o Lake-Protect-TISC-2026.pdf
+```
+
+Edit `build/theme.src.css`, never `theme.css`. Icons are written as `<i class="ic ic-NAME"></i>` with Lucide names; the theme build fails if a name does not exist.
 
 ## Owner's architecture sketch and the improvements made
 
@@ -80,9 +98,9 @@ Every number on the slides was checked against its source:
 
 | Figure | Source |
 |---|---|
-| 61% lost; 15 years | Proposal; CONTEXT.md §16 |
+| 61% lost; 15 years; 920 water bodies; 264 lakes under CCTV; 656 with no routine watch | Proposal; CONTEXT.md §16 |
 | 765 of 3,342 lakes (23%) with a final notice | Proposal |
 | 99 lakes, 7,652 looks, 14 days, 58 candidates, 25 refused by radar, 28 min | PROGRESS.md (M10) and `summary.json` |
-| 124,203 changed pixels | Sum of `px_changed_any` in `summary.json` |
+| 124,203 → 102,758 → 8,750 pixels → 83 patches → 58 | Sums of `px_changed_any`, `px_alerting_type`, `px_kept`, `candidates` and `candidates_dropped_radar` in `summary.json` |
 | 249 API tests and 15 browser tests | PROGRESS.md (M10) |
-| Phases, gates and costs | Proposal (indicative estimates) |
+| Phases, gates, costs and pilot targets | Proposal (indicative estimates; targets, not results) |
