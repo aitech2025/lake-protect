@@ -13,7 +13,8 @@
     "logout": "Sign out",
     "language": "తెలుగు",
     "label": "Main navigation",
-    "skip": "Skip to content"
+    "skip": "Skip to content",
+    "sources": "Sources"
   },
   "demo": {
     "badge": "Demo data",
@@ -281,7 +282,25 @@
     "in_force": "In force",
     "superseded": "Replaced",
     "baseline": "Watching since {{date}}",
-    "acres": "{{acres}} acres"
+    "acres": "{{acres}} acres",
+    "register": "Where this record comes from",
+    "no_links": "Not linked to any government source yet.",
+    "parcels": "Survey numbers it touches",
+    "core_area": "Lake bed (tank and shikam survey numbers inside the boundary): {{area}} sq m",
+    "core": "lake bed",
+    "no_parcels": "No land records loaded for this area yet.",
+    "col": {
+      "survey": "Survey no.",
+      "village": "Village",
+      "category": "Land category",
+      "extent": "Extent (acres)",
+      "zone": "Where"
+    },
+    "where": {
+      "inside": "Inside the boundary",
+      "buffer": "Buffer",
+      "watch_ring": "Watch ring"
+    }
   },
   "records": {
     "title": "Records",
@@ -475,5 +494,87 @@
       "drought_control_not_run": "Drought check not run",
       "water_to_built": "Water to built-up"
     }
+  },
+  "sources": {
+    "title": "Government sources",
+    "lede": "Where the boundary register comes from. Every source is read the same way: kept, checked, matched and versioned.",
+    "no_agreement": "No data-sharing agreement exists yet, so no government system is called. Sources load from files: an officer's drop folder, or fictional samples that load into the demo world.",
+    "agreement": "Agreement",
+    "none_yet": "None yet",
+    "drop": "Drop folder",
+    "no_files": "No files waiting",
+    "last_run": "Last load",
+    "never": "Never loaded",
+    "contract": "Data contract: the files this source must send",
+    "required": "required",
+    "optional": "optional",
+    "preview_sample": "Preview sample",
+    "load_sample": "Load sample",
+    "preview_drop": "Preview dropped files",
+    "load_drop": "Load dropped files",
+    "running": "Working…",
+    "preview_of": "Preview: {{agency}}",
+    "loaded": "Loaded: {{agency}} (run {{id}})",
+    "preview_note": "Nothing has been written. This is exactly what loading would do.",
+    "loaded_note": "Written to the register. Boundaries are added as new versions; nothing was overwritten.",
+    "sample_note": "Sample data is fictional and belongs to the demo world.",
+    "records": "Records in this load",
+    "seen_before": "seen before",
+    "recent": "Recent loads",
+    "no_runs": "Nothing loaded yet.",
+    "nothing": "No changes",
+    "col": {
+      "action": "Result",
+      "record": "Record",
+      "asset": "Asset",
+      "why": "Detail",
+      "when": "When",
+      "source": "Source",
+      "result": "Result"
+    },
+    "via": {
+      "sample": "sample",
+      "file_drop": "drop folder",
+      "api": "official API"
+    },
+    "action": {
+      "created": "Created",
+      "new_version": "New boundary version",
+      "unchanged": "Unchanged",
+      "skipped_weaker": "Kept the stronger boundary",
+      "conflict": "Conflict",
+      "rejected": "Refused",
+      "waiting": "Waiting",
+      "warning": "Warning",
+      "survey_numbers": "Survey numbers added",
+      "parcels": "Parcels",
+      "privacy": "Personal data removed"
+    },
+    "count": {
+      "assets_created": "Assets created: {{count}}",
+      "boundary_versions": "New boundary versions: {{count}}",
+      "unchanged": "Unchanged: {{count}}",
+      "skipped_weaker": "Stronger kept: {{count}}",
+      "conflicts": "Conflicts: {{count}}",
+      "rejected": "Refused: {{count}}",
+      "waiting": "Waiting: {{count}}",
+      "warnings": "Warnings: {{count}}",
+      "links_added": "Links: {{count}}",
+      "parcels_loaded": "Parcels loaded: {{count}}",
+      "parcels_unchanged": "Parcels unchanged: {{count}}",
+      "survey_numbers_updated": "Survey numbers updated: {{count}}"
+    }
+  },
+  "land": {
+    "government": "Government",
+    "tank": "Tank (kunta, cheruvu)",
+    "shikam": "Shikam",
+    "assigned": "Assigned",
+    "patta": "Patta (private)",
+    "inam": "Inam",
+    "endowment": "Endowment",
+    "wakf": "Wakf",
+    "forest": "Forest",
+    "unknown": "Not recognised"
   }
 }

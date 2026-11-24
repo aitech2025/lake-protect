@@ -93,6 +93,9 @@ class Boundary(Base):
     derived_from_id: Mapped[int | None] = mapped_column(ForeignKey("boundaries.id"))
     sha256: Mapped[str] = mapped_column(String(64), default="")
     created_at: Mapped[dt.datetime] = mapped_column(TZ, server_default="now()")
+    # Migration 0005: the file it came from, and how far its lines may be off on the ground.
+    source_snapshot_id: Mapped[int | None] = mapped_column(ForeignKey("source_snapshots.id"))
+    positional_accuracy_m: Mapped[Decimal | None] = mapped_column(Numeric(8, 2))
 
 
 class Observation(Base):
@@ -376,3 +379,78 @@ class AssetScreen(Base):
     candidates: Mapped[int] = mapped_column(Integer, default=0)
     legacy_changes: Mapped[int] = mapped_column(Integer, default=0)
     counts: Mapped[dict] = mapped_column(JSONB, default=dict)
+
+
+class SourceSnapshot(Base):
+    """One file received from a government source (migration 0005). Append-only."""
+
+    __tablename__ = "source_snapshots"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    connector: Mapped[str] = mapped_column(Text)
+    agency: Mapped[str] = mapped_column(Text)
+    dataset: Mapped[str] = mapped_column(Text)
+    transport: Mapped[str] = mapped_column(Text)
+    file_name: Mapped[str] = mapped_column(Text)
+    content_type: Mapped[str] = mapped_column(Text)
+    received_sha256: Mapped[str] = mapped_column(String(64))
+    sha256: Mapped[str] = mapped_column(String(64))
+    byte_size: Mapped[int] = mapped_column(BigInteger)
+    storage_key: Mapped[str] = mapped_column(Text)
+    source_date: Mapped[dt.date] = mapped_column(Date)
+    reference: Mapped[str | None] = mapped_column(Text)
+    agreement_ref: Mapped[str | None] = mapped_column(Text)
+    licence_note: Mapped[str] = mapped_column(Text)
+    is_sample: Mapped[bool] = mapped_column(Boolean)
+    stripped_fields: Mapped[list[str]] = mapped_column(ARRAY(Text), default=list)
+    record_count: Mapped[int] = mapped_column(Integer, default=0)
+    received_at: Mapped[dt.datetime] = mapped_column(TZ, server_default="now()")
+    received_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+
+
+class ImportRun(Base):
+    """One run of the asset creation engine, with what it did to each record. Append-only."""
+
+    __tablename__ = "import_runs"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    connector: Mapped[str] = mapped_column(Text)
+    transport: Mapped[str] = mapped_column(Text)
+    is_sample: Mapped[bool] = mapped_column(Boolean)
+    started_at: Mapped[dt.datetime] = mapped_column(TZ)
+    finished_at: Mapped[dt.datetime] = mapped_column(TZ)
+    actor_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    snapshot_ids: Mapped[list[int]] = mapped_column(ARRAY(BigInteger), default=list)
+    counts: Mapped[dict] = mapped_column(JSONB, default=dict)
+    items: Mapped[list] = mapped_column(JSONB, default=list)
+
+
+class AssetSourceLink(Base):
+    """The ID a department uses for an asset (the crosswalk). Append-only."""
+
+    __tablename__ = "asset_source_links"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    asset_id: Mapped[int] = mapped_column(ForeignKey("assets.id"))
+    connector: Mapped[str] = mapped_column(Text)
+    external_id: Mapped[str] = mapped_column(Text)
+    snapshot_id: Mapped[int] = mapped_column(ForeignKey("source_snapshots.id"))
+    matched_by: Mapped[str] = mapped_column(Text)
+    linked_at: Mapped[dt.datetime] = mapped_column(TZ, server_default="now()")
+
+
+class LandParcel(Base):
+    """A survey-number parcel with its land category. No owner fields, by design (17.10)."""
+
+    __tablename__ = "land_parcels"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    snapshot_id: Mapped[int] = mapped_column(ForeignKey("source_snapshots.id"))
+    district: Mapped[str] = mapped_column(Text)
+    mandal: Mapped[str] = mapped_column(Text)
+    village: Mapped[str] = mapped_column(Text)
+    survey_no: Mapped[str] = mapped_column(Text)
+    sub_division: Mapped[str] = mapped_column(Text, default="")
+    bhudhaar: Mapped[str | None] = mapped_column(Text)
+    land_category: Mapped[str] = mapped_column(Text)
+    recorded_category: Mapped[str | None] = mapped_column(Text)
+    extent_acres: Mapped[Decimal | None] = mapped_column(Numeric(12, 4))
+    positional_accuracy_m: Mapped[Decimal | None] = mapped_column(Numeric(8, 2))
+    geom = mapped_column(MULTIPOLYGON)
+    is_sample: Mapped[bool] = mapped_column(Boolean)

@@ -1,0 +1,6 @@
+tank_id,tank_name,tank_name_te,district,mandal,village,hmda_lake_id,survey_numbers,ftl_level_m,weir_crest_m,surveyed_by
+MI-S-0101,Sample Cheruvu A,,Sample District,Sample Mandal,Sample Village 1,S-001,,,,Sample office (fictional)
+MI-S-0102,Sample Kunta F,,Sample District,Sample Mandal,Sample Village 1,,,,,Sample office (fictional)
+MI-S-0103,Sample Kunta C (tank register),,Sample District,Sample Mandal,Sample Village 1,,,,,Sample office (fictional)
+MI-S-0104,Sample Tank G,,Sample District,Sample Mandal,Sample Village 1,,,,,Sample office (fictional)
+MI-S-0105,Sample Tank H,,Sample District,Sample Mandal,Sample Village 1,,,,,Sample office (fictional)

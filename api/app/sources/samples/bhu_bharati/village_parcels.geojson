@@ -1,0 +1,6845 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "1",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6060744,
+       14.6289831
+      ],
+      [
+       81.6060744,
+       14.6312289
+      ],
+      [
+       81.6037535,
+       14.6312289
+      ],
+      [
+       81.6037535,
+       14.6289831
+      ],
+      [
+       81.6060744,
+       14.6289831
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "2",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6083954,
+       14.6289831
+      ],
+      [
+       81.6083954,
+       14.6312289
+      ],
+      [
+       81.6060744,
+       14.6312289
+      ],
+      [
+       81.6060744,
+       14.6289831
+      ],
+      [
+       81.6083954,
+       14.6289831
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "3",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6107163,
+       14.6289831
+      ],
+      [
+       81.6107163,
+       14.6312289
+      ],
+      [
+       81.6083954,
+       14.6312289
+      ],
+      [
+       81.6083954,
+       14.6289831
+      ],
+      [
+       81.6107163,
+       14.6289831
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "4",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6130372,
+       14.6289831
+      ],
+      [
+       81.6130372,
+       14.6312289
+      ],
+      [
+       81.6107163,
+       14.6312289
+      ],
+      [
+       81.6107163,
+       14.6289831
+      ],
+      [
+       81.6130372,
+       14.6289831
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "5",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6153581,
+       14.6289831
+      ],
+      [
+       81.6153581,
+       14.6312289
+      ],
+      [
+       81.6130372,
+       14.6312289
+      ],
+      [
+       81.6130372,
+       14.6289831
+      ],
+      [
+       81.6153581,
+       14.6289831
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "6",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6176791,
+       14.6289831
+      ],
+      [
+       81.6176791,
+       14.6312289
+      ],
+      [
+       81.6153581,
+       14.6312289
+      ],
+      [
+       81.6153581,
+       14.6289831
+      ],
+      [
+       81.6176791,
+       14.6289831
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "7",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.62,
+       14.6289831
+      ],
+      [
+       81.62,
+       14.6312289
+      ],
+      [
+       81.6176791,
+       14.6312289
+      ],
+      [
+       81.6176791,
+       14.6289831
+      ],
+      [
+       81.62,
+       14.6289831
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "8",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6223209,
+       14.6289831
+      ],
+      [
+       81.6223209,
+       14.6312289
+      ],
+      [
+       81.62,
+       14.6312289
+      ],
+      [
+       81.62,
+       14.6289831
+      ],
+      [
+       81.6223209,
+       14.6289831
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "9",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6246419,
+       14.6289831
+      ],
+      [
+       81.6246419,
+       14.6312289
+      ],
+      [
+       81.6223209,
+       14.6312289
+      ],
+      [
+       81.6223209,
+       14.6289831
+      ],
+      [
+       81.6246419,
+       14.6289831
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "10",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6269628,
+       14.6289831
+      ],
+      [
+       81.6269628,
+       14.6312289
+      ],
+      [
+       81.6246419,
+       14.6312289
+      ],
+      [
+       81.6246419,
+       14.6289831
+      ],
+      [
+       81.6269628,
+       14.6289831
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "1",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6292837,
+       14.6289831
+      ],
+      [
+       81.6292837,
+       14.6312289
+      ],
+      [
+       81.6269628,
+       14.6312289
+      ],
+      [
+       81.6269628,
+       14.6289831
+      ],
+      [
+       81.6292837,
+       14.6289831
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "2",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6316046,
+       14.6289831
+      ],
+      [
+       81.6316046,
+       14.6312289
+      ],
+      [
+       81.6292837,
+       14.6312289
+      ],
+      [
+       81.6292837,
+       14.6289831
+      ],
+      [
+       81.6316046,
+       14.6289831
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "3",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6339256,
+       14.6289831
+      ],
+      [
+       81.6339256,
+       14.6312289
+      ],
+      [
+       81.6316046,
+       14.6312289
+      ],
+      [
+       81.6316046,
+       14.6289831
+      ],
+      [
+       81.6339256,
+       14.6289831
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "4",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6362465,
+       14.6289831
+      ],
+      [
+       81.6362465,
+       14.6312289
+      ],
+      [
+       81.6339256,
+       14.6312289
+      ],
+      [
+       81.6339256,
+       14.6289831
+      ],
+      [
+       81.6362465,
+       14.6289831
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "5",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6385674,
+       14.6289831
+      ],
+      [
+       81.6385674,
+       14.6312289
+      ],
+      [
+       81.6362465,
+       14.6312289
+      ],
+      [
+       81.6362465,
+       14.6289831
+      ],
+      [
+       81.6385674,
+       14.6289831
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "11",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6060744,
+       14.6267373
+      ],
+      [
+       81.6060744,
+       14.6289831
+      ],
+      [
+       81.6037535,
+       14.6289831
+      ],
+      [
+       81.6037535,
+       14.6267373
+      ],
+      [
+       81.6060744,
+       14.6267373
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "12",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6083954,
+       14.6267373
+      ],
+      [
+       81.6083954,
+       14.6289831
+      ],
+      [
+       81.6060744,
+       14.6289831
+      ],
+      [
+       81.6060744,
+       14.6267373
+      ],
+      [
+       81.6083954,
+       14.6267373
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "13",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6107163,
+       14.6267373
+      ],
+      [
+       81.6107163,
+       14.6289831
+      ],
+      [
+       81.6083954,
+       14.6289831
+      ],
+      [
+       81.6083954,
+       14.6267373
+      ],
+      [
+       81.6107163,
+       14.6267373
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "14",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6130372,
+       14.6267373
+      ],
+      [
+       81.6130372,
+       14.6289831
+      ],
+      [
+       81.6107163,
+       14.6289831
+      ],
+      [
+       81.6107163,
+       14.6267373
+      ],
+      [
+       81.6130372,
+       14.6267373
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "15",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6153581,
+       14.6267373
+      ],
+      [
+       81.6153581,
+       14.6289831
+      ],
+      [
+       81.6130372,
+       14.6289831
+      ],
+      [
+       81.6130372,
+       14.6267373
+      ],
+      [
+       81.6153581,
+       14.6267373
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "16",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6176791,
+       14.6267373
+      ],
+      [
+       81.6176791,
+       14.6289831
+      ],
+      [
+       81.6153581,
+       14.6289831
+      ],
+      [
+       81.6153581,
+       14.6267373
+      ],
+      [
+       81.6176791,
+       14.6267373
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "17",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.62,
+       14.6267373
+      ],
+      [
+       81.62,
+       14.6289831
+      ],
+      [
+       81.6176791,
+       14.6289831
+      ],
+      [
+       81.6176791,
+       14.6267373
+      ],
+      [
+       81.62,
+       14.6267373
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "18",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6223209,
+       14.6267373
+      ],
+      [
+       81.6223209,
+       14.6289831
+      ],
+      [
+       81.62,
+       14.6289831
+      ],
+      [
+       81.62,
+       14.6267373
+      ],
+      [
+       81.6223209,
+       14.6267373
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "19",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6246419,
+       14.6267373
+      ],
+      [
+       81.6246419,
+       14.6289831
+      ],
+      [
+       81.6223209,
+       14.6289831
+      ],
+      [
+       81.6223209,
+       14.6267373
+      ],
+      [
+       81.6246419,
+       14.6267373
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "20",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6269628,
+       14.6267373
+      ],
+      [
+       81.6269628,
+       14.6289831
+      ],
+      [
+       81.6246419,
+       14.6289831
+      ],
+      [
+       81.6246419,
+       14.6267373
+      ],
+      [
+       81.6269628,
+       14.6267373
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "6",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6292837,
+       14.6267373
+      ],
+      [
+       81.6292837,
+       14.6289831
+      ],
+      [
+       81.6269628,
+       14.6289831
+      ],
+      [
+       81.6269628,
+       14.6267373
+      ],
+      [
+       81.6292837,
+       14.6267373
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "7",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6316046,
+       14.6267373
+      ],
+      [
+       81.6316046,
+       14.6289831
+      ],
+      [
+       81.6292837,
+       14.6289831
+      ],
+      [
+       81.6292837,
+       14.6267373
+      ],
+      [
+       81.6316046,
+       14.6267373
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "8",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6339256,
+       14.6267373
+      ],
+      [
+       81.6339256,
+       14.6289831
+      ],
+      [
+       81.6316046,
+       14.6289831
+      ],
+      [
+       81.6316046,
+       14.6267373
+      ],
+      [
+       81.6339256,
+       14.6267373
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "9",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6362465,
+       14.6267373
+      ],
+      [
+       81.6362465,
+       14.6289831
+      ],
+      [
+       81.6339256,
+       14.6289831
+      ],
+      [
+       81.6339256,
+       14.6267373
+      ],
+      [
+       81.6362465,
+       14.6267373
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "10",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6385674,
+       14.6267373
+      ],
+      [
+       81.6385674,
+       14.6289831
+      ],
+      [
+       81.6362465,
+       14.6289831
+      ],
+      [
+       81.6362465,
+       14.6267373
+      ],
+      [
+       81.6385674,
+       14.6267373
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "21",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6060744,
+       14.6244916
+      ],
+      [
+       81.6060744,
+       14.6267373
+      ],
+      [
+       81.6037535,
+       14.6267373
+      ],
+      [
+       81.6037535,
+       14.6244916
+      ],
+      [
+       81.6060744,
+       14.6244916
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "22",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6083954,
+       14.6244916
+      ],
+      [
+       81.6083954,
+       14.6267373
+      ],
+      [
+       81.6060744,
+       14.6267373
+      ],
+      [
+       81.6060744,
+       14.6244916
+      ],
+      [
+       81.6083954,
+       14.6244916
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "23",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6107163,
+       14.6244916
+      ],
+      [
+       81.6107163,
+       14.6267373
+      ],
+      [
+       81.6083954,
+       14.6267373
+      ],
+      [
+       81.6083954,
+       14.6244916
+      ],
+      [
+       81.6107163,
+       14.6244916
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "24",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6130372,
+       14.6244916
+      ],
+      [
+       81.6130372,
+       14.6267373
+      ],
+      [
+       81.6107163,
+       14.6267373
+      ],
+      [
+       81.6107163,
+       14.6244916
+      ],
+      [
+       81.6130372,
+       14.6244916
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "25",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6153581,
+       14.6244916
+      ],
+      [
+       81.6153581,
+       14.6267373
+      ],
+      [
+       81.6130372,
+       14.6267373
+      ],
+      [
+       81.6130372,
+       14.6244916
+      ],
+      [
+       81.6153581,
+       14.6244916
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "26",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6176791,
+       14.6244916
+      ],
+      [
+       81.6176791,
+       14.6267373
+      ],
+      [
+       81.6153581,
+       14.6267373
+      ],
+      [
+       81.6153581,
+       14.6244916
+      ],
+      [
+       81.6176791,
+       14.6244916
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "27",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.62,
+       14.6244916
+      ],
+      [
+       81.62,
+       14.6267373
+      ],
+      [
+       81.6176791,
+       14.6267373
+      ],
+      [
+       81.6176791,
+       14.6244916
+      ],
+      [
+       81.62,
+       14.6244916
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "28",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6223209,
+       14.6244916
+      ],
+      [
+       81.6223209,
+       14.6267373
+      ],
+      [
+       81.62,
+       14.6267373
+      ],
+      [
+       81.62,
+       14.6244916
+      ],
+      [
+       81.6223209,
+       14.6244916
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "29",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6246419,
+       14.6244916
+      ],
+      [
+       81.6246419,
+       14.6267373
+      ],
+      [
+       81.6223209,
+       14.6267373
+      ],
+      [
+       81.6223209,
+       14.6244916
+      ],
+      [
+       81.6246419,
+       14.6244916
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "30",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6269628,
+       14.6244916
+      ],
+      [
+       81.6269628,
+       14.6267373
+      ],
+      [
+       81.6246419,
+       14.6267373
+      ],
+      [
+       81.6246419,
+       14.6244916
+      ],
+      [
+       81.6269628,
+       14.6244916
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "11",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6292837,
+       14.6244916
+      ],
+      [
+       81.6292837,
+       14.6267373
+      ],
+      [
+       81.6269628,
+       14.6267373
+      ],
+      [
+       81.6269628,
+       14.6244916
+      ],
+      [
+       81.6292837,
+       14.6244916
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "12",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6316046,
+       14.6244916
+      ],
+      [
+       81.6316046,
+       14.6267373
+      ],
+      [
+       81.6292837,
+       14.6267373
+      ],
+      [
+       81.6292837,
+       14.6244916
+      ],
+      [
+       81.6316046,
+       14.6244916
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "13",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6339256,
+       14.6244916
+      ],
+      [
+       81.6339256,
+       14.6267373
+      ],
+      [
+       81.6316046,
+       14.6267373
+      ],
+      [
+       81.6316046,
+       14.6244916
+      ],
+      [
+       81.6339256,
+       14.6244916
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "14",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6362465,
+       14.6244916
+      ],
+      [
+       81.6362465,
+       14.6267373
+      ],
+      [
+       81.6339256,
+       14.6267373
+      ],
+      [
+       81.6339256,
+       14.6244916
+      ],
+      [
+       81.6362465,
+       14.6244916
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "15",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6385674,
+       14.6244916
+      ],
+      [
+       81.6385674,
+       14.6267373
+      ],
+      [
+       81.6362465,
+       14.6267373
+      ],
+      [
+       81.6362465,
+       14.6244916
+      ],
+      [
+       81.6385674,
+       14.6244916
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "31",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6060744,
+       14.6222458
+      ],
+      [
+       81.6060744,
+       14.6244916
+      ],
+      [
+       81.6037535,
+       14.6244916
+      ],
+      [
+       81.6037535,
+       14.6222458
+      ],
+      [
+       81.6060744,
+       14.6222458
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "32",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6083954,
+       14.6222458
+      ],
+      [
+       81.6083954,
+       14.6244916
+      ],
+      [
+       81.6060744,
+       14.6244916
+      ],
+      [
+       81.6060744,
+       14.6222458
+      ],
+      [
+       81.6083954,
+       14.6222458
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "33",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6107163,
+       14.6222458
+      ],
+      [
+       81.6107163,
+       14.6244916
+      ],
+      [
+       81.6083954,
+       14.6244916
+      ],
+      [
+       81.6083954,
+       14.6222458
+      ],
+      [
+       81.6107163,
+       14.6222458
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "34",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6130372,
+       14.6222458
+      ],
+      [
+       81.6130372,
+       14.6244916
+      ],
+      [
+       81.6107163,
+       14.6244916
+      ],
+      [
+       81.6107163,
+       14.6222458
+      ],
+      [
+       81.6130372,
+       14.6222458
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "35",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6153581,
+       14.6222458
+      ],
+      [
+       81.6153581,
+       14.6244916
+      ],
+      [
+       81.6130372,
+       14.6244916
+      ],
+      [
+       81.6130372,
+       14.6222458
+      ],
+      [
+       81.6153581,
+       14.6222458
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "36",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6176791,
+       14.6222458
+      ],
+      [
+       81.6176791,
+       14.6244916
+      ],
+      [
+       81.6153581,
+       14.6244916
+      ],
+      [
+       81.6153581,
+       14.6222458
+      ],
+      [
+       81.6176791,
+       14.6222458
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "37",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.62,
+       14.6222458
+      ],
+      [
+       81.62,
+       14.6244916
+      ],
+      [
+       81.6176791,
+       14.6244916
+      ],
+      [
+       81.6176791,
+       14.6222458
+      ],
+      [
+       81.62,
+       14.6222458
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "38",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6223209,
+       14.6222458
+      ],
+      [
+       81.6223209,
+       14.6244916
+      ],
+      [
+       81.62,
+       14.6244916
+      ],
+      [
+       81.62,
+       14.6222458
+      ],
+      [
+       81.6223209,
+       14.6222458
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "39",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6246419,
+       14.6222458
+      ],
+      [
+       81.6246419,
+       14.6244916
+      ],
+      [
+       81.6223209,
+       14.6244916
+      ],
+      [
+       81.6223209,
+       14.6222458
+      ],
+      [
+       81.6246419,
+       14.6222458
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "40",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6269628,
+       14.6222458
+      ],
+      [
+       81.6269628,
+       14.6244916
+      ],
+      [
+       81.6246419,
+       14.6244916
+      ],
+      [
+       81.6246419,
+       14.6222458
+      ],
+      [
+       81.6269628,
+       14.6222458
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "16",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6292837,
+       14.6222458
+      ],
+      [
+       81.6292837,
+       14.6244916
+      ],
+      [
+       81.6269628,
+       14.6244916
+      ],
+      [
+       81.6269628,
+       14.6222458
+      ],
+      [
+       81.6292837,
+       14.6222458
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "17",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6316046,
+       14.6222458
+      ],
+      [
+       81.6316046,
+       14.6244916
+      ],
+      [
+       81.6292837,
+       14.6244916
+      ],
+      [
+       81.6292837,
+       14.6222458
+      ],
+      [
+       81.6316046,
+       14.6222458
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "18",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6339256,
+       14.6222458
+      ],
+      [
+       81.6339256,
+       14.6244916
+      ],
+      [
+       81.6316046,
+       14.6244916
+      ],
+      [
+       81.6316046,
+       14.6222458
+      ],
+      [
+       81.6339256,
+       14.6222458
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "19",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6362465,
+       14.6222458
+      ],
+      [
+       81.6362465,
+       14.6244916
+      ],
+      [
+       81.6339256,
+       14.6244916
+      ],
+      [
+       81.6339256,
+       14.6222458
+      ],
+      [
+       81.6362465,
+       14.6222458
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "20",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6385674,
+       14.6222458
+      ],
+      [
+       81.6385674,
+       14.6244916
+      ],
+      [
+       81.6362465,
+       14.6244916
+      ],
+      [
+       81.6362465,
+       14.6222458
+      ],
+      [
+       81.6385674,
+       14.6222458
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "41",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6060744,
+       14.62
+      ],
+      [
+       81.6060744,
+       14.6222458
+      ],
+      [
+       81.6037535,
+       14.6222458
+      ],
+      [
+       81.6037535,
+       14.62
+      ],
+      [
+       81.6060744,
+       14.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "42",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6083954,
+       14.62
+      ],
+      [
+       81.6083954,
+       14.6222458
+      ],
+      [
+       81.6060744,
+       14.6222458
+      ],
+      [
+       81.6060744,
+       14.62
+      ],
+      [
+       81.6083954,
+       14.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "43",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6107163,
+       14.62
+      ],
+      [
+       81.6107163,
+       14.6222458
+      ],
+      [
+       81.6083954,
+       14.6222458
+      ],
+      [
+       81.6083954,
+       14.62
+      ],
+      [
+       81.6107163,
+       14.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "44",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6130372,
+       14.62
+      ],
+      [
+       81.6130372,
+       14.6222458
+      ],
+      [
+       81.6107163,
+       14.6222458
+      ],
+      [
+       81.6107163,
+       14.62
+      ],
+      [
+       81.6130372,
+       14.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "45",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6153581,
+       14.62
+      ],
+      [
+       81.6153581,
+       14.6222458
+      ],
+      [
+       81.6130372,
+       14.6222458
+      ],
+      [
+       81.6130372,
+       14.62
+      ],
+      [
+       81.6153581,
+       14.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "46",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6176791,
+       14.62
+      ],
+      [
+       81.6176791,
+       14.6222458
+      ],
+      [
+       81.6153581,
+       14.6222458
+      ],
+      [
+       81.6153581,
+       14.62
+      ],
+      [
+       81.6176791,
+       14.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "47",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.62,
+       14.62
+      ],
+      [
+       81.62,
+       14.6222458
+      ],
+      [
+       81.6176791,
+       14.6222458
+      ],
+      [
+       81.6176791,
+       14.62
+      ],
+      [
+       81.62,
+       14.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "48",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6223209,
+       14.62
+      ],
+      [
+       81.6223209,
+       14.6222458
+      ],
+      [
+       81.62,
+       14.6222458
+      ],
+      [
+       81.62,
+       14.62
+      ],
+      [
+       81.6223209,
+       14.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "49",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6246419,
+       14.62
+      ],
+      [
+       81.6246419,
+       14.6222458
+      ],
+      [
+       81.6223209,
+       14.6222458
+      ],
+      [
+       81.6223209,
+       14.62
+      ],
+      [
+       81.6246419,
+       14.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "50",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6269628,
+       14.62
+      ],
+      [
+       81.6269628,
+       14.6222458
+      ],
+      [
+       81.6246419,
+       14.6222458
+      ],
+      [
+       81.6246419,
+       14.62
+      ],
+      [
+       81.6269628,
+       14.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "21",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6292837,
+       14.62
+      ],
+      [
+       81.6292837,
+       14.6222458
+      ],
+      [
+       81.6269628,
+       14.6222458
+      ],
+      [
+       81.6269628,
+       14.62
+      ],
+      [
+       81.6292837,
+       14.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "22",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6316046,
+       14.62
+      ],
+      [
+       81.6316046,
+       14.6222458
+      ],
+      [
+       81.6292837,
+       14.6222458
+      ],
+      [
+       81.6292837,
+       14.62
+      ],
+      [
+       81.6316046,
+       14.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "23",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6339256,
+       14.62
+      ],
+      [
+       81.6339256,
+       14.6222458
+      ],
+      [
+       81.6316046,
+       14.6222458
+      ],
+      [
+       81.6316046,
+       14.62
+      ],
+      [
+       81.6339256,
+       14.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "24",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6362465,
+       14.62
+      ],
+      [
+       81.6362465,
+       14.6222458
+      ],
+      [
+       81.6339256,
+       14.6222458
+      ],
+      [
+       81.6339256,
+       14.62
+      ],
+      [
+       81.6362465,
+       14.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "25",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6385674,
+       14.62
+      ],
+      [
+       81.6385674,
+       14.6222458
+      ],
+      [
+       81.6362465,
+       14.6222458
+      ],
+      [
+       81.6362465,
+       14.62
+      ],
+      [
+       81.6385674,
+       14.62
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "51",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6060744,
+       14.6177542
+      ],
+      [
+       81.6060744,
+       14.62
+      ],
+      [
+       81.6037535,
+       14.62
+      ],
+      [
+       81.6037535,
+       14.6177542
+      ],
+      [
+       81.6060744,
+       14.6177542
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "52",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6083954,
+       14.6177542
+      ],
+      [
+       81.6083954,
+       14.62
+      ],
+      [
+       81.6060744,
+       14.62
+      ],
+      [
+       81.6060744,
+       14.6177542
+      ],
+      [
+       81.6083954,
+       14.6177542
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "53",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6107163,
+       14.6177542
+      ],
+      [
+       81.6107163,
+       14.62
+      ],
+      [
+       81.6083954,
+       14.62
+      ],
+      [
+       81.6083954,
+       14.6177542
+      ],
+      [
+       81.6107163,
+       14.6177542
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "54",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6130372,
+       14.6177542
+      ],
+      [
+       81.6130372,
+       14.62
+      ],
+      [
+       81.6107163,
+       14.62
+      ],
+      [
+       81.6107163,
+       14.6177542
+      ],
+      [
+       81.6130372,
+       14.6177542
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "55",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6153581,
+       14.6177542
+      ],
+      [
+       81.6153581,
+       14.62
+      ],
+      [
+       81.6130372,
+       14.62
+      ],
+      [
+       81.6130372,
+       14.6177542
+      ],
+      [
+       81.6153581,
+       14.6177542
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "56",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6176791,
+       14.6177542
+      ],
+      [
+       81.6176791,
+       14.62
+      ],
+      [
+       81.6153581,
+       14.62
+      ],
+      [
+       81.6153581,
+       14.6177542
+      ],
+      [
+       81.6176791,
+       14.6177542
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "57",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.62,
+       14.6177542
+      ],
+      [
+       81.62,
+       14.62
+      ],
+      [
+       81.6176791,
+       14.62
+      ],
+      [
+       81.6176791,
+       14.6177542
+      ],
+      [
+       81.62,
+       14.6177542
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "58",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6223209,
+       14.6177542
+      ],
+      [
+       81.6223209,
+       14.62
+      ],
+      [
+       81.62,
+       14.62
+      ],
+      [
+       81.62,
+       14.6177542
+      ],
+      [
+       81.6223209,
+       14.6177542
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "59",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6246419,
+       14.6177542
+      ],
+      [
+       81.6246419,
+       14.62
+      ],
+      [
+       81.6223209,
+       14.62
+      ],
+      [
+       81.6223209,
+       14.6177542
+      ],
+      [
+       81.6246419,
+       14.6177542
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "60",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6269628,
+       14.6177542
+      ],
+      [
+       81.6269628,
+       14.62
+      ],
+      [
+       81.6246419,
+       14.62
+      ],
+      [
+       81.6246419,
+       14.6177542
+      ],
+      [
+       81.6269628,
+       14.6177542
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "26",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6292837,
+       14.6177542
+      ],
+      [
+       81.6292837,
+       14.62
+      ],
+      [
+       81.6269628,
+       14.62
+      ],
+      [
+       81.6269628,
+       14.6177542
+      ],
+      [
+       81.6292837,
+       14.6177542
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "27",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6316046,
+       14.6177542
+      ],
+      [
+       81.6316046,
+       14.62
+      ],
+      [
+       81.6292837,
+       14.62
+      ],
+      [
+       81.6292837,
+       14.6177542
+      ],
+      [
+       81.6316046,
+       14.6177542
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "28",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6339256,
+       14.6177542
+      ],
+      [
+       81.6339256,
+       14.62
+      ],
+      [
+       81.6316046,
+       14.62
+      ],
+      [
+       81.6316046,
+       14.6177542
+      ],
+      [
+       81.6339256,
+       14.6177542
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "29",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6362465,
+       14.6177542
+      ],
+      [
+       81.6362465,
+       14.62
+      ],
+      [
+       81.6339256,
+       14.62
+      ],
+      [
+       81.6339256,
+       14.6177542
+      ],
+      [
+       81.6362465,
+       14.6177542
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "30",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6385674,
+       14.6177542
+      ],
+      [
+       81.6385674,
+       14.62
+      ],
+      [
+       81.6362465,
+       14.62
+      ],
+      [
+       81.6362465,
+       14.6177542
+      ],
+      [
+       81.6385674,
+       14.6177542
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "61",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6060744,
+       14.6155084
+      ],
+      [
+       81.6060744,
+       14.6177542
+      ],
+      [
+       81.6037535,
+       14.6177542
+      ],
+      [
+       81.6037535,
+       14.6155084
+      ],
+      [
+       81.6060744,
+       14.6155084
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "62",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6083954,
+       14.6155084
+      ],
+      [
+       81.6083954,
+       14.6177542
+      ],
+      [
+       81.6060744,
+       14.6177542
+      ],
+      [
+       81.6060744,
+       14.6155084
+      ],
+      [
+       81.6083954,
+       14.6155084
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "63",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6107163,
+       14.6155084
+      ],
+      [
+       81.6107163,
+       14.6177542
+      ],
+      [
+       81.6083954,
+       14.6177542
+      ],
+      [
+       81.6083954,
+       14.6155084
+      ],
+      [
+       81.6107163,
+       14.6155084
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "64",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6130372,
+       14.6155084
+      ],
+      [
+       81.6130372,
+       14.6177542
+      ],
+      [
+       81.6107163,
+       14.6177542
+      ],
+      [
+       81.6107163,
+       14.6155084
+      ],
+      [
+       81.6130372,
+       14.6155084
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "65",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6153581,
+       14.6155084
+      ],
+      [
+       81.6153581,
+       14.6177542
+      ],
+      [
+       81.6130372,
+       14.6177542
+      ],
+      [
+       81.6130372,
+       14.6155084
+      ],
+      [
+       81.6153581,
+       14.6155084
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "66",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6176791,
+       14.6155084
+      ],
+      [
+       81.6176791,
+       14.6177542
+      ],
+      [
+       81.6153581,
+       14.6177542
+      ],
+      [
+       81.6153581,
+       14.6155084
+      ],
+      [
+       81.6176791,
+       14.6155084
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "67",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.62,
+       14.6155084
+      ],
+      [
+       81.62,
+       14.6177542
+      ],
+      [
+       81.6176791,
+       14.6177542
+      ],
+      [
+       81.6176791,
+       14.6155084
+      ],
+      [
+       81.62,
+       14.6155084
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "68",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6223209,
+       14.6155084
+      ],
+      [
+       81.6223209,
+       14.6177542
+      ],
+      [
+       81.62,
+       14.6177542
+      ],
+      [
+       81.62,
+       14.6155084
+      ],
+      [
+       81.6223209,
+       14.6155084
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "69",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6246419,
+       14.6155084
+      ],
+      [
+       81.6246419,
+       14.6177542
+      ],
+      [
+       81.6223209,
+       14.6177542
+      ],
+      [
+       81.6223209,
+       14.6155084
+      ],
+      [
+       81.6246419,
+       14.6155084
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "70",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6269628,
+       14.6155084
+      ],
+      [
+       81.6269628,
+       14.6177542
+      ],
+      [
+       81.6246419,
+       14.6177542
+      ],
+      [
+       81.6246419,
+       14.6155084
+      ],
+      [
+       81.6269628,
+       14.6155084
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "31",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6292837,
+       14.6155084
+      ],
+      [
+       81.6292837,
+       14.6177542
+      ],
+      [
+       81.6269628,
+       14.6177542
+      ],
+      [
+       81.6269628,
+       14.6155084
+      ],
+      [
+       81.6292837,
+       14.6155084
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "32",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6316046,
+       14.6155084
+      ],
+      [
+       81.6316046,
+       14.6177542
+      ],
+      [
+       81.6292837,
+       14.6177542
+      ],
+      [
+       81.6292837,
+       14.6155084
+      ],
+      [
+       81.6316046,
+       14.6155084
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "33",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6339256,
+       14.6155084
+      ],
+      [
+       81.6339256,
+       14.6177542
+      ],
+      [
+       81.6316046,
+       14.6177542
+      ],
+      [
+       81.6316046,
+       14.6155084
+      ],
+      [
+       81.6339256,
+       14.6155084
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "34",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6362465,
+       14.6155084
+      ],
+      [
+       81.6362465,
+       14.6177542
+      ],
+      [
+       81.6339256,
+       14.6177542
+      ],
+      [
+       81.6339256,
+       14.6155084
+      ],
+      [
+       81.6362465,
+       14.6155084
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "35",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6385674,
+       14.6155084
+      ],
+      [
+       81.6385674,
+       14.6177542
+      ],
+      [
+       81.6362465,
+       14.6177542
+      ],
+      [
+       81.6362465,
+       14.6155084
+      ],
+      [
+       81.6385674,
+       14.6155084
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "71",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6060744,
+       14.6132627
+      ],
+      [
+       81.6060744,
+       14.6155084
+      ],
+      [
+       81.6037535,
+       14.6155084
+      ],
+      [
+       81.6037535,
+       14.6132627
+      ],
+      [
+       81.6060744,
+       14.6132627
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "72",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6083954,
+       14.6132627
+      ],
+      [
+       81.6083954,
+       14.6155084
+      ],
+      [
+       81.6060744,
+       14.6155084
+      ],
+      [
+       81.6060744,
+       14.6132627
+      ],
+      [
+       81.6083954,
+       14.6132627
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "73",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6107163,
+       14.6132627
+      ],
+      [
+       81.6107163,
+       14.6155084
+      ],
+      [
+       81.6083954,
+       14.6155084
+      ],
+      [
+       81.6083954,
+       14.6132627
+      ],
+      [
+       81.6107163,
+       14.6132627
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "74",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6130372,
+       14.6132627
+      ],
+      [
+       81.6130372,
+       14.6155084
+      ],
+      [
+       81.6107163,
+       14.6155084
+      ],
+      [
+       81.6107163,
+       14.6132627
+      ],
+      [
+       81.6130372,
+       14.6132627
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "75",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6153581,
+       14.6132627
+      ],
+      [
+       81.6153581,
+       14.6155084
+      ],
+      [
+       81.6130372,
+       14.6155084
+      ],
+      [
+       81.6130372,
+       14.6132627
+      ],
+      [
+       81.6153581,
+       14.6132627
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "76",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6176791,
+       14.6132627
+      ],
+      [
+       81.6176791,
+       14.6155084
+      ],
+      [
+       81.6153581,
+       14.6155084
+      ],
+      [
+       81.6153581,
+       14.6132627
+      ],
+      [
+       81.6176791,
+       14.6132627
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "77",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.62,
+       14.6132627
+      ],
+      [
+       81.62,
+       14.6155084
+      ],
+      [
+       81.6176791,
+       14.6155084
+      ],
+      [
+       81.6176791,
+       14.6132627
+      ],
+      [
+       81.62,
+       14.6132627
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "78",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6223209,
+       14.6132627
+      ],
+      [
+       81.6223209,
+       14.6155084
+      ],
+      [
+       81.62,
+       14.6155084
+      ],
+      [
+       81.62,
+       14.6132627
+      ],
+      [
+       81.6223209,
+       14.6132627
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "79",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6246419,
+       14.6132627
+      ],
+      [
+       81.6246419,
+       14.6155084
+      ],
+      [
+       81.6223209,
+       14.6155084
+      ],
+      [
+       81.6223209,
+       14.6132627
+      ],
+      [
+       81.6246419,
+       14.6132627
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "80",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6269628,
+       14.6132627
+      ],
+      [
+       81.6269628,
+       14.6155084
+      ],
+      [
+       81.6246419,
+       14.6155084
+      ],
+      [
+       81.6246419,
+       14.6132627
+      ],
+      [
+       81.6269628,
+       14.6132627
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "36",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6292837,
+       14.6132627
+      ],
+      [
+       81.6292837,
+       14.6155084
+      ],
+      [
+       81.6269628,
+       14.6155084
+      ],
+      [
+       81.6269628,
+       14.6132627
+      ],
+      [
+       81.6292837,
+       14.6132627
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "37",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6316046,
+       14.6132627
+      ],
+      [
+       81.6316046,
+       14.6155084
+      ],
+      [
+       81.6292837,
+       14.6155084
+      ],
+      [
+       81.6292837,
+       14.6132627
+      ],
+      [
+       81.6316046,
+       14.6132627
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "38",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6339256,
+       14.6132627
+      ],
+      [
+       81.6339256,
+       14.6155084
+      ],
+      [
+       81.6316046,
+       14.6155084
+      ],
+      [
+       81.6316046,
+       14.6132627
+      ],
+      [
+       81.6339256,
+       14.6132627
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "39",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6362465,
+       14.6132627
+      ],
+      [
+       81.6362465,
+       14.6155084
+      ],
+      [
+       81.6339256,
+       14.6155084
+      ],
+      [
+       81.6339256,
+       14.6132627
+      ],
+      [
+       81.6362465,
+       14.6132627
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "40",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6385674,
+       14.6132627
+      ],
+      [
+       81.6385674,
+       14.6155084
+      ],
+      [
+       81.6362465,
+       14.6155084
+      ],
+      [
+       81.6362465,
+       14.6132627
+      ],
+      [
+       81.6385674,
+       14.6132627
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "81",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6060744,
+       14.6110169
+      ],
+      [
+       81.6060744,
+       14.6132627
+      ],
+      [
+       81.6037535,
+       14.6132627
+      ],
+      [
+       81.6037535,
+       14.6110169
+      ],
+      [
+       81.6060744,
+       14.6110169
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "82",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6083954,
+       14.6110169
+      ],
+      [
+       81.6083954,
+       14.6132627
+      ],
+      [
+       81.6060744,
+       14.6132627
+      ],
+      [
+       81.6060744,
+       14.6110169
+      ],
+      [
+       81.6083954,
+       14.6110169
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "83",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6107163,
+       14.6110169
+      ],
+      [
+       81.6107163,
+       14.6132627
+      ],
+      [
+       81.6083954,
+       14.6132627
+      ],
+      [
+       81.6083954,
+       14.6110169
+      ],
+      [
+       81.6107163,
+       14.6110169
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "84",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6130372,
+       14.6110169
+      ],
+      [
+       81.6130372,
+       14.6132627
+      ],
+      [
+       81.6107163,
+       14.6132627
+      ],
+      [
+       81.6107163,
+       14.6110169
+      ],
+      [
+       81.6130372,
+       14.6110169
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "85",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6153581,
+       14.6110169
+      ],
+      [
+       81.6153581,
+       14.6132627
+      ],
+      [
+       81.6130372,
+       14.6132627
+      ],
+      [
+       81.6130372,
+       14.6110169
+      ],
+      [
+       81.6153581,
+       14.6110169
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "86",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6176791,
+       14.6110169
+      ],
+      [
+       81.6176791,
+       14.6132627
+      ],
+      [
+       81.6153581,
+       14.6132627
+      ],
+      [
+       81.6153581,
+       14.6110169
+      ],
+      [
+       81.6176791,
+       14.6110169
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "87",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.62,
+       14.6110169
+      ],
+      [
+       81.62,
+       14.6132627
+      ],
+      [
+       81.6176791,
+       14.6132627
+      ],
+      [
+       81.6176791,
+       14.6110169
+      ],
+      [
+       81.62,
+       14.6110169
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "88",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6223209,
+       14.6110169
+      ],
+      [
+       81.6223209,
+       14.6132627
+      ],
+      [
+       81.62,
+       14.6132627
+      ],
+      [
+       81.62,
+       14.6110169
+      ],
+      [
+       81.6223209,
+       14.6110169
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "89",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6246419,
+       14.6110169
+      ],
+      [
+       81.6246419,
+       14.6132627
+      ],
+      [
+       81.6223209,
+       14.6132627
+      ],
+      [
+       81.6223209,
+       14.6110169
+      ],
+      [
+       81.6246419,
+       14.6110169
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "90",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6269628,
+       14.6110169
+      ],
+      [
+       81.6269628,
+       14.6132627
+      ],
+      [
+       81.6246419,
+       14.6132627
+      ],
+      [
+       81.6246419,
+       14.6110169
+      ],
+      [
+       81.6269628,
+       14.6110169
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "41",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6292837,
+       14.6110169
+      ],
+      [
+       81.6292837,
+       14.6132627
+      ],
+      [
+       81.6269628,
+       14.6132627
+      ],
+      [
+       81.6269628,
+       14.6110169
+      ],
+      [
+       81.6292837,
+       14.6110169
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "42",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6316046,
+       14.6110169
+      ],
+      [
+       81.6316046,
+       14.6132627
+      ],
+      [
+       81.6292837,
+       14.6132627
+      ],
+      [
+       81.6292837,
+       14.6110169
+      ],
+      [
+       81.6316046,
+       14.6110169
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "43",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6339256,
+       14.6110169
+      ],
+      [
+       81.6339256,
+       14.6132627
+      ],
+      [
+       81.6316046,
+       14.6132627
+      ],
+      [
+       81.6316046,
+       14.6110169
+      ],
+      [
+       81.6339256,
+       14.6110169
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "44",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6362465,
+       14.6110169
+      ],
+      [
+       81.6362465,
+       14.6132627
+      ],
+      [
+       81.6339256,
+       14.6132627
+      ],
+      [
+       81.6339256,
+       14.6110169
+      ],
+      [
+       81.6362465,
+       14.6110169
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "45",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6385674,
+       14.6110169
+      ],
+      [
+       81.6385674,
+       14.6132627
+      ],
+      [
+       81.6362465,
+       14.6132627
+      ],
+      [
+       81.6362465,
+       14.6110169
+      ],
+      [
+       81.6385674,
+       14.6110169
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "91",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6060744,
+       14.6087711
+      ],
+      [
+       81.6060744,
+       14.6110169
+      ],
+      [
+       81.6037535,
+       14.6110169
+      ],
+      [
+       81.6037535,
+       14.6087711
+      ],
+      [
+       81.6060744,
+       14.6087711
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "92",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6083954,
+       14.6087711
+      ],
+      [
+       81.6083954,
+       14.6110169
+      ],
+      [
+       81.6060744,
+       14.6110169
+      ],
+      [
+       81.6060744,
+       14.6087711
+      ],
+      [
+       81.6083954,
+       14.6087711
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "93",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6107163,
+       14.6087711
+      ],
+      [
+       81.6107163,
+       14.6110169
+      ],
+      [
+       81.6083954,
+       14.6110169
+      ],
+      [
+       81.6083954,
+       14.6087711
+      ],
+      [
+       81.6107163,
+       14.6087711
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "94",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6130372,
+       14.6087711
+      ],
+      [
+       81.6130372,
+       14.6110169
+      ],
+      [
+       81.6107163,
+       14.6110169
+      ],
+      [
+       81.6107163,
+       14.6087711
+      ],
+      [
+       81.6130372,
+       14.6087711
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "95",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6153581,
+       14.6087711
+      ],
+      [
+       81.6153581,
+       14.6110169
+      ],
+      [
+       81.6130372,
+       14.6110169
+      ],
+      [
+       81.6130372,
+       14.6087711
+      ],
+      [
+       81.6153581,
+       14.6087711
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "96",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6176791,
+       14.6087711
+      ],
+      [
+       81.6176791,
+       14.6110169
+      ],
+      [
+       81.6153581,
+       14.6110169
+      ],
+      [
+       81.6153581,
+       14.6087711
+      ],
+      [
+       81.6176791,
+       14.6087711
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "97",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.62,
+       14.6087711
+      ],
+      [
+       81.62,
+       14.6110169
+      ],
+      [
+       81.6176791,
+       14.6110169
+      ],
+      [
+       81.6176791,
+       14.6087711
+      ],
+      [
+       81.62,
+       14.6087711
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "98",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6223209,
+       14.6087711
+      ],
+      [
+       81.6223209,
+       14.6110169
+      ],
+      [
+       81.62,
+       14.6110169
+      ],
+      [
+       81.62,
+       14.6087711
+      ],
+      [
+       81.6223209,
+       14.6087711
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "99",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6246419,
+       14.6087711
+      ],
+      [
+       81.6246419,
+       14.6110169
+      ],
+      [
+       81.6223209,
+       14.6110169
+      ],
+      [
+       81.6223209,
+       14.6087711
+      ],
+      [
+       81.6246419,
+       14.6087711
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "100",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6269628,
+       14.6087711
+      ],
+      [
+       81.6269628,
+       14.6110169
+      ],
+      [
+       81.6246419,
+       14.6110169
+      ],
+      [
+       81.6246419,
+       14.6087711
+      ],
+      [
+       81.6269628,
+       14.6087711
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "46",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6292837,
+       14.6087711
+      ],
+      [
+       81.6292837,
+       14.6110169
+      ],
+      [
+       81.6269628,
+       14.6110169
+      ],
+      [
+       81.6269628,
+       14.6087711
+      ],
+      [
+       81.6292837,
+       14.6087711
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "47",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6316046,
+       14.6087711
+      ],
+      [
+       81.6316046,
+       14.6110169
+      ],
+      [
+       81.6292837,
+       14.6110169
+      ],
+      [
+       81.6292837,
+       14.6087711
+      ],
+      [
+       81.6316046,
+       14.6087711
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "48",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6339256,
+       14.6087711
+      ],
+      [
+       81.6339256,
+       14.6110169
+      ],
+      [
+       81.6316046,
+       14.6110169
+      ],
+      [
+       81.6316046,
+       14.6087711
+      ],
+      [
+       81.6339256,
+       14.6087711
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "49",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6362465,
+       14.6087711
+      ],
+      [
+       81.6362465,
+       14.6110169
+      ],
+      [
+       81.6339256,
+       14.6110169
+      ],
+      [
+       81.6339256,
+       14.6087711
+      ],
+      [
+       81.6362465,
+       14.6087711
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "50",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6385674,
+       14.6087711
+      ],
+      [
+       81.6385674,
+       14.6110169
+      ],
+      [
+       81.6362465,
+       14.6110169
+      ],
+      [
+       81.6362465,
+       14.6087711
+      ],
+      [
+       81.6385674,
+       14.6087711
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "101",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6060744,
+       14.6065253
+      ],
+      [
+       81.6060744,
+       14.6087711
+      ],
+      [
+       81.6037535,
+       14.6087711
+      ],
+      [
+       81.6037535,
+       14.6065253
+      ],
+      [
+       81.6060744,
+       14.6065253
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "102",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6083954,
+       14.6065253
+      ],
+      [
+       81.6083954,
+       14.6087711
+      ],
+      [
+       81.6060744,
+       14.6087711
+      ],
+      [
+       81.6060744,
+       14.6065253
+      ],
+      [
+       81.6083954,
+       14.6065253
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "103",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6107163,
+       14.6065253
+      ],
+      [
+       81.6107163,
+       14.6087711
+      ],
+      [
+       81.6083954,
+       14.6087711
+      ],
+      [
+       81.6083954,
+       14.6065253
+      ],
+      [
+       81.6107163,
+       14.6065253
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "104",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6130372,
+       14.6065253
+      ],
+      [
+       81.6130372,
+       14.6087711
+      ],
+      [
+       81.6107163,
+       14.6087711
+      ],
+      [
+       81.6107163,
+       14.6065253
+      ],
+      [
+       81.6130372,
+       14.6065253
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "105",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6153581,
+       14.6065253
+      ],
+      [
+       81.6153581,
+       14.6087711
+      ],
+      [
+       81.6130372,
+       14.6087711
+      ],
+      [
+       81.6130372,
+       14.6065253
+      ],
+      [
+       81.6153581,
+       14.6065253
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "106",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6176791,
+       14.6065253
+      ],
+      [
+       81.6176791,
+       14.6087711
+      ],
+      [
+       81.6153581,
+       14.6087711
+      ],
+      [
+       81.6153581,
+       14.6065253
+      ],
+      [
+       81.6176791,
+       14.6065253
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "107",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.62,
+       14.6065253
+      ],
+      [
+       81.62,
+       14.6087711
+      ],
+      [
+       81.6176791,
+       14.6087711
+      ],
+      [
+       81.6176791,
+       14.6065253
+      ],
+      [
+       81.62,
+       14.6065253
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "108",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6223209,
+       14.6065253
+      ],
+      [
+       81.6223209,
+       14.6087711
+      ],
+      [
+       81.62,
+       14.6087711
+      ],
+      [
+       81.62,
+       14.6065253
+      ],
+      [
+       81.6223209,
+       14.6065253
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "109",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6246419,
+       14.6065253
+      ],
+      [
+       81.6246419,
+       14.6087711
+      ],
+      [
+       81.6223209,
+       14.6087711
+      ],
+      [
+       81.6223209,
+       14.6065253
+      ],
+      [
+       81.6246419,
+       14.6065253
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "110",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6269628,
+       14.6065253
+      ],
+      [
+       81.6269628,
+       14.6087711
+      ],
+      [
+       81.6246419,
+       14.6087711
+      ],
+      [
+       81.6246419,
+       14.6065253
+      ],
+      [
+       81.6269628,
+       14.6065253
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "51",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6292837,
+       14.6065253
+      ],
+      [
+       81.6292837,
+       14.6087711
+      ],
+      [
+       81.6269628,
+       14.6087711
+      ],
+      [
+       81.6269628,
+       14.6065253
+      ],
+      [
+       81.6292837,
+       14.6065253
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "52",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6316046,
+       14.6065253
+      ],
+      [
+       81.6316046,
+       14.6087711
+      ],
+      [
+       81.6292837,
+       14.6087711
+      ],
+      [
+       81.6292837,
+       14.6065253
+      ],
+      [
+       81.6316046,
+       14.6065253
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "53",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6339256,
+       14.6065253
+      ],
+      [
+       81.6339256,
+       14.6087711
+      ],
+      [
+       81.6316046,
+       14.6087711
+      ],
+      [
+       81.6316046,
+       14.6065253
+      ],
+      [
+       81.6339256,
+       14.6065253
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "54",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6362465,
+       14.6065253
+      ],
+      [
+       81.6362465,
+       14.6087711
+      ],
+      [
+       81.6339256,
+       14.6087711
+      ],
+      [
+       81.6339256,
+       14.6065253
+      ],
+      [
+       81.6362465,
+       14.6065253
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "55",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6385674,
+       14.6065253
+      ],
+      [
+       81.6385674,
+       14.6087711
+      ],
+      [
+       81.6362465,
+       14.6087711
+      ],
+      [
+       81.6362465,
+       14.6065253
+      ],
+      [
+       81.6385674,
+       14.6065253
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "111",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6060744,
+       14.6042796
+      ],
+      [
+       81.6060744,
+       14.6065253
+      ],
+      [
+       81.6037535,
+       14.6065253
+      ],
+      [
+       81.6037535,
+       14.6042796
+      ],
+      [
+       81.6060744,
+       14.6042796
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "112",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6083954,
+       14.6042796
+      ],
+      [
+       81.6083954,
+       14.6065253
+      ],
+      [
+       81.6060744,
+       14.6065253
+      ],
+      [
+       81.6060744,
+       14.6042796
+      ],
+      [
+       81.6083954,
+       14.6042796
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "113",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6107163,
+       14.6042796
+      ],
+      [
+       81.6107163,
+       14.6065253
+      ],
+      [
+       81.6083954,
+       14.6065253
+      ],
+      [
+       81.6083954,
+       14.6042796
+      ],
+      [
+       81.6107163,
+       14.6042796
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "114",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6130372,
+       14.6042796
+      ],
+      [
+       81.6130372,
+       14.6065253
+      ],
+      [
+       81.6107163,
+       14.6065253
+      ],
+      [
+       81.6107163,
+       14.6042796
+      ],
+      [
+       81.6130372,
+       14.6042796
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "115",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6153581,
+       14.6042796
+      ],
+      [
+       81.6153581,
+       14.6065253
+      ],
+      [
+       81.6130372,
+       14.6065253
+      ],
+      [
+       81.6130372,
+       14.6042796
+      ],
+      [
+       81.6153581,
+       14.6042796
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "116",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6176791,
+       14.6042796
+      ],
+      [
+       81.6176791,
+       14.6065253
+      ],
+      [
+       81.6153581,
+       14.6065253
+      ],
+      [
+       81.6153581,
+       14.6042796
+      ],
+      [
+       81.6176791,
+       14.6042796
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "117",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.62,
+       14.6042796
+      ],
+      [
+       81.62,
+       14.6065253
+      ],
+      [
+       81.6176791,
+       14.6065253
+      ],
+      [
+       81.6176791,
+       14.6042796
+      ],
+      [
+       81.62,
+       14.6042796
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "118",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6223209,
+       14.6042796
+      ],
+      [
+       81.6223209,
+       14.6065253
+      ],
+      [
+       81.62,
+       14.6065253
+      ],
+      [
+       81.62,
+       14.6042796
+      ],
+      [
+       81.6223209,
+       14.6042796
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "119",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6246419,
+       14.6042796
+      ],
+      [
+       81.6246419,
+       14.6065253
+      ],
+      [
+       81.6223209,
+       14.6065253
+      ],
+      [
+       81.6223209,
+       14.6042796
+      ],
+      [
+       81.6246419,
+       14.6042796
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_no": "120",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6269628,
+       14.6042796
+      ],
+      [
+       81.6269628,
+       14.6065253
+      ],
+      [
+       81.6246419,
+       14.6065253
+      ],
+      [
+       81.6246419,
+       14.6042796
+      ],
+      [
+       81.6269628,
+       14.6042796
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "56",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6292837,
+       14.6042796
+      ],
+      [
+       81.6292837,
+       14.6065253
+      ],
+      [
+       81.6269628,
+       14.6065253
+      ],
+      [
+       81.6269628,
+       14.6042796
+      ],
+      [
+       81.6292837,
+       14.6042796
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "57",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6316046,
+       14.6042796
+      ],
+      [
+       81.6316046,
+       14.6065253
+      ],
+      [
+       81.6292837,
+       14.6065253
+      ],
+      [
+       81.6292837,
+       14.6042796
+      ],
+      [
+       81.6316046,
+       14.6042796
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "58",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6339256,
+       14.6042796
+      ],
+      [
+       81.6339256,
+       14.6065253
+      ],
+      [
+       81.6316046,
+       14.6065253
+      ],
+      [
+       81.6316046,
+       14.6042796
+      ],
+      [
+       81.6339256,
+       14.6042796
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "59",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6362465,
+       14.6042796
+      ],
+      [
+       81.6362465,
+       14.6065253
+      ],
+      [
+       81.6339256,
+       14.6065253
+      ],
+      [
+       81.6339256,
+       14.6042796
+      ],
+      [
+       81.6362465,
+       14.6042796
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_no": "60",
+    "sub_division": "",
+    "positional_accuracy_m": 6.0
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6385674,
+       14.6042796
+      ],
+      [
+       81.6385674,
+       14.6065253
+      ],
+      [
+       81.6362465,
+       14.6065253
+      ],
+      [
+       81.6362465,
+       14.6042796
+      ],
+      [
+       81.6385674,
+       14.6042796
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}

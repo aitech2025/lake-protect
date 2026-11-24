@@ -21,6 +21,7 @@ data in the app), then M3.
 | M2 Detection on Sentinel-2 | Done | Pipeline 25 passed | cf91bce |
 | M10 Real data in the app | Done | API 249, pipeline 25, browser 15 passed | M10 commit |
 | M3 Radar and scored backtest | Radar check for built-up done; backtest not started | | |
+| M11 Asset creation engine (templates) | Done | API 284, browser 2 new (m11-sources) | M11 commit |
 
 ## M0 Scaffold: done
 
@@ -234,6 +235,30 @@ removed, is `reports/m2-tuning/README.md`.
   upload, the area rounding case). Browser 15 passed on fresh demos: `m10-real` (switch, no demo
   record on the real side, Sentinel-2 tiles requested, 99 real lakes listed) with the M5 to M8
   suites, then the M9 walkthrough with no internet.
+
+## M11 Asset creation engine (templates): done
+
+Owner's request, 24 Nov 2026: compare the solution with the code, then build the data source
+layer that collects government records and creates assets, as templates because no data-sharing
+agreement exists (D-056). Comparison and design: `docs/asset-engine.md`.
+
+- Migration 0005: `source_snapshots`, `import_runs`, `asset_source_links`, `land_parcels` (all
+  append-only) and the `land_parcels_current` view. Boundaries gain `source_snapshot_id` and
+  `positional_accuracy_m`. Migrating down to 0001 and up again works.
+- `app/sources`: four template connectors with data contracts (HMDA Lake Protection Committee,
+  Irrigation and CAD, Bhu Bharati land records, HYDRAA); file-drop, sample and official-API
+  transports (the API refuses without an agreement, and refuses HTML); a privacy filter that drops
+  owner, phone and Aadhaar columns before a file is stored; the engine (validate, match, reconcile,
+  publish, dry run by default).
+- Fictional samples in open sea 15 km from the demo world, with every awkward case the engine must
+  handle. Not loaded into the dev database (they would widen the demo map).
+- API: `GET /sources`, `POST /sources/{name}/runs`, `GET /sources/runs`, `GET /assets/{id}/register`.
+  CLI: `python -m app.sources list | run | samples`.
+- Desk: a Sources page (preview and load; admin and nodal officer run, others view) and a register
+  panel on Assets (source IDs, survey numbers touched, land category, lake-bed area). Telugu strings
+  are drafts (D-028).
+- Tests: API 284 passed (16 new). Browser `m11-sources` 2 passed, run on its own without a reset
+  because it only previews; the full `scripts/e2e.sh` was not run, because it resets the dev database.
 
 ## Stop: report to owner (after M9)
 

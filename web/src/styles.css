@@ -329,3 +329,14 @@ aside > .panel:first-child { margin-top: 0; }
 .obs-list { list-style: none; padding: 0; margin: 0.75rem 0 0; display: grid; gap: 0.45rem; font-size: var(--step--1); }
 .obs-list .obs-id { display: block; overflow-wrap: anywhere; }
 .flag-list { margin: 0.6rem 0 0; padding-left: 1.1rem; color: #8a5a00; }
+
+/* Government sources (asset creation engine). */
+.source-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); gap: 1rem; align-items: start; }
+.source-card { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-m); padding: 1rem; display: grid; gap: 0.6rem; align-content: start; }
+.source-card h2 { font-size: var(--step-0); margin: 0; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 0.3rem 0.8rem; margin: 0; font-size: var(--step--1); }
+.kv dt { color: var(--ink-2); font-weight: 600; }
+.kv dd { margin: 0; overflow-wrap: anywhere; }
+.contract { list-style: none; padding: 0; margin: 0.5rem 0 0; display: grid; gap: 0.5rem; font-size: var(--step--1); }
+.contract li { overflow-wrap: anywhere; }
+.source-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }

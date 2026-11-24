@@ -46,6 +46,14 @@ C:\lp-cache\venv\Scripts\lp replay reports\screen\<date>  # after a demo reset: 
 C:\lp-cache\venv\Scripts\lp detect --asset <asset_key>   # one or more lakes from data/assets.geojson, report only
 ```
 
+Government sources (asset creation engine, `docs/asset-engine.md`). No data-sharing agreement exists yet, so they read files:
+
+```powershell
+docker compose exec api python -m app.sources list                                    # data contracts
+docker compose exec api python -m app.sources run hmda_lpc --transport sample --items  # dry run
+docker compose exec api python -m app.sources samples --apply                          # load all four fictional samples
+```
+
 Install once: `py -m venv C:\lp-cache\venv`, then `C:\lp-cache\venv\Scripts\pip install -e "pipeline[geo,osm,dev]" planetary-computer`.
 Rules are in `pipeline/lake_protect/detect_rules.yaml`; the tuning record is `reports/m2-tuning/README.md`.
 

@@ -1,0 +1,50 @@
+# Settings for the asset creation engine (docs/asset-engine.md).
+#
+# No data-sharing agreement with any department exists yet (24 Nov 2026). So every `api` block is
+# empty, and every connector reads files: either an officer's drop folder or the fictional samples
+# shipped in app/sources/samples. When an agreement is signed, fill in its reference, the endpoint
+# it names and the environment variable that holds the credential. Nothing else changes.
+
+# Under LP_STORAGE_DIR. Each connector reads <drop_root>/<connector>/ with a manifest.yml.
+drop_root: source-drops
+
+# A boundary whose lines may be off by more than this on the ground is refused (asset-load.md 3).
+max_positional_error_m: 25
+
+# Matching an incoming outline to an existing asset with no shared ID (overlap / union).
+spatial_match_iou: 0.5
+spatial_conflict_iou: 0.1
+
+# Flag a parcel whose drawn area differs from its recorded extent by more than this.
+extent_mismatch_pct: 10
+
+# Where records may lie. Real records must be in Telangana; samples must be in the open sea used
+# for all fictional data (DECISIONS.md D-015). [west, south, east, north]
+real_bbox: [77.0, 15.7, 81.5, 20.0]
+sample_bbox: [81.3, 14.3, 81.95, 14.95]
+
+connectors:
+  hmda_lpc:
+    api:
+      base_url: null
+      agreement_ref: null
+      token_env: LP_SRC_HMDA_LPC_TOKEN
+      paths: {lakes: /lakes.csv, ftl: /ftl.geojson}
+  irrigation:
+    api:
+      base_url: null
+      agreement_ref: null
+      token_env: LP_SRC_IRRIGATION_TOKEN
+      paths: {tanks: /tanks.csv, outlines: /tank_outlines.geojson}
+  bhu_bharati:
+    api:
+      base_url: null
+      agreement_ref: null
+      token_env: LP_SRC_BHU_BHARATI_TOKEN
+      paths: {parcels: /village_parcels.geojson, ror: /ror_extract.csv}
+  hydraa:
+    api:
+      base_url: null
+      agreement_ref: null
+      token_env: LP_SRC_HYDRAA_TOKEN
+      paths: {ftl_layer: /ftl_layer.geojson, recovered: /recovered_parcels.geojson}

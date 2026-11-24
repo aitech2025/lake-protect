@@ -1,0 +1,6 @@
+lake_id,lake_name,lake_name_te,district,mandal,village,survey_numbers,area_ha,notification_status,notification_ref,notification_date,notification_url,certified_by,positional_accuracy_m
+S-001,Sample Cheruvu A,నమూనా చెరువు A,Sample District,Sample Mandal,Sample Village 1,11;12;26,17.09,final,SAMPLE/LPC/FINAL/001,2025-03-14,,Sample office (fictional),
+S-002,Sample Cheruvu B,నమూనా చెరువు B,Sample District,Sample Mandal,Sample Village 2,31,8.19,preliminary,SAMPLE/LPC/PRELIM/002,2025-08-01,,Sample office (fictional),
+S-003,Sample Kunta C,నమూనా కుంట C,Sample District,Sample Mandal,Sample Village 1,,3.64,none,,,,,
+S-004,Sample Kunta D,,Sample District,Sample Mandal,Sample Village 1,,2.53,final,,2024-12-02,,,
+S-005,Sample Cheruvu E,,Sample District,Sample Mandal,Sample Village 2,,,none,,,,,

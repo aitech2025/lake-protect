@@ -24,7 +24,7 @@ _DERIVE_SQL = text(
     """
     INSERT INTO boundaries (asset_id, version, kind, status, geom, source_name, source_url, source_date,
                             notification_ref, certified_by, valid_from, valid_to, supersedes_id,
-                            derived_from_id, sha256)
+                            derived_from_id, sha256, source_snapshot_id, positional_accuracy_m)
     SELECT p.asset_id, p.version, CAST(:kind AS boundary_kind), p.status,
            ST_Multi(ST_CollectionExtract(ST_MakeValid(ST_Transform(
                ST_Difference(ST_Buffer(ST_Transform(p.geom, 32644), :outer_m),
@@ -32,7 +32,7 @@ _DERIVE_SQL = text(
                                   ELSE ST_Transform(p.geom, 32644) END),
                4326)), 3)),
            :source_name, p.source_url, p.source_date, p.notification_ref, p.certified_by,
-           p.valid_from, p.valid_to, :supersedes_id, p.id, ''
+           p.valid_from, p.valid_to, :supersedes_id, p.id, '', p.source_snapshot_id, p.positional_accuracy_m
     FROM boundaries p WHERE p.id = :primary_id
     RETURNING id
     """
@@ -81,8 +81,13 @@ def add_version(
     valid_from: dt.date | None = None,
     actor_id: int | None = None,
     at: dt.datetime | None = None,
+    source_snapshot_id: int | None = None,
+    positional_accuracy_m: float | None = None,
 ) -> list[Boundary]:
-    """Insert a new boundary version with its derived buffer and watch ring. Moves the asset's cohort."""
+    """Insert a new boundary version with its derived buffer and watch ring. Moves the asset's cohort.
+
+    The derived rows inherit the source snapshot and positional accuracy of the line they come from.
+    """
     if kind not in PRIMARY_KINDS:
         raise BoundaryError("Post an ftl or parcel boundary. Buffer and watch ring are derived from it.")
     geom = to_multipolygon(geometry)
@@ -101,6 +106,8 @@ def add_version(
         valid_from=valid_from or dt.date.today(),
         supersedes_id=_latest_of_kind(db, asset.id, kind, version),
         sha256="",
+        source_snapshot_id=source_snapshot_id,
+        positional_accuracy_m=positional_accuracy_m,
     )
     db.add(primary)
     db.flush()
@@ -148,6 +155,7 @@ def add_version(
             "status": status,
             "boundary_ids": created_ids,
             "source_name": source_name,
+            "source_snapshot_id": source_snapshot_id,
             "cohort_before": old_cohort,
             "cohort_after": new_cohort,
         },
@@ -194,7 +202,8 @@ def all_versions(db: Session, asset_id: int) -> list[dict]:
             SELECT bv.id, bv.version, bv.kind::text AS kind, bv.status::text AS status, bv.source_name,
                    bv.source_url, bv.source_date, bv.notification_ref, bv.certified_by, bv.valid_from,
                    bv.valid_to, bv.effective_valid_to, bv.supersedes_id, bv.superseded_by_id,
-                   bv.derived_from_id, bv.sha256, bv.created_at,
+                   bv.derived_from_id, bv.sha256, bv.created_at, bv.source_snapshot_id,
+                   bv.positional_accuracy_m,
                    round((ST_Area(ST_Transform(bv.geom, 32644)))::numeric, 1) AS area_sq_m,
                    ST_AsGeoJSON(bv.geom)::json AS geometry
             FROM boundary_versions bv WHERE bv.asset_id = :a ORDER BY bv.version, bv.kind

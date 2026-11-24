@@ -9,6 +9,7 @@ const NAV: { to: string; key: string; roles: string[] }[] = [
   { to: "/alerts", key: "nav.queue", roles: ["analyst", "reviewer", "nodal_officer", "legal_officer", "senior_officer", "admin", "auditor"] },
   { to: "/assets", key: "nav.assets", roles: ["admin", "nodal_officer", "analyst", "legal_officer"] },
   { to: "/records", key: "nav.records", roles: ["admin", "legal_officer", "nodal_officer", "analyst"] },
+  { to: "/sources", key: "nav.sources", roles: ["admin", "nodal_officer", "analyst", "auditor", "senior_officer"] },
   { to: "/monthly", key: "nav.monthly", roles: ["senior_officer", "nodal_officer", "legal_officer", "admin", "auditor"] },
   { to: "/audit", key: "nav.audit", roles: ["auditor", "admin"] },
 ];

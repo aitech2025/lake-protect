@@ -61,6 +61,36 @@ It keeps section 6.1 cohorts, append-only boundary versions (D-011) and the sect
 
 The baseline stays 19 July 2024 (D-039) until HYDRAA and counsel confirm it (section 15).
 
+### D-056: The asset creation engine is built as templates (owner, 24 Nov 2026)
+The owner asked for two things: compare the solution with the code, then build the data source
+layer that collects records from Bhu Bharati and other government sources and creates assets. No
+agreement exists, so it is built as templates. Built as M11 (`docs/asset-engine.md`).
+
+Choices made:
+- **No government system is called.** Files come from a drop folder or fictional samples. The
+  API transport is a template. It refuses to run without an agreement reference, and it refuses
+  HTML, so it can never become a portal scraper.
+- **Only the Lake Protection Committee's notification makes a lake boundary notified.** It must
+  cite its reference and date. Irrigation outlines load as `derived`. HYDRAA recovered parcels
+  load as `physically_marked`, with their order.
+- **Reconciliation never lowers a boundary's status.**
+  - A different source giving the same status is a conflict, and the current boundary is kept.
+  - The same source may revise its own outline.
+- **Matching** tries, in order:
+  1. the source's own ID;
+  2. an ID it cites;
+  3. overlap. An overlap of 0.5 or more is a match; 0.1 to 0.5 is a conflict.
+- **Personal columns are removed before the file is stored.** The snapshot keeps both hashes, as
+  received and as stored, and the names of the removed columns, never their values.
+- **Samples are demo data** in open sea at 81.62 E, 14.62 N. `sample:` link IDs keep them apart.
+- **An asset's survey numbers are a union.** Declared ones are never dropped automatically.
+- **Not built yet:**
+  - maker-checker certification;
+  - the `core` boundary kind in the legal check;
+  - the `near_edge` flag;
+  - the frozen reference image;
+  - merging or unlinking assets.
+
 ## Errors and gaps found in CONTEXT.md
 
 ### E-001: `boundaries` is append-only but has `valid_to` (section 7, invariant 12)

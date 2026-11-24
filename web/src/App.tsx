@@ -8,6 +8,7 @@ import { Audit } from "./desk/Audit";
 import { Login } from "./desk/Login";
 import { Queue } from "./desk/Queue";
 import { Records } from "./desk/Records";
+import { Sources } from "./desk/Sources";
 import { FieldApp } from "./field/FieldApp";
 import { Monthly } from "./bulletin/Monthly";
 
@@ -31,6 +32,7 @@ export function App() {
         <Route path="/alerts/:id" element={<AlertDetail />} />
         <Route path="/assets" element={<Assets />} />
         <Route path="/records" element={<Records />} />
+        <Route path="/sources" element={<Sources />} />
         <Route path="/audit" element={<Audit />} />
         <Route path="/monthly" element={<Monthly />} />
       </Route>

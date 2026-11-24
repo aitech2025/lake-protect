@@ -1,0 +1,93 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "parcel_ref": "HYD-REC-S-01",
+    "name": "Sample Recovered Parcel 1",
+    "name_te": "నమూనా స్వాధీన స్థలం 1",
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 2",
+    "survey_numbers": [
+     "41",
+     "42"
+    ],
+    "recovered_on": "2025-11-02",
+    "marked_on": "2025-11-20",
+    "order_ref": "SAMPLE/HYDRAA/ORDER/01",
+    "positional_accuracy_m": 1.5
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.629534,
+       14.6114768
+      ],
+      [
+       81.6291495,
+       14.6128651
+      ],
+      [
+       81.6271767,
+       14.6123536
+      ],
+      [
+       81.6275611,
+       14.6109653
+      ],
+      [
+       81.629534,
+       14.6114768
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "parcel_ref": "HYD-REC-S-02",
+    "name": "Sample Recovered Parcel 2",
+    "district": "Sample District",
+    "mandal": "Sample Mandal",
+    "village": "Sample Village 1",
+    "survey_numbers": [],
+    "recovered_on": "2025-12-01",
+    "marked_on": "2025-12-05",
+    "order_ref": "",
+    "positional_accuracy_m": 1.5
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       81.6072531,
+       14.6114768
+      ],
+      [
+       81.6068686,
+       14.6128651
+      ],
+      [
+       81.6048958,
+       14.6123536
+      ],
+      [
+       81.6052803,
+       14.6109653
+      ],
+      [
+       81.6072531,
+       14.6114768
+      ]
+     ]
+    ]
+   }
+  }
+ ]
+}
