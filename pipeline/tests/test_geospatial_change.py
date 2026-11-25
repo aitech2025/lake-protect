@@ -24,11 +24,14 @@ def test_temporal_water_comparison_identifies_loss_and_gain(tmp_path):
     _write_mask(ref_path, reference)
     _write_mask(cur_path, current)
 
-    result = compare_water_masks(ref_path, cur_path, tmp_path / "change", minimum_area_sq_m=1)
+    result = compare_water_masks(ref_path, cur_path, tmp_path / "change", minimum_area_sq_m=1,
+        reference_scene_id="S2_REFERENCE", current_scene_id="S2_CURRENT", processing_run_id="run-123")
     assert result["water_loss_pixels"] == 1
     assert result["water_gain_pixels"] == 1
     features = json.loads((tmp_path / "change" / "water-change.geojson").read_text())
     assert {f["properties"]["change_type"] for f in features["features"]} == {"water_loss", "water_gain"}
+    assert all(f["properties"]["reference_scene_id"] == "S2_REFERENCE" for f in features["features"])
+    assert all(f["properties"]["processing_run_id"] == "run-123" for f in features["features"])
 
 def test_temporal_comparison_rejects_non_overlapping_scenes(tmp_path):
     from rasterio.transform import from_origin
