@@ -16,6 +16,8 @@ type Props = {
   layerVisibility?: { boundaries?: boolean; ftl?: boolean; changes?: boolean };
   onAssetClick?: (id: number) => void;
   interactive?: boolean;
+  measure?: boolean;
+  onMeasureChange?: (metres: number) => void;
 };
 
 const EMPTY: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
@@ -56,13 +58,15 @@ function bboxOf(fcs: GeoJSON.FeatureCollection[]): [number, number, number, numb
   return Number.isFinite(w) ? [w, s, e, n] : null;
 }
 
-export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, height = "100%", testId, theme = "light", layerVisibility = {}, onAssetClick, interactive = true }: Props) {
+export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, height = "100%", testId, theme = "light", layerVisibility = {}, onAssetClick, interactive = true, measure = false, onMeasureChange }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const markers = useRef<maplibregl.Marker[]>([]);
   const loaded = useRef(false);
   const onAssetClickRef = useRef(onAssetClick);
+  const onMeasureChangeRef = useRef(onMeasureChange);
   useEffect(() => { onAssetClickRef.current = onAssetClick; }, [onAssetClick]);
+  useEffect(() => { onMeasureChangeRef.current = onMeasureChange; }, [onMeasureChange]);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -71,6 +75,7 @@ export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, h
     m.on("load", () => {
       m.addSource("boundaries", { type: "geojson", data: EMPTY });
       m.addSource("changes", { type: "geojson", data: EMPTY });
+      m.addSource("measure", { type: "geojson", data: EMPTY });
       const isKind = (k: string[]) => ["in", ["get", "kind"], ["literal", k]] as maplibregl.ExpressionSpecification;
       m.addLayer({ id: "ring", type: "line", source: "boundaries", filter: isKind(["watch_ring"]), paint: { "line-color": "#75848b", "line-width": 1.2, "line-dasharray": [1, 3] } });
       m.addLayer({ id: "buffer", type: "line", source: "boundaries", filter: isKind(["buffer"]), paint: { "line-color": "#c4402f", "line-width": 1.6, "line-dasharray": [3, 2] } });
@@ -91,6 +96,8 @@ export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, h
       m.on("mouseleave", "primary-fill", () => { m.getCanvas().style.cursor = ""; });
       m.addLayer({ id: "change-fill", type: "fill", source: "changes", paint: { "fill-color": "#e0a526", "fill-opacity": 0.55 } });
       m.addLayer({ id: "change-line", type: "line", source: "changes", paint: { "line-color": "#7a4f05", "line-width": 1.6 } });
+      m.addLayer({ id: "measure-line", type: "line", source: "measure", filter: ["==", ["geometry-type"], "LineString"], paint: { "line-color": "#06b6d4", "line-width": 2.5, "line-dasharray": [2, 1] } });
+      m.addLayer({ id: "measure-points", type: "circle", source: "measure", filter: ["==", ["geometry-type"], "Point"], paint: { "circle-radius": 4, "circle-color": "#06b6d4", "circle-stroke-color": "#ffffff", "circle-stroke-width": 1.5 } });
       loaded.current = true;
       m.fire("lp:data");
     });
@@ -145,6 +152,51 @@ export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, h
     else m.once("lp:data", apply);
   }, [theme, layerVisibility.boundaries, layerVisibility.ftl, layerVisibility.changes]);
 
+
+  useEffect(() => {
+    const m = map.current;
+    if (!m) return;
+    let points: [number, number][] = [];
+    const distance = (a: [number, number], b: [number, number]) => {
+      const rad = Math.PI / 180;
+      const dLat = (b[1] - a[1]) * rad;
+      const dLon = (b[0] - a[0]) * rad;
+      const x = Math.sin(dLat / 2) ** 2 + Math.cos(a[1] * rad) * Math.cos(b[1] * rad) * Math.sin(dLon / 2) ** 2;
+      return 6371008.8 * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+    };
+    const render = () => {
+      const features: GeoJSON.Feature[] = points.map((p) => ({ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: p } }));
+      if (points.length > 1) features.push({ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: points } });
+      (m.getSource("measure") as maplibregl.GeoJSONSource | undefined)?.setData({ type: "FeatureCollection", features });
+      let total = 0;
+      for (let i = 1; i < points.length; i++) total += distance(points[i - 1], points[i]);
+      onMeasureChangeRef.current?.(total);
+    };
+    const click = (event: maplibregl.MapMouseEvent) => {
+      points.push([event.lngLat.lng, event.lngLat.lat]);
+      render();
+    };
+    const attach = () => {
+      if (measure && interactive) {
+        points = [];
+        render();
+        m.getCanvas().style.cursor = "crosshair";
+        m.on("click", click);
+      } else {
+        points = [];
+        render();
+        m.off("click", click);
+        m.getCanvas().style.cursor = "";
+      }
+    };
+    if (loaded.current) attach();
+    else m.once("lp:data", attach);
+    return () => {
+      m.off("click", click);
+      m.getCanvas().style.cursor = "";
+    };
+  }, [measure, interactive]);
+
   useEffect(() => {
     const m = map.current;
     if (!m) return;
@@ -152,8 +204,13 @@ export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, h
       const amount = Number((event as CustomEvent<number>).detail ?? 0);
       m.zoomTo(m.getZoom() + amount, { duration: 220 });
     };
+    const tilt = (event: Event) => {
+      const enabled = Boolean((event as CustomEvent<boolean>).detail);
+      m.easeTo({ pitch: enabled ? 48 : 0, duration: 350 });
+    };
     window.addEventListener("geoguard:zoom", zoom);
-    return () => window.removeEventListener("geoguard:zoom", zoom);
+    window.addEventListener("geoguard:tilt", tilt);
+    return () => { window.removeEventListener("geoguard:zoom", zoom); window.removeEventListener("geoguard:tilt", tilt); };
   }, []);
 
   useEffect(() => {
