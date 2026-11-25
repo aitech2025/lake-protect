@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { api, fmtDate, type AlertRow } from "../api";
 import { useAsync, usePageTitle } from "../components/Bits";
@@ -36,6 +36,13 @@ export function CommandOverview() {
   const [swipe, setSwipe] = useState(52);
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
+  useEffect(() => {
+    const syncTheme = (event: Event) => setTheme((event as CustomEvent<Theme>).detail);
+    window.addEventListener("geoguard:theme", syncTheme);
+    return () => window.removeEventListener("geoguard:theme", syncTheme);
+  }, []);
+  useEffect(() => { setQuery(searchParams.get("q") ?? ""); }, [searchParams.toString()]);
+
   const [category, setCategory] = useState("all");
 
   const assetsState = useAsync(() => api<{ features: any[] }>("/assets"), []);
