@@ -74,10 +74,10 @@ def run_water_screen(*,endpoint: str,collections: list[str],bbox: list[float],
     response.raise_for_status()
     api.patch(f"/api/v1/ingestion/processing-runs/{run_id}",
               json={"status":"RUNNING","output_manifest":{}}).raise_for_status()
-    items=Client.open(endpoint).search(collections=collections,bbox=bbox,
-        datetime=f"{start}/{end}",max_items=200).items()
     outputs=[]; rejected=[]; registered=0; mask_records=[]
     try:
+        items=Client.open(endpoint).search(collections=collections,bbox=bbox,
+            datetime=f"{start}/{end}",max_items=200).items()
         for item in items:
             decision=assess_item(item,max_cloud_pct=max_cloud_pct)
             item_dict=item.to_dict()
