@@ -53,7 +53,8 @@ LABELS = {
     "change": {"soil_fill": "Land fill", "clearing": "Clearing", "levelling": "Levelling", "small_structure": "Construction (small structure)",
                "building": "Construction", "other": "Other change"},
     "stage": {"soil_dumped": "Soil dumped", "land_levelled": "Land levelled", "sheds_fences": "Sheds or fences", "building_rises": "Building rising", "occupied": "Occupied"},
-    "sensor": {"optical_and_radar": "Optical and radar", "optical_only": "Optical", "radar_only": "Radar only"},
+    "sensor": {"optical_and_radar": "Optical and radar", "optical_only": "Optical", "radar_only": "Radar only",
+               "citizen_report": "Reported by a citizen, with a satellite review"},
     "review": {"real_change": "A real change", "not_real": "Not a real change", "needs_site_visit": "Needs a site visit"},
 }
 

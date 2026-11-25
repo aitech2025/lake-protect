@@ -48,6 +48,13 @@ TEXT = {
                                  "and has not acknowledged it within 48 hours.\n\n{summary}.\n{link}",
         "flag.court": "A court case is recorded on this asset: the legal team should see it before anyone acts.\n",
         "flag.boundary": "The boundary is not confirmed: treat the zone as an estimate.\n",
+        "flag.citizen": "Reported by a citizen ({channel}), reference {ref}. Their words and photos are on the incident page.\n",
+        "satellite_review.subject": "Satellite review of incident {code} at {asset}: {result}",
+        "satellite_review.body": "{summary}.\n\nAsset: {asset}, {area}.\nThe before and after images are on the incident page:\n{link}",
+        "review.change_found": "a change is visible",
+        "review.no_change": "no change visible yet",
+        "review.no_clear_look": "no clear image yet",
+        "review.failed": "could not be done",
         "area.none": "area not recorded",
         "weekly_digest.subject": "Week {week}: change at {changed} assets, {new} new incidents, {waiting} waiting for you",
         "digest.scope": "Week {week} ({dates}), {scope}.",
@@ -80,6 +87,13 @@ TEXT = {
                                  "48 గంటల్లో అందినట్లు నిర్ధారించలేదు.\n\n{summary}.\n{link}",
         "flag.court": "ఈ ఆస్తిపై కోర్టు కేసు నమోదై ఉంది: ఎవరైనా చర్య తీసుకునే ముందు న్యాయ బృందం చూడాలి.\n",
         "flag.boundary": "సరిహద్దు నిర్ధారించబడలేదు: జోన్‌ను అంచనాగా మాత్రమే చూడండి.\n",
+        "flag.citizen": "ఒక పౌరుడు తెలిపారు ({channel}), సూచిక {ref}. వారి మాటలు, ఫోటోలు సంఘటన పేజీలో ఉన్నాయి.\n",
+        "satellite_review.subject": "సంఘటన {code} ({asset}) ఉపగ్రహ పరిశీలన: {result}",
+        "satellite_review.body": "{summary}.\n\nఆస్తి: {asset}, {area}.\nముందు, తర్వాతి చిత్రాలు సంఘటన పేజీలో ఉన్నాయి:\n{link}",
+        "review.change_found": "మార్పు కనిపిస్తోంది",
+        "review.no_change": "ఇంకా మార్పు కనిపించలేదు",
+        "review.no_clear_look": "ఇంకా స్పష్టమైన చిత్రం లేదు",
+        "review.failed": "జరగలేదు",
         "area.none": "ప్రాంతం నమోదు కాలేదు",
         "weekly_digest.subject": "వారం {week}: {changed} చోట్ల మార్పులు, {new} కొత్త సంఘటనలు, {waiting} మీ కోసం వేచి ఉన్నాయి",
         "digest.scope": "వారం {week} ({dates}), {scope}.",
@@ -129,6 +143,8 @@ def summary(p: dict, language: str) -> str:
     """The incident's plain sentence; in Telugu from Telugu labels, so no English is mixed in."""
     if lang(language) == "en":
         return p["summary"]
+    if p.get("summary_te"):
+        return p["summary_te"]
     what = CHANGE_TE.get(p["change_type"], "మార్పు")
     size = f"సుమారు {p['area_sq_m']:,.0f} చ.మీ. " if p.get("area_sq_m") else ""
     where = f", {ZONE_TE[p['zone']]}" if p.get("zone") in ZONE_TE else ""
@@ -158,6 +174,12 @@ def incident_payload(row: dict) -> dict:
         "area_sq_m": row["area_sq_m"],
         "first_changed_at": row["first_changed_at"].isoformat() if row["first_changed_at"] else None,
         "summary": row["summary"],
+        "summary_te": row.get("summary_te"),
+        "origin": row.get("origin", "satellite"),
+        "report_ref": row.get("report_ref"),
+        "report_channel": row.get("report_channel"),
+        "review_result": row.get("review_result"),
+        "review_status": row.get("review_status"),
         "state": row["state"],
         "court_matter": row["court_matter"],
         "boundary_confirmed": row["boundary_confirmed"],
@@ -186,7 +208,14 @@ def compose(kind: str, language: str, p: dict) -> Message:
             flags += t(language, "flag.boundary")
         if p.get("unrouted"):
             flags += t(language, "incident_opened.unrouted")
+        if p.get("origin") == "citizen":
+            from app.citizen import texts as ctexts
+
+            flags = t(language, "flag.citizen", ref=p["report_ref"], channel=ctexts.pick(ctexts.CHANNEL.get(p.get("report_channel"), {"en": ""}), language)) + flags
         return Message(t(language, "incident_opened.subject", **values), t(language, "incident_opened.body", flags=flags, **values))
+    if kind == "satellite_review":
+        result = t(language, f"review.{p.get('review_result') or 'failed'}")
+        return Message(t(language, "satellite_review.subject", result=result, **values), t(language, "satellite_review.body", **values))
     if kind == "incident_decided":
         decision = DECISION[language][p["decision"]]
         return Message(t(language, "incident_decided.subject", decision=decision, **values),

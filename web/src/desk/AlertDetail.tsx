@@ -30,6 +30,10 @@ async function download(path: string): Promise<void> {
 /** One plain sentence: what changed, how big, where, and when it was first seen. */
 export function ChangeSummary({ a }: { a: any }) {
   const { t, i18n } = useTranslation();
+  if (a.origin === "citizen") {
+    // A citizen incident: what was reported, when, and what the satellite review shows (D-063).
+    return <p className="change-summary" data-testid="change-summary">{i18n.language === "te" && a.summary_te ? a.summary_te : a.summary}</p>;
+  }
   const zone = a.zone ? t(a.asset_type === "recovered_parcel" && a.zone === "inside_ftl" ? "incident.where.parcel_inside" : `incident.where.${a.zone}`) : "";
   return (
     <p className="change-summary" data-testid="change-summary">
@@ -97,11 +101,13 @@ export function AlertDetail() {
       <ChangeSummary a={a} />
       <AckBanner notes={a.my_notifications ?? []} isAdminUser={isAdmin(user)} onDone={reload} />
       <Flags a={a} />
+      {a.citizen && <CitizenOrigin a={a} />}
 
       <div className="detail">
         <section className="panel detail-decision" aria-labelledby="next-step-title">
           <h2 id="next-step-title" className="title-s">{t("detail.actions_title")}</h2>
           <Actions alert={a} onDone={reload} />
+          {a.satellite_review && <SatelliteReviewPanel a={a} />}
         </section>
 
         <div className="detail-evidence">
@@ -109,12 +115,12 @@ export function AlertDetail() {
             <>
               <div className="pair" data-testid="image-pair">
                 <figure>
-                  <AuthImage frame path={`/alerts/${a.id}/chips/before`} alt={`${t("detail.before")}, ${fmtDate(cand.last_clear_at, lang)}`} />
-                  <figcaption><b>{t("detail.before")}</b><span>{fmtDate(cand.last_clear_at, lang)}</span></figcaption>
+                  <AuthImage frame path={`/alerts/${a.id}/chips/before`} alt={`${t("detail.before")}, ${fmtDate(a.satellite_review?.before_date ?? cand.last_clear_at, lang)}`} />
+                  <figcaption><b>{t("detail.before")}</b><span>{fmtDate(a.satellite_review?.before_date ?? cand.last_clear_at, lang)}</span></figcaption>
                 </figure>
                 <figure>
-                  <AuthImage frame path={`/alerts/${a.id}/chips/after`} alt={`${t("detail.after")}, ${fmtDate(cand.first_changed_at, lang)}`} />
-                  <figcaption><b>{t("detail.after")}</b><span>{fmtDate(cand.first_changed_at, lang)}</span></figcaption>
+                  <AuthImage frame path={`/alerts/${a.id}/chips/after`} alt={`${t("detail.after")}, ${fmtDate(a.satellite_review?.after_date ?? cand.first_changed_at, lang)}`} />
+                  <figcaption><b>{t("detail.after")}</b><span>{fmtDate(a.satellite_review?.after_date ?? cand.first_changed_at, lang)}</span></figcaption>
                 </figure>
               </div>
               <div className="img-legend">
@@ -125,6 +131,13 @@ export function AlertDetail() {
                 {obs[0] && <span>{obs[0].licence_notice}</span>}
               </div>
             </>
+          ) : a.satellite_review?.has_images ? (
+            <div className="pair single" data-testid="image-latest">
+              <figure>
+                <AuthImage frame path={`/alerts/${a.id}/chips/after`} alt={`${t("citizen_incident.latest")}, ${fmtDate(a.satellite_review.after_date, lang)}`} />
+                <figcaption><b>{t("citizen_incident.latest")}</b><span>{fmtDate(a.satellite_review.after_date, lang)}</span></figcaption>
+              </figure>
+            </div>
           ) : null}
 
           <section className="section panel">
@@ -274,7 +287,7 @@ function Actions({ alert, onDone }: { alert: any; onDone: () => void }) {
       )}
       {review && <ReviewForm alertId={alert.id} already={review.already_reviewed} onDone={(msg) => { show(msg); onDone(); }} />}
       {steps.map((x) => (
-        <DecisionForm key={x.to} alertId={alert.id} to={x.to} onDone={(msg) => { show(msg); onDone(); }} />
+        <DecisionForm key={x.to} alertId={alert.id} to={x.to} citizen={alert.citizen_reports > 0} onDone={(msg) => { show(msg); onDone(); }} />
       ))}
       {admin && open && (
         <button className="btn quiet" onClick={() => api(`/alerts/${alert.id}/imagery-request`, { json: { provider: "commercial_archive" } }).then(() => show(t("detail.imagery_done")))}>
@@ -322,10 +335,15 @@ function ReviewForm({ alertId, already, onDone }: { alertId: number; already: bo
   );
 }
 
-function DecisionForm({ alertId, to, onDone }: { alertId: number; to: string; onDone: (msg: string) => void }) {
+const DEPARTMENTS = ["revenue", "municipal", "irrigation", "hydraa", "forest", "endowments", "waqf"];
+
+function DecisionForm({ alertId, to, citizen, onDone }: { alertId: number; to: string; citizen: boolean; onDone: (msg: string) => void }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
+  const [department, setDepartment] = useState("");
+  const [falseReport, setFalseReport] = useState(false);
+  const forCitizen = citizen && to === "DISMISSED";
   const [error, setError] = useState<string | null>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
@@ -342,7 +360,9 @@ function DecisionForm({ alertId, to, onDone }: { alertId: number; to: string; on
   const submit = async () => {
     setError(null);
     try {
-      await api(`/alerts/${alertId}/transitions`, { json: { to, note } });
+      await api(`/alerts/${alertId}/transitions`, {
+        json: forCitizen ? { to, note, citizen_department: department || null, citizen_false_report: falseReport } : { to, note },
+      });
       setOpen(false);
       setNote("");
       onDone(t("action.done"));
@@ -354,6 +374,18 @@ function DecisionForm({ alertId, to, onDone }: { alertId: number; to: string; on
     <div className="action" data-testid={`form-${to}`}>
       <h3 className="title-xs" tabIndex={-1} ref={headingRef}>{t(`action.${to}`)}</h3>
       <label className="field">{t("action.note")}<textarea rows={3} value={note} onChange={(e) => setNote(e.target.value)} data-testid="input-note" /></label>
+      {forCitizen && (
+        <>
+          <label className="field">{t("citizen_incident.department")}
+            <select value={department} onChange={(e) => setDepartment(e.target.value)} data-testid="input-department">
+              <option value="">{t("citizen_incident.no_department")}</option>
+              {DEPARTMENTS.map((d) => <option key={d} value={d}>{t(`reports.dept.${d}`)}</option>)}
+            </select>
+          </label>
+          <label className="check"><input type="checkbox" checked={falseReport} onChange={(e) => setFalseReport(e.target.checked)} /> {t("reports.false_report")}</label>
+          <p className="small muted">{t("citizen_incident.told")}</p>
+        </>
+      )}
       {error && <p className="error" role="alert">{error}</p>}
       <div style={{ display: "flex", gap: "0.5rem" }}>
         <button className={`btn ${danger ? "danger" : ""}`} disabled={!note.trim()} onClick={() => void submit()} data-testid="submit-action">{t("action.submit")}</button>
@@ -430,5 +462,58 @@ function CitizenReportsOn({ alertId }: { alertId: number }) {
         ))}
       </ul>
     </section>
+  );
+}
+
+/** The report that opened a citizen incident (D-063): what the citizen said and where, never who. */
+function CitizenOrigin({ a }: { a: any }) {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
+  const c = a.citizen;
+  return (
+    <section className="panel citizen-origin" data-testid="citizen-origin">
+      <div className="person-head">
+        <h2 className="title-s">{t("citizen_incident.title")}</h2>
+        <Link to={`/reports/${c.report_id}`} className="small"><code>{c.ref}</code></Link>
+      </div>
+      <p className="small muted">
+        {t(`reports.channel.${c.channel}`)} · {fmtDateTime(c.created_at, lang)} · {t(`reports.what.${c.what}`)}
+        {c.source_ref ? ` · ${c.source_ref}` : ""}
+      </p>
+      {c.description && <blockquote className="citizen-words">{c.description}</blockquote>}
+      <ul className="small citizen-facts">
+        <li>{t(`citizen_incident.placed.${c.placed_by ?? "pin"}`)}{c.location_text ? `: ${c.location_text}` : ""}</li>
+        {c.reported_place && <li>{t("citizen_incident.reported_place")}</li>}
+        {c.area_source && <li>{t("citizen_incident.area_source", { source: c.area_source })}</li>}
+        {c.survey_numbers.length > 0 && <li>{t("citizen_incident.survey", { list: c.survey_numbers.map((s: any) => `${s.survey_no}${s.sub_division ? "/" + s.sub_division : ""} (${s.village})`).join(", ") })}</li>}
+        <li>{c.updates ? t("citizen_incident.updates_yes") : t("citizen_incident.updates_no")}</li>
+      </ul>
+      {c.photos > 0 && (
+        <div className="report-photos">
+          {Array.from({ length: c.photos }, (_, i) => <AuthImage key={i} path={`/reports/${c.report_id}/photos/${i + 1}`} alt={`${c.ref} ${i + 1}`} className="report-photo" />)}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/** What the satellite showed at the reported place (D-063). */
+function SatelliteReviewPanel({ a }: { a: any }) {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
+  const r = a.satellite_review;
+  const key = r.status === "done" ? r.result : r.status;
+  return (
+    <div className={`satellite-review ${key}`} data-testid="satellite-review">
+      <h3 className="title-xs">{t("citizen_incident.review_title")}</h3>
+      <p data-testid="satellite-review-result"><b>{t(`citizen_incident.review.${key}`)}</b></p>
+      {r.result === "change_found" && r.change_area_sq_m && (
+        <p className="small">{t("citizen_incident.review_change", { area: Math.round(r.change_area_sq_m).toLocaleString("en-IN"), date: fmtDate(r.first_changed_at, lang), change: t(`change.${r.change_type}`) })}</p>
+      )}
+      {r.after_date && <p className="small muted">{t("citizen_incident.review_dates", { before: fmtDate(r.before_date, lang) || "-", after: fmtDate(r.after_date, lang) })}</p>}
+      <p className="small muted">{t(`citizen_incident.source.${r.source}`)}{r.detail ? ` · ${r.detail}` : ""}</p>
+      {r.status === "pending" && <p className="small">{t("citizen_incident.pending_help")}</p>}
+      <p className="small">{t("citizen_incident.next")}</p>
+    </div>
   );
 }

@@ -291,6 +291,52 @@ The owner asked for the citizen interaction channels, both ways. Built as M15 to
 - **Not in this build:** WhatsApp photo download (needs the provider's media token), voice notes,
   a public map or district figures, and overview figures for reports.
 
+### D-063: A citizen's report opens an incident with a satellite review; no Urdu (owner, 25 Nov 2026)
+The owner asked for two changes:
+- remove Urdu;
+- route every report from every channel through the regular incident flow: the app finds the
+  place, reviews it with satellite imagery, and notifies the officials, who work it with reviews,
+  a sharper image, a decision and closing, each with a note.
+
+Built as M16 (`docs/citizen.md`). This replaces D-062's report-only steps (record a check, close
+with a reason, link).
+
+- **Urdu removed:**
+  - English and Telugu only, on the portal, WhatsApp and every note;
+  - existing Urdu rows become English;
+  - the Nastaliq font is dropped.
+
+  This departs from CONTEXT.md 17.8 ("English, Telugu and Urdu") at the owner's request.
+- **Finding the place:**
+  - from the pin;
+  - or from words that name exactly one watched location (flagged for officials to check);
+  - otherwise the admin puts it on the map.
+
+  District and mandal come from the location or, outside every location, from OpenStreetMap
+  boundaries (not the revenue record). Survey numbers at the pin are shown when loaded.
+- **The incident:**
+  - **Where the report goes:** a report next to an open incident joins it, and a report of a place
+    already reported follows that report. Any other report opens a **citizen incident**
+    (`alerts.origin = 'citizen'`).
+  - **The citizen incident's outline** is the reported spot, a 30 m circle, with the change the
+    citizen named.
+  - **Outside every location** a "reported place" is made: a 50 m circle, kind "Places reported by
+    citizens", not on the weekly watch. Without it the incident would have no place or boundary,
+    and every existing view, notification and pack expects both.
+  - **The legal check is kept but never closes a citizen incident:** an official always looks.
+    This departs from section 6.2 for citizen incidents only.
+- **The satellite review:**
+  - **Demo:** at once, from the demo world, including a change the weekly screen has not seen yet.
+  - **Real:** `lp review-reports` (the `reviewer` service, every 5 minutes, needs internet) screens
+    the location now, with the weekly screen's rules.
+  - **The result:** the nearest change within 150 m, no change, no clear look, or failed after three
+    tries. Its images and scenes become the incident's.
+  - **Officials are told** when the incident opens, and again (`satellite_review`) when a real
+    result arrives.
+- **The regular flow is passed on to the citizen:** under review, sharper images asked for,
+  confirmed, dismissed, or dismissed as passed to a department. The admin may mark the report as
+  false when dismissing. Officials' notes stay inside.
+
 ## Errors and gaps found in CONTEXT.md
 
 ### E-001: `boundaries` is append-only but has `valid_to` (section 7, invariant 12)

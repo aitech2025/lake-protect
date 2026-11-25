@@ -289,15 +289,26 @@ class Seeder:
         return run
 
     def _citizen_step(self, spec: dict, step: dict, at: dt.datetime) -> Callable[[], None]:
+        """Officials work a citizen's incident in the regular flow (D-063)."""
         def run() -> None:
+            from app.services import imagery
+
             report = self.reports[spec["key"]]
+            alert = self.db.get(Alert, report.alert_id)
             by = self.users[step["by"]]
-            if step["do"] == "check":
-                citizen.record_check(self.db, report, by, step["outcome"], step["note"], at)
-            elif step["do"] == "close":
-                citizen.close(self.db, report, by, step["reason"], step["note"], at, department=step.get("department"))
+            do = step["do"]
+            if do == "review":
+                lifecycle.review(self.db, alert, by, step["outcome"], step["note"], at=at)
+            elif do == "imagery":
+                imagery.request(self.db, alert, by, step.get("provider", "commercial_archive"), step.get("note"), at)
+            elif do == "decide":
+                if alert.state == "OPEN":
+                    lifecycle.transition(self.db, alert, "UNDER_REVIEW", actor=by, note="Review started", at=at - dt.timedelta(minutes=5))
+                lifecycle.transition(self.db, alert, step["to"], actor=by, note=step["note"], at=at, department=step.get("department"))
+            elif do == "close":
+                lifecycle.transition(self.db, alert, "CLOSED", actor=by, note=step["note"], at=at)
             else:
-                raise ValueError(f"Unknown citizen step {step['do']}")
+                raise ValueError(f"Unknown citizen step {do}")
 
         return run
 
@@ -365,6 +376,15 @@ class Seeder:
 
     # Run ------------------------------------------------------------------------------------------
     def run(self) -> dict:
+        from app.citizen import incident
+
+        incident.SEED_DAY = self.T.date()  # citizen reviews date the demo world before its weekly screens exist
+        try:
+            return self._run()
+        finally:
+            incident.SEED_DAY = None
+
+    def _run(self) -> dict:
         self.seed_users()
         self.seed_assets()
         self.seed_records()
@@ -394,6 +414,7 @@ class Seeder:
             "notifications": self.db.scalar(text("SELECT count(*) FROM notifications WHERE is_demo")),
             "digests": digests["sent"],
             "citizen_reports": {k: f"{r.status}{'/' + r.closed_reason if r.closed_reason else ''}" for k, r in self.reports.items()},
+            "citizen_incidents": {k: f"{self.db.get(Alert, r.alert_id).origin}:{self.db.get(Alert, r.alert_id).state}" for k, r in self.reports.items() if r.alert_id},
             "citizen_satellite_checked": satellite_checked,
         }
 

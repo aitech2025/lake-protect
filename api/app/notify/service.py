@@ -119,6 +119,15 @@ def incident_decided(db: Session, alert: Alert, actor: User, note_text: str | No
 
 
 # Acknowledging ----------------------------------------------------------------------------------
+def satellite_review(db: Session, alert: Alert, at: dt.datetime | None = None) -> list[Notification]:
+    """A citizen incident's satellite review is back (D-063): the people told about the incident hear the result."""
+    at = as_utc(at)
+    asset = _asset_of(db, alert)
+    base = messages.incident_payload(alert_view.row_for(db, alert.id))
+    people = {u.id: u for u in routing.officials_for(db, asset) + routing.admins(db)}
+    return [create(db, u, "satellite_review", base, at=at, needs_ack=False, is_demo=alert.is_demo, alert_id=alert.id) for u in people.values()]
+
+
 def citizen_report(db: Session, report: CitizenReport, at: dt.datetime | None = None) -> list[Notification]:
     """A citizen's report: the area's officials and every admin. Duplicates of a report tell no one again."""
     from app.citizen import texts

@@ -206,6 +206,42 @@ def _screen_once(api, token, as_of, asset, out, workers, dry_run) -> None:
         typer.echo(f"Outcomes: {outcomes or 'none sent'}\nReport: {folder}")
 
 
+@app.command("review-reports")
+def review_reports(
+    api: str = typer.Option("http://localhost:8100", envvar="LP_API_URL", help="GeoGuard API."),
+    token: str = typer.Option(..., envvar="LP_PIPELINE_TOKEN", help="Pipeline token (LP_PIPELINE_TOKEN)."),
+    every: int = typer.Option(0, help="Look for new reviews every this many seconds (the reviewer service uses 300). 0: once."),
+    radar: bool = typer.Option(True, help="Use Sentinel-1 radar to confirm built-up, as the weekly screen does."),
+    workers: int = typer.Option(8, help="Parallel reads."),
+) -> None:
+    """Satellite review of citizens' reports (D-063): the newest Sentinel-2 looks at each reported place."""
+    import datetime as dt
+    import time
+
+    import httpx
+
+    from lake_protect.review import aoi_for, result_for
+    from lake_protect.screen import run
+
+    while True:
+        with httpx.Client(base_url=api, headers={"X-Pipeline-Token": token}, timeout=300) as client:
+            items = client.get("/pipeline/reviews").raise_for_status().json()["reviews"]
+            if items:
+                typer.echo(f"{len(items)} report(s) to review")
+            for item in items:
+                typer.echo(f"Review {item['id']}: incident {item['code']}, report {item['ref']}, {item['asset']['name']}")
+                try:
+                    results, _ = run([aoi_for(item)], dt.date.today(), workers=workers, use_radar=radar, log=typer.echo)
+                    body = result_for(item, results[0])
+                except Exception as exc:  # a review that fails is reported, and tried again later
+                    body = {"status": "failed", "detail": f"{type(exc).__name__}: {exc}"[:400]}
+                resp = client.post(f"/pipeline/reviews/{item['id']}", json=body)
+                typer.echo(f"  -> {body.get('result') or body['status']}: {resp.status_code} {resp.text[:160]}")
+        if not every:
+            return
+        time.sleep(every)
+
+
 @app.command()
 def replay(
     report: str = typer.Argument(..., help="A report folder written by lp screen (holds summary.json and payloads.jsonl)."),

@@ -56,11 +56,21 @@ watched now and planned are listed in `api/app/categories.yaml`. Design:
 
 **Citizens.**
 - **How they report:**
-  - on the public portal at `/report`, with no sign-in, in English, Telugu or Urdu;
+  - on the public portal at `/report`, with no sign-in, in English or Telugu;
   - on WhatsApp, once the State's channel exists (the desk has a demo simulator);
   - through staff, who enter 1070 calls and Praja Vani petitions on **Citizen reports**.
-- **How they hear back:** each report gets a reference. Its status page `/report/track/<ref>` shows
-  every step in their language, and SMS or WhatsApp updates start once a gateway is set up.
+- **What happens to a report:**
+  - the app finds the place;
+  - it opens an incident, or joins one already open nearby;
+  - it reviews the place with satellite imagery;
+  - it tells the area's officials.
+
+  The demo answers at once. Real reports wait for the `reviewer` service:
+  `docker compose --profile screen up -d reviewer`, which needs internet.
+- **What officials do:** they work it like any incident: review, ask for sharper imagery, then
+  confirm or dismiss and close, each with a note.
+- **How citizens hear back:** each report gets a reference. Its status page `/report/track/<ref>`
+  shows every step in their language, and SMS or WhatsApp updates start once a gateway is set up.
 - **Design:** [docs/citizen.md](docs/citizen.md).
 
 The demo script is in [docs/DEMO.md](docs/DEMO.md). After the first build the laptop needs no

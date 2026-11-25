@@ -69,6 +69,8 @@ export type User = { id: number; username: string; name: string; role: string; l
 export type AlertRow = {
   id: number;
   code: string;
+  origin?: "satellite" | "citizen";
+  citizen_reports?: number;
   state: string;
   resolution: string | null;
   closed_at: string | null;
@@ -109,7 +111,7 @@ export type AlertRow = {
 export type Delivery = { channel: "email" | "sms" | "whatsapp"; status: string; attempt: number; to_masked: string | null; detail: string | null; at: string };
 export type Note = {
   id: number;
-  kind: "incident_opened" | "incident_decided" | "reminder" | "not_acknowledged" | "weekly_digest" | "citizen_report";
+  kind: "incident_opened" | "incident_decided" | "reminder" | "not_acknowledged" | "weekly_digest" | "citizen_report" | "satellite_review";
   alert_id: number | null;
   report_id?: number | null;
   week: string | null;

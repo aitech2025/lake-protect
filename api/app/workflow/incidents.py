@@ -79,8 +79,13 @@ def transition(
     at: dt.datetime | None = None,
     resolution: str | None = None,
     details: dict | None = None,
+    department: str | None = None,
+    false_report: bool = False,
 ) -> dict:
-    """One step of the lifecycle. Admin steps need a note; system steps come from the legal check."""
+    """One step of the lifecycle. Admin steps need a note; system steps come from the legal check.
+
+    `department`: when dismissing, the department a citizen's report was passed to; the citizen is
+    told so instead of "no change that needs action" (D-063)."""
     at = as_utc(at)
     try:
         to = S(to).value
@@ -96,6 +101,13 @@ def transition(
         raise Refused(f"Only the {who} can take this step ({label})", 403)
     if actor is not None and not (note and note.strip()):
         raise Refused("A note is required", 422)
+    if department is not None:
+        from app.citizen import texts as ctexts
+
+        if to != S.DISMISSED.value or department not in ctexts.DEPARTMENTS:
+            raise Refused(f"A department goes with a dismissal, one of: {', '.join(ctexts.DEPARTMENTS)}", 422)
+    if false_report and to != S.DISMISSED.value:
+        raise Refused("Only a dismissal can mark the citizen's report as false", 422)
     frm = alert.state
     _set_state(db, alert, to, at, resolution)
     chain.record(
@@ -115,7 +127,11 @@ def transition(
             notify.incident_decided(db, alert, actor, note, at)
             from app.citizen import service as citizen
 
-            citizen.on_incident_decided(db, alert, to, at)  # their reports close with the decision (D-062)
+            citizen.on_incident_decided(db, alert, to, at, department, false_report)  # their reports close with the decision (D-062, D-063)
+    if to == S.UNDER_REVIEW.value:
+        from app.citizen import service as citizen
+
+        citizen.on_review_started(db, alert, at)  # citizens are told an official is reviewing it (D-063)
     return {"status": "applied", "from": frm, "state": alert.state, "resolution": alert.resolution}
 
 

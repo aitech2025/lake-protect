@@ -1,21 +1,30 @@
-"""Citizen reports: intake, matching, the public history and updates (CONTEXT.md 17.8; DECISIONS.md D-062).
+"""Citizen reports: intake, placing, the incident and updates (CONTEXT.md 17.8; DECISIONS.md D-062, D-063).
 
-Upstream. A report comes in from the web portal, WhatsApp, or staff who take a 1070 call, a Praja
-Vani petition or a visit. On arrival it:
-1. gets a reference number;
-2. is placed: inside, in the buffer or in the watch ring of a watched location, or outside them;
-3. is merged with an open report of the same place (within 100 m, 60 days), whose updates it then
-   shares;
-4. is linked to an incident within 150 m on the same location, if one is open;
-5. becomes a signal (CONTEXT.md section 7), and the area's officials and the admin are told.
-A report never creates a finding on its own (section 5).
+**Upstream.** A report comes in from the web portal, WhatsApp, or staff who take a 1070 call, a
+Praja Vani petition or a visit. On arrival:
+1. **Reference.** It gets a reference number.
+2. **Place.** From the pin, or from words that name one watched location (app.citizen.locate). With
+   no place, the admin is asked to put it on the map.
+3. **Incident** (app.citizen.incident):
+   - it follows an earlier report of the same place (100 m, 60 days);
+   - or it joins an open incident within 150 m;
+   - or it opens a citizen incident.
 
-Downstream. Every step is an event with a public note in English, Telugu and Urdu. The citizen
-sees it on the portal with the reference, and by SMS or WhatsApp if they asked for updates. The
-note never names an officer, owner or claimant, and never shows evidence. Steps come from:
-- officials recording a check, and the admin closing the report with a reason;
-- the incident it is linked to: a change found, confirmed or dismissed;
-- the weekly screen: satellite images of the place checked with no change seen.
+   A new citizen incident gets a satellite review of the place and its officials are told.
+   Officials then work it in the regular flow: reviews, sharper images, a decision and closing,
+   each with a note.
+4. **Signal.** It becomes a row in `signals` (CONTEXT.md section 7).
+
+**Downstream.**
+- **Every step is an event** with a public note in English and Telugu.
+- **Where the citizen sees it:** on the portal with the reference, and by SMS or WhatsApp if they
+  asked for updates.
+- **The note never names** an officer, owner or claimant, and never shows evidence.
+- **Steps come from the incident:**
+  - opened, with the satellite review's result;
+  - under review;
+  - sharper images asked for;
+  - confirmed, dismissed or passed to a department.
 
 Privacy (DPDP Act 2023). Name and phone are optional. A phone is kept only to send updates, only
 once verified (one-time password, the WhatsApp number itself, or taken by staff from the caller),
@@ -39,7 +48,7 @@ from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from app.audit import chain
-from app.citizen import sender, texts
+from app.citizen import locate, sender, texts
 from app.config import settings
 from app.models import Alert, Asset, CitizenMessage, CitizenReport, CitizenReportEvent, Signal, User
 from app.sources import engine
@@ -264,7 +273,7 @@ def submit(
     if (channel in STAFF_CHANNELS) != (entered_by is not None):
         raise CitizenError("Staff enter 1070, Praja Vani and walk-in reports from the desk")
     if language not in texts.LANGS:
-        raise CitizenError("Language must be en, te or ur")
+        raise CitizenError("Language must be en or te")
     if what not in WHATS:
         raise CitizenError(f"What was seen must be one of: {', '.join(WHATS)}")
     description = (description or "").strip() or None
@@ -310,124 +319,123 @@ def submit(
     )
     db.add(report)
     db.flush()
-    # One update for the first steps: the routing note below. On WhatsApp the chat's own reply says it.
-    first = channel != "whatsapp"
+    # The first steps send one update, the last. On WhatsApp the chat's own reply says them.
+    send = channel != "whatsapp"
     add_event(db, report, "received", status="RECEIVED", note=texts.note("received", ref=ref), at=at, actor=entered_by, mirror=False, send=False)
 
-    root = duplicate_root(db, lon, lat, report.is_demo, at) if lon is not None else None
-    if root is not None and root.id != report.id:
-        report.duplicate_of, report.asset_id, report.zone, report.alert_id = root.id, root.asset_id, root.zone, root.alert_id
-        add_event(db, report, "duplicate", status=root.status if root.status != "RECEIVED" else "RECEIVED",
-                  note=texts.note("duplicate"), at=at, internal=f"Same place as {root.ref}", mirror=False, send=first)
-    elif lon is not None:
-        m = match(db, lon, lat, report.is_demo)
-        if m:
-            report.asset_id, report.zone = m["id"], m["zone"]
-            report.alert_id = near_incident(db, m["id"], lon, lat)
-            if report.alert_id:
-                add_event(db, report, "linked_incident", status="CHECKING", note=texts.note("linked_incident", place=place_name(db, report)),
-                          at=at, send=first)
-            else:
-                add_event(db, report, "routed_area", status="CHECKING", note=texts.note("routed_area"), at=at, send=first)
-        else:
-            report.zone = "outside"
-            add_event(db, report, "not_watched", status="RECEIVED", note=texts.note("not_watched"), at=at, send=first)
-    else:
-        add_event(db, report, "no_place", status="RECEIVED", note=texts.note("no_place"), at=at, send=first)
-
-    db.add(Signal(kind="citizen_report", asset_id=report.asset_id, geom=report.geom, received_at=at, ref=ref,
-                  linked_alert_id=report.alert_id, is_demo=report.is_demo))
-    db.flush()
-    if report.duplicate_of is None:
+    placed_by = "pin"
+    if lon is None:
+        guess = locate.from_words(db, location_text or description, report.is_demo)
+        if guess:
+            lon, lat, placed_by = guess["lon"], guess["lat"], "description"
+            add_event(db, report, "placed_from_words", status="RECEIVED", note=texts.note("placed_from_words", place={"en": guess["name"], "te": guess["name"]}),
+                      at=at, internal=f"Placed on {guess['name']} from the words: {(location_text or description or '')[:120]}", mirror=False, send=False)
+    if lon is None:
+        add_event(db, report, "no_place", status="RECEIVED", note=texts.note("no_place"), at=at, send=send)
+        db.add(Signal(kind="citizen_report", asset_id=None, geom=None, received_at=at, ref=ref, linked_alert_id=None, is_demo=report.is_demo))
+        db.flush()
         from app.notify import service as notify
 
-        notify.citizen_report(db, report, at)
+        notify.citizen_report(db, report, at)  # the admin places it
+    else:
+        place(db, report, lon, lat, placed_by, at, send=send)
     chain.record(db, actor_id=entered_by.id if entered_by else None, action="citizen.report_received", entity="citizen_report",
                  entity_id=report.id, at=at,
                  details={"ref": ref, "channel": channel, "what": what, "asset_id": report.asset_id, "zone": report.zone,
                           "alert_id": report.alert_id, "duplicate_of": report.duplicate_of, "photos": len(kept),
-                          "updates": report.wants_updates, "flags": flags})
+                          "updates": report.wants_updates, "flags": flags, "placed_by": report.placed_by})
     return report
 
 
-# Officials' steps -------------------------------------------------------------------------------
-def _ack(db: Session, user: User, report: CitizenReport, at: dt.datetime) -> None:
+def place(db: Session, report: CitizenReport, lon: float, lat: float, placed_by: str, at: dt.datetime, *,
+          send: bool = True, actor: User | None = None) -> None:
+    """Where the report is, and the incident it belongs to: an earlier report's, an open one nearby, or
+    a new citizen incident with its satellite review (D-063)."""
+    from app.citizen import incident
+    from app.notify import service as notify
+
+    report.geom = WKTElement(f"POINT({lon} {lat})", srid=4326)
+    report.placed_by = placed_by
+    db.flush()
+    root = duplicate_root(db, lon, lat, report.is_demo, at)
+    if root is not None and root.id != report.id and root.alert_id:
+        report.duplicate_of, report.asset_id, report.zone, report.alert_id = root.id, root.asset_id, root.zone, root.alert_id
+        add_event(db, report, "duplicate", status=root.status, note=texts.note("duplicate"), at=at, internal=f"Same place as {root.ref}",
+                  mirror=False, send=send, actor=actor)
+    else:
+        m = match(db, lon, lat, report.is_demo)
+        if m:
+            report.asset_id, report.zone = m["id"], m["zone"]
+        existing = near_incident(db, m["id"], lon, lat) if m else None
+        if existing:
+            report.alert_id = existing
+            add_event(db, report, "linked_incident", status="CHECKING", note=texts.note("linked_incident", place=place_name(db, report)),
+                      at=at, send=send, actor=actor)
+            notify.citizen_report(db, report, at)  # for information: the incident already has its officials
+            alert = db.get(Alert, existing)
+            if alert.state == "CONFIRMED":
+                add_event(db, report, "closed_incident_confirmed", status="CLOSED", note=texts.note("incident_confirmed"), at=at,
+                          closed_reason="incident_confirmed", internal=f"Incident {alert.code} was already confirmed")
+        else:
+            alert = incident.create(db, report, lon, lat, m, at)
+            report.alert_id = alert.id
+            if not m:
+                report.asset_id = db.scalar(text("SELECT c.asset_id FROM candidates c WHERE c.id = :c"), {"c": alert.candidate_id})
+                report.zone = "inside"
+            # Demo: the review answers at once and its note is the update; real data waits for the screener.
+            add_event(db, report, "case_opened", status="CHECKING", note=texts.note("case_opened"), at=at, actor=actor,
+                      internal=f"Incident {alert.code} opened", send=send and not report.is_demo)
+            incident.request(db, alert, report, lon, lat, at, send=send)
+            notify.incident_opened(db, alert, at)
+    db.add(Signal(kind="citizen_report", asset_id=report.asset_id, geom=report.geom, received_at=at, ref=report.ref,
+                  linked_alert_id=report.alert_id, is_demo=report.is_demo))
+    db.flush()
+
+
+def place_by_official(db: Session, report: CitizenReport, user: User, lon: float, lat: float, at: dt.datetime) -> None:
+    """A report with no place: an official puts it on the map, and it goes on as any other."""
+    if report.geom is not None or report.alert_id:
+        raise CitizenError("This report already has its place")
+    found = dataset_of(lon, lat)
+    if found is None or found != report.is_demo:
+        raise CitizenError("The place must be in the demo world" if report.is_demo else "The place must be in Telangana")
+    db.execute(text("DELETE FROM signals WHERE kind = 'citizen_report' AND ref = :r AND geom IS NULL"), {"r": report.ref})
+    add_event(db, report, "placed", status="RECEIVED", note=texts.note("placed", place={"en": f"{lat:.5f}, {lon:.5f}", "te": f"{lat:.5f}, {lon:.5f}"}),
+              at=at, actor=user, internal="Placed on the map by an official", send=False)
+    place(db, report, lon, lat, "official", at, actor=user)
     from app.notify import service as notify
 
     notify.acknowledge_for_report(db, user, report, "report_check", at)
+    chain.record(db, actor_id=user.id, action="citizen.report_placed", entity="citizen_report", entity_id=report.id, at=at,
+                 details={"ref": report.ref, "alert_id": report.alert_id})
 
 
-def record_check(db: Session, report: CitizenReport, user: User, outcome: str, internal: str, at: dt.datetime) -> None:
-    if report.status == "CLOSED":
-        raise CitizenError("The report is closed")
-    if outcome not in ("visible", "not_visible"):
-        raise CitizenError("The check is either 'visible' or 'not_visible'")
-    if not (internal or "").strip():
-        raise CitizenError("Add a note for the record")
-    add_event(db, report, f"check_{outcome}", status="CHECKING", note=texts.note(f"check_{outcome}"), at=at, internal=internal.strip(), actor=user)
-    _ack(db, user, report, at)
-    chain.record(db, actor_id=user.id, action="citizen.report_checked", entity="citizen_report", entity_id=report.id, at=at,
-                 details={"ref": report.ref, "outcome": outcome})
+def open_reports_of(db: Session, alert_id: int) -> list[CitizenReport]:
+    """The reports an incident's steps are passed on to. Reports that follow another follow its events."""
+    return list(db.scalars(select(CitizenReport).where(CitizenReport.alert_id == alert_id, CitizenReport.status != "CLOSED",
+                                                       CitizenReport.duplicate_of.is_(None)).order_by(CitizenReport.id)))
 
 
-def close(db: Session, report: CitizenReport, admin: User, reason: str, internal: str, at: dt.datetime, *,
-          department: str | None = None, false_report: bool = False) -> None:
-    if report.status == "CLOSED":
-        raise CitizenError("The report is already closed")
-    if report.duplicate_of:
-        raise CitizenError("This report follows an earlier report of the same place: close that one")
-    if reason not in texts.CLOSE_REASONS:
-        raise CitizenError(f"The reason must be one of: {', '.join(texts.CLOSE_REASONS)}")
-    if reason == "passed_on" and department not in texts.DEPARTMENTS:
-        raise CitizenError(f"Say which department: {', '.join(texts.DEPARTMENTS)}")
-    if not (internal or "").strip():
-        raise CitizenError("Add a note for the record")
-    report.false_report = bool(false_report)
-    note = texts.note(reason, department=texts.DEPARTMENTS.get(department or "", texts.DEPARTMENTS["revenue"]))
-    add_event(db, report, f"closed_{reason}", status="CLOSED", note=note, at=at, internal=internal.strip(), actor=admin, closed_reason=reason)
-    _ack(db, admin, report, at)
-    chain.record(db, actor_id=admin.id, action="citizen.report_closed", entity="citizen_report", entity_id=report.id, at=at,
-                 details={"ref": report.ref, "reason": reason, "department": department, "false_report": report.false_report})
+# Steps on the incident, passed on to the citizen (D-063) ---------------------------------------
+def on_review_started(db: Session, alert: Alert, at: dt.datetime) -> int:
+    """The incident's first review: once per report."""
+    reports = [r for r in open_reports_of(db, alert.id)
+               if not db.scalar(select(CitizenReportEvent.id).where(CitizenReportEvent.report_id == r.id, CitizenReportEvent.kind == "under_review"))]
+    for r in reports:
+        add_event(db, r, "under_review", status="CHECKING", note=texts.note("under_review"), at=at, internal=f"Incident {alert.code} under review")
+    return len(reports)
 
 
-def link(db: Session, report: CitizenReport, admin: User, at: dt.datetime, *, asset_id: int | None = None, alert_id: int | None = None) -> None:
-    """The admin places a report on a location (perhaps one just added from it), or on an incident."""
-    if report.status == "CLOSED":
-        raise CitizenError("The report is closed")
-    if report.duplicate_of:
-        raise CitizenError("This report follows an earlier report of the same place")
-    if alert_id is not None:
-        alert = db.get(Alert, alert_id)
-        if alert is None or alert.is_demo != report.is_demo:
-            raise CitizenError("No such incident in this dataset")
-        report.alert_id = alert.id
-        report.asset_id = db.scalar(text("SELECT c.asset_id FROM candidates c WHERE c.id = :c"), {"c": alert.candidate_id})
-        add_event(db, report, "linked_incident", status="CHECKING", note=texts.note("linked_incident", place=place_name(db, report)),
-                  at=at, actor=admin, internal=f"Linked to incident {alert.code}")
-    elif asset_id is not None:
-        asset = db.get(Asset, asset_id)
-        if asset is None or asset.is_demo != report.is_demo:
-            raise CitizenError("No such location in this dataset")
-        report.asset_id = asset.id
-        if report.geom is not None:
-            lon, lat = db.execute(text("SELECT ST_X(geom), ST_Y(geom) FROM citizen_reports WHERE id = :i"), {"i": report.id}).one()
-            m = match(db, lon, lat, report.is_demo)
-            report.zone = m["zone"] if m and m["id"] == asset.id else "outside"
-        recent = asset.added_at is not None and asset.added_at >= report.created_at
-        key = "added_to_watch" if recent else "placed"
-        add_event(db, report, key, status="CHECKING", note=texts.note(key, place=place_name(db, report)), at=at, actor=admin,
-                  internal=f"Placed on {asset.name}")
-    else:
-        raise CitizenError("Give a location or an incident")
-    db.execute(text("UPDATE signals SET asset_id = :a, linked_alert_id = :l WHERE kind = 'citizen_report' AND ref = :r"),
-               {"a": report.asset_id, "l": report.alert_id, "r": report.ref})
-    chain.record(db, actor_id=admin.id, action="citizen.report_linked", entity="citizen_report", entity_id=report.id, at=at,
-                 details={"ref": report.ref, "asset_id": report.asset_id, "alert_id": report.alert_id})
+def on_imagery_requested(db: Session, alert: Alert, at: dt.datetime) -> int:
+    reports = open_reports_of(db, alert.id)
+    for r in reports:
+        add_event(db, r, "sharper_images", status="CHECKING", note=texts.note("sharper_images"), at=at,
+                  internal=f"Sharper images requested on incident {alert.code}")
+    return len(reports)
 
 
-# Automatic steps --------------------------------------------------------------------------------
 def on_incident_opened(db: Session, alert: Alert, at: dt.datetime) -> int:
-    """A new incident: open reports of that place, not yet linked, now follow it."""
+    """A new satellite incident: open reports of that place with no incident yet now follow it."""
     rows = db.scalars(text(
         """
         SELECT r.id FROM citizen_reports r JOIN alerts al ON al.id = :al JOIN candidates c ON c.id = al.candidate_id
@@ -443,15 +451,25 @@ def on_incident_opened(db: Session, alert: Alert, at: dt.datetime) -> int:
     return len(rows)
 
 
-def on_incident_decided(db: Session, alert: Alert, to: str, at: dt.datetime) -> int:
+def on_incident_decided(db: Session, alert: Alert, to: str, at: dt.datetime, department: str | None = None,
+                        false_report: bool = False) -> int:
+    """The admin's decision closes the reports of the incident. A dismissal may say which department
+    the report was passed to."""
     reason = {"CONFIRMED": "incident_confirmed", "DISMISSED": "incident_dismissed"}.get(to)
     if reason is None:
         return 0
-    reports = list(db.scalars(select(CitizenReport).where(CitizenReport.alert_id == alert.id, CitizenReport.status != "CLOSED",
-                                                          CitizenReport.duplicate_of.is_(None))))
+    if department and to == "DISMISSED":
+        if department not in texts.DEPARTMENTS:
+            raise CitizenError(f"Department must be one of: {', '.join(texts.DEPARTMENTS)}")
+        reason = "passed_on"
+    reports = open_reports_of(db, alert.id)
     for report in reports:
-        add_event(db, report, f"closed_{reason}", status="CLOSED", note=texts.note(reason), at=at, closed_reason=reason,
-                  internal=f"Incident {alert.code} {to.lower()}")
+        if false_report:
+            report.false_report = True
+            for child in _children(db, report):
+                child.false_report = True
+        add_event(db, report, f"closed_{reason}", status="CLOSED", note=texts.note(reason, **({"department": texts.DEPARTMENTS[department]} if department else {})),
+                  at=at, closed_reason=reason, internal=f"Incident {alert.code} {to.lower()}" + (f"; passed to {department}" if department else ""))
     return len(reports)
 
 
@@ -460,12 +478,14 @@ def on_screen_stored(db: Session, run_id: int, at: dt.datetime) -> int:
     rows = db.execute(text(
         """
         SELECT r.id, s.last_look FROM citizen_reports r JOIN asset_screens s ON s.asset_id = r.asset_id AND s.run_id = :run
-        WHERE r.status = 'CHECKING' AND r.alert_id IS NULL AND r.duplicate_of IS NULL
+        WHERE r.status = 'CHECKING' AND r.duplicate_of IS NULL
           AND s.status = 'no_candidate' AND s.last_look IS NOT NULL AND s.last_look >= (r.created_at AT TIME ZONE 'UTC')::date
+          AND NOT EXISTS (SELECT 1 FROM citizen_report_events e WHERE e.report_id = r.id AND e.kind IN ('satellite_checked', 'satellite_no_change')
+                          AND e.at >= CAST(:at AS timestamptz) - interval '6 days')
           AND NOT EXISTS (SELECT 1 FROM citizen_report_events e WHERE e.report_id = r.id AND e.kind = 'satellite_checked'
                           AND e.internal_note = 'Look of ' || s.last_look::text)
         """
-    ), {"run": run_id}).all()
+    ), {"run": run_id, "at": at}).all()
     for rid, last_look in rows:
         report = db.get(CitizenReport, rid)
         when = {lang: last_look.strftime("%d %b %Y") for lang in texts.LANGS}

@@ -8,25 +8,25 @@ import "./portal.css";
 
 /**
  * The public side of GeoGuard (CONTEXT.md 17.8; DECISIONS.md D-062): report a problem on public
- * land, and check a report by its reference. No sign-in. English, Telugu and Urdu; Urdu reads
- * right to left. `?demo=1` uses the fictional demo world, so nothing real is reported in a demo.
+ * land, and check a report by its reference. No sign-in. English and Telugu. `?demo=1` uses the
+ * fictional demo world, so nothing real is reported in a demo.
  */
-type Lang = "en" | "te" | "ur";
-type L3 = { en: string; te: string; ur: string };
+type Lang = "en" | "te";
+type L3 = { en: string; te: string };
 type View = {
   ref: string; status: string; status_label: L3; what: string; what_label: L3; place: L3 | null; created_at: string;
   closed_reason: string | null; updates: boolean; is_demo: boolean; events: { kind: string; status: string; note: L3; at: string }[];
 };
 type Config = { whats: { key: string; label: L3 }[]; updates: { sms_updates: boolean; whatsapp: boolean }; stats: { received: number; checking: number; closed: number } };
 
-const LANGS: { code: Lang; label: string }[] = [{ code: "en", label: "English" }, { code: "te", label: "తెలుగు" }, { code: "ur", label: "اردو" }];
+const LANGS: { code: Lang; label: string }[] = [{ code: "en", label: "English" }, { code: "te", label: "తెలుగు" }];
 const KEY = "gg.portal.lang";
 
 function usePortalLang(): [Lang, (l: Lang) => void] {
   const [lang, set] = useState<Lang>(() => {
     try {
       const v = localStorage.getItem(KEY);
-      return v === "te" || v === "ur" ? v : "en";
+      return v === "te" ? v : "en";
     } catch {
       return "en";
     }
@@ -43,7 +43,7 @@ function usePortalLang(): [Lang, (l: Lang) => void] {
 }
 
 function fmt(value: string, lang: Lang, withTime = false): string {
-  const locale = lang === "te" ? "te-IN" : lang === "ur" ? "ur-IN" : "en-IN";
+  const locale = lang === "te" ? "te-IN" : "en-IN";
   const opts: Intl.DateTimeFormatOptions = withTime
     ? { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }
     : { day: "numeric", month: "short", year: "numeric" };
@@ -58,7 +58,7 @@ function Shell({ lang, setLang, demo, children }: { lang: Lang; setLang: (l: Lan
     document.title = `${t("citizen.title")} · GeoGuard`;
   }, [t]);
   return (
-    <div className={`portal lang-${lang}`} dir={lang === "ur" ? "rtl" : "ltr"} lang={lang} data-testid="portal">
+    <div className={`portal lang-${lang}`} lang={lang} data-testid="portal">
       {demo && <div className="portal-demo" role="status" data-testid="portal-demo">{t("citizen.demo_note")}</div>}
       <header className="portal-head">
         <div className="brand">
@@ -206,7 +206,7 @@ export function ReportPage() {
         <section className="portal-card done" data-testid="report-done">
           <h1>{t("citizen.thanks")}</h1>
           <p>{t("citizen.your_ref")}</p>
-          <p className="ref" data-testid="report-ref" dir="ltr">{done.ref}</p>
+          <p className="ref" data-testid="report-ref">{done.ref}</p>
           <button type="button" className="btn secondary" onClick={() => { void navigator.clipboard?.writeText(done.ref); setCopied(true); }}>
             {copied ? t("citizen.copied") : t("citizen.copy")}
           </button>
@@ -234,7 +234,7 @@ export function ReportPage() {
         <fieldset className="portal-card">
           <legend>{t("citizen.step_place")}</legend>
           <p className="muted">{t("citizen.place_help")}</p>
-          <div className="portal-map" dir="ltr">
+          <div className="portal-map">
             <MapView base={demo ? "demo" : "s2"} draft={pin ? [pin] : []} fit={fit} onMapClick={(p) => setPin(p)} testId="portal-map" />
           </div>
           {!demo && <p className="small muted">{t("citizen.map_note")}</p>}
@@ -303,13 +303,13 @@ export function ReportPage() {
             <>
               <p className="small muted">{t("citizen.updates_help")}{demo ? ` ${t("citizen.demo_phone")}` : ""}</p>
               <div className="portal-row">
-                <label className="field grow">{t("citizen.phone")}<input type="tel" inputMode="tel" dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)} data-testid="phone" /></label>
+                <label className="field grow">{t("citizen.phone")}<input type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} data-testid="phone" /></label>
                 <button type="button" className="btn secondary" disabled={phone.replace(/\D/g, "").length < 10} onClick={() => void sendCode()} data-testid="send-code">{t("citizen.send_code")}</button>
               </div>
               {demoCode && <p className="note" data-testid="demo-code">{t("citizen.demo_code", { code: demoCode })}</p>}
               {codeSent && (
                 <div className="portal-row">
-                  <label className="field grow">{t("citizen.code")}<input inputMode="numeric" dir="ltr" maxLength={6} value={code} onChange={(e) => setCode(e.target.value)} data-testid="code" /></label>
+                  <label className="field grow">{t("citizen.code")}<input inputMode="numeric" maxLength={6} value={code} onChange={(e) => setCode(e.target.value)} data-testid="code" /></label>
                   <button type="button" className="btn secondary" disabled={code.length !== 6} onClick={() => void verify()} data-testid="verify-code">{t("citizen.verify")}</button>
                 </div>
               )}
@@ -352,7 +352,7 @@ export function TrackPage() {
         <h1>{t("citizen.tab_track")}</h1>
         <form className="portal-row" onSubmit={(e) => { e.preventDefault(); if (ref.trim()) nav(`/report/track/${ref.trim().toUpperCase()}${demo ? "?demo=1" : ""}`); }}>
           <label className="field grow">{t("citizen.track_help")}
-            <input value={ref} dir="ltr" onChange={(e) => setRef(e.target.value)} placeholder="GGR-XXXX-XXXX" data-testid="track-ref" />
+            <input value={ref} onChange={(e) => setRef(e.target.value)} placeholder="GGR-XXXX-XXXX" data-testid="track-ref" />
           </label>
           <button type="submit" className="btn" data-testid="track-go">{t("citizen.check")}</button>
         </form>
@@ -360,7 +360,7 @@ export function TrackPage() {
       </section>
       {view && (
         <section className="portal-card" data-testid="track-view">
-          <p className="ref" dir="ltr">{view.ref}</p>
+          <p className="ref">{view.ref}</p>
           <p className={`portal-status s-${view.status}`} data-testid="track-status">{t("citizen.status_now", { status: view.status_label[lang] })}</p>
           <p>{t("citizen.reported", { date: fmt(view.created_at, lang), what: view.what_label[lang] })}</p>
           {view.place && <p>{t("citizen.place", { place: view.place[lang] })}</p>}
@@ -368,7 +368,7 @@ export function TrackPage() {
           <ol className="portal-timeline" data-testid="track-events">
             {view.events.map((ev, i) => (
               <li key={i}>
-                <time dir="ltr">{fmt(ev.at, lang, true)}</time>
+                <time>{fmt(ev.at, lang, true)}</time>
                 <span>{ev.note[lang]}</span>
               </li>
             ))}

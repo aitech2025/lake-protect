@@ -42,7 +42,8 @@ def test_every_asset_type_has_one_category_and_planned_ones_say_what_they_need(c
     viewer = make_user(db, "viewer")
     items = {c["name"]: c for c in client.get("/categories", headers=auth(viewer)).json()["items"]}
     assert {k: v["status"] for k, v in items.items()} == {
-        "water_body": "live", "government_land": "live", "endowment_land": "planned", "forest_land": "planned"}
+        "water_body": "live", "government_land": "live", "endowment_land": "planned", "forest_land": "planned",
+        "citizen_reported": "intake"}  # places made from citizens' reports (D-063)
     assert {t["type"] for c in items.values() for t in c["types"]} == set(AssetType.__members__)
     assert items["forest_land"]["needs"] and items["endowment_land"]["needs"]
     assert items["government_land"]["label"]["te"] == "ప్రభుత్వ భూమి"

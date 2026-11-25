@@ -109,6 +109,23 @@ services:
       api:
         condition: service_healthy
 
+  # Satellite review of citizens' reports (D-063): the newest Sentinel-2 looks at each reported
+  # place, within minutes of the report. Needs internet, like the screener:
+  # docker compose --profile screen up -d reviewer
+  reviewer:
+    profiles: ["screen"]
+    image: lakeprotect-screener:dev
+    command: lp review-reports --every 300
+    environment:
+      LP_API_URL: http://api:8000
+      LP_PIPELINE_TOKEN: ${LP_PIPELINE_TOKEN:?set in .env}
+      LP_CACHE_DIR: /var/lp/cache
+    volumes:
+      - lp_cache:/var/lp/cache
+    depends_on:
+      api:
+        condition: service_healthy
+
   # Browser tests: docker compose --profile e2e run --rm e2e
   e2e:
     profiles: ["e2e"]

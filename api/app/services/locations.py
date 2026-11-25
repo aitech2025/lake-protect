@@ -139,6 +139,8 @@ def add_location(
     except categories.CategoryError as exc:
         raise LocationError(str(exc)) from exc
     cat = categories.get(category)
+    if cat["status"] == "intake":
+        raise LocationError(f"{cat['label']['en']} are made from citizens' reports, not added by hand")
     if cat["status"] != categories.LIVE:
         raise LocationError(f"{cat['label']['en']} is planned and not watched yet. Still needed: {'; '.join(cat.get('needs', []))}")
     name, district, source_name = (name or "").strip(), (district or "").strip(), (source_name or "").strip()

@@ -21,8 +21,8 @@ def registry() -> dict:
     data = yaml.safe_load(FILE.read_text(encoding="utf-8"))
     seen: dict[str, str] = {}
     for name, cat in data["categories"].items():
-        if cat["status"] not in ("live", "planned"):
-            raise CategoryError(f"{name}: status must be live or planned")
+        if cat["status"] not in ("live", "planned", "intake"):
+            raise CategoryError(f"{name}: status must be live, planned or intake")
         if cat["primary_kind"] not in ("ftl", "parcel"):
             raise CategoryError(f"{name}: primary_kind must be ftl or parcel")
         for t in cat["types"]:

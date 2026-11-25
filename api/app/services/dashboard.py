@@ -196,7 +196,7 @@ def overview(db: Session, user: User, *, is_demo: bool, district: str | None = N
     for a in assets:
         if a["monitored"]:
             by_type[a["type"]] = by_type.get(a["type"], 0) + 1
-    by_category = [{k: c[k] for k in ("name", "status", "label", "watched")} for c in categories.as_list(by_type)]
+    by_category = [{k: c[k] for k in ("name", "status", "label", "watched")} for c in categories.as_list(by_type) if c["status"] != "intake"]
 
     crumbs = [{"level": "state", "name": "Demo State" if is_demo else "Telangana", "params": {}}]
     for i, lvl in enumerate(LEVELS[1:depth + 1], start=1):

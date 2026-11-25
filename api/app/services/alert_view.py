@@ -61,10 +61,17 @@ SELECT al.id, al.code, al.state::text AS state, al.resolution, al.closed_at, al.
        (SELECT count(*) FROM incident_reviews r WHERE r.alert_id = al.id) AS review_count,
        (SELECT r.outcome FROM incident_reviews r WHERE r.alert_id = al.id ORDER BY r.id DESC LIMIT 1) AS last_review_outcome,
        ST_X(ST_PointOnSurface(c.geom)) AS lon, ST_Y(ST_PointOnSurface(c.geom)) AS lat,
-       ST_AsGeoJSON(c.geom)::json AS geometry
+       ST_AsGeoJSON(c.geom)::json AS geometry,
+       al.origin, al.report_id, cr.ref AS report_ref, cr.channel AS report_channel, cr.what AS report_what,
+       cr.created_at AS report_at, cr.placed_by AS report_placed_by,
+       sr.status AS review_status, sr.result AS review_result, sr.after_date AS review_after_date,
+       sr.first_changed_at AS review_first_changed, sr.change_area_sq_m AS review_change_area, sr.source AS review_source,
+       (SELECT count(*) FROM citizen_reports r2 WHERE r2.alert_id = al.id) AS citizen_reports
 FROM alerts al
 JOIN candidates c ON c.id = al.candidate_id
 JOIN assets a ON a.id = c.asset_id
+LEFT JOIN citizen_reports cr ON cr.id = al.report_id
+LEFT JOIN satellite_reviews sr ON sr.alert_id = al.id
 LEFT JOIN LATERAL (SELECT * FROM legal_checks l WHERE l.candidate_id = c.id ORDER BY l.id DESC LIMIT 1) lc ON true
 WHERE (CAST(:alert_id AS bigint) IS NULL OR al.id = CAST(:alert_id AS bigint))
   AND (CAST(:asset_id AS bigint) IS NULL OR a.id = CAST(:asset_id AS bigint))
@@ -82,14 +89,48 @@ def describe(change_type: str, area_sq_m: float | None, zone: str | None, first_
     return f"{what}{size}{where}{when}"
 
 
+def citizen_summary(row: dict) -> tuple[str, str]:
+    """A citizen incident in one sentence, English and Telugu: what was reported, when, and what the
+    satellite review shows (D-063)."""
+    from app.citizen import texts
+
+    what = texts.REPORTED.get(row["report_what"], texts.REPORTED["other"])
+    day = row["report_at"]
+    en, te = f"{what['en']} reported by a citizen on {day:%d %b %Y}", f"{day:%d %b %Y}న ఒక పౌరుడు తెలిపారు: {what['te']}"
+    result, status = row.get("review_result"), row.get("review_status")
+    if result == "change_found":
+        area = f" of about {float(row['review_change_area']):,.0f} sq m" if row.get("review_change_area") else ""
+        area_te = f"సుమారు {float(row['review_change_area']):,.0f} చ.మీ. " if row.get("review_change_area") else ""
+        first = row.get("review_first_changed")
+        en += f"; the satellite shows a change{area}" + (f", first seen {first:%d %b %Y}" if first else "")
+        te += f"; ఉపగ్రహ చిత్రంలో {area_te}మార్పు కనిపిస్తోంది" + (f", మొదట {first:%d %b %Y}న" if first else "")
+    elif result == "no_change":
+        after = row.get("review_after_date")
+        en += "; no change visible on satellite images" + (f" up to {after:%d %b %Y}" if after else "")
+        te += "; ఉపగ్రహ చిత్రాల్లో మార్పు కనిపించలేదు" + (f" ({after:%d %b %Y} వరకు)" if after else "")
+    elif result == "no_clear_look":
+        en += "; no clear satellite image yet"
+        te += "; ఇంకా స్పష్టమైన ఉపగ్రహ చిత్రం లేదు"
+    elif status == "pending":
+        en += "; satellite review pending"
+        te += "; ఉపగ్రహ పరిశీలన జరుగుతోంది"
+    elif status == "failed":
+        en += "; the satellite review could not be done"
+        te += "; ఉపగ్రహ పరిశీలన జరగలేదు"
+    return en, te
+
+
 def _row_out(row: dict) -> dict:
     out = dict(row)
-    for k in ("priority_score", "area_sq_m", "confidence"):
-        out[k] = float(out[k]) if out[k] is not None else None
+    for k in ("priority_score", "area_sq_m", "confidence", "review_change_area"):
+        out[k] = float(out[k]) if out.get(k) is not None else None
     out["mode"] = rules.mode_for_cohort(row["cohort"]).value
     out["area_acres"] = round(out["area_sq_m"] / 4046.86, 2) if out["area_sq_m"] else None
     out["change_label"] = CHANGE_LABEL.get(row["change_type"], row["change_type"])
     out["summary"] = describe(row["change_type"], out["area_sq_m"], row["zone"], row["first_changed_at"])
+    out["summary_te"] = None
+    if row.get("origin") == "citizen":
+        out["summary"], out["summary_te"] = citizen_summary(row)
     out["court_matter"] = row["legal_verdict"] == "HOLD_LEGAL"
     out["boundary_confirmed"] = bool(row["checked_boundary_status"]) and rules.is_confirmed_status(row["checked_boundary_status"])
     out["permit_conflict"] = "permit_conflict" in (row["flags"] or [])
@@ -154,6 +195,43 @@ def get_visible(db: Session, alert_id: int) -> Alert:
 
 def _iso(v):
     return v.isoformat() if isinstance(v, (dt.date, dt.datetime)) else v
+
+
+def _citizen_block(db: Session, alert: Alert) -> dict | None:
+    """The report that opened a citizen incident (D-063): what the citizen said, never who they are."""
+    from app.citizen import locate
+    from app.models import CitizenReport
+
+    if alert.report_id is None:
+        return None
+    r = db.get(CitizenReport, alert.report_id)
+    lon, lat = db.execute(text("SELECT ST_X(geom), ST_Y(geom) FROM citizen_reports WHERE id = :i"), {"i": r.id}).one()
+    asset = db.get(Asset, db.get(Candidate, alert.candidate_id).asset_id)
+    area_source = None
+    if asset.type == "reported_place":
+        area_source = "nearest demo location" if asset.is_demo else (locate.AREA_SOURCE if asset.district else None)
+    return {
+        "report_id": r.id, "ref": r.ref, "channel": r.channel, "language": r.language, "what": r.what, "description": r.description,
+        "location_text": r.location_text, "placed_by": r.placed_by, "photos": len(r.photos or []), "created_at": _iso(r.created_at),
+        "lon": lon, "lat": lat, "updates": r.wants_updates, "source_ref": r.source_ref, "reported_place": asset.type == "reported_place",
+        "area_source": area_source,
+        "survey_numbers": locate.survey_numbers(db, lon, lat, r.is_demo) if lon is not None else [],
+    }
+
+
+def _review_block(db: Session, alert: Alert) -> dict | None:
+    from app.models import SatelliteReview
+
+    rv = db.scalar(select(SatelliteReview).where(SatelliteReview.alert_id == alert.id))
+    if rv is None:
+        return None
+    return {
+        "status": rv.status, "result": rv.result, "source": rv.source, "requested_at": _iso(rv.requested_at), "done_at": _iso(rv.done_at),
+        "before_date": _iso(rv.before_date), "after_date": _iso(rv.after_date), "scenes": rv.scenes, "change_type": rv.change_type,
+        "change_area_sq_m": float(rv.change_area_sq_m) if rv.change_area_sq_m is not None else None,
+        "first_changed_at": _iso(rv.first_changed_at), "detail": rv.detail, "attempts": rv.attempts,
+        "has_images": bool(rv.after_chip),
+    }
 
 
 def detail(db: Session, alert: Alert, user: User) -> dict:
@@ -253,6 +331,8 @@ def detail(db: Session, alert: Alert, user: User) -> dict:
             {"id": p.id, "version": p.version, "generated_at": _iso(p.generated_at), "manifest_sha256": p.manifest_sha256, "counsel_reviewed": p.counsel_reviewed}
             for p in db.scalars(select(EvidencePack).where(EvidencePack.alert_id == alert.id).order_by(EvidencePack.version))
         ],
+        "citizen": _citizen_block(db, alert),
+        "satellite_review": _review_block(db, alert),
         "imagery_requests": [
             {"id": r.id, "provider": r.provider, "area_sq_km": float(r.area_sq_km), "est_cost_usd": float(r.est_cost_usd) if r.est_cost_usd is not None else None, "status": r.status}
             for r in db.scalars(select(ImageryRequest).where(ImageryRequest.alert_id == alert.id))

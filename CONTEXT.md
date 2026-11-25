@@ -1025,7 +1025,7 @@ The April 2026 High Court order asked HYDRAA for written procedures and prior no
 - The reporter's identity is protected and kept to a minimum, under the Digital Personal Data Protection Act, 2023.
 - Accused persons are never shown publicly.
 - Rate limits and the one-time password guard against abuse; repeated false reports are flagged.
-- The channel works in English, Telugu and Urdu.
+- The channel works in English, Telugu and Urdu. (Changed 25 Nov 2026: English and Telugu only, at the owner's request, DECISIONS.md D-063.)
 - A report about a place the system does not watch is passed to the right department.
 
 ### 17.9 Imagery sourcing (changed 7 November 2026)

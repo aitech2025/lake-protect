@@ -48,16 +48,25 @@ def test_seeded_demo(db, client, isolated_storage):
 
 
 def _citizen_reports(db, seeded):
-    """Every channel and every way a report ends (D-062), all fictional."""
+    """Every channel, reports joining incidents and opening their own, worked in the regular flow (D-062, D-063)."""
     assert seeded["citizen_reports"] == {
         "r-full-path": "CLOSED/incident_confirmed", "r-not-real": "CLOSED/incident_dismissed", "r-outside": "CLOSED/passed_on",
-        "r-kunta": "CLOSED/no_change_seen", "r-parcel-a": "CHECKING", "r-headline": "CHECKING", "r-headline-whatsapp": "CHECKING",
+        "r-kunta-7": "CLOSED/incident_dismissed", "r-kunta-8": "CHECKING", "r-headline": "CHECKING", "r-headline-whatsapp": "CHECKING",
+    }
+    assert seeded["citizen_incidents"] == {
+        "r-full-path": "satellite:CLOSED", "r-not-real": "satellite:CLOSED", "r-outside": "citizen:CLOSED", "r-kunta-7": "citizen:CLOSED",
+        "r-kunta-8": "citizen:UNDER_REVIEW", "r-headline": "satellite:OPEN", "r-headline-whatsapp": "satellite:OPEN",
     }
     rows = db.execute(text("SELECT channel, reporter_phone, is_demo, duplicate_of IS NOT NULL AS dup FROM citizen_reports")).all()
     assert {r[0] for r in rows} == {"web", "whatsapp", "helpline_1070", "praja_vani"} and all(r[2] for r in rows)
     assert all(p is None or p.startswith("+910000") for _, p, _, _ in rows) and sum(r[3] for r in rows) == 1
-    kinds = db.scalars(text("SELECT e.kind FROM citizen_report_events e JOIN citizen_reports r ON r.id = e.report_id ORDER BY e.id")).all()
-    assert {"change_found", "duplicate", "check_not_visible", "closed_passed_on", "closed_incident_confirmed", "satellite_checked"} <= set(kinds)
+    kinds = db.scalars(text("SELECT e.kind FROM citizen_report_events e ORDER BY e.id")).all()
+    assert {"case_opened", "satellite_no_change", "under_review", "sharper_images", "linked_incident", "duplicate",
+            "closed_passed_on", "closed_incident_confirmed"} <= set(kinds)
+    reviews = db.execute(text("SELECT status, result FROM satellite_reviews")).all()
+    assert len(reviews) == 3 and all(r == ("done", "no_change") for r in reviews)
+    place = db.execute(text("SELECT monitored, district FROM assets WHERE type::text = 'reported_place'")).all()
+    assert len(place) == 1 and place[0][0] is False and place[0][1]
 
 
 def _incident_paths(db, seeded):

@@ -1,7 +1,6 @@
 """The WhatsApp conversation (CONTEXT.md 17.8; DECISIONS.md D-062).
 
-One question at a time, by number or keyword, so it works on any phone and in any of the three
-languages:
+One question at a time, by number or keyword, so it works on any phone, in English or Telugu:
 1. Language.
 2. The place: a shared location pin, or a landmark in words.
 3. What is happening, from five choices.
@@ -125,7 +124,7 @@ def _step(db: Session, chat: CitizenChat, wa_id: str, kind: str | None, body: st
     invalid = [f"{texts.pick(texts.BOT['invalid'], lang)}\n{_question(chat)}\n{texts.pick(texts.BOT['restart'], lang)}"]
 
     if chat.state == "lang":
-        choice = {"1": "en", "2": "te", "3": "ur", "english": "en", "తెలుగు": "te", "اردو": "ur"}.get(word)
+        choice = {"1": "en", "2": "te", "english": "en", "తెలుగు": "te"}.get(word)
         if not choice:
             return [texts.BOT["welcome"]]
         chat.language, chat.state = choice, "place"

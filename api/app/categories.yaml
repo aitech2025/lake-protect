@@ -63,6 +63,18 @@ categories:
       - "Approved diversions and felling permissions, so lawful work is not flagged"
       - "A source connector, and the department's officials with their areas"
 
+  # Places outside every watched location that citizens reported (D-063). Made by the system, so
+  # each report's incident has a place; not on the weekly watch until the admin starts watching.
+  citizen_reported:
+    status: intake
+    label: {en: "Places reported by citizens", te: "పౌరులు తెలిపిన ప్రదేశాలు"}
+    one: {en: "Place reported by a citizen", te: "పౌరులు తెలిపిన ప్రదేశం"}
+    primary_kind: parcel
+    custodians: "Not known yet: the officials find out"
+    boundary_from: "A 50 m circle around the citizen's pin"
+    watch_for: [soil_fill, clearing, levelling, small_structure, building]
+    types: [reported_place]
+
 # Labels of the asset types. A type belongs to exactly one category above.
 types:
   lake: {en: "Lake or tank (cheruvu, kunta)", te: "చెరువు, కుంట"}
@@ -71,6 +83,7 @@ types:
   recovered_parcel: {en: "Recovered land", te: "స్వాధీనం చేసుకున్న భూమి"}
   endowment_land: {en: "Endowment land", te: "దేవాదాయ భూమి"}
   forest_land: {en: "Forest land", te: "అటవీ భూమి"}
+  reported_place: {en: "Place reported by a citizen", te: "పౌరులు తెలిపిన ప్రదేశం"}
 
 # Limits for a location the admin adds by hand. Sentinel-2 sees 10 m pixels and the smallest change
 # it reports is 1,000 sq m (detect_rules.yaml), so a smaller location cannot be watched usefully.

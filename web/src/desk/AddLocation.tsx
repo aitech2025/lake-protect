@@ -7,7 +7,7 @@ import { MapView } from "../components/MapView";
 
 export type Category = {
   name: string;
-  status: "live" | "planned";
+  status: "live" | "planned" | "intake";
   label: { en: string; te: string };
   one: { en: string; te: string };
   primary_kind: "ftl" | "parcel";
@@ -184,7 +184,7 @@ export function AddLocation({ cats, context, onAdded, onCancel, onOpen }: {
 
       <fieldset className="kinds">
         <legend>{t("locations.kind")}</legend>
-        {cats.items.map((c) => (
+        {cats.items.filter((c) => c.status !== "intake").map((c) => (
           <label key={c.name} className={`kind ${c.status}`} data-testid={`kind-${c.name}`}>
             <input type="radio" name="category" value={c.name} checked={category === c.name} disabled={c.status !== "live"} onChange={() => setCategory(c.name)} />
             <span>

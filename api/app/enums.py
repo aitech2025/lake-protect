@@ -19,6 +19,8 @@ class AssetType(StrEnum):
     # Planned categories (app/categories.yaml, DECISIONS.md D-061): in the database, not yet watched.
     endowment_land = "endowment_land"
     forest_land = "forest_land"
+    # A place outside every watched location, made from a citizen's report (D-063). Not watched.
+    reported_place = "reported_place"
 
 
 class BoundaryKind(StrEnum):
@@ -66,6 +68,7 @@ class SensorBasis(StrEnum):
     optical_and_radar = "optical_and_radar"
     optical_only = "optical_only"
     radar_only = "radar_only"
+    citizen_report = "citizen_report"  # the reported spot; the satellite review is kept beside it (D-063)
 
 
 class AlertClass(StrEnum):
@@ -158,6 +161,7 @@ class NotificationKind(StrEnum):
     not_acknowledged = "not_acknowledged"  # to the admin: an official has not acknowledged in 48 hours
     weekly_digest = "weekly_digest"  # after each weekly screen: the official's area that week
     citizen_report = "citizen_report"  # a citizen's report in the area (D-062): needs acknowledgement
+    satellite_review = "satellite_review"  # the satellite review of a citizen incident is done (D-063)
 
 
 class Channel(StrEnum):

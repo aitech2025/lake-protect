@@ -31,8 +31,11 @@ def test_rebuild_from_saved_response_matches_committed_file(tmp_path):
     # As `lp assets-osm` does: districts and mandals from the saved boundaries (D-060).
     from lake_protect.osm_areas import run as place_areas
 
-    place_areas(out, ROOT / "data/sources/overpass_admin_orr.json", [78.22, 17.20, 78.72, 17.62], refetch=False)
+    areas_out = tmp_path / "admin_orr.geojson"
+    place_areas(out, ROOT / "data/sources/overpass_admin_orr.json", [78.22, 17.20, 78.72, 17.62], refetch=False, areas_out=areas_out)
     rebuilt = json.loads(out.read_text(encoding="utf-8"))
+    # The district and mandal outlines the API uses to place a citizen's pin (D-063) match too.
+    assert json.loads(areas_out.read_text(encoding="utf-8"))["features"] == json.loads((ROOT / "data/areas/admin_orr.geojson").read_text(encoding="utf-8"))["features"]
     committed = json.loads((ROOT / "data/assets.geojson").read_text(encoding="utf-8"))
     assert rebuilt["features"] == committed["features"]
     for f in rebuilt["features"]:

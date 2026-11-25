@@ -17,8 +17,7 @@
   --focus: #1f6fa8;
   --radius-s: 4px;
   --radius-m: 8px;
-  /* Urdu (D-062) falls back to the bundled Nastaliq font, so Arabic script joins correctly offline. */
-  --font: "Noto Sans", "Noto Sans Telugu", "Noto Nastaliq Urdu", system-ui, sans-serif;
+  --font: "Noto Sans", "Noto Sans Telugu", system-ui, sans-serif;
   --step--1: 0.8125rem;
   --step-0: 0.9375rem;
   --step-1: 1.125rem;
@@ -458,3 +457,13 @@ tr.superseded td { color: var(--ink-2); text-decoration: line-through; text-deco
 @media (max-width: 960px) {
   .reports-grid, .report-grid, .intake-grid { grid-template-columns: 1fr; }
 }
+
+/* Citizen incidents (D-063): the report that opened it, and the satellite review. */
+.citizen-origin { margin: 0 0 1rem; display: grid; gap: 0.4rem; border-left: 4px solid var(--ftl); }
+.citizen-facts { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.15rem; }
+.satellite-review { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--rule); display: grid; gap: 0.3rem; }
+.satellite-review.change_found [data-testid="satellite-review-result"] { color: #8c2c1f; }
+.satellite-review.no_change [data-testid="satellite-review-result"] { color: #1f5a40; }
+.satellite-review.pending [data-testid="satellite-review-result"] { color: #6f4708; }
+.pair.single { grid-template-columns: minmax(0, 1fr); max-width: 32rem; }
+.report-incident { margin-bottom: 1rem; display: grid; gap: 0.4rem; }

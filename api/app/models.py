@@ -222,6 +222,9 @@ class Alert(Base):
     __tablename__ = "alerts"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     code: Mapped[str] = mapped_column(Text, unique=True)
+    # Migration 0010: 'satellite' or 'citizen', and the report a citizen incident came from (D-063).
+    origin: Mapped[str] = mapped_column(Text, server_default="satellite")
+    report_id: Mapped[int | None] = mapped_column(ForeignKey("citizen_reports.id"))
     candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id"), unique=True)
     state: Mapped[str] = mapped_column(INCIDENT_STATE)
     resolution: Mapped[str | None] = mapped_column(Text)
@@ -599,6 +602,7 @@ class CitizenReport(Base):
     false_report: Mapped[bool] = mapped_column(Boolean, default=False)
     flags: Mapped[list[str]] = mapped_column(ARRAY(Text), default=list)
     source_hash: Mapped[str] = mapped_column(Text)
+    placed_by: Mapped[str | None] = mapped_column(Text)  # migration 0010: pin, description or official
     contact_purged_at: Mapped[dt.datetime | None] = mapped_column(TZ)
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[dt.datetime] = mapped_column(TZ)
@@ -663,3 +667,28 @@ class CitizenOtp(Base):
     verified_at: Mapped[dt.datetime | None] = mapped_column(TZ)
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[dt.datetime] = mapped_column(TZ)
+
+
+class SatelliteReview(Base):
+    """The satellite look at a citizen incident's place (migration 0010, DECISIONS.md D-063)."""
+
+    __tablename__ = "satellite_reviews"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    alert_id: Mapped[int] = mapped_column(ForeignKey("alerts.id"), unique=True)
+    status: Mapped[str] = mapped_column(Text, default="pending")
+    result: Mapped[str | None] = mapped_column(Text)
+    source: Mapped[str] = mapped_column(Text)
+    requested_at: Mapped[dt.datetime] = mapped_column(TZ)
+    done_at: Mapped[dt.datetime | None] = mapped_column(TZ)
+    as_of: Mapped[dt.date | None] = mapped_column(Date)
+    before_date: Mapped[dt.date | None] = mapped_column(Date)
+    after_date: Mapped[dt.date | None] = mapped_column(Date)
+    scenes: Mapped[list] = mapped_column(JSONB, default=list)
+    before_chip: Mapped[str | None] = mapped_column(Text)
+    after_chip: Mapped[str | None] = mapped_column(Text)
+    change_type: Mapped[str | None] = mapped_column(Text)
+    change_area_sq_m: Mapped[Decimal | None] = mapped_column(Numeric(14, 2))
+    first_changed_at: Mapped[dt.date | None] = mapped_column(Date)
+    detail: Mapped[str | None] = mapped_column(Text)
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)

@@ -11,6 +11,7 @@ import { notifyCountChanged } from "../components/Layout";
 const KIND_CLASS: Record<Note["kind"], string> = {
   incident_opened: "review",
   citizen_report: "field",
+  satellite_review: "field",
   reminder: "legal",
   not_acknowledged: "legal",
   incident_decided: "officer",

@@ -6,9 +6,9 @@
 - POST /reports/whatsapp-simulator    send a demo WhatsApp message
 - GET  /reports/{id}                  one report: history, messages to the citizen, duplicates
 - GET  /reports/{id}/photos/{n}       a photo (metadata already removed)
-- POST /reports/{id}/check            an official records a check against the images and records
-- POST /reports/{id}/close            admin: close it with a reason the citizen sees
-- POST /reports/{id}/link             admin: place it on a location or an incident
+- POST /reports/{id}/place            an official puts a report with no place on the map
+
+Each placed report belongs to an incident (D-063): officials work it there, in the regular flow.
 
 Officials never see a citizen's number or name: only whether updates go to a verified phone.
 """
@@ -27,9 +27,8 @@ from app.audit import chain
 from app.citizen import service, whatsapp
 from app.clock import utcnow
 from app.db import get_db
-from app.enums import Role
 from app.models import CitizenChat, CitizenMessage, CitizenReport, User
-from app.security import current_user, require_roles
+from app.security import current_user
 from app.storage import store
 
 router = APIRouter(prefix="/reports", tags=["citizen reports"])
@@ -74,7 +73,7 @@ class IntakeIn(BaseModel):
     dataset: Literal["demo", "real"] = "real"
     channel: Literal["helpline_1070", "praja_vani", "walk_in"]
     source_ref: str | None = None
-    language: Literal["en", "te", "ur"] = "te"
+    language: Literal["en", "te"] = "te"
     what: str
     lon: float | None = Field(default=None, ge=-180, le=180)
     lat: float | None = Field(default=None, ge=-90, le=90)
@@ -191,56 +190,19 @@ def photo(report_id: int, n: int, user: User = Depends(current_user), db: Sessio
     return Response(store.get_object(photos[n - 1]["key"]), media_type="image/jpeg", headers={"Cache-Control": "private, max-age=3600"})
 
 
-class CheckIn(BaseModel):
+class PlaceIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    outcome: Literal["visible", "not_visible"]
-    note: str
+    lon: float = Field(ge=-180, le=180)
+    lat: float = Field(ge=-90, le=90)
 
 
-@router.post("/{report_id}/check")
-def check(report_id: int, body: CheckIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+@router.post("/{report_id}/place")
+def place(report_id: int, body: PlaceIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """A report with no place: an official puts it on the map. Its incident and satellite review follow (D-063)."""
     report = _get(db, report_id)
     try:
         with db.begin_nested():
-            service.record_check(db, report, user, body.outcome, body.note, utcnow())
-    except service.CitizenError as exc:
-        raise _fail(exc) from exc
-    db.commit()
-    return get_report(report_id, user, db)
-
-
-class CloseIn(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    reason: str
-    note: str
-    department: str | None = None
-    false_report: bool = False
-
-
-@router.post("/{report_id}/close")
-def close(report_id: int, body: CloseIn, user: User = Depends(require_roles(Role.admin)), db: Session = Depends(get_db)) -> dict:
-    report = _get(db, report_id)
-    try:
-        with db.begin_nested():
-            service.close(db, report, user, body.reason, body.note, utcnow(), department=body.department, false_report=body.false_report)
-    except service.CitizenError as exc:
-        raise _fail(exc) from exc
-    db.commit()
-    return get_report(report_id, user, db)
-
-
-class LinkIn(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    asset_id: int | None = None
-    alert_id: int | None = None
-
-
-@router.post("/{report_id}/link")
-def link(report_id: int, body: LinkIn, user: User = Depends(require_roles(Role.admin)), db: Session = Depends(get_db)) -> dict:
-    report = _get(db, report_id)
-    try:
-        with db.begin_nested():
-            service.link(db, report, user, utcnow(), asset_id=body.asset_id, alert_id=body.alert_id)
+            service.place_by_official(db, report, user, body.lon, body.lat, utcnow())
     except service.CitizenError as exc:
         raise _fail(exc) from exc
     db.commit()

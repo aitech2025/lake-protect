@@ -72,7 +72,10 @@ def render_chip(
     grow: float = 1.0,
     window: tuple[float, float, float] | None = None,
     out_px: int = 512,
+    show_change: bool = True,
 ) -> bytes:
+    """`show_change=False` draws the place with no change at all: a citizen's report where the demo
+    world has nothing (D-063)."""
     asset = world.asset(scenario["asset"])
     cx, cy, side = window or chip_window(world, scenario, grow)
     n = int(round(side / 10))  # 10 m pixels
@@ -98,7 +101,7 @@ def render_chip(
     water = world.water_m(asset, season)
     if water is not None and not water.is_empty:
         img[contains_xy(water, gx, gy)] = (34, 58, 74)
-    if after:
+    if after and show_change:
         change = world.change_m(scenario, grow)
         colour = CHANGE_COLOUR.get(scenario["change"]["type"], CHANGE_COLOUR["other"])
         img[contains_xy(change, gx, gy)] = colour
@@ -128,7 +131,8 @@ def render_chip(
     if "lake" in asset:
         outline(shape.buffer(width_m), (230, 70, 60), 2, dash=7)
     outline(shape, (70, 160, 255), 3)
-    outline(world.change_m(scenario, grow), (255, 214, 64), 2, dash=5)
+    if show_change:
+        outline(world.change_m(scenario, grow), (255, 214, 64), 2, dash=5)
 
     # Labels
     draw.rectangle([0, 0, out_px, 30], fill=(0, 0, 0, 160))

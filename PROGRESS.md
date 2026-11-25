@@ -25,7 +25,8 @@ data in the app), then M3.
 | M12 Weekly record, incidents, documents, two roles | Done | API 263, pipeline 27, browser 4 | 76c6593 |
 | M13 Downstream: notifications by area, overview | Done | API 308, pipeline 29, browser 4 | b03bb99 |
 | M14 GeoGuard: kinds of land, admin adds and stops watching locations | Done | API 334, pipeline 29, browser 5 | 789c555 |
-| M15 Citizen channels: portal, WhatsApp, staff intake, updates back | Done | API 361, pipeline 29, browser 6 | M15 commit |
+| M15 Citizen channels: portal, WhatsApp, staff intake, updates back | Done | API 361, pipeline 29, browser 6 | be69e84 |
+| M16 Citizen reports open incidents with a satellite review; no Urdu | Done | API 365, pipeline 32, browser 6 | M16 commit |
 
 ## M0 Scaffold: done
 
@@ -239,6 +240,41 @@ removed, is `reports/m2-tuning/README.md`.
   upload, the area rounding case). Browser 15 passed on fresh demos: `m10-real` (switch, no demo
   record on the real side, Sentinel-2 tiles requested, 99 real lakes listed) with the M5 to M8
   suites, then the M9 walkthrough with no internet.
+
+## M16 Citizen reports open incidents with a satellite review; no Urdu: done
+
+Owner's request, 25 Nov 2026 (D-063). Design: `docs/citizen.md`.
+
+- **Urdu removed** from the portal, WhatsApp, notes, fonts and the database (migration 0010).
+- **Finding the place:** the pin, or words naming one watched location, or an official on the map.
+  District and mandal come from the location or OpenStreetMap boundaries (exported by
+  `lp assets-areas` to `data/areas/admin_orr.geojson`), and survey numbers when loaded.
+- **Every placed report belongs to an incident.**
+  - A report of the same place follows the earlier report; a report next to an open incident
+    joins it.
+  - Otherwise a citizen incident opens: the reported spot, on the location or a new "reported
+    place" (not watched).
+  - The legal check is kept but never closes it.
+- **Satellite review:**
+  - **Demo:** at once, finding a change the weekly screen has not seen at Demo Kunta 7.
+  - **Real:** `lp review-reports` (the new `reviewer` service), through `/pipeline/reviews`.
+  - **Result:** the images become the incident's, and officials hear it (`satellite_review`).
+- **Regular flow:**
+  - officials review, ask for sharper imagery, confirm or dismiss (optionally passed to a
+    department, or marked false), and close, each with a note;
+  - each step reaches the citizen;
+  - the report page links to its incident and lets an official place a report with no pin.
+- **Demo:**
+  - seven reports;
+  - three citizen incidents (Demo Kunta 8 under review with sharper imagery requested; Demo Kunta 7
+    dismissed and closed; a reported place passed to Revenue);
+  - four reports joining satellite incidents.
+- **Tests:**
+  - API 365 passed, including `test_citizen.py` (14, rewritten);
+  - pipeline 32 passed, including `test_review.py`;
+  - browser 6 passed. `m15-citizen` now goes from a portal report by phone location, to the demo
+    satellite finding, the official's review, sharper imagery, confirm and close, and the Telugu
+    status page.
 
 ## M15 Citizen channels, upstream and downstream: done
 

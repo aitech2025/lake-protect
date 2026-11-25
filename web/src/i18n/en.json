@@ -157,7 +157,8 @@
     "optical_and_radar": "Optical and radar",
     "optical_only": "Optical",
     "radar_only": "Radar only",
-    "pending": "Optical confirmation pending"
+    "pending": "Optical confirmation pending",
+    "citizen_report": "Reported by a citizen"
   },
   "queue": {
     "title": "Incidents",
@@ -182,7 +183,9 @@
     "linked": "From the overview:",
     "linked_week": "new in {{week}}",
     "linked_asset": "one location",
-    "linked_clear": "Show all incidents"
+    "linked_clear": "Show all incidents",
+    "citizen": "Citizen report",
+    "citizen_reports": "{{count}} citizen report(s)"
   },
   "detail": {
     "back": "All incidents",
@@ -491,7 +494,8 @@
       "sentinel-2": "Sentinel-2 optical",
       "sentinel-1": "Sentinel-1 radar",
       "demo_synthetic_optical": "Demo image (synthetic)",
-      "demo_synthetic_radar": "Demo radar (synthetic)"
+      "demo_synthetic_radar": "Demo radar (synthetic)",
+      "sentinel-2-l2a": "Sentinel-2 optical"
     },
     "flag": {
       "seasonal_history_partial": "No clear look in the same months of earlier years",
@@ -499,7 +503,10 @@
       "radar_confirmed": "Radar confirms new built-up (3 dB or more)",
       "radar_unavailable": "No radar look to confirm built-up",
       "drought_control_not_run": "Drought check not run",
-      "water_to_built": "Water to built-up"
+      "water_to_built": "Water to built-up",
+      "citizen_report": "Opened by a citizen's report: the outline is the reported spot, not a measured change",
+      "satellite_change_seen": "The satellite review saw a change at the reported spot",
+      "placed_from_description": "Placed from the citizen's words, not a pin: check the place"
     }
   },
   "sources": {
@@ -749,7 +756,8 @@
       "reminder": "Reminder",
       "not_acknowledged": "Not acknowledged",
       "weekly_digest": "Weekly digest",
-      "citizen_report": "Citizen report"
+      "citizen_report": "Citizen report",
+      "satellite_review": "Satellite review"
     },
     "open_incident": "Open the incident",
     "open_overview": "Open the overview",
@@ -878,7 +886,8 @@
     "history": "Started and stopped",
     "started": "Watching started",
     "stopped": "Watching stopped",
-    "not_watched": "Not watched"
+    "not_watched": "Not watched",
+    "from_reports": "Made from citizens' reports; not watched"
   },
   "citizen": {
     "tagline": "Weekly satellite watch over Telangana's lakes and government land",
@@ -1059,6 +1068,43 @@
     "sim_photo": "Send a photo",
     "sim_held": "held",
     "on_incident": "Citizen reports of this place",
-    "back": "All reports"
+    "back": "All reports",
+    "place_title": "Put it on the map",
+    "place_help": "Click where it is. An incident opens there with a satellite review, as for any report.",
+    "place": "Place it here",
+    "incident_flow": "Officials work this report on its incident: reviews, sharper images, decision and closing."
+  },
+  "citizen_incident": {
+    "title": "Reported by a citizen",
+    "placed": {
+      "pin": "Placed by the citizen's pin",
+      "description": "Placed from the citizen's words, not a pin: check the place",
+      "official": "Placed on the map by an official"
+    },
+    "reported_place": "Outside every watched location: a reported place, not on the weekly watch",
+    "area_source": "District and mandal: {{source}}",
+    "survey": "Survey numbers at the pin: {{list}}",
+    "updates_yes": "The citizen gets updates on a verified phone. Officials never see the number.",
+    "updates_no": "The citizen checks with the reference.",
+    "review_title": "Satellite review of the reported place",
+    "review": {
+      "change_found": "A change is visible",
+      "no_change": "No change visible yet",
+      "no_clear_look": "No clear image yet (cloud)",
+      "pending": "Waiting for the satellite review",
+      "failed": "The satellite review could not be done"
+    },
+    "review_change": "{{change}} of about {{area}} sq m, first seen {{date}}",
+    "review_dates": "Images: before {{before}}, latest {{after}}",
+    "source": {
+      "sentinel-2": "Sentinel-2, 10 m pixels: works smaller than about 1,000 sq m may not show",
+      "demo-synthetic": "Demo sensor (synthetic images)"
+    },
+    "pending_help": "The screener looks at the newest Sentinel-2 images within minutes when it is running (docker compose --profile screen up -d reviewer).",
+    "next": "Next: review it, ask for a sharper image if the change is small, then decide with a note. The citizen is told each step.",
+    "latest": "Latest clear image",
+    "department": "Passed to a department? (the citizen is told)",
+    "no_department": "No: not a change that needs action",
+    "told": "The citizens who reported it are told the outcome in their language. Your note stays inside."
   }
 }

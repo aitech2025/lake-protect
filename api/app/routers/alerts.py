@@ -5,7 +5,6 @@ through its lifecycle. Every state change goes through app.workflow.incidents.
 """
 from __future__ import annotations
 
-import math
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Response
@@ -17,9 +16,9 @@ from app.audit import chain
 from app.clock import utcnow
 from app.db import db_guard, get_db
 from app.enums import ReviewOutcome, Role
-from app.models import Candidate, EvidencePack, ImageryRequest, User
+from app.models import Candidate, EvidencePack, User
 from app.security import current_user, require_roles
-from app.services import alert_view
+from app.services import alert_view, imagery
 from app.storage import store
 from app.workflow import incidents as lifecycle
 
@@ -102,6 +101,8 @@ class TransitionIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     to: str
     note: str | None = None
+    citizen_department: str | None = None  # dismissing a citizen's report: the department it was passed to (D-063)
+    citizen_false_report: bool = False  # dismissing: the report was false; repeated false reports flag their source
 
 
 @router.post("/{alert_id}/transitions")
@@ -109,7 +110,8 @@ def post_transition(alert_id: int, body: TransitionIn, user: User = Depends(requ
     alert = alert_view.get_visible(db, alert_id)
     with db_guard(db):
         try:
-            result = lifecycle.transition(db, alert, body.to, actor=user, note=body.note)
+            result = lifecycle.transition(db, alert, body.to, actor=user, note=body.note, department=body.citizen_department or None,
+                                          false_report=body.citizen_false_report)
         except lifecycle.Refused as exc:
             db.rollback()
             raise HTTPException(exc.status, exc.message) from exc
@@ -123,27 +125,11 @@ class ImageryIn(BaseModel):
     note: str | None = None
 
 
-# Reseller guide figures from CONTEXT.md section 8.1, upper end. Planning estimates, not quotes.
-_USD_PER_SQ_KM = {"isro_nrsc": None, "commercial_archive": 26.0, "commercial_tasking": 55.0}
-
-
 @router.post("/{alert_id}/imagery-request", status_code=201)
 def post_imagery_request(alert_id: int, body: ImageryIn, user: User = Depends(require_roles(Role.admin)), db: Session = Depends(get_db)) -> dict:
     """Stub: records a request for a sharper image and its estimated cost. Nothing is ordered."""
     alert = alert_view.get_visible(db, alert_id)
-    area = db.scalar(
-        text("SELECT ST_Area(ST_Transform(ST_Envelope(ST_Buffer(geom::geography, 250)::geometry), 32644)) / 1e6 FROM candidates WHERE id = :c"),
-        {"c": alert.candidate_id},
-    )
-    rate = _USD_PER_SQ_KM[body.provider]
-    req = ImageryRequest(alert_id=alert.id, provider=body.provider, area_sq_km=round(area, 3),
-                         est_cost_usd=None if rate is None else round(math.ceil(area * 100) / 100 * rate, 2),
-                         status="recorded", requested_by=user.id, created_at=utcnow())
-    db.add(req)
-    db.flush()
-    chain.record(db, actor_id=user.id, action="imagery.requested", entity="alert", entity_id=alert.id,
-                 details={"imagery_request_id": req.id, "provider": body.provider, "area_sq_km": float(req.area_sq_km),
-                          "est_cost_usd": req.est_cost_usd and float(req.est_cost_usd), "note": body.note})
+    req = imagery.request(db, alert, user, body.provider, body.note, utcnow())
     db.commit()
     return {"id": req.id, "status": req.status, "area_sq_km": float(req.area_sq_km), "est_cost_usd": req.est_cost_usd and float(req.est_cost_usd),
             "note": "Recorded only. No imagery is ordered in the prototype."}

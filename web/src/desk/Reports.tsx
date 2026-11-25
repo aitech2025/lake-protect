@@ -3,7 +3,6 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api, fmtDate, fmtDateTime } from "../api";
-import { isAdmin, useAuth } from "../auth";
 import { AuthImage, useAsync, usePageTitle } from "../components/Bits";
 import { notifyCountChanged } from "../components/Layout";
 import { MapView, type Pin } from "../components/MapView";
@@ -20,8 +19,6 @@ type Row = {
   updates: boolean; phone_masked: string | null; has_name: boolean; source_ref: string | null; is_demo: boolean; created_at: string;
 };
 const STATUS_COLOUR: Record<string, string> = { RECEIVED: "#b5651d", CHECKING: "#1f6fa8", CLOSED: "#75848b" };
-const MANUAL_REASONS = ["no_change_seen", "authorised", "passed_on", "not_enough"];
-const DEPTS = ["revenue", "municipal", "irrigation", "hydraa", "forest", "endowments", "waqf"];
 
 function placeLabel(r: Row, t: (k: string, o?: any) => string, lang: string): string {
   if (r.asset_name) return `${lang === "te" && r.asset_name_te ? r.asset_name_te : r.asset_name}, ${t(`reports.zone.${r.zone ?? "inside"}`)}`;
@@ -134,7 +131,7 @@ function Intake({ onDone }: { onDone: () => void }) {
           </label>
           <label className="field">{t("reports.intake_source_ref")}<input value={f.source_ref} onChange={set("source_ref")} data-testid="intake-source" /></label>
           <label className="field">{t("reports.intake_language")}
-            <select value={f.language} onChange={set("language")}><option value="te">తెలుగు</option><option value="en">English</option><option value="ur">اردو</option></select>
+            <select value={f.language} onChange={set("language")}><option value="te">తెలుగు</option><option value="en">English</option></select>
           </label>
           <label className="field">{t("reports.col.what")}
             <select value={f.what} onChange={set("what")} data-testid="intake-what">{["dumping", "construction", "fencing", "clearing", "other"].map((w) => <option key={w} value={w}>{t(`reports.what.${w}`)}</option>)}</select>
@@ -162,31 +159,21 @@ export function ReportDetail() {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
-  const { user } = useAuth();
-  const admin = isAdmin(user);
   const { data: r, error, status, loading, reload } = useAsync(() => api<any>(`/reports/${id}`), [id]);
   useDemoOnScreen(!!r?.is_demo);
   usePageTitle(r ? `${t("reports.title")}: ${r.ref}` : t("reports.title"));
-  const [outcome, setOutcome] = useState<"visible" | "not_visible">("visible");
-  const [checkNote, setCheckNote] = useState("");
-  const [reason, setReason] = useState("no_change_seen");
-  const [dept, setDept] = useState("revenue");
-  const [closeNote, setCloseNote] = useState("");
-  const [falseReport, setFalseReport] = useState(false);
-  const [assetId, setAssetId] = useState("");
-  const [alertId, setAlertId] = useState("");
+  const [pin, setPin] = useState<[number, number] | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
-  const dataset = r ? (r.is_demo ? "demo" : "real") : null;
-  const assets = useAsync(() => (admin && dataset ? api<any>(`/assets?dataset=${dataset}`) : Promise.resolve(null)), [admin, dataset]);
-  const alerts = useAsync(() => (admin && dataset ? api<any>(`/alerts?dataset=${dataset}`) : Promise.resolve(null)), [admin, dataset]);
-  useEffect(() => setMsg(null), [id]);
+  useEffect(() => {
+    setMsg(null);
+    setPin(null);
+  }, [id]);
 
-  const act = async (path: string, json: unknown) => {
+  const place = async () => {
+    if (!pin) return;
     setMsg(null);
     try {
-      await api(`/reports/${id}/${path}`, { json });
-      setCheckNote("");
-      setCloseNote("");
+      await api(`/reports/${id}/place`, { json: { lon: pin[0], lat: pin[1] } });
       reload();
       notifyCountChanged();
     } catch (e) {
@@ -195,8 +182,6 @@ export function ReportDetail() {
   };
 
   if (!r) return <div className="page"><PageState loading={loading} error={error} status={status} onRetry={reload} /></div>;
-  const open = r.status !== "CLOSED";
-  const leader = !r.duplicate_of;
   const noteOf = (n: any) => (lang === "te" ? n.te : n.en);
 
   return (
@@ -211,12 +196,17 @@ export function ReportDetail() {
       </div>
       <div className="report-grid">
         <div>
-          <section className="panel">
+          {r.alert_code && (
+            <section className="panel report-incident" data-testid="report-incident">
+              <p><Link className="btn" to={`/alerts/${r.alert_id}`} data-testid="open-incident">{t("reports.open_incident", { code: r.alert_code })}</Link></p>
+              <p className="small muted">{t("reports.incident_flow")}</p>
+            </section>
+          )}
+          <section className="panel section">
             <dl className="facts">
               <dt>{t("reports.col.place")}</dt>
               <dd>{placeLabel(r, t, lang)}{r.asset_id && <> · <Link to={`/assets?asset=${r.asset_id}`}>{t("reports.open_location")}</Link></>}
                 {r.location_text && <div className="small muted">{r.location_text}</div>}</dd>
-              {r.alert_code && <><dt>{t("reports.link_incident")}</dt><dd><Link to={`/alerts/${r.alert_id}`}>{t("reports.open_incident", { code: r.alert_code })}</Link></dd></>}
               {r.source_ref && <><dt>{t("reports.intake_source_ref")}</dt><dd>{r.source_ref}</dd></>}
             </dl>
             {r.duplicate_of_ref && <p className="note"><Link to={`/reports/${r.duplicate_of}`}>{t("reports.duplicate_of", { ref: r.duplicate_of_ref })}</Link></p>}
@@ -260,59 +250,23 @@ export function ReportDetail() {
           </section>
         </div>
         <aside>
-          {r.lon !== null && (
-            <div className="mapbox" style={{ height: 260, marginBottom: "1rem" }}>
+          {r.lon !== null ? (
+            <div className="mapbox" style={{ height: 260 }}>
               <MapView base={r.is_demo ? "demo" : "s2"} draft={[[r.lon, r.lat]]} fit={[r.lon - 0.004, r.lat - 0.003, r.lon + 0.004, r.lat + 0.003]} />
             </div>
+          ) : (
+            <section className="panel" data-testid="place-form">
+              <h2 className="title-s">{t("reports.place_title")}</h2>
+              <p className="small muted">{t("reports.place_help")}</p>
+              <div className="mapbox" style={{ height: 300 }}>
+                <MapView base={r.is_demo ? "demo" : "s2"} draft={pin ? [pin] : []} onMapClick={(p) => setPin(p)} testId="place-map" />
+              </div>
+              {pin && <p className="small">{pin[1].toFixed(5)}, {pin[0].toFixed(5)}</p>}
+              <button type="button" className="btn" disabled={!pin} onClick={() => void place()} data-testid="place-submit">{t("reports.place")}</button>
+            </section>
           )}
           {msg && <p className="banner stop" role="alert">{msg}</p>}
-          {open && leader && (
-            <form className="panel" onSubmit={(e) => { e.preventDefault(); void act("check", { outcome, note: checkNote }); }} data-testid="check-form">
-              <h2 className="title-s">{t("reports.check_title")}</h2>
-              <label className="check"><input type="radio" checked={outcome === "visible"} onChange={() => setOutcome("visible")} /> {t("reports.check_visible")}</label>
-              <label className="check"><input type="radio" checked={outcome === "not_visible"} onChange={() => setOutcome("not_visible")} data-testid="check-not-visible" /> {t("reports.check_not_visible")}</label>
-              <label className="field">{t("reports.note")}<textarea rows={2} value={checkNote} onChange={(e) => setCheckNote(e.target.value)} data-testid="check-note" /></label>
-              <button type="submit" className="btn" disabled={!checkNote.trim()} data-testid="check-submit">{t("reports.save_check")}</button>
-            </form>
-          )}
-          {open && leader && admin && (
-            <form className="panel" onSubmit={(e) => { e.preventDefault(); void act("link", alertId ? { alert_id: Number(alertId) } : { asset_id: Number(assetId) }); }} data-testid="link-form">
-              <h2 className="title-s">{t("reports.link_title")}</h2>
-              <label className="field">{t("reports.link_location")}
-                <select value={assetId} onChange={(e) => { setAssetId(e.target.value); setAlertId(""); }} data-testid="link-asset">
-                  <option value="">{t("reports.choose")}</option>
-                  {(assets.data?.features ?? []).filter((f: any) => f.properties.monitored).map((f: any) => <option key={f.id} value={f.id}>{f.properties.name}</option>)}
-                </select>
-              </label>
-              <label className="field">{t("reports.link_incident")}
-                <select value={alertId} onChange={(e) => { setAlertId(e.target.value); setAssetId(""); }}>
-                  <option value="">{t("reports.choose")}</option>
-                  {(alerts.data?.items ?? []).filter((a: any) => ["OPEN", "UNDER_REVIEW", "CONFIRMED"].includes(a.state)).map((a: any) => <option key={a.id} value={a.id}>{a.code} · {a.asset_name}</option>)}
-                </select>
-              </label>
-              <p className="small muted">{t("reports.add_location")}</p>
-              <button type="submit" className="btn secondary" disabled={!assetId && !alertId} data-testid="link-submit">{t("reports.link")}</button>
-            </form>
-          )}
-          {open && leader && admin && (
-            <form className="panel" onSubmit={(e) => { e.preventDefault(); void act("close", { reason, note: closeNote, department: reason === "passed_on" ? dept : null, false_report: falseReport }); }} data-testid="close-form">
-              <h2 className="title-s">{t("reports.close_title")}</h2>
-              <label className="field">{t("reports.reason_label")}
-                <select value={reason} onChange={(e) => setReason(e.target.value)} data-testid="close-reason">
-                  {MANUAL_REASONS.map((x) => <option key={x} value={x}>{t(`reports.reason.${x}`)}</option>)}
-                </select>
-              </label>
-              {reason === "passed_on" && (
-                <label className="field">{t("reports.department")}
-                  <select value={dept} onChange={(e) => setDept(e.target.value)} data-testid="close-dept">{DEPTS.map((d) => <option key={d} value={d}>{t(`reports.dept.${d}`)}</option>)}</select>
-                </label>
-              )}
-              <label className="field">{t("reports.note")}<textarea rows={2} value={closeNote} onChange={(e) => setCloseNote(e.target.value)} data-testid="close-note" /></label>
-              <label className="check"><input type="checkbox" checked={falseReport} onChange={(e) => setFalseReport(e.target.checked)} /> {t("reports.false_report")}</label>
-              <button type="submit" className="btn danger" disabled={!closeNote.trim()} data-testid="close-submit">{t("reports.close")}</button>
-            </form>
-          )}
-          {!open && r.closed_reason && <p className="note">{t(`reports.reason.${r.closed_reason}`)} · {fmtDate(r.updated_at, lang)}</p>}
+          {r.status === "CLOSED" && r.closed_reason && <p className="note">{t(`reports.reason.${r.closed_reason}`)} · {fmtDate(r.updated_at, lang)}</p>}
         </aside>
       </div>
     </div>

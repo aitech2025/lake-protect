@@ -1,165 +1,146 @@
-# Citizen channels: reports in, updates out (M15)
+# Citizen channels: a report opens an incident, and the citizen hears back (M15, M16)
 
-Built 25 November 2026 (DECISIONS.md D-062), to CONTEXT.md section 17.8. A citizen tells GeoGuard
-about a problem on public land, and hears back at each step.
+Built 25 November 2026 to CONTEXT.md section 17.8 (DECISIONS.md D-062). Changed the same day at
+the owner's request (D-063):
+- Urdu is removed. The channel works in English and Telugu.
+- Every report now goes into the regular incident flow:
+  1. the app finds the place;
+  2. it reviews the place with satellite imagery;
+  3. it tells the officials;
+  4. the officials work the report as an incident, with reviews, a sharper image, a decision and
+     closing, each with a note.
 
 ## 1. The flow
 
 ```
-UPSTREAM (in)                                   GEOGUARD                                  DOWNSTREAM (out)
-web portal /report  ─┐                                                                ┌─ status page /report/track/<ref>
-WhatsApp chatbot    ─┼─►  reference number at once                                   ├─ SMS at each step (verified phone)
-1070 helpline       ─┤    placed on a watched location: inside, buffer, watch ring   ├─ WhatsApp at each step (the chat's number)
-Praja Vani petition ─┤    merged with a report of the same place (100 m, 60 days)    │
-visit in person     ─┘    linked to an incident within 150 m                         │   in English, Telugu or Urdu
-                          signal (CONTEXT.md section 7)                              │   never: officer names, owner names,
-                          area's officials and the admin notified (D-059)  ──────────┘   evidence, or "illegal"
+IN                         GEOGUARD                                                        OUT (to the citizen)
+web portal /report  ─┐     reference at once                                               status page /report/track/<ref>
+WhatsApp chatbot    ─┤     1. place: the pin, or words naming a watched location           SMS (verified phone)
+1070 helpline       ─┼──►  2. district, mandal, survey numbers; zone of the location  ──►  WhatsApp (the chat's number)
+Praja Vani petition ─┤     3. incident: same place reported → follows it                   English or Telugu, at each step:
+visit in person     ─┘        open incident within 150 m → joins it                        case opened, satellite result,
+                              otherwise → a new citizen incident                           under review, sharper images asked,
+                           4. satellite review of the place (demo: at once; real: the        confirmed / dismissed / passed on
+                              screener, within minutes)
+                           5. officials notified (area routing, D-059), with the result
+                           6. regular flow: review → sharper imagery → decide → close
 ```
 
-A report never makes a finding on its own (CONTEXT.md section 5). It asks officials to look. The
-satellite screen and the records do the rest.
+A report never makes a finding on its own (CONTEXT.md section 5). It opens a case that an official
+must look at. The satellite review and the officials' notes do the rest.
 
-## 2. Upstream: how reports come in
+## 2. Finding the place (`api/app/citizen/locate.py`)
 
-| Channel | Who uses it | In this build |
+| What the citizen gave | What the app does |
+|---|---|
+| A pin (map, "use my location", or WhatsApp location) | Takes the watched location and zone that hold it. If none does, it makes a **reported place**: a 50 m circle, kind "Places reported by citizens", not on the weekly watch |
+| Words only (a WhatsApp landmark, a caller's description) | If the words name exactly one watched location ("near the bund of Kapra lake"), places the report on it and flags "placed from the words, check the place". Otherwise the admin is asked to put it on the map, on the report's page |
+
+**Area and land records at the pin:**
+- **District and mandal** come from the matched location.
+- **Outside every location**, they come from OpenStreetMap's boundaries (`data/areas/admin_orr.geojson`,
+  made by `lp assets-areas`). The incident says these are not the revenue record.
+- **Survey numbers** at the pin are shown when land records are loaded (M11).
+
+The district decides which officials are told.
+
+## 3. The incident
+
+**A new citizen incident (origin `citizen`):**
+- **The location:** the matched location, or the reported place.
+- **The outline:** the reported spot, a 30 m circle around the pin. The change type follows what
+  the citizen chose: soil dumped becomes land fill, construction becomes construction, a fence or
+  wall becomes a small structure, and clearing becomes clearing.
+- **The legal check runs and is kept**, but it never closes a citizen incident on its own: an
+  official always looks.
+- **The incident list** marks it **Citizen report**.
+- **The incident page** shows:
+  - the citizen's words and photos;
+  - how the place was found;
+  - the area source and survey numbers;
+  - the satellite review.
+
+**A report next to an open incident** (within 150 m) joins it instead, and the incident page lists
+it. **A report of a place already reported** (100 m, 60 days) follows the earlier report.
+
+## 4. The satellite review
+
+| Data | Who looks | When |
 |---|---|---|
-| **Web portal**, `/report` | Anyone, with no sign-in | Built. A map pin or "use my location", what is happening (five choices), up to 3 photos, a few words, and optionally a verified phone for updates. English, Telugu and Urdu; Urdu reads right to left |
-| **WhatsApp** | Anyone with WhatsApp | Built as a conversation (one question at a time, by number, in the three languages). **Real messages need the State's WhatsApp Business agreement**: HYDRAA's number or MeeSeva on WhatsApp. Until then the webhook refuses messages (`503`), and the desk's **WhatsApp (demo)** page runs the same conversation from a fictional number |
-| **1070 helpline, Praja Vani, visits** | Staff at the desk | Built. **Citizen reports → Enter a call or petition**: the call or petition number, the caller's language, the place on the map or in words, what they said. Staff read the reference back |
+| Demo world | The demo sensor, in the API | At once, before officials are told. A change the weekly screen has not seen yet (`unscreened_changes` in `data/demo/world.yml`, at Demo Kunta 7) is found; elsewhere it shows no change |
+| Real | `lp review-reports`, which screens the location now with the weekly screen's rules and imagery (Sentinel-2, and Sentinel-1 radar for built-up). It runs as the `reviewer` service, every 5 minutes, and needs internet: `docker compose --profile screen up -d reviewer` | Within minutes. Officials are told when the incident opens, and again with the result |
 
-**On arrival, every report:**
-1. Gets a reference like `GGR-7K3M-9QXA`. It is random, so references cannot be guessed in order.
-2. Is placed:
-   - inside, in the buffer or in the watch ring of a watched location;
-   - outside them all ("not on the watch list");
-   - or with no pin ("needs the place").
-3. Is merged with an open report within 100 m from the last 60 days. The later one follows the
-   earlier: it shares every update and tells no one again.
-4. Is linked to an open, under-review or confirmed incident within 150 m on the same location.
-5. Becomes a row in `signals` (kind `citizen_report`).
-6. Is notified to the area's officials (routing by area, D-059) and every admin.
-   - **Needs acknowledgement** when it is not already on an incident.
-   - **Follow-up:** a reminder after 24 hours, and the admin is told after 48.
-   - **Acknowledging:** recording a check or closing the report counts as acknowledging it.
-   - **Outside the inbox:** email only, because the SMS and WhatsApp templates are worded for
-     incidents.
+**The results:**
+- **A change is visible:** the nearest change within 150 m of the pin, with its area, date and
+  before and after images.
+- **No change visible yet:** the latest clear image.
+- **No clear image yet:** too much cloud.
+- **Failed:** after three failed tries.
 
-**Checks:**
-- **Place:** the pin must lie in Telangana, or in the demo world for demo reports.
-- **Photos:** JPEG, PNG or WebP, at most 8 MB, re-encoded at most 2048 px a side. Re-encoding drops
-  EXIF: camera, time and the phone's own location.
-- **Rate limits:**
-  - **Reports:** 5 an hour and 20 a day from one source.
-  - **Codes:** 3 a phone an hour, and 5 tries a code.
-  - **Status lookups:** 30 a minute.
-  - **Source:** a salted hash of the network address or phone; the address itself is never stored.
-- **Repeated false reports:** when the admin marks two reports from one source as false, that
-  source's later reports carry a flag for officials. They are not blocked.
+The images and scenes become the incident's images and observations, so the evidence pack carries
+them.
 
-## 3. On the desk: what officials do
+**Small works may not show:** Sentinel-2 has 10 m pixels, and the smallest change it reports is
+1,000 sq m. The citizen is told so, and officials are prompted to ask for a sharper image.
 
-**Where:** **Citizen reports** in the side bar. A map and a list, filtered open, all or closed.
-Each report shows:
-- the place and zone;
-- the linked incident and any duplicates;
-- the photos and the citizen's words;
-- the history (what the citizen read, and the note for the record);
-- the messages sent to the citizen.
+## 5. The regular flow, and what the citizen reads
 
-**Officials never see a citizen's number or name.** They see only whether updates go to a verified
-phone (masked, for example `+91******0003`).
+| Officials' step (incident page) | Citizen reads |
+|---|---|
+| (opened) | "Officials have opened a case for this place. The app is checking it against satellite images." |
+| (satellite review) | "The newest satellite images show a change at this place, first seen …", or "… show no change large enough to see from space. Small works may not show …", or "no clear image yet, because of cloud" |
+| A review (the incident moves to under review) | "An official is reviewing it." |
+| Request sharper imagery | "Officials have asked for sharper satellite images of this place." |
+| Confirm, with a note | "Closed: officials confirmed a change at this place. Action is with the department." |
+| Dismiss, with a note | "Closed: officials reviewed this place and found no change that needs action. If the work continues, please report again with a new photo." |
+| Dismiss, choosing **Passed to a department** | "Closed here: … Your report was passed to the Revenue Department (Tahsildar)", or the municipality, Irrigation, HYDRAA, Forest, Endowments or the Waqf Board |
+| Close, with a note | (no new note: the citizen already has the outcome) |
 
-| Step | Who | What the citizen reads |
-|---|---|---|
-| Record a check: a change is visible | Official or admin | "Officials checked the satellite images: a change is visible. They are reviewing it." |
-| Record a check: nothing visible yet | Official or admin | "...no change is visible yet. Small works may not show from space." |
-| Place it on a location or incident | Admin | "Officials found the place: ..." or, for a location just added from it, "This place is now on GeoGuard's weekly watch" |
-| Close: no change that needs action | Admin | "...If the work continues, please report again with a new photo." |
-| Close: covered by a recorded work or permission | Admin | "...covered by a recorded government work or permission." |
-| Close: passed to a department | Admin | "...passed to the Revenue Department (Tahsildar)", or the municipality, Irrigation, HYDRAA, Forest, Endowments or the Waqf Board |
-| Close: could not place or understand it | Admin | "...Please report again with a pin on the map and a photo." |
+**What stays inside, and false reports:**
+- Officials' notes stay inside. Citizens read only these fixed notes.
+- When dismissing, the admin can also mark the report as false. Two false reports from one source
+  flag its later reports for officials. They are not blocked.
 
-**Steps the system takes on its own:**
-- **An incident opens on the place:** "The satellite images show a change at this place."
-- **The admin confirms the incident:** the report closes with "officials confirmed a change. Action
-  is with the department."
-- **The admin dismisses the incident:** the report closes with "found no change that needs action."
-- **The weekly screen** sees the place clearly with no change: "Satellite images up to <date> were
-  checked: no change large enough to see from space yet. Small works may not show." The report
-  stays open for an official.
-
-The incident page lists the citizen reports of its place, by reference.
-
-## 4. Downstream: how citizens hear back
+## 6. How citizens hear back
 
 | Channel | In this build | To switch it on |
 |---|---|---|
-| **Status page** `/report/track/<ref>` | Always. Status and every public note, in English, Telugu or Urdu | Nothing |
-| **SMS** | A message at each step to a phone verified by one-time password. Every message is **held** | The State's SMS gateway agreement, and two DLT templates (`citizen_update`, `citizen_otp` in `api/app/notify/channels.yaml`). Until then, the portal says SMS updates are not available yet and does not ask for a number |
-| **WhatsApp** | Replies inside the conversation. Later updates need the approved template `citizen_update`. Every message is **held** | The WhatsApp agreement, `LP_WHATSAPP_APP_SECRET`, `LP_WHATSAPP_VERIFY_TOKEN` and `LP_WHATSAPP_TOKEN` in `.env`, and the template approved |
+| **Status page** `/report/track/<ref>` | Always, in English or Telugu | Nothing |
+| **SMS** | An update at each step to a phone verified by one-time password. Every message is **held** | The State's SMS gateway agreement, and the DLT templates `citizen_update` and `citizen_otp` (`api/app/notify/channels.yaml`). Until then, the portal says SMS updates are not available yet |
+| **WhatsApp** | Replies in the conversation; later updates through the template `citizen_update`. Every message is **held** | The WhatsApp agreement, the app secret, the verify token, the API token, and the approved template |
 
-**How messages are sent:**
-- **SMS:** carries the reference, the status and the link, because DLT fixes the words. The full
-  note is on the status page.
-- **Held messages:** a held message is never sent later.
-- **Demo:** demo messages never leave the machine. The demo shows the one-time code on screen.
-- **Retries:** a failed attempt is retried after 5 minutes, up to three attempts.
-- **Record:** every attempt is an append-only row with a masked number.
+Demo messages never leave the machine. A held message is never sent later.
 
-## 5. Privacy (DPDP Act 2023) and safety
+## 7. Privacy (DPDP Act 2023)
 
-- **Name and phone:**
-  - Optional, and kept only to send updates, once the citizen has proved the phone is theirs: a
-    one-time password, the WhatsApp number itself, or staff taking it from the caller.
-  - The citizen agrees to that use on the form.
-  - Both are removed 90 days after the report closes (the notifier does it). The report and its
-    history stay.
-- **WhatsApp chat state:** the number in it is removed after 24 hours without a message.
-- **The audit log** records each step with the reference, never the citizen's words, name or
-  number.
-- **Accused persons are never shown in public.** The portal and the status page show no owner,
-  claimant or officer, no photo and no evidence. Citizens are asked not to name anyone.
-- **The history is append-only.** The database refuses any change to `citizen_report_events` and
-  `citizen_messages`.
+- **Name and phone:** optional, kept only for updates once verified, and removed 90 days after
+  closing.
+- **Officials see** a masked number only.
+- **Photos** lose their EXIF.
+- **The audit log** holds no citizen's words, name or number.
+- **Nobody accused** is ever shown in public.
+- **The report's history and messages** are append-only.
 
-## 6. Files
+## 8. Files
 
 | Part | File |
 |---|---|
-| Tables, notification kind, guards | `api/migrations/versions/0009_citizen.py` |
-| Intake, placing, merging, events, automatic steps, retention | `api/app/citizen/service.py` |
-| Words in English, Telugu and Urdu | `api/app/citizen/texts.py` |
-| One-time passwords | `api/app/citizen/otp.py` |
-| WhatsApp conversation and webhook parsing | `api/app/citizen/whatsapp.py` |
-| SMS and WhatsApp messages to citizens | `api/app/citizen/sender.py`, `api/app/notify/channels.yaml` |
-| Public API | `api/app/routers/citizen.py` |
-| Desk API | `api/app/routers/reports.py` |
-| Hooks | `services/ingest.py` (incident opened), `workflow/incidents.py` (decided), `routers/pipeline.py` (weekly screen), `notify/service.py` (notifications, the notifier) |
-| Portal | `web/src/portal/Portal.tsx`, `portal.css`, `web/src/i18n/ur.json` |
-| Desk | `web/src/desk/Reports.tsx` (list, report, intake, WhatsApp demo); the panel on the incident page |
-| Demo reports | `data/demo/world.yml` (`citizen_reports`), `api/app/seed/demo.py` |
-| Tests | `api/tests/test_citizen.py` (13), `api/tests/test_demo_seed.py`, `e2e/tests/m15-citizen.spec.ts` |
+| Tables: reports, events, messages, codes, chats | `api/migrations/versions/0009_citizen.py` |
+| Citizen incidents: origin and report on incidents, reported places, satellite reviews; no Urdu | `api/migrations/versions/0010_citizen_incidents.py` |
+| Finding the place | `api/app/citizen/locate.py`, `data/areas/admin_orr.geojson` |
+| Opening the incident, the satellite review, the demo sensor | `api/app/citizen/incident.py` |
+| Intake, placing, events, steps passed on | `api/app/citizen/service.py` |
+| Words (English, Telugu) | `api/app/citizen/texts.py` |
+| Real reviews | `pipeline/lake_protect/review.py`, `lp review-reports`, the `reviewer` service; `GET`/`POST /pipeline/reviews` |
+| Sharper imagery | `api/app/services/imagery.py` |
+| Desk | `web/src/desk/AlertDetail.tsx` (citizen and satellite review panels, dismissing to a department), `Queue.tsx` (badge), `Reports.tsx` (log, intake, place on the map, WhatsApp demo) |
+| Portal | `web/src/portal/Portal.tsx` |
+| Tests | `api/tests/test_citizen.py` (14), `pipeline/tests/test_review.py` (3), `e2e/tests/m15-citizen.spec.ts` |
 
-**API.**
-- **Public:**
-  - `GET /citizen/config`;
-  - `POST /citizen/reports`, `GET /citizen/reports/{ref}`;
-  - `POST /citizen/otp`, `/citizen/otp/verify`;
-  - `GET|POST /citizen/whatsapp/webhook`.
-- **Desk:**
-  - `GET /reports`, `POST /reports/intake`, `GET /reports/{id}`, `GET /reports/{id}/photos/{n}`;
-  - `POST /reports/{id}/check`;
-  - `/close` and `/link` (admin);
-  - `GET|POST /reports/whatsapp-simulator`.
+## 9. Not built yet
 
-## 7. Not built yet
-
-- **Downloading WhatsApp photos.** It needs the provider's media token. Until then the report notes
-  that a photo was sent.
-- **Voice notes and long messages on WhatsApp.**
-- **A public map or figures by district.** The portal shows only 30-day totals, so no place is ever
-  named in public.
-- **Overview figures for citizen reports.**
-- **Delivery receipts from the gateways.**
-- **Urdu on the desk.** Officials work in English and Telugu.
-- **Native-speaker review.** The Telugu and Urdu wording is a draft.
+- **WhatsApp photo download.** It needs the provider's media token.
+- **Geocoding of free text** beyond the names of watched locations.
+- **A public map or district figures.**
+- **Delivery receipts.**
+- **Native-speaker review.** The Telugu wording is a draft.

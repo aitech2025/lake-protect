@@ -253,20 +253,22 @@ scenarios:
       - {day: -66, do: pack, by: demo.admin}
       - {day: -40, do: close, by: demo.admin, note: Fill removed under demo order DEMO/ORDER/2026/012. The land stays on weekly watch.}
 
-# Citizen reports (DECISIONS.md D-062). Fictional reporters with demo numbers (+91 0000…, which no
-# real mobile can have) and drawn demo photos. `near` puts the pin by a scenario's change; `asset`
-# by a location's centre; `at` anywhere, in metres east and north of the origin.
+# Citizen reports (DECISIONS.md D-062, D-063). Fictional reporters with demo numbers (+91 0000…,
+# which no real mobile can have) and drawn demo photos. `near` puts the pin by a scenario's
+# change; `asset` by a location's centre; `at` anywhere, in metres east and north of the origin.
+# A report next to an open incident joins it; any other report opens a citizen incident with a
+# satellite review, and its steps are the regular incident steps.
 citizen_reports:
   - key: r-full-path
     near: full_path
-    day: -47
+    day: -44
     channel: web
     language: te
     what: dumping
     description: Soil heaped on the edge of the cheruvu over two nights.
   - key: r-headline
     near: headline
-    day: -4
+    day: -1
     channel: web
     language: te
     what: dumping
@@ -276,42 +278,44 @@ citizen_reports:
   - key: r-headline-whatsapp
     near: headline
     offset: [40, 25]
-    day: -3
+    day: -0.5
     channel: whatsapp
-    language: ur
+    language: en
     what: dumping
     phone: "+910000000102"
     description: Mud lorries at night near the bund.
   - key: r-not-real
     near: not_real
-    day: -28
+    day: -27
     channel: web
     language: en
     what: dumping
     description: Looks like fresh soil on the water's edge.
-  - key: r-parcel-a
-    asset: demo-parcel-a
-    offset: [30, 10]
+  - key: r-kunta-8
+    asset: demo-kunta-8
+    offset: [20, 15]
     day: -6
     channel: helpline_1070
-    by: demo.viewer1
+    by: demo.viewer2
     source_ref: 1070/DEMO/0412
     language: te
     what: fencing
-    description: Caller says stone posts and wire went up along the road side of the parcel.
+    description: Caller says stone posts and wire went up along the kunta's edge.
     steps:
-      - {day: -5, do: check, by: demo.viewer1, outcome: not_visible, note: Posts and wire are too small for the 10 m images. Nothing visible yet.}
-  - key: r-kunta
-    asset: demo-kunta-4
-    day: -9
+      - {day: -5, do: review, by: demo.viewer2, outcome: needs_site_visit, note: Posts and wire are too small for the 10 m images. A sharper image is needed.}
+      - {day: -4, do: imagery, by: demo.admin, provider: commercial_archive}
+  - key: r-kunta-7
+    asset: demo-kunta-7
+    day: -10
     channel: web
     language: en
     what: clearing
     photo: true
     description: Bushes cut on the tank bed.
     steps:
-      - {day: -8, do: check, by: demo.viewer1, outcome: not_visible, note: No change on this week's image.}
-      - {day: -6, do: close, by: demo.admin, reason: no_change_seen, note: Weeds cleared by the tank users' group. No fill and no structure.}
+      - {day: -9, do: review, by: demo.viewer1, outcome: not_real, note: Weeds cleared by the tank users' group. No fill and no structure.}
+      - {day: -8, do: decide, to: DISMISSED, by: demo.admin, note: Weed clearing by the tank users. Nothing to act on.}
+      - {day: -7, do: close, by: demo.admin, note: Closed. The kunta stays watched.}
   - key: r-outside
     at: [5200, 4300]
     day: -12
@@ -322,4 +326,14 @@ citizen_reports:
     what: construction
     description: Petition about a shed going up on a field next to the village road.
     steps:
-      - {day: -10, do: close, by: demo.admin, reason: passed_on, department: revenue, note: Patta land outside every watched location. Sent to the Tahsildar.}
+      - {day: -10, do: decide, to: DISMISSED, by: demo.admin, department: revenue, note: Patta land outside every watched location. Sent to the Tahsildar.}
+      - {day: -9, do: close, by: demo.admin, note: Closed here. Revenue has it.}
+
+# Changes in the demo world the weekly screen has not seen yet (D-063): a citizen's report finds
+# them through its satellite review. `first_changed` is in days from the seed day; 0 means a
+# report made any time after seeding finds it.
+unscreened_changes:
+  - key: unscreened-kunta-7
+    asset: demo-kunta-7
+    change: {type: soil_fill, stage: soil_dumped, shape: edge, angle: 60, size: [70, 45]}
+    first_changed: 0

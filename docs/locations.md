@@ -37,6 +37,7 @@ public launch.
 | Government land | Watched now | Revenue land (survey number), agency land (surveyed), recovered land | Parcel, with the 100 m watch ring and no buffer |
 | Endowment land | Planned | Endowment land | Parcel |
 | Forest land | Planned | Forest land | Parcel |
+| Places reported by citizens | Made from reports (D-063) | Place reported by a citizen | A 50 m circle around the pin; not watched until the admin starts it; cannot be added by hand |
 
 The two planned types are already in the database (migration 0008). The desk shows them, greyed
 out, with what each still needs. The API refuses to add a location of a planned kind. To switch one

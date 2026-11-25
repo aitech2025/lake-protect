@@ -24,10 +24,10 @@ function KindsStrip({ cats, kind, setKind }: { cats: Categories; kind: string; s
         <span className="small muted">{t("locations.watched_n", { n: cats.items.reduce((a, c) => a + c.watched, 0) })}</span>
       </button>
       {cats.items.map((c) =>
-        c.status === "live" ? (
+        c.status !== "planned" ? (
           <button key={c.name} type="button" className="kind-card" aria-pressed={kind === c.name} onClick={() => setKind(c.name)} data-testid={`kind-card-${c.name}`}>
             <b>{pick(c.label, lang)}</b>
-            <span className="small muted">{t("locations.watched_n", { n: c.watched })}</span>
+            <span className="small muted">{c.status === "intake" ? t("locations.from_reports") : t("locations.watched_n", { n: c.watched })}</span>
           </button>
         ) : (
           <details key={c.name} className="kind-card planned" data-testid={`kind-card-${c.name}`}>
@@ -143,7 +143,9 @@ export function Assets() {
   const all = useMemo(() => (data?.features ?? []).filter((f) => f.properties.is_demo === (dataset === "demo")), [data, dataset]);
   const stopped = all.filter((f) => !f.properties.monitored).length;
   const features = useMemo(
-    () => all.filter((f) => (kind === "all" || f.properties.category === kind) && (showStopped || f.properties.monitored || f.id === selected)),
+    // Places made from citizens' reports are never watched, so choosing their kind shows them (D-063).
+    () => all.filter((f) => (kind === "all" || f.properties.category === kind)
+      && (showStopped || f.properties.monitored || f.id === selected || kind === "citizen_reported")),
     [all, kind, showStopped, selected],
   );
   const labelOf = (category: string) => {

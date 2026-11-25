@@ -5,6 +5,8 @@
                              image and what changed (DECISIONS.md D-057). Then the weekly digest
                              goes to every official and the admin (D-059).
 - POST /pipeline/basemap     a zip of Sentinel-2 base-map tiles (`lp basemap`)
+- GET  /pipeline/reviews     citizen incidents waiting for their satellite review (`lp review-reports`, D-063)
+- POST /pipeline/reviews/{id}  the review's result: what the newest images show at the reported place
 
 And the desk's read side:
 - GET  /screening/runs       recent runs with their outcomes
@@ -175,6 +177,94 @@ def record_run(body: RunIn, db: Session = Depends(get_db)) -> dict:
                      details={"error": type(exc).__name__})
         db.commit()
     return {"run_id": run.id, "assets": len(body.assets), "coverage": statuses, "digests": digests, "citizen_reports_checked": checked}
+
+
+@router.get("/pipeline/reviews", dependencies=[Depends(pipeline_token)])
+def pending_reviews(db: Session = Depends(get_db)) -> dict:
+    """Real citizen incidents waiting for a satellite look: the place, its location and boundaries."""
+    from app.citizen import incident
+    from app.models import Alert, Candidate, CitizenReport
+
+    out = []
+    for rv in incident.pending(db):
+        alert = db.get(Alert, rv.alert_id)
+        cand = db.get(Candidate, alert.candidate_id)
+        asset = db.get(Asset, cand.asset_id)
+        report = db.get(CitizenReport, alert.report_id)
+        lon, lat = db.execute(text("SELECT ST_X(geom), ST_Y(geom) FROM citizen_reports WHERE id = :i"), {"i": report.id}).one()
+        bset = bsvc.current_boundary_set(db, asset.id)
+        out.append({
+            "id": rv.id, "alert_id": alert.id, "code": alert.code, "ref": report.ref, "lon": lon, "lat": lat,
+            "reported_at": report.created_at.isoformat(), "attempts": rv.attempts,
+            "asset": {"id": asset.id, "asset_key": asset.asset_key, "name": asset.name, "baseline_date": asset.baseline_date.isoformat(),
+                      "boundaries": {k: {"version": b["version"], "status": b["status"], "geometry": b["geometry"]} for k, b in bset.items()}},
+        })
+    return {"reviews": out, "count": len(out)}
+
+
+class SceneIn(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    sensor: str
+    scene_id: str
+    acquired_at: dt.datetime
+    cloud_pct: float | None = None
+    stac_href: str | None = None
+    licence_notice: str | None = None
+
+
+class ChangeSeenIn(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    change_type: str
+    area_sq_m: float = Field(gt=0)
+    first_changed_at: dt.date
+
+
+class ReviewIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    status: Literal["done", "failed"]
+    result: Literal["change_found", "no_change", "no_clear_look"] | None = None
+    as_of: dt.date | None = None
+    before_date: dt.date | None = None
+    after_date: dt.date | None = None
+    scenes: list[SceneIn] = []
+    before_png_b64: str | None = None
+    after_png_b64: str | None = None
+    change: ChangeSeenIn | None = None
+    detail: str | None = None
+
+
+@router.post("/pipeline/reviews/{review_id}", dependencies=[Depends(pipeline_token)])
+def post_review(review_id: int, body: ReviewIn, db: Session = Depends(get_db)) -> dict:
+    from app.citizen import incident
+    from app.models import SatelliteReview
+
+    rv = db.get(SatelliteReview, review_id)
+    if rv is None or rv.is_demo:
+        raise HTTPException(404, "No such review")
+    if rv.status != "pending":
+        raise HTTPException(409, f"The review is already {rv.status}")
+    if body.status == "failed":
+        incident.failed(db, rv, body.detail or "The screener could not finish", utcnow())
+        db.commit()
+        return {"id": rv.id, "status": rv.status, "attempts": rv.attempts}
+    if body.result is None or (body.result == "change_found") != (body.change is not None):
+        raise HTTPException(422, "A finished review needs its result, and a change exactly when one was found")
+    if any(d and d > dt.date.today() for d in (body.as_of, body.before_date, body.after_date)):
+        raise HTTPException(422, "A review cannot use images acquired in the future")
+    try:
+        result = {
+            "result": body.result, "as_of": body.as_of, "before_date": body.before_date, "after_date": body.after_date,
+            "scenes": [s.model_dump() for s in body.scenes], "detail": body.detail,
+            "before_png": incident.decode(body.before_png_b64), "after_png": incident.decode(body.after_png_b64),
+            "change": body.change.model_dump() if body.change else None,
+        }
+        with db_guard(db):
+            incident.record(db, rv, result, utcnow())
+            db.commit()
+    except ValueError as exc:
+        db.rollback()
+        raise HTTPException(422, str(exc)) from exc
+    return {"id": rv.id, "status": rv.status, "result": rv.result}
 
 
 _TILE = re.compile(r"^(\d{1,2})/(\d{1,7})/(\d{1,7})\.(jpg|png)$")

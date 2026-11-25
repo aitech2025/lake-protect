@@ -117,12 +117,14 @@ export function Queue() {
                 <span className="meta">
                   <StatePill state={r.state} />
                   <b className="change-type">{t(`change.${r.change_type}`)}</b>
+                  {r.origin === "citizen" && <span className="pill field" data-testid="origin-citizen">{t("queue.citizen")}</span>}
                   <span>{t("queue.acres", { acres: r.area_acres })}</span>
                   {zone(r) && <span>{zone(r)}</span>}
                   <span>{t("queue.first_seen", { date: fmtDate(r.first_changed_at, i18n.language) })}</span>
                 </span>
                 <span className="meta">
                   {r.review_count > 0 && <span>{t("queue.reviews", { count: r.review_count })}</span>}
+                  {(r.citizen_reports ?? 0) > 0 && r.origin !== "citizen" && <span>{t("queue.citizen_reports", { count: r.citizen_reports })}</span>}
                   {r.resolution && <span>{t(`resolution.${r.resolution}`)}</span>}
                   {r.court_matter && <span className="flag-overdue">{t("queue.court")}</span>}
                   {!r.boundary_confirmed && <span className="flag">{t("queue.boundary_unconfirmed")}</span>}

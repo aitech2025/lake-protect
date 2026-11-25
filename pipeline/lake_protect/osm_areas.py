@@ -98,9 +98,30 @@ def place(features: list[dict], found: list[dict]) -> dict:
     return {**placed, "unplaced": unplaced}
 
 
-def run(assets_path: Path, raw_path: Path, bbox: list[float], refetch: bool) -> dict:
+AREAS_OUT = Path("data/areas/admin_orr.geojson")
+
+
+def export(found: list[dict], payload: dict, out_path: Path) -> int:
+    """District and mandal outlines for the API, so a citizen's pin gets its area (D-063).
+
+    Simplified to about 20 m: enough to say which mandal holds a point, small enough to load fast.
+    """
+    from shapely.geometry import mapping
+
+    feats = [{"type": "Feature", "properties": {"level": a["level"], "name": a["name"], "name_te": a["name_te"], "osm": a["osm"]},
+              "geometry": mapping(a["geom"].simplify(0.0002, preserve_topology=True))} for a in found]
+    out = {"type": "FeatureCollection", "source": {"description": AREA_SOURCE, "licence": "ODbL, (c) OpenStreetMap contributors",
+                                                   "retrieved_at": payload.get("retrieved_at")}, "features": feats}
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(out, ensure_ascii=False), encoding="utf-8")
+    return len(feats)
+
+
+def run(assets_path: Path, raw_path: Path, bbox: list[float], refetch: bool, areas_out: Path | None = AREAS_OUT) -> dict:
     payload = fetch(bbox, raw_path) if refetch or not raw_path.exists() else json.loads(raw_path.read_text(encoding="utf-8"))
     found = areas(payload)
+    if areas_out is not None:
+        export(found, payload, areas_out)
     collection = json.loads(assets_path.read_text(encoding="utf-8"))
     result = place(collection["features"], found)
     collection.setdefault("source", {})["areas"] = {

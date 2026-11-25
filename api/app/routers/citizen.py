@@ -65,7 +65,7 @@ def config(dataset: Literal["demo", "real"] = "real", db: Session = Depends(get_
 class ReportIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     dataset: Literal["demo", "real"] = "real"
-    language: Literal["en", "te", "ur"] = "en"
+    language: Literal["en", "te"] = "en"
     what: str
     lon: float | None = Field(default=None, ge=-180, le=180)
     lat: float | None = Field(default=None, ge=-90, le=90)

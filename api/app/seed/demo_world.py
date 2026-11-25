@@ -41,6 +41,10 @@ class World:
         lon0, lat0 = self.origin
         return lon0 + east / (M_PER_DEG_LAT * math.cos(math.radians(lat0))), lat0 + north / M_PER_DEG_LAT
 
+    def from_lonlat(self, lon: float, lat: float) -> tuple[float, float]:
+        lon0, lat0 = self.origin
+        return (lon - lon0) * M_PER_DEG_LAT * math.cos(math.radians(lat0)), (lat - lat0) * M_PER_DEG_LAT
+
     def poly_to_lonlat(self, poly: Polygon) -> Polygon:
         return Polygon([self.to_lonlat(x, y) for x, y in poly.exterior.coords])
 
