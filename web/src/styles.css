@@ -547,3 +547,14 @@ a { color:var(--ftl); }
 @media (prefers-reduced-motion:reduce) {
   *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; animation:none!important; }
 }
+
+/* Swipe comparison is a true two-layer map comparison: baseline boundaries underneath,
+   current detection overlays clipped by the draggable divider. Historical raster pairs are
+   explicitly identified as a future imagery integration rather than simulated. */
+.geo-compare-map { position:absolute; inset:0; overflow:hidden; }
+.geo-compare-map>div { position:absolute; inset:0; width:100%!important; height:100%!important; }
+.geo-compare-latest { z-index:2; }
+.geo-compare-map .maplibregl-ctrl-top-right { display:none; }
+.geo-compare-baseline::after,.geo-compare-latest::after { position:absolute; top:52px; padding:6px 8px; border-radius:4px; color:#e0f2fe; background:rgba(8,47,73,.88); font-size:8px; font-weight:800; letter-spacing:.12em; pointer-events:none; }
+.geo-compare-baseline::after { content:"BASELINE · BOUNDARY VIEW"; left:16px; }
+.geo-compare-latest::after { content:"LATEST · DETECTION OVERLAY"; right:16px; background:rgba(127,29,29,.9); }
