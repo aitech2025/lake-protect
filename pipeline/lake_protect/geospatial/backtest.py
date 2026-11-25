@@ -15,7 +15,9 @@ def evaluate(cases: list[dict[str,Any]], detections: list[dict[str,Any]], *, min
     eligible=[]
     for feature in cases:
         geom=shape(feature["geometry"]); props=feature.get("properties",{})
-        area=float(props.get("area_acres") or geom.area*12300000/ACRE_SQ_M)
+        if props.get("area_acres") is None:
+            raise ValueError(f"Case {props.get('case_id', feature.get('id'))} must provide area_acres; degree-based area estimates are not accepted")
+        area=float(props["area_acres"])
         if area>=minimum_area_acres: eligible.append((feature,geom))
     remaining=set(range(len(detections))); matches=[]
     for case,case_geom in eligible:
