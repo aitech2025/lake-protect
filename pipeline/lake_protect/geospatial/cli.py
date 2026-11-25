@@ -4,6 +4,22 @@ import json
 import typer
 app=typer.Typer(help="Lake Protect geospatial intelligence commands",no_args_is_help=True)
 
+
+@app.command("run-water")
+def run_water(endpoint:str=typer.Option("https://earth-search.aws.element84.com/v1"),
+              collections:str=typer.Option("sentinel-2-l2a"),
+              bbox:str=typer.Option(...,help="west,south,east,north EPSG:4326"),
+              start:str=typer.Option(...),end:str=typer.Option(...),
+              max_cloud_pct:float=typer.Option(35.0,min=0,max=100),
+              license_label:str=typer.Option(...,help="Approved licence label for this provider/product"),
+              output_dir:Path=typer.Option(Path("data/imagery/work"))):
+    from .runner import run_water_screen
+    bounds=[float(x.strip()) for x in bbox.split(",")]
+    result=run_water_screen(endpoint=endpoint,collections=[x.strip() for x in collections.split(",")],
+        bbox=bounds,start=start,end=end,max_cloud_pct=max_cloud_pct,license_label=license_label,output_dir=output_dir)
+    typer.echo(json.dumps({k:v for k,v in result.items() if k!="outputs"},indent=2))
+    typer.echo("processing_run="+result["run_id"]+" status="+result["status"]+" processed="+str(result["processed_count"]))
+
 @app.command("search")
 def search(endpoint:str=typer.Option("https://earth-search.aws.element84.com/v1"),collections:str=typer.Option("sentinel-2-l2a"),
            bbox:str=typer.Option(...,help="west,south,east,north EPSG:4326"),start:str=typer.Option(...),end:str=typer.Option(...),
