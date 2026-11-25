@@ -42,10 +42,10 @@ def _s3_client():
     return bucket,client
 
 
-def _upload(bucket,client,key: str,path: Path) -> dict:
+def _upload(bucket,client,key: str,path: Path,content_type: str = "image/tiff") -> dict:
     data=path.read_bytes()
     digest=hashlib.sha256(data).hexdigest()
-    client.put_object(Bucket=bucket,Key=key,Body=data,ContentType="image/tiff",
+    client.put_object(Bucket=bucket,Key=key,Body=data,ContentType=content_type,
                       Metadata={"sha256":digest})
     return {"uri":f"s3://{bucket}/{key}","sha256":digest,"bytes":len(data)}
 
@@ -76,7 +76,7 @@ def run_water_screen(*,endpoint: str,collections: list[str],bbox: list[float],
               json={"status":"RUNNING","output_manifest":{}}).raise_for_status()
     items=Client.open(endpoint).search(collections=collections,bbox=bbox,
         datetime=f"{start}/{end}",max_items=200).items()
-    outputs=[]; rejected=[]; registered=0
+    outputs=[]; rejected=[]; registered=0; mask_records=[]
     try:
         for item in items:
             decision=assess_item(item,max_cloud_pct=max_cloud_pct)
@@ -112,13 +112,30 @@ def run_water_screen(*,endpoint: str,collections: list[str],bbox: list[float],
             index_local=Path(result["index_path"])
             mask_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/{safe_id}-water-mask.cog.tif",mask_local)
             index_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/{safe_id}-mndwi.cog.tif",index_local)
+            mask_records.append({"scene_id":item.id,"acquired_at":acquired,"mask_path":mask_local})
             outputs.append({"scene_id":item.id,"acquired_at":acquired,
                 "scene_registration":scene_resp.json(),"water_mask":mask_obj,"mndwi":index_obj,
                 "water_area_sq_m":result["water_area_sq_m"],"valid_pixels":result["valid_pixels"],
                 "method":result["method"],"validated":False})
+        temporal_change=None
+        if len(mask_records) >= 2:
+            from .change import compare_water_masks
+            ordered=sorted(mask_records,key=lambda row:row["acquired_at"])
+            comparison=compare_water_masks(ordered[0]["mask_path"],ordered[-1]["mask_path"],
+                output_dir/f"{run_id}-change")
+            loss_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/water-loss.cog.tif",Path(comparison["water_loss_mask"]))
+            gain_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/water-gain.cog.tif",Path(comparison["water_gain_mask"]))
+            vector_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/water-change.geojson",
+                Path(comparison["vector_path"]),"application/geo+json")
+            temporal_change={"reference_scene":ordered[0]["scene_id"],"current_scene":ordered[-1]["scene_id"],
+                "reference_acquired_at":ordered[0]["acquired_at"],"current_acquired_at":ordered[-1]["acquired_at"],
+                "water_loss_mask":loss_obj,"water_gain_mask":gain_obj,"change_features":vector_obj,
+                "water_loss_area_sq_m":comparison["water_loss_area_sq_m"],
+                "water_gain_area_sq_m":comparison["water_gain_area_sq_m"],
+                "feature_count":comparison["features"],"validated":False,"method":comparison["method"]}
         final_status="SUCCEEDED" if outputs and not rejected else ("PARTIAL" if outputs else "FAILED")
         output_manifest={"scene_count":registered,"processed_count":len(outputs),
-            "rejected_count":len(rejected),"outputs":outputs,"rejected":rejected,
+            "rejected_count":len(rejected),"outputs":outputs,"rejected":rejected,"temporal_change":temporal_change,
             "caveat":"MNDWI threshold screening only; not a legally verified FTL or encroachment determination."}
         api.patch(f"/api/v1/ingestion/processing-runs/{run_id}",
             json={"status":final_status,"output_manifest":output_manifest,
