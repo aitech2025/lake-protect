@@ -29,7 +29,7 @@ data in the app), then M3.
 | M16 Citizen reports open incidents with a satellite review; no Urdu | Done | API 365, pipeline 32, browser 6 | 6bbcd8c |
 | M17 Officials and the admin work citizens' incidents: acknowledge, notes, looks, legal records, decide, watch | Done | API 375, pipeline 33, browser 7 | 27fbb13 |
 | M18 Real data only: demo world and maps removed, role accounts kept | Done | API 366, pipeline 33, browser 7 | c6134b2 |
-| M19 Satellite image sources the admin maintains | Done | API 375, pipeline 36, browser 8 | M19 commit |
+| M19 Satellite image sources the admin maintains | Done | API 375, pipeline 36, browser 8 | 473e664 |
 
 ## M0 Scaffold: done
 
