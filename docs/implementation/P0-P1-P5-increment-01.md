@@ -16,7 +16,7 @@ This is an additive increment. It preserves the existing FastAPI/PostGIS case-ma
 ## P1 — executable Sentinel-2 water workflow
 
 - Dedicated geospatial dependencies and worker image remain separate from the transactional API.
-- `lp-geo run-water` searches STAC, evaluates suitability, registers scene metadata through `/api/v1/ingestion/scenes`, creates and updates a processing run through `/api/v1/ingestion/processing-runs`, calculates MNDWI masks, compares the earliest and latest suitable scenes, and writes derived artefacts to S3-compatible object storage.
+- `lp-geo run-water` searches STAC, evaluates suitability, registers scene metadata through `/api/v1/ingestion/scenes`, creates and updates a processing run through `/api/v1/ingestion/processing-runs`, calculates MNDWI masks, selects a temporally distinct pair with at least 50% footprint overlap, compares water masks, and writes derived artefacts to S3-compatible object storage.
 - Scene and run metadata use the existing ingestion schema; no duplicate scene or processing-run database was introduced.
 - COG layout is checked; outputs are SHA-256 hashed and uploaded with hash metadata.
 - The processing-run output manifest records scene IDs, acquisition dates, S3 object URIs, checksums, areas and method disclaimers.
@@ -75,7 +75,7 @@ Configure `LP_WHATSAPP_VERIFY_TOKEN` and `LP_WHATSAPP_APP_SECRET` in the runtime
 
 - MNDWI/SAR outputs and temporal water polygons are screening products. They are not proof of FTL encroachment, ownership or illegality.
 - Water spread is not equivalent to the legally notified FTL polygon. Seasonal hydrology, image quality and acquisition timing matter.
-- A two-date mask comparison is meaningful only when scenes are seasonally and spatially comparable. The first/last scene heuristic is an initial baseline, not a lake-specific reference policy.
+- A two-date mask comparison is meaningful only when scenes are seasonally and spatially comparable. The pair selector uses acquisition-time gap and footprint overlap; it is an initial baseline, not a lake-specific seasonal reference policy. Comparisons are withheld when sufficient overlap is unavailable.
 - Sentinel-1 thresholding is not a substitute for calibration, terrain correction, speckle filtering or orbit processing.
 - MNDWI does not detect buildings or soil filling. High-resolution construction/fill models remain separate work.
 - Backtest metrics require independently adjudicated cases, consistent geometry CRS, reliable event/action dates and a held-out blind cohort.
