@@ -3,7 +3,7 @@ import { useState, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { api, fmtDate, fmtDateTime } from "../api";
 import { isAdmin, useAuth } from "../auth";
-import { AuthImage } from "../components/Bits";
+import { AuthImage, useAsync } from "../components/Bits";
 import { notifyCountChanged } from "../components/Layout";
 
 /**
@@ -12,7 +12,6 @@ import { notifyCountChanged } from "../components/Layout";
  * approve or decline, close, and the weekly watch. The server checks every step.
  */
 const DEPARTMENTS = ["revenue", "municipal", "irrigation", "hydraa", "forest", "endowments", "waqf"];
-const PROVIDERS = ["isro_nrsc", "commercial_archive", "commercial_tasking"];
 const DOC_TYPES = ["notification", "survey_map", "land_record", "government_order", "court_order", "recovery_order", "other"];
 
 function useAct(onDone: () => void) {
@@ -57,7 +56,10 @@ export function CitizenSide({ a, onDone }: { a: any; onDone: () => void }) {
   const [note, setNote] = useState("");
   const [dept, setDept] = useState("");
   const [falseReport, setFalseReport] = useState(false);
-  const [provider, setProvider] = useState("commercial_archive");
+  const sources = useAsync(() => api<{ items: any[] }>("/satellites?purpose=sharper&active=true"), []);
+  const providers: any[] = sources.data?.items ?? [];
+  const [chosen, setProvider] = useState("");
+  const provider = chosen || providers[0]?.key || "";
   const [imgNote, setImgNote] = useState("");
   const [placeName, setPlaceName] = useState("");
   const [reason, setReason] = useState("");
@@ -120,10 +122,12 @@ export function CitizenSide({ a, onDone }: { a: any; onDone: () => void }) {
         {!closed && <>
         <p className="small muted">{t("act.sharper_help")}</p>
         <select value={provider} onChange={(e) => setProvider(e.target.value)} aria-label={t("act.provider")} data-testid="sharper-provider">
-          {PROVIDERS.map((p) => <option key={p} value={p}>{t(`act.providers.${p}`)}</option>)}
+          {providers.map((p) => (
+            <option key={p.key} value={p.key}>{p.name}{p.price_usd_per_sq_km !== null ? ` · US$ ${p.price_usd_per_sq_km}/sq km` : ` · ${t("sat.price_on_request")}`}</option>
+          ))}
         </select>
         <input value={imgNote} onChange={(e) => setImgNote(e.target.value)} placeholder={t("act.why_sharper")} aria-label={t("act.why_sharper")} data-testid="sharper-note" />
-        <button type="button" className="btn secondary" disabled={busy} onClick={() => void run(`/alerts/${a.id}/imagery-request`, { json: { provider, note: imgNote || null } }, () => setImgNote(""))} data-testid="sharper-submit">
+        <button type="button" className="btn secondary" disabled={busy || !provider} onClick={() => void run(`/alerts/${a.id}/imagery-request`, { json: { provider, note: imgNote || null } }, () => setImgNote(""))} data-testid="sharper-submit">
           {t("act.sharper_request")}
         </button>
         </>}
@@ -131,7 +135,7 @@ export function CitizenSide({ a, onDone }: { a: any; onDone: () => void }) {
           <ul className="officer-list" data-testid="sharper-list">
             {a.imagery_requests.map((r: any) => (
               <li key={r.id}>
-                <span><b className={`delivery ${r.status === "approved" ? "sent" : r.status === "declined" ? "failed" : "queued"}`}>{t(`act.img_status.${r.status}`)}</b> {t(`act.providers.${r.provider}`)}
+                <span><b className={`delivery ${r.status === "approved" ? "sent" : r.status === "declined" ? "failed" : "queued"}`}>{t(`act.img_status.${r.status}`)}</b> {r.provider_name ?? r.provider}
                   {r.est_cost_usd !== null ? ` · ~US$ ${Math.round(r.est_cost_usd).toLocaleString("en-IN")}` : ""}</span>
                 <span className="small muted">{r.requested_by}{r.note ? `: ${r.note}` : ""}{r.decided_by && r.status !== "recorded" ? ` · ${r.decided_by}${r.decision_note ? `: ${r.decision_note}` : ""}` : ""}</span>
                 {r.status === "requested" && o.can_approve_imagery && (

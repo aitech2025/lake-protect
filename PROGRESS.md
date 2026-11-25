@@ -28,7 +28,8 @@ data in the app), then M3.
 | M15 Citizen channels: portal, WhatsApp, staff intake, updates back | Done | API 361, pipeline 29, browser 6 | be69e84 |
 | M16 Citizen reports open incidents with a satellite review; no Urdu | Done | API 365, pipeline 32, browser 6 | 6bbcd8c |
 | M17 Officials and the admin work citizens' incidents: acknowledge, notes, looks, legal records, decide, watch | Done | API 375, pipeline 33, browser 7 | 27fbb13 |
-| M18 Real data only: demo world and maps removed, role accounts kept | Done | API 366, pipeline 33, browser 7 | M18 commit |
+| M18 Real data only: demo world and maps removed, role accounts kept | Done | API 366, pipeline 33, browser 7 | c6134b2 |
+| M19 Satellite image sources the admin maintains | Done | API 375, pipeline 36, browser 8 | M19 commit |
 
 ## M0 Scaffold: done
 
@@ -242,6 +243,37 @@ removed, is `reports/m2-tuning/README.md`.
   upload, the area rounding case). Browser 15 passed on fresh demos: `m10-real` (switch, no demo
   record on the real side, Sentinel-2 tiles requested, 99 real lakes listed) with the M5 to M8
   suites, then the M9 walkthrough with no internet.
+
+## M19 Satellite image sources the admin maintains: done
+
+Owner's request, 25 Nov 2026 (D-066): view, change, update, delete and add satellite
+configurations. The owner chose image sources only; detection thresholds stay in the rule file.
+
+- **Migration 0013:** `satellite_sources`, seeded with the five sources the app used (CONTEXT.md
+  8.1). One source on per screening purpose (unique index).
+- **API:**
+  - `GET /satellites` (everyone); `POST`, `PATCH`, `DELETE?reason=` and `GET /satellites/history`
+    (admin);
+  - `GET /pipeline/satellites` (pipeline token).
+  - Every change is in the audit log with the values before and after.
+- **Sharper images:**
+  - **Estimates:** priced from the chosen source, with its smallest order.
+  - **Choices:** officials choose among the sources that are on; with none named, the first one on.
+  - **Deleted sources:** requests keep the key.
+- **Pipeline:**
+  - **At the start of a run:** `lp screen` and `lp review-reports` apply the sources that are on.
+    That is the optical catalogue, collection, cloud limit and licence line, and radar on or off.
+  - **The hash:** settings that differ from the rule file go into `rules_sha256`.
+  - **Radar:** `radar.py` reads its catalogue from the rules instead of constants.
+- **Desk:**
+  - **The Satellites page,** in English and Telugu: the sources by purpose. The admin adds, changes,
+    turns on or off and deletes, with a reason; the latest changes are listed. Officials see it
+    read-only.
+  - **The officials' panel** lists the sharper sources that are on, with their prices.
+- **Tests:**
+  - **API:** 375 passed, including `test_satellites.py` (5).
+  - **Pipeline:** 36 passed, including `test_sources_config.py` (3).
+  - **Browser:** 8 passed, including `m19-satellites`.
 
 ## M18 Real data only: the demo world and its maps are removed: done
 

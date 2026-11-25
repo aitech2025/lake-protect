@@ -468,3 +468,11 @@ tr.superseded td { color: var(--ink-2); text-decoration: line-through; text-deco
 .look-thumb.pending { background: repeating-linear-gradient(45deg, #e7ebe4 0 6px, #dfe4de 6px 12px); }
 .legal-snapshot { display: grid; gap: 0.6rem; margin-top: 0.5rem; }
 .legal-list ul { margin: 0.2rem 0 0; padding-left: 1.1rem; }
+
+/* Satellites (D-066) */
+.sat-form { margin: 0.75rem 0 1rem; display: grid; gap: 0.6rem; }
+.sat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 0.6rem 1rem; align-items: end; }
+.sat-grid .wide { grid-column: 1 / -1; }
+.sat-grid textarea { font-size: var(--step-0); color: var(--ink); padding: 0.45rem 0.55rem; border: 1px solid var(--border-control); border-radius: var(--radius-s); background: var(--surface-raised); }
+.sat-url { overflow-wrap: anywhere; }
+.sat-actions { display: flex; flex-wrap: wrap; gap: 0.35rem; }

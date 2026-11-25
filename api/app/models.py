@@ -728,3 +728,27 @@ class IncidentLegalRecord(Base):
     at: Mapped[dt.datetime] = mapped_column(TZ)
     records: Mapped[dict] = mapped_column(JSONB)
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class SatelliteSource(Base):
+    """A satellite image source the admin maintains (migration 0013, D-066)."""
+    __tablename__ = "satellite_sources"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    key: Mapped[str] = mapped_column(Text, unique=True)
+    name: Mapped[str] = mapped_column(Text)
+    provider: Mapped[str] = mapped_column(Text)
+    purpose: Mapped[str] = mapped_column(Text)
+    resolution_m: Mapped[Decimal] = mapped_column(Numeric(8, 2))
+    revisit_days: Mapped[Decimal | None] = mapped_column(Numeric(6, 1))
+    stac_url: Mapped[str | None] = mapped_column(Text)
+    collection: Mapped[str | None] = mapped_column(Text)
+    max_scene_cloud_pct: Mapped[Decimal | None] = mapped_column(Numeric(5, 1))
+    price_usd_per_sq_km: Mapped[Decimal | None] = mapped_column(Numeric(10, 2))
+    min_order_sq_km: Mapped[Decimal | None] = mapped_column(Numeric(10, 2))
+    licence_notice: Mapped[str | None] = mapped_column(Text)
+    notes: Mapped[str | None] = mapped_column(Text)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    added_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    added_at: Mapped[dt.datetime] = mapped_column(TZ)
+    updated_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    updated_at: Mapped[dt.datetime] = mapped_column(TZ)

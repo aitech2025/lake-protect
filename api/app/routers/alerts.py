@@ -118,7 +118,7 @@ def post_transition(alert_id: int, body: TransitionIn, user: User = Depends(curr
 
 class ImageryIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    provider: Literal["isro_nrsc", "commercial_archive", "commercial_tasking"]
+    provider: str | None = None  # a sharper-image source that is on (Satellites, D-066); none: the first one on
     note: str | None = None
 
 
@@ -129,9 +129,15 @@ def post_imagery_request(alert_id: int, body: ImageryIn, user: User = Depends(cu
     alert = alert_view.get_visible(db, alert_id)
     if user.role != Role.admin.value and alert.origin != "citizen":
         raise HTTPException(403, "Officials request sharper images on incidents a citizen reported")
-    req = imagery.request(db, alert, user, body.provider, body.note, utcnow())
+    from app.services import satellites
+
+    try:
+        with db.begin_nested():
+            req = imagery.request(db, alert, user, body.provider, body.note, utcnow())
+    except satellites.Refused as exc:
+        raise HTTPException(exc.status, str(exc)) from exc
     db.commit()
-    return {"id": req.id, "status": req.status, "area_sq_km": float(req.area_sq_km), "est_cost_usd": req.est_cost_usd and float(req.est_cost_usd),
+    return {"id": req.id, "provider": req.provider, "status": req.status, "area_sq_km": float(req.area_sq_km), "est_cost_usd": req.est_cost_usd and float(req.est_cost_usd),
             "note": "Recorded only. No imagery is ordered in the prototype."}
 
 

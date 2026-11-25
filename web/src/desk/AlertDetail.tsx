@@ -291,7 +291,7 @@ function Actions({ alert, onDone }: { alert: any; onDone: () => void }) {
         <DecisionForm key={x.to} alertId={alert.id} to={x.to} citizen={alert.citizen_reports > 0} onDone={(msg) => { show(msg); onDone(); }} />
       ))}
       {admin && open && (
-        <button className="btn quiet" onClick={() => api(`/alerts/${alert.id}/imagery-request`, { json: { provider: "commercial_archive" } }).then(() => show(t("detail.imagery_done")))}>
+        <button className="btn quiet" onClick={() => api(`/alerts/${alert.id}/imagery-request`, { json: {} }).then(() => show(t("detail.imagery_done")))}>
           {t("detail.imagery")}
         </button>
       )}

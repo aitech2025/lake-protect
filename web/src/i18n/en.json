@@ -18,7 +18,8 @@
     "dashboard": "Overview",
     "inbox": "Inbox",
     "officials": "Officials",
-    "reports": "Citizen reports"
+    "reports": "Citizen reports",
+    "satellites": "Satellites"
   },
   "login": {
     "title": "Sign in with a demo account",
@@ -1105,11 +1106,6 @@
     "sharper_title": "Sharper image",
     "sharper_help": "Ask for a sharper paid image of the place. The admin approves it first. Nothing is ordered in the prototype.",
     "provider": "Source",
-    "providers": {
-      "isro_nrsc": "ISRO / NRSC",
-      "commercial_archive": "Commercial, from the archive",
-      "commercial_tasking": "Commercial, new capture"
-    },
     "why_sharper": "Why it is needed",
     "sharper_request": "Request a sharper image",
     "img_status": {
@@ -1171,5 +1167,66 @@
     "doc_date": "Issued on",
     "doc_file": "File",
     "doc_attach": "Attach"
+  },
+  "sat": {
+    "title": "Satellites",
+    "lede": "The satellite image sources GeoGuard uses: what the weekly screen and citizens' satellite looks read, and the sharper images officials may ask for. The admin adds, changes, turns on or off, and deletes them.",
+    "add": "Add a source",
+    "edit": "Change {{name}}",
+    "edit_short": "Change",
+    "purpose": "Used for",
+    "purposes": {
+      "screen_optical": "Weekly screen and satellite looks (optical)",
+      "screen_radar": "Radar check for built-up",
+      "sharper": "Sharper images, on request"
+    },
+    "help": {
+      "screen_optical": "One optical source screens at a time: turning one on turns the other off. The screen cannot run without one.",
+      "screen_radar": "At most one radar source is on. With none, the screen runs without the radar check and says so.",
+      "sharper": "Officials choose one when they ask for a sharper image; the admin approves. The price and the smallest order make the estimate. Nothing is ordered in the prototype."
+    },
+    "key": "Key (never changes)",
+    "name": "Name",
+    "provider": "Provider",
+    "resolution": "Resolution (metres per pixel)",
+    "revisit": "Revisit (days)",
+    "stac_url": "Catalogue address (STAC)",
+    "collection": "Catalogue collection",
+    "cloud": "Scene cloud limit (%)",
+    "price": "Price (US$ per sq km)",
+    "min_order": "Smallest order (sq km)",
+    "licence": "Licence line on images",
+    "notes": "Notes",
+    "on": "On",
+    "off": "Off",
+    "save": "Save",
+    "detail": "Detail",
+    "catalogue": "Catalogue",
+    "status": "Status",
+    "none": "No source here yet.",
+    "res_value": "{{m}} m pixels",
+    "revisit_value": "every {{d}} days",
+    "cloud_value": "scenes up to {{p}}% cloud",
+    "price_value": "US$ {{usd}} per sq km",
+    "price_on_request": "price on request",
+    "min_order_value": "at least {{km}} sq km",
+    "turn_on": "Turn on",
+    "turn_off": "Turn off",
+    "delete": "Delete",
+    "reason": "Why it is deleted",
+    "delete_warn": "Delete {{name}}? Requests made through it keep its key. The deletion and the reason are kept in the audit log.",
+    "saved": "{{name}} saved.",
+    "saved_switched": "{{name}} saved and on. Turned off: {{off}}.",
+    "turned_on": "{{name}} is on.",
+    "turned_off": "{{name}} is off.",
+    "deleted": "{{name}} deleted.",
+    "thresholds": "The detection rules (smallest change, cloud masks, persistence, index cut-offs) are not set here: they stay in the versioned rule file, so the accuracy test cannot be changed from a screen. Each screen records the source settings it used.",
+    "history": "Changes",
+    "action": {
+      "added": "Added",
+      "changed": "Changed",
+      "deleted": "Deleted",
+      "switched_off": "Turned off"
+    }
   }
 }

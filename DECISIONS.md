@@ -431,6 +431,45 @@ apart".
 - **Reset:** `app.seed.reset` now loads the real lakes and the role accounts. `lp replay` puts the
   saved real screen back.
 
+### D-066: The admin maintains the satellite image sources (owner, 25 Nov 2026)
+The owner asked that the admin maintain satellite configurations: view them, change and update
+them, delete one, and add new ones. Asked what a configuration covers, the owner chose **image
+sources only**. Detection thresholds stay in the versioned rule file.
+
+Built as M19 (the **Satellites** page; `api/app/services/satellites.py`).
+
+- **A source** has:
+  - a purpose: the weekly screen and satellite looks (optical), the radar check for built-up, or
+    sharper images on request;
+  - a name, a provider, and its resolution and revisit;
+  - for screening, the catalogue address (STAC) and collection, and for optical the scene cloud
+    limit;
+  - for sharper images, the price per sq km and the smallest order;
+  - a licence line, notes, and on or off.
+- **Seeded** (migration 0013) with the sources the app used until now, at CONTEXT.md 8.1's figures:
+  - Sentinel-2 L2A (Earth Search) and Sentinel-1 RTC (Planetary Computer);
+  - ISRO/NRSC (price on request);
+  - commercial archive ($26/sq km) and tasking ($55/sq km).
+- **Rules:**
+  - **Optical:** exactly one source screens. Turning one on turns the other off; the one in use
+    can be neither turned off nor deleted.
+  - **Radar:** at most one source. With none, the screen runs without the radar check and says so.
+  - **Sharper images:** any number. Officials choose among those that are on; the price and the
+    smallest order make the estimate.
+  - **The key never changes:** requests keep a deleted source's key.
+  - **The log:** every change, with the values before and after, and every deletion, with its
+    reason, is in the audit log, and the page shows the latest changes.
+- **The pipeline:**
+  - `lp screen` and `lp review-reports` read the sources that are on (`GET /pipeline/satellites`)
+    at the start of each run.
+  - Only the source settings can change from the app: catalogue, collection, cloud limit, licence
+    line, and the radar check on or off. Bands and every detection threshold stay in the rule file.
+  - Settings that differ from the rule file go into the run's `rules_sha256`, so two runs on
+    different sources never share a hash.
+  - If the app does not answer, the run uses the rule file's sources and says so.
+- **Why thresholds are not on the page:** the scored backtest (M3) must run on rules fixed and
+  tagged before the run (section 8.6). A threshold changed from a screen would break that.
+
 ## Errors and gaps found in CONTEXT.md
 
 ### E-001: `boundaries` is append-only but has `valid_to` (section 7, invariant 12)

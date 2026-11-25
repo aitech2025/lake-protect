@@ -54,6 +54,14 @@ map or uploading a GeoJSON or KML file. The next weekly screen includes it. Remo
 watched now and planned are listed in `api/app/categories.yaml`. Design:
 [docs/locations.md](docs/locations.md).
 
+**Satellites.** The admin keeps the satellite image sources on the **Satellites** page (D-066):
+- **The weekly screen's optical source** (Sentinel-2 today) and the radar check (Sentinel-1);
+- **sharper paid images,** with the price per sq km used for estimates.
+
+The admin adds, changes, turns on or off and deletes them, and every change is logged. `lp screen`
+and `lp review-reports` read the sources that are on at the start of each run. Detection
+thresholds stay in `pipeline/lake_protect/detect_rules.yaml`.
+
 **Citizens.**
 - **How they report:**
   - on the public portal at `/report`, with no sign-in, in English or Telugu;

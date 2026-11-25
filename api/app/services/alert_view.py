@@ -279,6 +279,9 @@ def detail(db: Session, alert: Alert, user: User) -> dict:
     latest = checks[-1] if checks else None
     observations = db.scalars(select(Observation).where(Observation.id.in_(cand.observation_ids or [0])).order_by(Observation.acquired_at)).all()
     users = {u.id: u for u in db.scalars(select(User))}
+    from app.services.satellites import names_by_key
+
+    source_names = names_by_key(db)
     timeline = db.execute(
         text(
             "SELECT id, actor_id, action, details, at FROM audit_log WHERE entity = 'alert' AND entity_id = :i "
@@ -370,7 +373,7 @@ def detail(db: Session, alert: Alert, user: User) -> dict:
         "citizen": _citizen_block(db, alert),
         "satellite_review": _review_block(db, alert),
         "imagery_requests": [
-            {"id": r.id, "provider": r.provider, "area_sq_km": float(r.area_sq_km), "est_cost_usd": float(r.est_cost_usd) if r.est_cost_usd is not None else None,
+            {"id": r.id, "provider": r.provider, "provider_name": source_names.get(r.provider, r.provider), "area_sq_km": float(r.area_sq_km), "est_cost_usd": float(r.est_cost_usd) if r.est_cost_usd is not None else None,
              "status": r.status, "note": r.note, "requested_by": users[r.requested_by].name if r.requested_by in users else None,
              "created_at": _iso(r.created_at), "decided_by": users[r.decided_by].name if r.decided_by in users else None,
              "decided_at": _iso(r.decided_at), "decision_note": r.decision_note}

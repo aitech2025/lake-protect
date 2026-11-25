@@ -29,8 +29,12 @@ from lake_protect.aoi import AssetAOI, Grid
 from lake_protect.rules import cache_dir, configure_gdal, rules
 from lake_protect.stac import end_of_day
 
-PC_STAC = "https://planetarycomputer.microsoft.com/api/stac/v1"
-COLLECTION = "sentinel-1-rtc"
+
+
+def _source() -> tuple[str, str]:
+    """The radar catalogue and collection: the rule file's, or the admin's source (D-066)."""
+    cfg = rules()["radar"]
+    return cfg["stac_url"], cfg["collection"]
 
 
 @dataclass(frozen=True)
@@ -48,16 +52,17 @@ class RadarScene:
 
 
 def search(bbox_ll, start: dt.date, as_of: dt.date) -> list[RadarScene]:
-    key = f"{COLLECTION}_{'_'.join(f'{v:.4f}' for v in bbox_ll)}_{start}_{as_of}"
+    stac_url, collection = _source()
+    key = f"{collection}_{'_'.join(f'{v:.4f}' for v in bbox_ll)}_{start}_{as_of}"
     path = cache_dir() / "stac" / f"{key}.json"
     if path.exists():
         items = json.loads(path.read_text(encoding="utf-8"))
     else:
         import pystac_client
 
-        client = pystac_client.Client.open(PC_STAC)
+        client = pystac_client.Client.open(stac_url)
         found = client.search(
-            collections=[COLLECTION],
+            collections=[collection],
             bbox=list(bbox_ll),
             datetime=[dt.datetime.combine(start, dt.time(0), tzinfo=dt.timezone.utc), end_of_day(as_of)],
             max_items=3000,
@@ -197,13 +202,14 @@ def check_built(aoi: AssetAOI, cands: list[dict], components: list[np.ndarray], 
 def observation(scene: RadarScene) -> dict:
     """In the shape `POST /candidates` takes for each observation."""
     cfg = rules().get("radar", {})
+    stac_url, collection = _source()
     return {
         "sensor": "sentinel-1",
         "scene_id": scene.id,
         "acquired_at": scene.acquired_at.isoformat(),
         "cloud_pct": None,
-        "stac_href": f"{PC_STAC}/collections/{COLLECTION}/items/{scene.id}",
-        "processing_version": f"planetary-computer {COLLECTION}, gamma0 VV, multi-date median; {rules()['rule_version']}",
+        "stac_href": f"{stac_url}/collections/{collection}/items/{scene.id}",
+        "processing_version": f"{collection} from {stac_url}, gamma0 VV, multi-date median; {rules()['rule_version']}",
         "licence_notice": cfg.get("licence_notice", "Contains modified Copernicus Sentinel data {year}").format(year=scene.acquired_at.year),
     }
 

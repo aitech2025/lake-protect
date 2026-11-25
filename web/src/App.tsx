@@ -12,6 +12,7 @@ import { Officials } from "./desk/Officials";
 import { Queue } from "./desk/Queue";
 import { Records } from "./desk/Records";
 import { ReportDetail, Reports } from "./desk/Reports";
+import { Satellites } from "./desk/Satellites";
 import { Sources } from "./desk/Sources";
 import { Monthly } from "./bulletin/Monthly";
 import { ReportPage, TrackPage } from "./portal/Portal";
@@ -47,6 +48,7 @@ export function App() {
         <Route path="/records" element={<Records />} />
         <Route path="/sources" element={<Sources />} />
         <Route path="/audit" element={<Audit />} />
+        <Route path="/satellites" element={<Satellites />} />
         <Route path="/monthly" element={<Monthly />} />
       </Route>
       <Route path="*" element={<Home />} />

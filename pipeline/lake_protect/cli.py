@@ -156,6 +156,23 @@ def screen(
         time.sleep(repeat_hours * 3600)
 
 
+def _apply_sources(client) -> bool:
+    """The image sources the admin keeps in the app (D-066); the rule file's if the app does not
+    answer. Returns whether the radar check is on."""
+    from lake_protect.rules import radar_enabled, set_sources
+
+    try:
+        resp = client.get("/pipeline/satellites")
+        resp.raise_for_status()
+        found = resp.json()
+    except Exception as exc:  # an older API, or no answer: the rule file's sources
+        typer.echo(f"Image sources: could not read them from the app ({type(exc).__name__})")
+        found = None
+    for line in set_sources(found):
+        typer.echo(line)
+    return radar_enabled()
+
+
 def _screen_once(api, token, as_of, asset, out, workers, dry_run) -> None:
     import datetime as dt
     from pathlib import Path
@@ -171,8 +188,9 @@ def _screen_once(api, token, as_of, asset, out, workers, dry_run) -> None:
         resp.raise_for_status()
         aois = aois_from_watchlist(resp.json()["assets"], asset or None)
         typer.echo(f"Watch list: {len(aois)} assets")
+        use_radar = _apply_sources(client)
         started = dt.datetime.now(dt.timezone.utc)
-        results, meta = run(aois, day, workers=workers, log=typer.echo)
+        results, meta = run(aois, day, workers=workers, use_radar=use_radar, log=typer.echo)
         folder = write_report(results, meta, Path(out or f"reports/screen/{day.isoformat()}"))
         _print_results(results, meta)
         outcomes: dict[str, int] = {}
@@ -228,10 +246,11 @@ def review_reports(
             items = client.get("/pipeline/reviews").raise_for_status().json()["reviews"]
             if items:
                 typer.echo(f"{len(items)} report(s) to review")
+                use_radar = _apply_sources(client) and radar
             for item in items:
                 typer.echo(f"Review {item['id']}: incident {item['code']}, report {item['ref']}, {item['asset']['name']}")
                 try:
-                    results, _ = run([aoi_for(item)], look_day(item, dt.date.today()), workers=workers, use_radar=radar, log=typer.echo)
+                    results, _ = run([aoi_for(item)], look_day(item, dt.date.today()), workers=workers, use_radar=use_radar, log=typer.echo)
                     body = result_for(item, results[0])
                 except Exception as exc:  # a review that fails is reported, and tried again later
                     body = {"status": "failed", "detail": f"{type(exc).__name__}: {exc}"[:400]}
