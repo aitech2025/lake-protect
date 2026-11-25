@@ -15,6 +15,8 @@ def evaluate(cases: list[dict[str,Any]], detections: list[dict[str,Any]], *, min
     eligible=[]
     for feature in cases:
         geom=shape(feature["geometry"]); props=feature.get("properties",{})
+        if not props.get("event_date"):
+            raise ValueError("Every ground-truth case must provide event_date for temporal backtesting")
         if props.get("area_acres") is None:
             raise ValueError(f"Case {props.get('case_id', feature.get('id'))} must provide area_acres; degree-based area estimates are not accepted")
         area=float(props["area_acres"])
