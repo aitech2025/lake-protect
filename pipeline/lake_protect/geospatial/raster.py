@@ -13,11 +13,12 @@ def _href(item: dict[str, Any], *names: str) -> str:
 
 def _write_cog(array: np.ndarray, profile: dict[str, Any], output: str | Path) -> Path:
     import rasterio
+    from rasterio.shutil import copy as rio_copy
     output=Path(output); output.parent.mkdir(parents=True,exist_ok=True)
     profile={**profile,"driver":"GTiff","count":1,"dtype":"float32","nodata":-9999.0,"compress":"deflate","tiled":True}
     temp=output.with_suffix(".tmp.tif")
     with rasterio.open(temp,"w",**profile) as dst: dst.write(np.where(np.isfinite(array),array,-9999).astype("float32"),1)
-    with rasterio.open(temp) as src: rasterio.shutil.copy(src,output,driver="COG",compress="DEFLATE",overview_resampling="NEAREST")
+    with rasterio.open(temp) as src: rio_copy(src,output,driver="COG",compress="DEFLATE",overview_resampling="NEAREST")
     temp.unlink(missing_ok=True)
     with rasterio.open(output) as check:
         if check.tags(ns="IMAGE_STRUCTURE").get("LAYOUT") != "COG":
