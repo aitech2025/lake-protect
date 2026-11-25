@@ -144,7 +144,10 @@ def run_water_screen(*,endpoint: str,collections: list[str],bbox: list[float],
             if comparable:
                 _,footprint_overlap,reference,current=max(comparable,key=lambda row:(row[0],row[1]))
                 comparison=compare_water_masks(reference["mask_path"],current["mask_path"],
-                    output_dir/f"{run_id}-change",minimum_overlap_ratio=0.5)
+                    output_dir/f"{run_id}-change",minimum_overlap_ratio=0.5,
+                    reference_scene_id=reference["scene_id"],current_scene_id=current["scene_id"],
+                    reference_acquired_at=reference["acquired_at"],current_acquired_at=current["acquired_at"],
+                    processing_run_id=run_id)
                 loss_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/water-loss.cog.tif",Path(comparison["water_loss_mask"]))
                 gain_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/water-gain.cog.tif",Path(comparison["water_gain_mask"]))
                 vector_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/water-change.geojson",
