@@ -1,4 +1,4 @@
-# Lake Protect prototype. `docker compose up` on one machine (CONTEXT.md section 11).
+# GeoGuard prototype (formerly Lake Protect; the project and image names keep the old name, D-061). `docker compose up` on one machine (CONTEXT.md section 11).
 # Secrets come from .env (see .env.example). Named volumes keep database files, evidence
 # packs and node_modules out of the OneDrive folder.
 name: lakeprotect

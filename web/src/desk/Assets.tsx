@@ -2,19 +2,131 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { api, fmtDate } from "../api";
+import { api, fmtDate, fmtDateTime } from "../api";
+import { isAdmin, useAuth } from "../auth";
 import { BoundarySeal, useAsync, usePageTitle } from "../components/Bits";
 import { MapView } from "../components/MapView";
 import { PageState, TableRegion } from "../components/PageState";
 import { baseFor, useDataset } from "../dataset";
 import { DemoTag, useDemoOnScreen } from "../demo";
+import { AddLocation, pick, type Categories } from "./AddLocation";
 import { Documents, WeeklyRecord } from "./AssetRecord";
 import { CoverageLine, ScreeningSummary } from "./Screening";
+
+/** What GeoGuard watches now and what is planned (app/categories.yaml, D-061). */
+function KindsStrip({ cats, kind, setKind }: { cats: Categories; kind: string; setKind: (k: string) => void }) {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
+  return (
+    <section className="kinds-strip" aria-label={t("locations.what")} data-testid="kinds">
+      <button type="button" className="kind-card" aria-pressed={kind === "all"} onClick={() => setKind("all")}>
+        <b>{t("locations.all")}</b>
+        <span className="small muted">{t("locations.watched_n", { n: cats.items.reduce((a, c) => a + c.watched, 0) })}</span>
+      </button>
+      {cats.items.map((c) =>
+        c.status === "live" ? (
+          <button key={c.name} type="button" className="kind-card" aria-pressed={kind === c.name} onClick={() => setKind(c.name)} data-testid={`kind-card-${c.name}`}>
+            <b>{pick(c.label, lang)}</b>
+            <span className="small muted">{t("locations.watched_n", { n: c.watched })}</span>
+          </button>
+        ) : (
+          <details key={c.name} className="kind-card planned" data-testid={`kind-card-${c.name}`}>
+            <summary>
+              <b>{pick(c.label, lang)}</b> <span className="pill closed">{t("locations.planned")}</span>
+            </summary>
+            <p className="small">{t("locations.custodians", { who: c.custodians })}</p>
+            <p className="small">{t("locations.boundary_from", { what: c.boundary_from })}</p>
+            <p className="small"><b>{t("locations.needs")}</b></p>
+            <ul className="small">{c.needs.map((n) => <li key={n}>{n}</li>)}</ul>
+          </details>
+        ),
+      )}
+    </section>
+  );
+}
+
+/** Whether the weekly screen watches this location, who changed it and why; the admin stops or resumes it. */
+function WatchControl({ assetId, p, onChanged }: { assetId: number; p: any; onChanged: () => void }) {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
+  const { user } = useAuth();
+  const hist = useAsync(() => api<{ items: any[] }>(`/assets/${assetId}/monitoring`), [assetId, p.monitored]);
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const [openIncidents, setOpenIncidents] = useState<number | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  useEffect(() => {
+    setOpen(false);
+    setReason("");
+    setMessage(null);
+  }, [assetId]);
+  useEffect(() => {
+    if (!open || !p.monitored) return;
+    api<{ items: any[] }>(`/alerts?asset_id=${assetId}`)
+      .then((r) => setOpenIncidents(r.items.filter((i) => ["OPEN", "UNDER_REVIEW"].includes(i.state)).length))
+      .catch(() => setOpenIncidents(null));
+  }, [open, assetId, p.monitored]);
+
+  const go = async () => {
+    setMessage(null);
+    try {
+      await api(`/assets/${assetId}/monitoring`, { json: { monitored: !p.monitored, reason } });
+      setOpen(false);
+      setReason("");
+      onChanged();
+    } catch (e) {
+      setMessage((e as Error).message);
+    }
+  };
+
+  return (
+    <section className="section panel" data-testid="watch-control">
+      <div className="person-head">
+        <h2 className="title-s">{t("locations.watch")}</h2>
+        {isAdmin(user) && !open && (
+          <button type="button" className={p.monitored ? "btn danger" : "btn"} onClick={() => setOpen(true)} data-testid="watch-toggle">
+            {p.monitored ? t("locations.stop") : t("locations.resume")}
+          </button>
+        )}
+      </div>
+      <p data-testid="watch-status">
+        {p.monitored ? t("locations.watched_since") : <b className="flag">{t("locations.stopped_since", { date: fmtDate(p.monitoring_changed_at, lang), reason: p.monitoring_reason })}</b>}
+        {p.added_by && <span className="small muted"> {t("locations.added_by", { name: p.added_by, date: fmtDate(p.added_at, lang) })}</span>}
+      </p>
+      {open && (
+        <div className="watch-form">
+          <p className="banner warn">{p.monitored ? t("locations.stop_warn", { n: openIncidents ?? "…" }) : t("locations.resume_warn")}</p>
+          <label className="field">{t("locations.reason")}
+            <textarea rows={2} value={reason} onChange={(e) => setReason(e.target.value)} data-testid="watch-reason" />
+          </label>
+          <div className="person-foot">
+            <button type="button" className={p.monitored ? "btn danger" : "btn"} disabled={reason.trim().length < 5} onClick={() => void go()} data-testid="watch-confirm">
+              {p.monitored ? t("locations.stop") : t("locations.resume")}
+            </button>
+            <button type="button" className="btn secondary" onClick={() => setOpen(false)}>{t("locations.cancel")}</button>
+          </div>
+        </div>
+      )}
+      {message && <p className="banner stop" role="alert">{message}</p>}
+      {!!hist.data?.items.length && (
+        <>
+          <h3 className="small" style={{ marginTop: "0.75rem" }}>{t("locations.history")}</h3>
+          <ul className="contract small" data-testid="watch-history">
+            {hist.data.items.map((h) => (
+              <li key={h.id}><b>{h.monitored ? t("locations.started") : t("locations.stopped")}</b>: {h.actor ?? t("role.system")}, {fmtDateTime(h.at, lang)}. {h.reason}</li>
+            ))}
+          </ul>
+        </>
+      )}
+    </section>
+  );
+}
 
 export function Assets() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
-  const { dataset } = useDataset();
+  const { dataset, setDataset } = useDataset();
+  const { user } = useAuth();
   const [params] = useSearchParams();
   const linked = params.get("asset");
   const [selected, setSelected] = useState<number | null>(linked ? Number(linked) : null);
@@ -23,7 +135,21 @@ export function Assets() {
     if (dataset !== firstDataset) setSelected(null);
   }, [dataset, firstDataset]);
   const { data, error, status, loading, reload } = useAsync(() => api<{ features: any[] }>(`/assets?dataset=${dataset}`), [dataset]);
-  const features = useMemo(() => (data?.features ?? []).filter((f) => f.properties.is_demo === (dataset === "demo")), [data, dataset]);
+  const cats = useAsync(() => api<Categories>(`/categories?dataset=${dataset}`), [dataset]);
+  const [kind, setKind] = useState("all");
+  const [showStopped, setShowStopped] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [added, setAdded] = useState<string | null>(null);
+  const all = useMemo(() => (data?.features ?? []).filter((f) => f.properties.is_demo === (dataset === "demo")), [data, dataset]);
+  const stopped = all.filter((f) => !f.properties.monitored).length;
+  const features = useMemo(
+    () => all.filter((f) => (kind === "all" || f.properties.category === kind) && (showStopped || f.properties.monitored || f.id === selected)),
+    [all, kind, showStopped, selected],
+  );
+  const labelOf = (category: string) => {
+    const c = cats.data?.items.find((x) => x.name === category);
+    return c ? pick(c.one, lang) : category;
+  };
   useDemoOnScreen(dataset === "demo" && features.length > 0);
   usePageTitle(t("assets.title"));
   const { data: versions } = useAsync(() => (selected ? api<{ features: any[] }>(`/assets/${selected}/boundaries`) : Promise.resolve(null)), [selected]);
@@ -41,14 +167,45 @@ export function Assets() {
     [versions, mapFc],
   );
 
+  const startAdding = () => {
+    if (dataset !== "real") setDataset("real");
+    setSelected(null);
+    setAdded(null);
+    setAdding(true);
+  };
+
   return (
     <div className="page">
       <div className="page-head">
         <div>
           <h1>{t("assets.title")}</h1>
-          <p className="muted" aria-hidden={!data}>{data ? features.length : " "}</p>
+          <p className="muted" aria-hidden={!data} data-testid="locations-count">{data ? t("locations.count", { n: all.length - stopped }) : " "}</p>
         </div>
+        {isAdmin(user) && !adding && <button type="button" className="btn" onClick={startAdding} data-testid="add-location-open">{t("locations.add")}</button>}
       </div>
+      {added && <p className="banner info" role="status" data-testid="added-message">{t("locations.added", { name: added })}</p>}
+      {adding && cats.data && dataset === "real" && (
+        <AddLocation
+          cats={cats.data}
+          context={mapFc}
+          onCancel={() => setAdding(false)}
+          onOpen={(id) => { setAdding(false); setShowStopped(true); setSelected(id); }}
+          onAdded={(id, name) => {
+            setAdding(false);
+            setAdded(name);
+            setKind("all");
+            setSelected(id);
+            reload();
+            cats.reload();
+          }}
+        />
+      )}
+      {cats.data && <KindsStrip cats={cats.data} kind={kind} setKind={setKind} />}
+      {stopped > 0 && (
+        <label className="small toggle-line">
+          <input type="checkbox" checked={showStopped} onChange={(e) => setShowStopped(e.target.checked)} data-testid="show-stopped" /> {t("locations.show_stopped", { n: stopped })}
+        </label>
+      )}
       {dataset === "real" && <p className="note" style={{ marginBottom: "1rem" }}>{t("assets.real_note")}</p>}
       {dataset === "real" && <ScreeningSummary />}
       <PageState loading={loading && !data} error={error} status={status} onRetry={reload} />
@@ -61,10 +218,11 @@ export function Assets() {
             const p = f.properties;
             return (
               <button key={f.id} className="row" style={{ width: "100%", border: 0, background: selected === f.id ? "#eef3f0" : "transparent", textAlign: "left" }} onClick={() => setSelected(f.id)}>
-                <span className="bar" style={{ background: "#1f6fa8" }} />
+                <span className="bar" style={{ background: !p.monitored ? "#9aa5a0" : p.category === "water_body" ? "#1f6fa8" : "#b08a3e" }} />
                 <span>
-                  <h3>{lang === "te" && p.name_te ? p.name_te : p.name} {p.is_demo && <DemoTag />}</h3>
+                  <h3>{lang === "te" && p.name_te ? p.name_te : p.name} {p.is_demo && <DemoTag />} {!p.monitored && <span className="pill closed">{t("locations.not_watched")}</span>}</h3>
                   <span className="meta">
+                    <span>{labelOf(p.category)}</span>
                     <span>{t(`cohort.${p.cohort}`)}</span>
                     <span>{t(`mode.${p.mode}`)}</span>
                     {p.area_acres !== null && <span>{t("assets.acres", { acres: p.area_acres })}</span>}
@@ -106,6 +264,9 @@ export function Assets() {
             </table>
           </TableRegion>
         </section>
+      )}
+      {selected && all.find((f) => f.id === selected) && (
+        <WatchControl assetId={selected} p={all.find((f) => f.id === selected)!.properties} onChanged={() => { reload(); cats.reload(); }} />
       )}
       {selected && <WeeklyRecord assetId={selected} />}
       {selected && <Documents assetId={selected} />}

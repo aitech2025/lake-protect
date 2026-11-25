@@ -12,12 +12,12 @@ boundary_days_ago: 400
 # Indian mobile numbers never start with 0. Areas decide who is notified (DECISIONS.md D-059);
 # each official also covers real districts, so the real lakes' incidents reach someone.
 users:
-  - {username: demo.admin,   name: Demo Admin,      role: admin, email: demo.admin@lakeprotect.invalid, channels: [in_app, email]}
+  - {username: demo.admin,   name: Demo Admin,      role: admin, email: demo.admin@geoguard.invalid, channels: [in_app, email]}
   - username: demo.viewer1
     name: Demo Official 1
     role: viewer
     language: te
-    email: demo.viewer1@lakeprotect.invalid
+    email: demo.viewer1@geoguard.invalid
     phone: "+910000000001"
     channels: [in_app, email, sms]
     areas:
@@ -27,7 +27,7 @@ users:
   - username: demo.viewer2
     name: Demo Official 2
     role: viewer
-    email: demo.viewer2@lakeprotect.invalid
+    email: demo.viewer2@geoguard.invalid
     phone: "+910000000002"
     channels: [in_app, email, whatsapp]
     areas:

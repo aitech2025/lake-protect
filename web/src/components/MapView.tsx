@@ -14,6 +14,10 @@ type Props = {
   fit?: [number, number, number, number] | null;
   height?: string;
   testId?: string;
+  /** Drawing an outline (D-061): the corners placed so far, whether it is closed, and a click handler. */
+  draft?: [number, number][];
+  draftClosed?: boolean;
+  onMapClick?: (lngLat: [number, number]) => void;
 };
 
 const EMPTY: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
@@ -76,9 +80,21 @@ function bboxOf(fcs: GeoJSON.FeatureCollection[]): [number, number, number, numb
   return Number.isFinite(w) ? [w, s, e, n] : null;
 }
 
-export function MapView({ base = "demo", boundaries = EMPTY, changes = EMPTY, pins = [], fit, height = "100%", testId }: Props) {
+function draftFc(points: [number, number][], closed: boolean): GeoJSON.FeatureCollection {
+  const features: GeoJSON.Feature[] = points.map((p) => ({ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: p } }));
+  if (points.length >= 3 && closed) {
+    features.push({ type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: [[...points, points[0]]] } });
+  } else if (points.length >= 2) {
+    features.push({ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: points } });
+  }
+  return { type: "FeatureCollection", features };
+}
+
+export function MapView({ base = "demo", boundaries = EMPTY, changes = EMPTY, pins = [], fit, height = "100%", testId, draft, draftClosed = false, onMapClick }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
+  const clickRef = useRef(onMapClick);
+  clickRef.current = onMapClick;
   const markers = useRef<maplibregl.Marker[]>([]);
   const loaded = useRef(false);
   const [generation, setGeneration] = useState(0);
@@ -101,9 +117,14 @@ export function MapView({ base = "demo", boundaries = EMPTY, changes = EMPTY, pi
       m.addLayer({ id: "primary-estimated", type: "line", source: "boundaries", filter: certaintyIs("estimated"), paint: { "line-color": "#1f6fa8", "line-width": 2.6, "line-dasharray": [0.6, 2] } });
       m.addLayer({ id: "change-fill", type: "fill", source: "changes", paint: { "fill-color": "#e0a526", "fill-opacity": 0.55 } });
       m.addLayer({ id: "change-line", type: "line", source: "changes", paint: { "line-color": "#7a4f05", "line-width": 1.6 } });
+      m.addSource("draft", { type: "geojson", data: EMPTY });
+      m.addLayer({ id: "draft-fill", type: "fill", source: "draft", filter: ["==", ["geometry-type"], "Polygon"], paint: { "fill-color": "#e0a526", "fill-opacity": 0.25 } });
+      m.addLayer({ id: "draft-line", type: "line", source: "draft", filter: ["!=", ["geometry-type"], "Point"], paint: { "line-color": "#e0a526", "line-width": 2.4 } });
+      m.addLayer({ id: "draft-points", type: "circle", source: "draft", filter: ["==", ["geometry-type"], "Point"], paint: { "circle-radius": 5, "circle-color": "#ffffff", "circle-stroke-color": "#7a4f05", "circle-stroke-width": 2 } });
       loaded.current = true;
       m.fire("lp:data");
     });
+    m.on("click", (e) => clickRef.current?.([Number(e.lngLat.lng.toFixed(6)), Number(e.lngLat.lat.toFixed(6))]));
     map.current = m;
     setGeneration((g) => g + 1);
     return () => {
@@ -128,6 +149,19 @@ export function MapView({ base = "demo", boundaries = EMPTY, changes = EMPTY, pi
     if (loaded.current) apply();
     else m.once("lp:data", apply);
   }, [boundaries, changes, fit, pins, generation]);
+
+  useEffect(() => {
+    const m = map.current;
+    if (!m) return;
+    const apply = () => {
+      (m.getSource("draft") as maplibregl.GeoJSONSource | undefined)?.setData(draftFc(draft ?? [], draftClosed) as never);
+      m.getCanvas().style.cursor = onMapClick ? "crosshair" : "";
+      if (onMapClick) m.doubleClickZoom.disable();
+      else m.doubleClickZoom.enable();
+    };
+    if (loaded.current) apply();
+    else m.once("lp:data", apply);
+  }, [draft, draftClosed, onMapClick, generation]);
 
   useEffect(() => {
     const m = map.current;

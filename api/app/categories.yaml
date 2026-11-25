@@ -1,0 +1,82 @@
+# Kinds of public land GeoGuard watches (DECISIONS.md D-061, docs/locations.md).
+#
+# A category groups asset types that share a custodian, a kind of legal boundary and a way of
+# reading change. `live` categories can be watched today. `planned` categories are listed so the
+# admin and the jury can see where the platform goes, but no location can be added to them until
+# each item in `needs` is done and the category is switched to live.
+#
+# To switch one on: set `status: live` here, finish its `needs`, and add a source connector for
+# its department's register (docs/asset-engine.md). The asset types are already in the database
+# (migration 0008), so no migration is needed.
+#
+# primary_kind: `ftl` for water bodies, whose boundary is the full tank level and gets a buffer
+# and a watch ring (CONTEXT.md section 4). `parcel` for land, which gets only the watch ring.
+
+categories:
+  water_body:
+    status: live
+    label: {en: "Lakes and water bodies", te: "చెరువులు, జలవనరులు"}
+    one: {en: "Lake or water body", te: "చెరువు లేదా జలవనరు"}
+    primary_kind: ftl
+    custodians: "Irrigation and CAD Department; HMDA Lake Protection Committee; HYDRAA"
+    boundary_from: "Full tank level (FTL) notification of the Lake Protection Committee, or an outline to watch until one exists"
+    watch_for: [soil_fill, levelling, building, clearing]
+    types: [lake]
+
+  government_land:
+    status: live
+    label: {en: "Government land", te: "ప్రభుత్వ భూమి"}
+    one: {en: "Government land parcel", te: "ప్రభుత్వ భూమి"}
+    primary_kind: parcel
+    custodians: "Revenue Department; land-owning agencies (HMDA, TGIIC and others); HYDRAA for recovered land"
+    boundary_from: "Survey sketch (FMB or tippan) and land record, an agency's survey, or a recovery order"
+    watch_for: [clearing, levelling, small_structure, building]
+    types: [revenue_parcel, agency_parcel, recovered_parcel]
+
+  endowment_land:
+    status: planned
+    label: {en: "Endowment land", te: "దేవాదాయ భూమి"}
+    one: {en: "Endowment land parcel", te: "దేవాదాయ భూమి"}
+    primary_kind: parcel
+    custodians: "Endowments Department"
+    boundary_from: "The institution's register of immovable property, with survey numbers"
+    watch_for: [clearing, levelling, small_structure, building]
+    types: [endowment_land]
+    needs:
+      - "The Endowments Department's register of lands, by survey number, as a file or an API"
+      - "A source connector for that register (docs/asset-engine.md)"
+      - "Leased and licensed land, so lawful use is not flagged (like permits for lakes)"
+      - "Officials of the department, with their areas, on the Officials page"
+
+  forest_land:
+    status: planned
+    label: {en: "Forest land", te: "అటవీ భూమి"}
+    one: {en: "Forest block", te: "అటవీ భూమి"}
+    primary_kind: parcel
+    custodians: "Forest Department"
+    boundary_from: "Notified forest block boundaries from the Forest Department"
+    watch_for: [clearing, levelling, building]
+    types: [forest_land]
+    needs:
+      - "Notified forest block boundaries from the Forest Department"
+      - "Detection rules tuned for dry deciduous forest, where leaf fall looks like clearing"
+      - "Approved diversions and felling permissions, so lawful work is not flagged"
+      - "A source connector, and the department's officials with their areas"
+
+# Labels of the asset types. A type belongs to exactly one category above.
+types:
+  lake: {en: "Lake or tank (cheruvu, kunta)", te: "చెరువు, కుంట"}
+  revenue_parcel: {en: "Revenue land (by survey number)", te: "రెవెన్యూ భూమి (సర్వే నంబరు)"}
+  agency_parcel: {en: "Agency land (surveyed)", te: "సంస్థ భూమి (సర్వే చేసినది)"}
+  recovered_parcel: {en: "Recovered land", te: "స్వాధీనం చేసుకున్న భూమి"}
+  endowment_land: {en: "Endowment land", te: "దేవాదాయ భూమి"}
+  forest_land: {en: "Forest land", te: "అటవీ భూమి"}
+
+# Limits for a location the admin adds by hand. Sentinel-2 sees 10 m pixels and the smallest change
+# it reports is 1,000 sq m (detect_rules.yaml), so a smaller location cannot be watched usefully.
+limits:
+  min_area_sq_m: 2000
+  max_area_sq_km: 50
+  # A new outline that overlaps a watched location this much (intersection over union) is the
+  # same place: add a boundary version to it instead.
+  same_place_iou: 0.5

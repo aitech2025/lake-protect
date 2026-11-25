@@ -195,6 +195,52 @@ Section 17.7's dashboard, scaled to two roles:
 - **Time in the demo.** Officials' steps in the demo move to 09:00 IST the next day. A seed run
   before 10:00 IST is dated now instead of 10:00, so nothing in it is dated in the future.
 
+### D-061: GeoGuard, kinds of land, and locations the admin adds or stops watching (owner, 25 Nov 2026)
+The owner asked for three things: rename the platform **GeoGuard**; cover government land, with
+endowment and forest land later; and let the admin add or remove a location to monitor. Built as
+M14 (`docs/locations.md`).
+
+- **Name.**
+  - The owner chose GeoGuard, the name of their own architecture drafts ("Telangana GeoGuard").
+    They were told GeoComply sells a product called GeoGuard (VPN and proxy detection). Check the
+    trademark before any public launch.
+  - The jury shortlisted the proposal as "Lake Protect", so present it as "GeoGuard (shortlisted as
+    Lake Protect)".
+  - The owner chose to rename only what people see before the jury: the desk, sign-in, titles,
+    emails, SMS templates, the monthly page, evidence packs and the docs.
+  - Code names stay until after the jury: the `lake_protect` package, `lp`, the `LP_` settings,
+    the Docker project and volumes, and the folder.
+  - Demo contacts move to `@geoguard.invalid`.
+- **Kinds of land** (`api/app/categories.yaml`):
+  - Each kind groups asset types and gives labels in English and Telugu, custodians, the boundary
+    source, the changes that matter, and the primary boundary kind (FTL with a buffer, or parcel).
+  - Lakes and water bodies, and government land (revenue, agency, recovered), are watched now.
+  - Endowment and forest land are **planned**. Their asset types are in the database (migration
+    0008), and the desk lists them greyed out with what each still needs. The API refuses them.
+  - Switching one on is a configuration change, once its needs are met.
+  - Detection and the legal check are the same for every kind. Forest needs its own tuning before
+    it goes live, because leaf fall looks like clearing.
+- **Adding a location** (admin, real data only, inside Telangana):
+  - The outline is drawn on the Sentinel-2 map or uploaded (GeoJSON or KML).
+  - **A drawn outline is "derived":** watch only, never field action (CONTEXT.md rule 2). A
+    confirmed status needs the reference of its notification, order or survey.
+  - Size limits are 2,000 sq m to 50 sq km.
+  - An outline that overlaps a watched location by half or more (intersection over union) is
+    refused. Add a boundary version to that location instead.
+  - The district is required, so routing by area (D-059) works.
+  - The baseline defaults to the policy cut-off.
+  - The location becomes an asset like any government record, and the next weekly screen includes
+    it.
+- **Removing is "stop watching", never deleting.**
+  - Boundaries are append-only, and a location's weeks, incidents, documents and packs are the
+    record.
+  - Stopping takes a reason and is reversible.
+  - A stopped location leaves the watchlist, and stops counting as watched on the overview, in the
+    digest and on the monthly page.
+  - Its open incidents stay open.
+  - Every start and stop is an append-only `monitoring_changes` row. The database lets
+    `assets.monitored` change only through one.
+
 ## Errors and gaps found in CONTEXT.md
 
 ### E-001: `boundaries` is append-only but has `valid_to` (section 7, invariant 12)

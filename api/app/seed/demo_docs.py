@@ -61,7 +61,7 @@ def documents_for(asset: dict, cohort: str, boundary_date: str, court_case: dict
     docs.append({"doc_type": "land_record", "title": "Record of Rights extract (land category, no names)", "reference": f"DEMO/ROR/{key.upper()}",
                  "issued_on": boundary_date, "issued_by": "Demo Revenue Office", "pdf": [
                  f"Survey numbers: {survey}", "Land category: government (tank bed and shikam).",
-                 "Owner names are not held in Lake Protect."]})
+                 "Owner names are not held in GeoGuard."]})
     if court_case:
         docs.append({"doc_type": "court_order", "title": f"Court case {court_case['case_no']}", "reference": court_case["case_no"],
                      "issued_on": None, "issued_by": court_case["court"], "pdf": None})

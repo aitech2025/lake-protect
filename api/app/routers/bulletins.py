@@ -47,7 +47,7 @@ def get_bulletin_pdf(month: str, dataset: Literal["demo", "real"] = "demo", user
     db.flush()
     chain.record(db, actor_id=user.id, action="export.bulletin_pdf", entity="bulletin", entity_id=month, details={"dataset": dataset, "bulletin_id": row.id})
     db.commit()
-    return Response(pdf, media_type="application/pdf", headers={"Content-Disposition": f'inline; filename="lake-protect-{month}.pdf"'})
+    return Response(pdf, media_type="application/pdf", headers={"Content-Disposition": f'inline; filename="geoguard-{month}.pdf"'})
 
 
 @router.get("")

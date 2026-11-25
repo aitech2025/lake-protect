@@ -50,7 +50,7 @@ All of this is fixed in place. Every component now carries a **Built**, **Pilot*
 
 ## Left for you to decide
 
-- **Name.** These pages say "Telangana GeoGuard"; the shortlisted proposal and the app say "Lake Protect". Pick one before the jury. Two names will read as two products. The pages were not renamed.
+- **Name.** These pages say "Telangana GeoGuard"; the shortlisted proposal and the app said "Lake Protect". Decided on 25 Nov 2026: the app is now GeoGuard (DECISIONS.md D-061). The proposal keeps its name, so present it as "GeoGuard (shortlisted as Lake Protect)".
 - **Proposal slide 26 claims more than the code has.** Its "Built and tested" box lists these four items; the code has less:
 
   | Claimed | What the code has |

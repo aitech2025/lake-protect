@@ -101,7 +101,10 @@ def compute(db: Session, month: str, *, demo: bool, now: dt.datetime | None = No
             })
     waiting.sort(key=lambda o: (-o["days_waiting"], o["code"]))
     watched = db.scalar(text(
-        "SELECT count(DISTINCT a.id) FROM assets a JOIN boundaries b ON b.asset_id = a.id WHERE a.is_demo = :demo AND b.valid_from < :cut"),
+        "SELECT count(DISTINCT a.id) FROM assets a JOIN boundaries b ON b.asset_id = a.id WHERE a.is_demo = :demo AND b.valid_from < :cut"
+        # Watched at the cut-off: the last start or stop before it (D-061); no row means watched.
+        " AND coalesce((SELECT m.monitored FROM monitoring_changes m WHERE m.asset_id = a.id AND m.at < :cut"
+        " ORDER BY m.at DESC, m.id DESC LIMIT 1), true)"),
         {"demo": demo, "cut": w.cutoff.date() + dt.timedelta(days=1)})
     by_state: dict[str, int] = {}
     for o in waiting:

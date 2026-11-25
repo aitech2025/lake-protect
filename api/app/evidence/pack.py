@@ -139,7 +139,7 @@ def build(db: Session, alert: Alert, user: User, at: dt.datetime | None = None) 
                  for h in history if h["action"] == "alert.transition"]
     files["records/history.json"] = (_json([dict(h) for h in history]), "derived", "Every logged step on this alert, with its audit hash")
     processing = {
-        "software": f"Lake Protect API {app_version}",
+        "software": f"GeoGuard API {app_version}",
         "detection_rules": cand.rule_version,
         "legal_rules": lc.rule_version if lc else None,
         "steps": [

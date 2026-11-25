@@ -41,7 +41,7 @@ STEPS: dict[tuple[str, str], tuple[str, str]] = {
 
 # The legal check's verdicts that close a change at once, and why.
 AUTO_CLOSE = {
-    AlertState.CLOSED_OUT_OF_SCOPE.value: "Outside the lake boundary, buffer and watch ring",
+    AlertState.CLOSED_OUT_OF_SCOPE.value: "Outside the boundary, buffer and watch ring",
     AlertState.CLOSED_LEGACY.value: "First changed on or before the baseline date: recorded, not an incident",
     AlertState.CLOSED_AUTHORISED.value: "Matches authorised works or a permit",
 }

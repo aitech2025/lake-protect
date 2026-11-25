@@ -1,4 +1,11 @@
-"""Assets and boundary versions (section 9.5)."""
+"""Assets and boundary versions (section 9.5), and the locations the admin adds or stops watching (D-061).
+
+- GET  /categories                    the kinds of land watched now and planned, with counts
+- POST /assets                        admin: add a location with its first boundary
+- POST /assets/outline-check          admin: area and overlap of an outline, before adding it
+- POST /assets/{id}/monitoring        admin: stop or resume the weekly watch, with a reason
+- GET  /assets/{id}/monitoring        who started or stopped the watch, when and why
+"""
 from __future__ import annotations
 
 import datetime as dt
@@ -9,13 +16,16 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app import categories
 from app.audit import chain
+from app.clock import utcnow
 from app.db import db_guard, get_db
 from app.enums import BoundaryStatus, Role
 from app.models import Asset, User
 from app.rules import config as rules
 from app.security import current_user, require_roles
 from app.services import boundaries as bsvc
+from app.services import locations as loc_svc
 from app.services import weeks as weeks_svc
 from app.storage import store
 
@@ -25,7 +35,10 @@ _LIST_SQL = text(
     """
     SELECT a.id, a.asset_key, a.name, a.name_te, a.type::text AS type, a.cohort::text AS cohort,
            a.district, a.mandal, a.village, a.survey_numbers, a.area_acres, a.custodian_agency,
-           a.has_cctv, a.baseline_date, a.is_demo, a.notes,
+           a.has_cctv, a.baseline_date, a.is_demo, a.notes, a.monitored, a.added_at,
+           (SELECT u.name FROM users u WHERE u.id = a.added_by) AS added_by,
+           (SELECT m.at FROM monitoring_changes m WHERE m.asset_id = a.id ORDER BY m.at DESC, m.id DESC LIMIT 1) AS monitoring_changed_at,
+           (SELECT m.reason FROM monitoring_changes m WHERE m.asset_id = a.id ORDER BY m.at DESC, m.id DESC LIMIT 1) AS monitoring_reason,
            b.id AS boundary_id, b.version AS boundary_version, b.kind::text AS boundary_kind,
            b.status::text AS boundary_status, b.source_name AS boundary_source,
            ST_AsGeoJSON(b.geom)::json AS geometry,
@@ -57,6 +70,7 @@ _LIST_SQL = text(
 def _feature(row: dict) -> dict:
     props = {k: v for k, v in row.items() if k != "geometry"}
     props["mode"] = rules.mode_for_cohort(row["cohort"]).value
+    props["category"] = categories.category_of(row["type"])
     props["boundary_confirmed"] = bool(row["boundary_status"]) and rules.is_confirmed_status(row["boundary_status"])
     props["area_acres"] = float(row["area_acres"]) if row["area_acres"] is not None else None
     return {"type": "Feature", "id": row["id"], "geometry": row["geometry"], "properties": props}
@@ -105,6 +119,96 @@ def list_boundaries(asset_id: int, user: User = Depends(current_user), db: Sessi
     chain.record(db, actor_id=user.id, action="view.boundaries", entity="asset", entity_id=asset_id)
     db.commit()
     return {"type": "FeatureCollection", "asset_id": asset_id, "features": features}
+
+
+@router.get("/categories")
+def list_categories(dataset: Literal["demo", "real"] | None = None, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """The kinds of land GeoGuard watches now, and those planned (app/categories.yaml)."""
+    return {"items": categories.as_list(loc_svc.counts_by_type(db, _demo_flag(dataset))), "limits": categories.limits(),
+            "policy_cutoff_date": rules.policy_cutoff_date().isoformat()}
+
+
+class OutlineIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    geometry: dict
+
+
+@router.post("/assets/outline-check")
+def outline_check(body: OutlineIn, user: User = Depends(require_roles(Role.admin)), db: Session = Depends(get_db)) -> dict:
+    """The outline's area, or why it cannot be watched, before the admin adds it."""
+    try:
+        out = loc_svc.check_outline(db, body.geometry)
+    except loc_svc.LocationError as exc:
+        return {"ok": False, "reason": str(exc), "asset_id": getattr(exc, "asset_id", None)}
+    return {"ok": True, **{k: v for k, v in out.items() if k != "nearest"}}
+
+
+class LocationIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    type: str
+    name: str
+    name_te: str | None = None
+    district: str
+    mandal: str | None = None
+    village: str | None = None
+    survey_numbers: list[str] = []
+    custodian_agency: str | None = None
+    baseline_date: dt.date | None = None
+    notes: str | None = None
+    geometry: dict
+    drawn: bool
+    status: BoundaryStatus
+    source_name: str
+    source_url: str | None = None
+    source_date: dt.date | None = None
+    notification_ref: str | None = None
+
+
+@router.post("/assets", status_code=201)
+def add_location(body: LocationIn, user: User = Depends(require_roles(Role.admin)), db: Session = Depends(get_db)) -> dict:
+    """A new location to watch, real data only. The next weekly screen includes it."""
+    with db_guard(db):
+        try:
+            with db.begin_nested():  # a refusal leaves nothing behind
+                asset = loc_svc.add_location(db, user, **body.model_dump(exclude={"status"}), status=body.status.value, at=utcnow())
+        except loc_svc.LocationError as exc:
+            detail = {"message": str(exc), "asset_id": exc.asset_id} if isinstance(exc, loc_svc.SamePlace) else str(exc)
+            raise HTTPException(exc.status_code, detail) from exc
+        db.commit()
+    row = db.execute(_LIST_SQL, {"area_user": None, "asset_id": asset.id, "demo": None}).mappings().first()
+    return _feature(dict(row))
+
+
+class MonitoringIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    monitored: bool
+    reason: str
+
+
+@router.post("/assets/{asset_id}/monitoring")
+def set_monitoring(asset_id: int, body: MonitoringIn, user: User = Depends(require_roles(Role.admin)), db: Session = Depends(get_db)) -> dict:
+    """Stop or resume the weekly watch. Nothing is deleted, and open incidents stay open."""
+    asset = db.get(Asset, asset_id)
+    if asset is None:
+        raise HTTPException(404, "Asset not found")
+    with db_guard(db):
+        try:
+            with db.begin_nested():
+                out = loc_svc.set_monitoring(db, user, asset, monitored=body.monitored, reason=body.reason, at=utcnow())
+        except loc_svc.LocationError as exc:
+            raise HTTPException(exc.status_code, str(exc)) from exc
+        db.commit()
+    return out
+
+
+@router.get("/assets/{asset_id}/monitoring")
+def monitoring_history(asset_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    if db.get(Asset, asset_id) is None:
+        raise HTTPException(404, "Asset not found")
+    items = loc_svc.history(db, asset_id)
+    chain.record(db, actor_id=user.id, action="view.monitoring", entity="asset", entity_id=asset_id, details={"count": len(items)})
+    db.commit()
+    return {"asset_id": asset_id, "items": items}
 
 
 class BoundaryIn(BaseModel):

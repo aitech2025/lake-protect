@@ -23,7 +23,7 @@ CHANGE_TE = {
     "other": "ఇతర మార్పు",
 }
 ZONE_TE = {
-    "inside_ftl": "చెరువు హద్దు లోపల",
+    "inside_ftl": "హద్దు లోపల",
     "buffer": "బఫర్ జోన్‌లో",
     "watch_ring": "100 మీ. పరిశీలన వలయంలో",
     "outside": "పరిశీలన పరిధి బయట",
@@ -53,7 +53,7 @@ TEXT = {
         "digest.scope": "Week {week} ({dates}), {scope}.",
         "digest.scope_all": "all areas",
         "digest.scope_areas": "your area: {areas}",
-        "digest.watched": "{watched} lakes and parcels watched: {clear} seen clearly, {no_clear} without a clear look.",
+        "digest.watched": "{watched} locations watched: {clear} seen clearly, {no_clear} without a clear look.",
         "digest.no_clear": "No clear look this week: {names}.",
         "digest.changes": "Changes found this week:",
         "digest.change": "- {asset}: {change} of about {area_sq_m:,.0f} sq m, incident {code}{continues}",
@@ -85,7 +85,7 @@ TEXT = {
         "digest.scope": "వారం {week} ({dates}), {scope}.",
         "digest.scope_all": "అన్ని ప్రాంతాలు",
         "digest.scope_areas": "మీ ప్రాంతం: {areas}",
-        "digest.watched": "{watched} చెరువులు, స్థలాలు పరిశీలనలో: {clear} స్పష్టంగా కనిపించాయి, {no_clear} స్పష్టంగా కనిపించలేదు.",
+        "digest.watched": "{watched} ప్రదేశాలు పరిశీలనలో: {clear} స్పష్టంగా కనిపించాయి, {no_clear} స్పష్టంగా కనిపించలేదు.",
         "digest.no_clear": "ఈ వారం స్పష్టమైన చిత్రం లేదు: {names}.",
         "digest.changes": "ఈ వారం కనిపించిన మార్పులు:",
         "digest.change": "- {asset}: సుమారు {area_sq_m:,.0f} చ.మీ. {change}, సంఘటన {code}{continues}",

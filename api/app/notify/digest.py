@@ -34,7 +34,7 @@ def build(db: Session, user: User, week: str, is_demo: bool, at: dt.datetime) ->
         return None
     scope = routing.scope_sql(user)
     params = {"demo": is_demo, "week": week}
-    assets = db.execute(text(f"SELECT a.id, a.name, a.name_te FROM assets a WHERE a.is_demo = :demo AND {scope} ORDER BY a.name"), params).mappings().all()
+    assets = db.execute(text(f"SELECT a.id, a.name, a.name_te FROM assets a WHERE a.is_demo = :demo AND a.monitored AND {scope} ORDER BY a.name"), params).mappings().all()
     ids = [a["id"] for a in assets] or [0]
     screens = {
         r["asset_id"]: r

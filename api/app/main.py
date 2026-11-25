@@ -1,4 +1,4 @@
-"""Lake Protect API."""
+"""GeoGuard API (formerly Lake Protect; DECISIONS.md D-061)."""
 from fastapi import Depends, FastAPI
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -21,7 +21,7 @@ from app.routers import (
     users,
 )
 
-app = FastAPI(title="Lake Protect API", version="0.1.0")
+app = FastAPI(title="GeoGuard API", version="0.1.0")
 for module in (auth, assets, candidates, pipeline, alerts, records, sources, documents, audit, users, tiles, bulletins, notifications, dashboard):
     app.include_router(module.router)
 

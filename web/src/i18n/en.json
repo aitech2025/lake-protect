@@ -1,11 +1,11 @@
 {
   "app": {
-    "name": "Lake Protect",
-    "tagline": "Weekly screening of lakes and recovered land"
+    "name": "GeoGuard",
+    "tagline": "Weekly satellite watch over lakes and government land"
   },
   "nav": {
     "queue": "Incidents",
-    "assets": "Assets",
+    "assets": "Locations",
     "records": "Records",
     "audit": "Audit",
     "monthly": "Monthly page",
@@ -28,7 +28,7 @@
     "intro": "Each account is fictional. The admin runs the application; officials see everything and record reviews.",
     "role": {
       "admin": "Runs the application: sources, documents and decisions on incidents",
-      "viewer": "Sees every lake, week and incident, and records reviews"
+      "viewer": "Sees every location, week and incident, and records reviews"
     }
   },
   "role": {
@@ -169,7 +169,7 @@
     "acres": "{{acres}} acre",
     "reopened": "Reopened",
     "cohort": "Asset group",
-    "empty_real": "No change on a real lake yet. The Assets page shows each lake week by week.",
+    "empty_real": "No change on a real location yet. The Locations page shows each one week by week.",
     "what_changed": "What changed",
     "state": "State",
     "first_seen": "First seen {{date}}",
@@ -179,7 +179,7 @@
     "seen_again": "Seen again",
     "linked": "From the overview:",
     "linked_week": "new in {{week}}",
-    "linked_asset": "one lake or parcel",
+    "linked_asset": "one location",
     "linked_clear": "Show all incidents"
   },
   "detail": {
@@ -203,7 +203,7 @@
     "court": "Court register",
     "none_found": "None found",
     "matched": "Matched record {{id}}",
-    "permit_conflict": "A permit overlaps the lake or buffer. A permit here does not close the alert.",
+    "permit_conflict": "A permit overlaps the boundary or buffer. A permit here does not close the alert.",
     "live_court": "Live court matter {{id}}",
     "rule_version": "Rules {{v}}",
     "actions_title": "Next step",
@@ -266,17 +266,17 @@
     "unset": "Not recorded"
   },
   "assets": {
-    "title": "Assets",
+    "title": "Locations",
     "dataset_demo": "Demo world",
     "dataset_real": "Real lakes (OpenStreetMap)",
-    "real_note": "Real lakes use OpenStreetMap outlines. They are estimates for watching only, never for field action. Every lake is screened from Sentinel-2 satellite images.",
+    "real_note": "The real lakes use OpenStreetMap outlines, and outlines drawn by the admin are estimates too: for watching only, never for field action. Every watched location is screened from Sentinel-2 satellite images each week.",
     "versions": "Boundary versions",
     "source": "Source",
     "valid": "In force from {{from}}",
     "until": "until {{to}}",
     "in_force": "In force",
     "superseded": "Replaced",
-    "baseline": "Watching since {{date}}",
+    "baseline": "Changes count from {{date}}",
     "acres": "{{acres}} acres",
     "register": "Where this record comes from",
     "no_links": "Not linked to any government source yet.",
@@ -417,14 +417,14 @@
     "whole": "Whole month.",
     "to_date": "Month to date, as of {{date}}.",
     "compared": "Compared with {{month}}.",
-    "watched": "lakes and parcels watched",
+    "watched": "locations watched",
     "new_alerts": "new incidents",
     "verified": "seen on site",
     "action_taken": "officer actions recorded",
     "overdue": "overdue",
     "was": "{{n}} in {{month}}",
     "was_end": "{{n}} at the end of {{month}}",
-    "map_legend": "Blue: lakes. Beige: recovered parcels. Amber dot: new incident this month. Red ring: waiting over {{days}} days for a decision.",
+    "map_legend": "Blue: lakes and water bodies. Beige: government land. Amber dot: new incident this month. Red ring: waiting over {{days}} days for a decision.",
     "by_who": "Overdue, by who must act",
     "list": "Waiting over {{days}} days for a decision",
     "days_late": "{{n}} days late",
@@ -432,7 +432,7 @@
     "print": "Print one page",
     "source": "Every figure comes from the system's records with no hand edits.",
     "dataset_demo": "Demo world",
-    "dataset_real": "Real lakes",
+    "dataset_real": "Real data",
     "reviewed": "reviewed by officials",
     "confirmed": "confirmed as real changes",
     "waiting": "waiting over {{days}} days",
@@ -458,14 +458,14 @@
   },
   "dataset": {
     "label": "Showing",
-    "real": "Hyderabad lakes (real data)",
+    "real": "Telangana (real data)",
     "demo": "Demo world (fictional)"
   },
   "screen": {
     "title": "Screen from space, as of {{date}}",
-    "assets": "{{count}} lakes watched",
+    "assets": "{{count}} locations watched",
     "looks": "{{count}} clear looks used",
-    "seen": "{{count}} lakes seen clearly",
+    "seen": "{{count}} locations seen clearly",
     "with_candidates": "{{count}} with a candidate change",
     "unseen": "{{count}} not seen clearly, so no finding for them",
     "source": "Sentinel-2 L2A, rules {{rule}}",
@@ -674,20 +674,20 @@
     "my_area": "My area",
     "path": "Where you are",
     "not_recorded": "Area not recorded",
-    "area_source": "Districts and mandals of the real lakes come from OpenStreetMap boundaries, not the revenue record.",
+    "area_source": "Districts and mandals of the OpenStreetMap lakes come from OpenStreetMap boundaries, not the revenue record.",
     "boundary": "{{n}} of {{total}} with a confirmed boundary",
     "no_clear_look": "{{n}} without a clear look",
     "ack_none": "No notifications to officials in the last 30 days",
     "ack_of": "{{n}} of {{total}} in the last 30 days",
-    "empty": "No lakes or parcels here.",
+    "empty": "No watched locations here.",
     "trend_title": "The last weeks",
     "trend": {
-      "changed": "Lakes and parcels with a change",
+      "changed": "Locations with a change",
       "new_incidents": "New incidents"
     },
     "as_table": "Show as a table",
     "figure": {
-      "assets": "lakes and parcels watched",
+      "assets": "locations watched",
       "clear_look": "seen clearly this week",
       "changed": "with a change this week",
       "new_incidents": "new incidents this week",
@@ -708,13 +708,13 @@
       "district": "District",
       "mandal": "Mandal",
       "village": "Village",
-      "asset": "Lake or parcel"
+      "asset": "Location"
     },
     "by": {
       "district": "By district",
       "mandal": "By mandal",
       "village": "By village",
-      "asset": "Lakes and parcels"
+      "asset": "Locations"
     },
     "col": {
       "status": "Now",
@@ -727,7 +727,10 @@
       "waiting": "Over 14 days",
       "confirmed": "Confirmed",
       "week": "Week"
-    }
+    },
+    "by_category": "Watched, by kind of land",
+    "planned": "planned",
+    "not_watched": "no longer watched"
   },
   "inbox": {
     "title": "Inbox",
@@ -809,5 +812,68 @@
       "ack": "Acknowledged"
     },
     "digest_already": "Digest for {{week}}: already sent to everyone."
+  },
+  "locations": {
+    "count": "{{n}} watched",
+    "show_stopped": "Show locations no longer watched ({{n}})",
+    "all": "All kinds",
+    "what": "What GeoGuard watches",
+    "live": "Watched now",
+    "planned": "Planned",
+    "watched_n": "{{n}} watched",
+    "needs": "Still needed before it can be watched",
+    "custodians": "Custodians: {{who}}",
+    "boundary_from": "Boundary from: {{what}}",
+    "add": "Add a location",
+    "add_title": "Add a location to watch",
+    "add_lede": "It joins the weekly screen from the next run. Locations are added to the real data, inside Telangana.",
+    "cancel": "Cancel",
+    "kind": "Kind of land",
+    "type": "Type",
+    "name": "Name (English)",
+    "name_te": "Name in Telugu (optional)",
+    "district": "District",
+    "mandal": "Mandal (optional)",
+    "village": "Village (optional)",
+    "survey_numbers": "Survey numbers (optional, separated by commas)",
+    "custodian": "Custodian department (optional)",
+    "baseline": "Baseline date",
+    "baseline_help": "Changes first seen on or before this date are recorded as older changes and never open an incident.",
+    "notes": "Notes (optional)",
+    "outline": "Outline",
+    "draw": "Draw on the map",
+    "upload": "Upload a file",
+    "draw_help": "Click the map to place each corner, then Finish. The satellite base map covers Hyderabad; for elsewhere, upload a file.",
+    "undo": "Undo last corner",
+    "clear": "Start again",
+    "finish": "Finish outline",
+    "points": "{{n}} corners",
+    "upload_help": "A GeoJSON or KML file with the outline as a polygon, in longitude and latitude (WGS 84).",
+    "file_bad": "No outline could be read from this file: {{why}}",
+    "area": "{{sqm}} sq m ({{acres}} acres)",
+    "checking": "Checking the outline…",
+    "source_name": "Where the outline comes from",
+    "status": "Boundary status",
+    "status_drawn": "Estimated. An outline drawn on the screen is for watching only: its changes go to the watch list and never lead to field action.",
+    "notification_ref": "Reference of the notification, order or survey",
+    "notification_ref_help": "Needed for a confirmed boundary.",
+    "source_date": "Date of the source (optional)",
+    "source_url": "Link to the source (optional)",
+    "submit": "Start watching",
+    "added": "{{name}} is added. The next weekly screen includes it.",
+    "same_place": "Open the location already watched",
+    "watch": "Weekly watch",
+    "watched_since": "Watched every week.",
+    "stopped_since": "Not watched since {{date}}: {{reason}}",
+    "added_by": "Added by {{name}} on {{date}}.",
+    "stop": "Stop watching",
+    "resume": "Watch again",
+    "reason": "Reason (kept in the record)",
+    "stop_warn": "The weekly screen leaves it out from the next run. Nothing is deleted: its boundaries, weeks, incidents and documents stay. Open incidents still need a decision: {{n}}.",
+    "resume_warn": "The weekly screen includes it again from the next run.",
+    "history": "Started and stopped",
+    "started": "Watching started",
+    "stopped": "Watching stopped",
+    "not_watched": "Not watched"
   }
 }

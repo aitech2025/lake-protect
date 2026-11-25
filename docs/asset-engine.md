@@ -140,7 +140,7 @@ The samples are not loaded into the development database. They sit about 15 km f
 2. If the department's field names differ from the contract, change only that connector's mapping, and add a test with a small fixture.
 3. Preview, read the conflicts and refusals with the boundary desk, then apply.
 
-The API transport accepts only CSV and GeoJSON. It stops on an HTML page, because Lake Protect does not read portal pages.
+The API transport accepts only CSV and GeoJSON. It stops on an HTML page, because GeoGuard does not read portal pages.
 
 ## 6. Tests
 

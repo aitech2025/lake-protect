@@ -104,6 +104,10 @@ export function Dashboard() {
       {data && f && !error && (
         <>
           <FigureRow f={f} area={data.filters} week={data.week} />
+          <p className="small by-kind" data-testid="by-category">
+            <b>{t("dashboard.by_category")}:</b>{" "}
+            {data.by_category.map((c) => `${lang === "te" ? c.label.te : c.label.en} ${c.status === "live" ? c.watched : `(${t("dashboard.planned")})`}`).join(" · ")}
+          </p>
           {data.area_source && <p className="small muted" style={{ marginBottom: "0.75rem" }}>{t("dashboard.area_source")}</p>}
           <div className="dash-grid">
             <div className="mapbox" style={{ height: 360 }}>
@@ -259,6 +263,7 @@ function Children({ data, onOpen }: { data: Overview; onOpen: (row: DashRow) => 
                   <td>
                     <button className="btn quiet" onClick={() => onOpen(row)}>{name}</button>
                     {row.kind === "asset" && row.week_status && <div className="small muted">{t(`weeks.status.${row.week_status}`)}</div>}
+                    {row.kind === "asset" && row.monitored === false && <div className="small flag">{t("dashboard.not_watched")}</div>}
                   </td>
                   <td><span className="tone" style={{ borderColor: TONE[row.tone].colour }}><i style={{ color: TONE[row.tone].colour }} aria-hidden="true">{TONE[row.tone].mark}</i>{t(`dashboard.tone.${row.tone}`)}</span></td>
                   {cols.map((c) => {

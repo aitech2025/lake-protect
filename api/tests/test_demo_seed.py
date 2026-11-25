@@ -157,7 +157,7 @@ def _notifications(db, seeded, isolated_storage):
     assert not {k for k in latest if k.endswith(":queued")}
     sent = db.scalar(select(NotificationDelivery).where(NotificationDelivery.status == "sent", NotificationDelivery.channel == "email"))
     key = sent.detail.split(": ", 1)[1]
-    assert isolated_storage.get_object(key).startswith(b"From: Lake Protect")
+    assert isolated_storage.get_object(key).startswith(b"From: GeoGuard")
     assert all(n.is_demo for n in db.scalars(select(Notification)))
 
 

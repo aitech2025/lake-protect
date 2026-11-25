@@ -24,15 +24,15 @@ sms:
   templates:
     incident_opened:
       dlt_template_id: null
-      text: "Lake Protect: new incident {#var#} at {#var#}: {#var#}. Please review and acknowledge: {#var#}"
+      text: "GeoGuard: new incident {#var#} at {#var#}: {#var#}. Please review and acknowledge: {#var#}"
       vars: [code, asset, change_label, link]
     reminder:
       dlt_template_id: null
-      text: "Lake Protect reminder: incident {#var#} at {#var#} is waiting for you. {#var#}"
+      text: "GeoGuard reminder: incident {#var#} at {#var#} is waiting for you. {#var#}"
       vars: [code, asset, link]
     not_acknowledged:
       dlt_template_id: null
-      text: "Lake Protect: {#var#} has not acknowledged incident {#var#} at {#var#} in 48 hours. {#var#}"
+      text: "GeoGuard: {#var#} has not acknowledged incident {#var#} at {#var#} in 48 hours. {#var#}"
       vars: [official, code, asset, link]
 
 whatsapp:

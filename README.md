@@ -1,12 +1,16 @@
-# Lake Protect (working name)
+# GeoGuard
 
-Prototype of a monitoring loop for Telangana's lakes and government land. `CONTEXT.md` is the
+Formerly Lake Protect, the name the TISC 2026 jury shortlisted. The code, the `lp` command, the `LP_`
+settings and the Docker project keep the old name for now (DECISIONS.md D-061).
+
+Prototype of a monitoring loop for Telangana's lakes and government land, with endowment and forest
+land planned. `CONTEXT.md` is the
 source of truth. `PROGRESS.md` shows what is built and what comes next. `DECISIONS.md` records every
 choice that departs from, or fills a gap in, `CONTEXT.md`.
 
 Two worlds, never mixed on one screen (switch in the desk's side bar):
 
-- **Hyderabad lakes (real data):** 99 lakes up to the ORR, outlines from OpenStreetMap, screened from
+- **Telangana (real data):** 99 lakes up to the ORR, outlines from OpenStreetMap, screened from
   Sentinel-2 (and Sentinel-1 radar for built-up) by `lp screen`. Real alerts stop at the watch list,
   because no official boundary is loaded yet (DECISIONS.md D-048).
 - **Demo world (fictional):** the full loop to an officer, on invented places (`is_demo`, marked on
@@ -42,6 +46,12 @@ lake. Each official is notified about incidents in their own area:
 
 The `notifier` service sends reminders after 24 hours and tells the admin after 48. The admin
 manages areas and channels on the **Officials** page. Design: [docs/downstream.md](docs/downstream.md).
+
+**Locations.** The admin adds a location on the **Locations** page, by drawing it on the satellite
+map or uploading a GeoJSON or KML file. The next weekly screen includes it. Removing a location means
+**Stop watching**, with a reason: nothing is deleted, and it can be watched again. The kinds of land
+watched now and planned are listed in `api/app/categories.yaml`. Design:
+[docs/locations.md](docs/locations.md).
 
 The demo script is in [docs/DEMO.md](docs/DEMO.md). After the first build the laptop needs no
 internet: tiles, image pairs, fonts and the app are all local.

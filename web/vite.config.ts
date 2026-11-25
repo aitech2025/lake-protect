@@ -12,8 +12,8 @@ export default defineConfig({
       injectRegister: "auto",
       includeAssets: ["favicon.svg"],
       manifest: {
-        name: "Lake Protect",
-        short_name: "Lake Protect",
+        name: "GeoGuard",
+        short_name: "GeoGuard",
         start_url: "/alerts",
         scope: "/",
         display: "standalone",

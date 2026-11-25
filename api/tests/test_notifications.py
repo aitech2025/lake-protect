@@ -21,8 +21,8 @@ H = dt.timedelta(hours=1)
 
 @pytest.fixture()
 def w(db):
-    admin = make_user(db, "admin", email="admin@lakeprotect.invalid")
-    north = make_user(db, "viewer", email="north@lakeprotect.invalid", phone="+910000000011", channels=["in_app", "email", "sms", "whatsapp"])
+    admin = make_user(db, "admin", email="admin@geoguard.invalid")
+    north = make_user(db, "viewer", email="north@geoguard.invalid", phone="+910000000011", channels=["in_app", "email", "sms", "whatsapp"])
     south = make_user(db, "viewer", language="te")
     idle = make_user(db, "viewer")  # covers no area
     cover(db, north, "North")
@@ -158,7 +158,7 @@ def test_email_goes_to_the_outbox_and_sms_and_whatsapp_are_held_without_a_gatewa
     n = notes_for(db, a.id)[w.north.id]
     counts = service.send_pending(db, T0 + H)
     latest = {d["channel"]: d for d in service.deliveries_for(db, [n.id])[n.id]}
-    assert latest["email"]["status"] == "sent" and latest["email"]["to_masked"] == "n***@lakeprotect.invalid"
+    assert latest["email"]["status"] == "sent" and latest["email"]["to_masked"] == "n***@geoguard.invalid"
     assert latest["sms"]["status"] == "held" and "No SMS gateway agreement" in latest["sms"]["detail"]
     assert latest["whatsapp"]["status"] == "held"
     assert latest["sms"]["to_masked"] == "+91******0011"
@@ -218,7 +218,7 @@ def test_a_set_up_sms_gateway_gets_the_registered_template(db, w, monkeypatch):
     result = channels.send("sms", real, w.north)
     assert result.status == "sent"
     assert sent["json"]["template_id"] == "T-reminder" and sent["json"]["sender"] == "LKPRTC"
-    assert sent["json"]["text"].startswith(f"Lake Protect reminder: incident {a.code} at ")
+    assert sent["json"]["text"].startswith(f"GeoGuard reminder: incident {a.code} at ")
     assert sent["headers"]["Authorization"] == "Bearer secret"
     assert channels.send("sms", notes_for(db, a.id)[w.north.id], w.north).detail == channels.DEMO_STAYS
 
@@ -295,10 +295,10 @@ def test_the_admin_sets_contacts_channels_and_areas(client, db, w):
     assert client.get("/users", headers=auth(w.north)).status_code == 403
     users = {u["id"]: u for u in client.get("/users", headers=auth(w.admin)).json()}
     assert users[w.north.id]["areas"] == [{"district": "North", "mandal": None}]
-    assert users[w.north.id]["email"] == "north@lakeprotect.invalid"
+    assert users[w.north.id]["email"] == "north@geoguard.invalid"
     for bad in ({"email": "not-an-email"}, {"phone": "98765"}, {"channels": ["email"]}, {"clear": ["name"]}):
         assert client.patch(f"/users/{w.idle.id}", json=bad, headers=auth(w.admin)).status_code == 422
-    out = client.patch(f"/users/{w.idle.id}", json={"email": "idle@lakeprotect.invalid", "channels": ["whatsapp", "in_app"]}, headers=auth(w.admin)).json()
+    out = client.patch(f"/users/{w.idle.id}", json={"email": "idle@geoguard.invalid", "channels": ["whatsapp", "in_app"]}, headers=auth(w.admin)).json()
     assert out["channels"] == ["in_app", "whatsapp"]
     audit = db.scalar(select(AuditLog).where(AuditLog.action == "user.contact_changed").order_by(AuditLog.id.desc()))
     assert audit.details["fields"] == ["email", "channels"] and "idle@" not in str(audit.details)

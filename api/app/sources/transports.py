@@ -6,7 +6,7 @@
   loaded this way is demo data.
 - `api`: a template for the official data-exchange API that a data-sharing agreement would name.
   It refuses to run without an agreement reference, an endpoint and a credential, and it refuses
-  HTML: Lake Protect reads files and APIs that a department gives it, never portal pages.
+  HTML: GeoGuard reads files and APIs that a department gives it, never portal pages.
 """
 from __future__ import annotations
 
@@ -128,7 +128,7 @@ class OfficialApiTransport:
                 ctype = resp.headers.get("content-type", "").split(";")[0].strip().lower()
                 if ctype == "text/html":
                     raise SourceError(
-                        f"{connector.name}: {spec.dataset} returned a web page. Lake Protect does not read "
+                        f"{connector.name}: {spec.dataset} returned a web page. GeoGuard does not read "
                         "portal pages; it needs the data file the agreement describes."
                     )
                 if ctype not in _ACCEPTED_TYPES:

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "lake-protect"
 version = "0.1.0"
-description = "Lake Protect detection pipeline and pack verifier"
+description = "GeoGuard detection pipeline and pack verifier"
 requires-python = ">=3.11"
 # Base install stays light: `lp verify-pack` needs only these and is also used inside the API image.
 dependencies = ["typer>=0.12,<1"]

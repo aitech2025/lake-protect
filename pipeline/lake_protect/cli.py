@@ -1,12 +1,12 @@
 """`lp` command line. Heavy geospatial imports stay inside each command."""
 import typer
 
-app = typer.Typer(help="Lake Protect pipeline commands.", no_args_is_help=True)
+app = typer.Typer(help="GeoGuard pipeline commands (package name lake_protect kept, D-061).", no_args_is_help=True)
 
 
 @app.callback()
 def main() -> None:
-    """Lake Protect pipeline commands."""
+    """GeoGuard pipeline commands."""
 
 
 @app.command()
@@ -131,7 +131,7 @@ def detect(
 
 @app.command()
 def screen(
-    api: str = typer.Option("http://localhost:8100", envvar="LP_API_URL", help="Lake Protect API."),
+    api: str = typer.Option("http://localhost:8100", envvar="LP_API_URL", help="GeoGuard API."),
     token: str = typer.Option(..., envvar="LP_PIPELINE_TOKEN", help="Pipeline token (LP_PIPELINE_TOKEN)."),
     as_of: str = typer.Option(None, help="Use only scenes acquired on or before this date (default: today)."),
     asset: list[str] = typer.Option(None, "--asset", help="Limit to these asset_keys."),

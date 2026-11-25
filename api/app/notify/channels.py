@@ -65,8 +65,8 @@ def email_message(note: Notification, user: User) -> EmailMessage:
     msg["To"] = user.email
     msg["Subject"] = ("[DEMO] " if note.is_demo else "") + note.subject
     msg["Date"] = format_datetime(note.created_at)
-    msg["Message-ID"] = make_msgid(idstring=f"lp-notification-{note.id}", domain="lakeprotect.invalid")
-    footer = "\n\n--\nLake Protect. Imagery shows physical change. It does not establish title or legality."
+    msg["Message-ID"] = make_msgid(idstring=f"lp-notification-{note.id}", domain="geoguard.invalid")
+    footer = "\n\n--\nGeoGuard. Imagery shows physical change. It does not establish title or legality."
     if note.is_demo:
         footer += "\nDemo data: every place, name and incident in this message is fictional."
     msg.set_content(note.body + footer)

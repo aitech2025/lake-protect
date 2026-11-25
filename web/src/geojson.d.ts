@@ -5,6 +5,14 @@ declare namespace GeoJSON {
     type: string;
     coordinates: unknown;
   }
+  interface Polygon extends Geometry {
+    type: "Polygon";
+    coordinates: Position[][];
+  }
+  interface MultiPolygon extends Geometry {
+    type: "MultiPolygon";
+    coordinates: Position[][][];
+  }
   interface Feature {
     type: "Feature";
     geometry: Geometry;

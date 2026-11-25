@@ -106,3 +106,20 @@ def test_every_number_opens_the_same_incidents(client, db, d, monkeypatch):
         assert waiting == child["figures"]["waiting"], child["name"]
     assert client.get("/dashboard?dataset=demo&mandal=Mandal A", headers=auth(d.official)).status_code == 422
     assert client.get("/dashboard?dataset=demo&district=North&mandal=Mandal A", headers=auth(d.admin)).json()["level"] == "mandal"
+
+
+def test_a_stopped_location_no_longer_counts_as_watched_but_its_incidents_still_show(db, d):
+    from app.models import MonitoringChange
+
+    for asset in (d.a.v1, d.a.x):  # v1 has an incident waiting; x has none
+        db.add(MonitoringChange(asset_id=asset.id, monitored=False, reason="Test stop", actor_id=d.admin.id))
+    db.flush()
+    out = view(db, d.official)
+    f = out["figures"]
+    assert f["assets"] == 3 and f["no_clear_look"] == 0 and f["changed"] == 0
+    assert f["open"] == 1 and f["waiting"] == 1  # the incident on v1 still needs a decision
+    assert [c["name"] for c in out["children"]] == ["North", "South"]  # x had nothing left to show
+    rows = {c["name"]: c for c in view(db, d.official, district="North", mandal="Mandal A")["children"]}
+    v1 = view(db, d.official, district="North", mandal="Mandal A", village="Village 1")["children"][0]
+    assert v1["monitored"] is False and v1["category"] == "water_body" and rows["Village 1"]["figures"]["assets"] == 0
+    assert {c["name"]: c["watched"] for c in out["by_category"]} == {"water_body": 3, "government_land": 0, "endowment_land": 0, "forest_land": 0}

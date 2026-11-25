@@ -72,7 +72,7 @@ None of them publishes its method. Each warns, directly or in its guides, that i
 
 **What we copy, and what we do not.**
 
-| | Private apps | Lake Protect |
+| | Private apps | GeoGuard |
 |---|---|---|
 | Pipeline | Gather, georeference, key by survey number, join records, point-in-polygon | **Same pipeline** |
 | Source | Portal views, certified copies, old scans | **The State's own files**, under a data-sharing order, because the State is our client |

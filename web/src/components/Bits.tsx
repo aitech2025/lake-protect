@@ -83,7 +83,7 @@ export function LineSwatch({ colour, dash }: { colour: string; dash?: string }) 
   );
 }
 
-/** Sets the browser tab title for a page, "<page> · Lake Protect", so each route is identifiable (UI audit A4). */
+/** Sets the browser tab title for a page, "<page> · GeoGuard", so each route is identifiable (UI audit A4). */
 export function usePageTitle(title: string | null | undefined): void {
   const { t } = useTranslation();
   const app = t("app.name");

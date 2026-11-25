@@ -133,6 +133,7 @@ export type Tone = "waiting" | "open" | "changed" | "no_look" | "quiet";
 export type DashRow = {
   kind: "area" | "asset"; level: string; name: string; name_te?: string | null; not_recorded?: boolean; asset_id?: number;
   cohort?: string; week_status?: string | null; params: Record<string, string>; figures: Figures; tone: Tone; lon: number | null; lat: number | null;
+  category?: string; monitored?: boolean;
 };
 export type Overview = {
   dataset: "demo" | "real"; level: string; child_level: string; path: { level: string; name: string; params: Record<string, string> }[];
@@ -140,5 +141,6 @@ export type Overview = {
   trend: { week: string; changed: number; clear_look: number; no_clear_look: number; new_incidents: number }[];
   pins: { asset_id: number; name: string; name_te: string | null; lon: number; lat: number; tone: Tone }[];
   my_areas: { district: string; mandal: string | null }[]; area_source: string | null; as_of: string;
+  by_category: { name: string; status: "live" | "planned"; label: { en: string; te: string }; watched: number }[];
 };
 

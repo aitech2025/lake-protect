@@ -9,7 +9,8 @@ figure is counted with the incident list's own rules (app.services.alert_view), 
 opens exactly the incidents behind it.
 
 A level whose assets all lack the next area (the real lakes have no village) is skipped, and the
-lakes are listed directly. Assets with no district are grouped as "area not recorded". Real and
+lakes are listed directly. Only locations being watched count as watched and in the weekly figures;
+a location whose watch was stopped still shows while it has incidents (D-061). Assets with no district are grouped as "area not recorded". Real and
 demo assets are never mixed. Everyone sees every area: areas decide who is notified, not who may
 look.
 """
@@ -20,6 +21,7 @@ import datetime as dt
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app import categories
 from app.models import User
 from app.notify import routing
 from app.services import alert_view
@@ -36,7 +38,7 @@ CONFIRMED_STATUSES = ("physically_marked", "final_notification", "surveyed_agenc
 _ASSETS = text(
     """
     SELECT a.id, a.name, a.name_te, a.cohort::text AS cohort, a.type::text AS type, a.district, a.mandal, a.village,
-           ST_X(b.p) AS lon, ST_Y(b.p) AS lat, b.status AS boundary_status
+           a.monitored, ST_X(b.p) AS lon, ST_Y(b.p) AS lat, b.status AS boundary_status
     FROM assets a
     LEFT JOIN LATERAL (
         SELECT ST_PointOnSurface(geom) AS p, status::text AS status FROM boundaries
@@ -81,8 +83,9 @@ def _key(value: str | None) -> str:
 
 def _figures(assets: list[dict], incidents: list[dict], screens: dict, week: str | None, acks: list[dict], now: dt.datetime) -> dict:
     ids = {a["id"] for a in assets}
+    watched = [a for a in assets if a.get("monitored", True)]
     mine = [i for i in incidents if i["asset_id"] in ids]
-    this_week = {aid: s for (aid, w), s in screens.items() if w == week and aid in ids}
+    this_week = {aid: s for (aid, w), s in screens.items() if w == week and aid in {a["id"] for a in watched}}
     start = _week_start(week) if week else None
     new = [i for i in mine if start and start <= i["created_at"] < start + dt.timedelta(days=7) and i["resolution"] != "auto"]
     alert_ids = {i["id"] for i in mine}
@@ -90,9 +93,9 @@ def _figures(assets: list[dict], incidents: list[dict], screens: dict, week: str
     on_time = [n for n in considered if n["acknowledged_at"] and n["acknowledged_at"] - n["created_at"] <= ACK_WITHIN]
     clear = sum(1 for s in this_week.values() if s["status"] in CLEAR)
     return {
-        "assets": len(assets),
+        "assets": len(watched),
         "clear_look": clear,
-        "no_clear_look": len(assets) - clear,
+        "no_clear_look": len(watched) - clear,
         "changed": sum(1 for s in this_week.values() if s["status"] == "candidate_found"),
         "new_incidents": len(new),
         "open": sum(1 for i in mine if i["state"] == "OPEN"),
@@ -100,7 +103,7 @@ def _figures(assets: list[dict], incidents: list[dict], screens: dict, week: str
         "waiting": sum(1 for i in mine if is_waiting(i, now)),
         "confirmed": sum(1 for i in mine if i["state"] == "CONFIRMED"),
         "court_matters": sum(1 for i in mine if i["state"] in ("OPEN", "UNDER_REVIEW") and i["court_matter"]),
-        "boundary_confirmed": sum(1 for a in assets if a["boundary_status"] in CONFIRMED_STATUSES),
+        "boundary_confirmed": sum(1 for a in watched if a["boundary_status"] in CONFIRMED_STATUSES),
         "ack_considered": len(considered),
         "ack_on_time": len(on_time),
     }
@@ -127,8 +130,9 @@ def overview(db: Session, user: User, *, is_demo: bool, district: str | None = N
     level = LEVELS[depth]
 
     every = [dict(r) for r in db.execute(_ASSETS, {"demo": is_demo}).mappings()]
-    assets = [a for a in every if in_area(a, district, mandal, village)]
     incidents = [i for i in alert_view.list_alerts(db) if i["is_demo"] == is_demo]
+    with_incidents = {i["asset_id"] for i in incidents}
+    assets = [a for a in every if in_area(a, district, mandal, village) and (a["monitored"] or a["id"] in with_incidents)]
     weeks = sorted(db.scalars(_WEEKS, {"demo": is_demo, "n": TREND_WEEKS}).all())
     week = weeks[-1] if weeks else None
     screens = {(r["asset_id"], r["week"]): dict(r) for r in db.execute(_SCREENS, {"demo": is_demo, "weeks": weeks or [""]}).mappings()}
@@ -160,12 +164,14 @@ def overview(db: Session, user: User, *, is_demo: bool, district: str | None = N
             s = screens.get((a["id"], week)) if week else None
             children.append({
                 "kind": "asset", "level": "asset", "asset_id": a["id"], "name": a["name"], "name_te": a["name_te"],
-                "cohort": a["cohort"], "type": a["type"], "boundary_status": a["boundary_status"],
+                "cohort": a["cohort"], "type": a["type"], "category": categories.category_of(a["type"]),
+                "monitored": a["monitored"], "boundary_status": a["boundary_status"],
                 "week_status": s["status"] if s else None, "week_status_label": STATUS_LABEL.get(s["status"], s["status"]) if s else "No record this week",
                 "params": {k: v for k, v in path.items() if v is not None}, "figures": f, "tone": _tone(f), "lon": a["lon"], "lat": a["lat"],
             })
 
     ids = {a["id"] for a in assets}
+    n_watched = sum(1 for a in assets if a["monitored"])
     trend = []
     for w in weeks:
         start = _week_start(w)
@@ -174,7 +180,7 @@ def overview(db: Session, user: User, *, is_demo: bool, district: str | None = N
             "week": w,
             "changed": sum(1 for s in rows if s["status"] == "candidate_found"),
             "clear_look": sum(1 for s in rows if s["status"] in CLEAR),
-            "no_clear_look": len(assets) - sum(1 for s in rows if s["status"] in CLEAR),
+            "no_clear_look": n_watched - sum(1 for s in rows if s["status"] in CLEAR and s["asset_id"] in ids),
             "new_incidents": sum(1 for i in incidents if i["asset_id"] in ids and start <= i["created_at"] < start + dt.timedelta(days=7)
                                  and i["resolution"] != "auto"),
         })
@@ -183,7 +189,14 @@ def overview(db: Session, user: User, *, is_demo: bool, district: str | None = N
     for a in assets:
         f = _figures([a], incidents, screens, week, acks, now)
         if a["lon"] is not None:
-            pins.append({"asset_id": a["id"], "name": a["name"], "name_te": a["name_te"], "lon": a["lon"], "lat": a["lat"], "tone": _tone(f)})
+            pins.append({"asset_id": a["id"], "name": a["name"], "name_te": a["name_te"], "lon": a["lon"], "lat": a["lat"], "tone": _tone(f),
+                         "monitored": a["monitored"]})
+
+    by_type: dict[str, int] = {}
+    for a in assets:
+        if a["monitored"]:
+            by_type[a["type"]] = by_type.get(a["type"], 0) + 1
+    by_category = [{k: c[k] for k in ("name", "status", "label", "watched")} for c in categories.as_list(by_type)]
 
     crumbs = [{"level": "state", "name": "Demo State" if is_demo else "Telangana", "params": {}}]
     for i, lvl in enumerate(LEVELS[1:depth + 1], start=1):
@@ -197,11 +210,12 @@ def overview(db: Session, user: User, *, is_demo: bool, district: str | None = N
         "filters": {k: v for k, v in path.items() if v is not None},
         "week": week,
         "figures": _figures(assets, incidents, screens, week, acks, now),
+        "by_category": by_category,
         "children": children,
         "trend": trend,
         "pins": pins,
         "my_areas": routing.areas_of(db, user.id),
-        "area_source": None if is_demo else "Districts and mandals of the real lakes come from OpenStreetMap boundaries, not the revenue record.",
+        "area_source": None if is_demo else "Districts and mandals of the OpenStreetMap lakes come from OpenStreetMap boundaries, not the revenue record.",
         "as_of": now.isoformat(),
     }
 

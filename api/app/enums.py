@@ -1,4 +1,4 @@
-"""Enumerations from CONTEXT.md section 7. Values must match the migrations (0002, 0006)."""
+"""Enumerations from CONTEXT.md section 7. Values must match the migrations (0002, 0006, 0008)."""
 from enum import StrEnum
 
 
@@ -16,6 +16,9 @@ class AssetType(StrEnum):
     recovered_parcel = "recovered_parcel"
     agency_parcel = "agency_parcel"
     revenue_parcel = "revenue_parcel"
+    # Planned categories (app/categories.yaml, DECISIONS.md D-061): in the database, not yet watched.
+    endowment_land = "endowment_land"
+    forest_land = "forest_land"
 
 
 class BoundaryKind(StrEnum):

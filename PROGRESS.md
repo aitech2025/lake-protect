@@ -23,7 +23,8 @@ data in the app), then M3.
 | M3 Radar and scored backtest | Radar check for built-up done; backtest not started | | |
 | M11 Asset creation engine (templates) | Done | API 284, browser 2 new (m11-sources) | 507d359 |
 | M12 Weekly record, incidents, documents, two roles | Done | API 263, pipeline 27, browser 4 | 76c6593 |
-| M13 Downstream: notifications by area, overview | Done | API 308, pipeline 29, browser 4 | M13 commit |
+| M13 Downstream: notifications by area, overview | Done | API 308, pipeline 29, browser 4 | b03bb99 |
+| M14 GeoGuard: kinds of land, admin adds and stops watching locations | Done | API 334, pipeline 29, browser 5 | M14 commit |
 
 ## M0 Scaffold: done
 
@@ -237,6 +238,36 @@ removed, is `reports/m2-tuning/README.md`.
   upload, the area rounding case). Browser 15 passed on fresh demos: `m10-real` (switch, no demo
   record on the real side, Sentinel-2 tiles requested, 99 real lakes listed) with the M5 to M8
   suites, then the M9 walkthrough with no internet.
+
+## M14 GeoGuard: kinds of land, and locations the admin adds or stops watching: done
+
+Owner's request, 25 Nov 2026 (D-061). Design: `docs/locations.md`.
+
+- **Name:** GeoGuard everywhere people see it. Code, Docker and `lp` names are kept until after the
+  jury.
+- **Kinds of land** (`api/app/categories.yaml`):
+  - lakes and water bodies, and government land, are watched now;
+  - endowment and forest land are planned, with what each needs. Their asset types are in
+    migration 0008, and the API refuses them until they are switched on.
+- **Adding a location** (admin):
+  - drawn on the Sentinel-2 map (watch only) or uploaded as GeoJSON or KML;
+  - checks for Telangana, size, the same place twice, status and reference;
+  - the area is shown before saving;
+  - the next weekly screen includes it.
+- **Stopping the watch:**
+  - with a reason, and reversible;
+  - nothing is deleted, and open incidents stay;
+  - logged in the append-only `monitoring_changes`, which is the only way the database lets
+    `assets.monitored` change.
+- **Watched only:** the pipeline watchlist, the overview figures, the weekly digest and the monthly
+  page count only watched locations. The overview adds a "by kind of land" line.
+- **Tests:**
+  - API 334 passed, including `test_locations.py` (21) and a dashboard test;
+  - pipeline 29 passed;
+  - browser 5 passed, including the new `m14-locations`: draw and add, a duplicate refused from a
+    file, stop watching.
+
+  They ran on the preview stack.
 
 ## M13 Downstream: notifications by area and the overview: done
 

@@ -1,6 +1,6 @@
 """The detection pipeline's side of the API (pipeline token, DECISIONS.md D-023).
 
-- GET  /pipeline/watchlist   real assets with the boundary set in force, for `lp screen`
+- GET  /pipeline/watchlist   real assets being watched, with the boundary set in force, for `lp screen`
 - POST /pipeline/runs        a screening run and, for every asset, its week: coverage, the week's
                              image and what changed (DECISIONS.md D-057). Then the weekly digest
                              goes to every official and the admin (D-059).
@@ -41,9 +41,10 @@ Status = Literal["not_observed", "no_usable_look", "failed", "no_candidate", "ca
 
 @router.get("/pipeline/watchlist", dependencies=[Depends(pipeline_token)])
 def watchlist(db: Session = Depends(get_db)) -> dict:
-    """Every real asset with a boundary in force today. Demo assets are never screened."""
+    """Every real asset being watched, with a boundary in force today. Demo assets are never screened,
+    and a location whose watch the admin stopped is left out (D-061)."""
     out = []
-    for asset in db.scalars(select(Asset).where(Asset.is_demo.is_(False)).order_by(Asset.id)):
+    for asset in db.scalars(select(Asset).where(Asset.is_demo.is_(False), Asset.monitored.is_(True)).order_by(Asset.id)):
         bset = bsvc.current_boundary_set(db, asset.id)
         if not bsvc.primary_of(bset):
             continue
@@ -53,6 +54,7 @@ def watchlist(db: Session = Depends(get_db)) -> dict:
                 "asset_key": asset.asset_key,
                 "name": asset.name,
                 "cohort": asset.cohort,
+                "type": asset.type,
                 "baseline_date": asset.baseline_date.isoformat(),
                 "boundaries": {k: {"version": b["version"], "status": b["status"], "geometry": b["geometry"]} for k, b in bset.items()},
             }

@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     # Email: "file" writes each email to <storage>/outbox/email (the default: nothing leaves the
     # machine); "smtp" sends through the State's mail relay; "off" sends none.
     email_transport: str = "file"
-    email_from: str = "Lake Protect <no-reply@lakeprotect.invalid>"
+    email_from: str = "GeoGuard <no-reply@geoguard.invalid>"
     smtp_host: str | None = None
     smtp_port: int = 587
     smtp_user: str | None = None

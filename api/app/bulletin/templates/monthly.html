@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Lake Protect monthly page, {{ label }}</title>
+<title>GeoGuard monthly page, {{ label }}</title>
 <style>
   @font-face { font-family: "Noto Sans"; src: url("{{ fonts.regular }}"); font-weight: 400; }
   @font-face { font-family: "Noto Sans"; src: url("{{ fonts.bold }}"); font-weight: 700; }
@@ -33,15 +33,15 @@
 <p class="sub">{% if complete_month %}Whole month.{% else %}Month to date, as of {{ as_of[:10] }}.{% endif %} Compared with {{ last_label }}.</p>
 
 <div class="counts">
-  <div class="count"><b>{{ counts.watched }}</b>lakes and parcels watched<div class="was">{{ last_month.counts.watched }} in {{ last_label }}</div></div>
+  <div class="count"><b>{{ counts.watched }}</b>locations watched<div class="was">{{ last_month.counts.watched }} in {{ last_label }}</div></div>
   <div class="count"><b>{{ counts.new_alerts }}</b>new incidents<div class="was">{{ last_month.counts.new_alerts }} in {{ last_label }}</div></div>
   <div class="count"><b>{{ counts.reviewed }}</b>reviewed by officials<div class="was">{{ last_month.counts.reviewed }} in {{ last_label }}</div></div>
   <div class="count"><b>{{ counts.confirmed }}</b>confirmed as real changes<div class="was">{{ last_month.counts.confirmed }} in {{ last_label }}</div></div>
   <div class="count overdue"><b>{{ counts.waiting }}</b>waiting over {{ wait_days }} days<div class="was">{{ last_month.counts.waiting }} at the end of {{ last_label }}</div></div>
 </div>
 
-<img class="map" src="{{ map_uri }}" alt="Map of watched lakes and parcels">
-<p class="legend">Blue: lakes. Beige: recovered parcels. Amber dot: new incident this month. Red ring: waiting over {{ wait_days }} days for a decision.</p>
+<img class="map" src="{{ map_uri }}" alt="Map of watched locations">
+<p class="legend">Blue: lakes and water bodies. Beige: government land. Amber dot: new incident this month. Red ring: waiting over {{ wait_days }} days for a decision.</p>
 
 <div class="cols">
   <div>

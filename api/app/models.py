@@ -76,6 +76,23 @@ class Asset(Base):
     baseline_date: Mapped[dt.date] = mapped_column(Date)
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
     notes: Mapped[str | None] = mapped_column(Text)
+    # Migration 0008: whether the weekly screen watches it (changed only through MonitoringChange),
+    # and who added it by hand.
+    monitored: Mapped[bool] = mapped_column(Boolean, server_default="true")
+    added_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    added_at: Mapped[dt.datetime | None] = mapped_column(TZ)
+
+
+class MonitoringChange(Base):
+    """Append-only. Inserting a row starts or stops the weekly watch of its asset (migration 0008)."""
+
+    __tablename__ = "monitoring_changes"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    asset_id: Mapped[int] = mapped_column(ForeignKey("assets.id"))
+    monitored: Mapped[bool] = mapped_column(Boolean)
+    reason: Mapped[str] = mapped_column(Text)
+    actor_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    at: Mapped[dt.datetime] = mapped_column(TZ, server_default="now()")
 
 
 class Boundary(Base):

@@ -1,4 +1,4 @@
-# Lake Protect: Build Context
+# GeoGuard (formerly Lake Protect): Build Context
 
 Single source for building the prototype. A developer or coding agent should be able to start from this file with no other context.
 
@@ -6,7 +6,7 @@ Single source for building the prototype. A developer or coding agent should be 
 |---|---|
 | **Status** | Prototype milestones M0, M1 and M4 to M9 are built on demo data; the backtest (M2, M3) is not. See `PROGRESS.md`. |
 | **Last updated** | 7 November 2026: section 17 added (officials, personas, detection by stage, alert contents, escalation, due diligence, dashboard, citizen reporting) and the imagery and owner-blind decisions refined at the owner's request |
-| **Name** | "Lake Protect" is a working name taken from the folder. The final name is not decided. |
+| **Name** | **GeoGuard**, chosen by the owner on 25 Nov 2026 (DECISIONS.md D-061). "Lake Protect" was the working name, and the name the TISC jury shortlisted. Code names keep it for now. |
 | **Background** | [Feasibility and solution design](https://claude.ai/artifact/6SgGGK4e8Zf8gyzjbC13wD) and [pitch deck](https://claude.ai/artifact/ABdLPgjWa1t5Y7V855Kbsa). Both are private until the owner shares them. |
 
 **How to use this file:** read sections 1 to 3, then build in the order given in section 12. Sections 6 to 10 are the specification. Section 15 lists what is already decided, so do not reopen it, and what is still unknown, so do not assume it.
@@ -838,7 +838,7 @@ If the backtest has been run, open with its real result.
 | What is the exact policy cut-off date? | HYDRAA | `2024-07-19`, configurable |
 | Do geospatial rules limit imagery over sensitive sites around Hyderabad? Not verified | Counsel, NRSC | Show only asset windows, not area-wide imagery |
 | NISAR resolution and coverage over Hyderabad? | Check ASF | Leave NISAR out |
-| Final product name? | Owner | "Lake Protect" |
+| Final product name? | Owner | Decided: GeoGuard (D-061) |
 
 ---
 
