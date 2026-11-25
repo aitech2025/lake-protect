@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
-import { useDataset } from "../dataset";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { API_BASE, api, authHeaders, fmtDate } from "../api";
 import { useAsync, usePageTitle } from "../components/Bits";
 import { PageState } from "../components/PageState";
-import { useDemoOnScreen } from "../demo";
 import "./monthly.css";
 
 function months(n: number): string[] {
@@ -31,13 +29,11 @@ export function Monthly() {
   const lang = i18n.language;
   const choices = useMemo(() => months(4), []);
   const [month, setMonth] = useState(choices[0]);
-  const { dataset, setDataset } = useDataset();
-  const { data, error, status, loading, reload } = useAsync(() => api<any>(`/bulletins/${month}?dataset=${dataset}`), [month, dataset]);
-  useDemoOnScreen(dataset === "demo" && Boolean(data));
+  const { data, error, status, loading, reload } = useAsync(() => api<any>(`/bulletins/${month}`), [month]);
   usePageTitle(t("monthly.title", { month: monthName(month, lang) }));
 
   const print = async () => {
-    const res = await fetch(`${API_BASE}/bulletins/${month}/pdf?dataset=${dataset}`, { headers: authHeaders() });
+    const res = await fetch(`${API_BASE}/bulletins/${month}/pdf`, { headers: authHeaders() });
     const url = URL.createObjectURL(await res.blob());
     const a = document.createElement("a");
     a.href = url;
@@ -64,9 +60,6 @@ export function Monthly() {
       </div>
       <div className="chips" style={{ marginBottom: "1.25rem" }}>
         {choices.map((m) => <button key={m} className="chip" aria-pressed={m === month} onClick={() => setMonth(m)}>{monthName(m, lang)}</button>)}
-        <span style={{ width: "1rem" }} />
-        <button className="chip" aria-pressed={dataset === "demo"} onClick={() => setDataset("demo")}>{t("monthly.dataset_demo")}</button>
-        <button className="chip" aria-pressed={dataset === "real"} onClick={() => setDataset("real")}>{t("monthly.dataset_real")}</button>
       </div>
       <PageState loading={loading && !data} error={error} status={status} onRetry={reload} />
       {data && !error && (

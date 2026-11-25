@@ -24,8 +24,8 @@ WhatsApp chatbot    ─┤     1. place: the pin, or words naming a watched loca
 Praja Vani petition ─┤     3. incident: same place reported → follows it                   English or Telugu, at each step:
 visit in person     ─┘        open incident within 150 m → joins it                        case opened, satellite result,
                               otherwise → a new citizen incident                           under review, sharper images asked,
-                           4. satellite review of the place (demo: at once; real: the        confirmed / dismissed / passed on
-                              screener, within minutes)
+                           4. satellite review of the place (the screener, within       confirmed / dismissed / passed on
+                              minutes, with internet)
                            5. officials notified (area routing, D-059), with the result
                            6. regular flow: review → sharper imagery → decide → close
 ```
@@ -69,10 +69,11 @@ it. **A report of a place already reported** (100 m, 60 days) follows the earlie
 
 ## 4. The satellite review
 
-| Data | Who looks | When |
-|---|---|---|
-| Demo world | The demo sensor, in the API | At once, before officials are told. A change the weekly screen has not seen yet (`unscreened_changes` in `data/demo/world.yml`, at Demo Kunta 7) is found; elsewhere it shows no change |
-| Real | `lp review-reports`, which screens the location now with the weekly screen's rules and imagery (Sentinel-2, and Sentinel-1 radar for built-up). It runs as the `reviewer` service, every 5 minutes, and needs internet: `docker compose --profile screen up -d reviewer` | Within minutes. Officials are told when the incident opens, and again with the result |
+Reports are taken in Telangana only; the demo world and its instant demo sensor were removed (D-065).
+
+| Who looks | When |
+|---|---|
+| `lp review-reports`, which screens the location now with the weekly screen's rules and imagery (Sentinel-2, and Sentinel-1 radar for built-up). It runs as the `reviewer` service, every 5 minutes, and needs internet: `docker compose --profile screen up -d reviewer` | Within minutes. Officials are told when the incident opens, and again with the result |
 
 **The results:**
 - **A change is visible:** the nearest change within 150 m of the pin, with its area, date and
@@ -114,7 +115,7 @@ roles can use all of it.
 |---|---|---|
 | **Acknowledge** (optional note) | Once per person. Clears that person's notifications for the incident. The first one starts the review. | "An official is reviewing it." |
 | **Add a note** | Kept for good, shown with author and time. | Nothing: notes stay inside. |
-| **Satellite look**, latest or on a date | **Demo:** answered at once. **Real:** `lp review-reports` answers it as of that date. The incident's own images are never replaced. Tick two looks to compare them side by side. | Nothing |
+| **Satellite look**, latest or on a date | `lp review-reports` answers it as of that date (needs internet). The incident's own images are never replaced. Tick two looks to compare them side by side. | Nothing |
 | **Sharper image** | **Official's request:** waits for the admin's approval or decline, with a note. **Admin's request:** approved as made. Nothing is ordered in the prototype. | "Officials have asked for sharper satellite images of this place." |
 | **Attach the legal records** | A dated snapshot, kept beside the earlier ones: land records at the spot, boundary, documents, court cases, permits, authorised works, the legal check, and the sources still to check by hand. | Nothing |
 | **Attach a legal document** | A file or a reference. It is kept on the location too. | Nothing |
@@ -134,7 +135,7 @@ Look images: `GET /alerts/{id}/looks/{review_id}/{before|after}`.
 | **SMS** | An update at each step to a phone verified by one-time password. Every message is **held** | The State's SMS gateway agreement, and the DLT templates `citizen_update` and `citizen_otp` (`api/app/notify/channels.yaml`). Until then, the portal says SMS updates are not available yet |
 | **WhatsApp** | Replies in the conversation; later updates through the template `citizen_update`. Every message is **held** | The WhatsApp agreement, the app secret, the verify token, the API token, and the approved template |
 
-Demo messages never leave the machine. A held message is never sent later.
+A held message is never sent later.
 
 ## 7. Privacy (DPDP Act 2023)
 
@@ -153,13 +154,13 @@ Demo messages never leave the machine. A held message is never sent later.
 | Tables: reports, events, messages, codes, chats | `api/migrations/versions/0009_citizen.py` |
 | Citizen incidents: origin and report on incidents, reported places, satellite reviews; no Urdu | `api/migrations/versions/0010_citizen_incidents.py` |
 | Finding the place | `api/app/citizen/locate.py`, `data/areas/admin_orr.geojson` |
-| Opening the incident, the satellite review, the demo sensor | `api/app/citizen/incident.py` |
+| Opening the incident, the satellite review and looks | `api/app/citizen/incident.py` |
 | Intake, placing, events, steps passed on | `api/app/citizen/service.py` |
 | Words (English, Telugu) | `api/app/citizen/texts.py` |
 | Real reviews | `pipeline/lake_protect/review.py`, `lp review-reports`, the `reviewer` service; `GET`/`POST /pipeline/reviews` |
 | Sharper imagery (official's request, admin's approval) | `api/app/services/imagery.py` |
 | Officials' actions: acknowledge, notes, legal records, documents, decisions, weekly watch | `api/app/citizen/actions.py`, `api/migrations/versions/0011_incident_actions.py` |
-| Desk | `web/src/desk/CitizenActions.tsx` (the officials' panel), `web/src/desk/AlertDetail.tsx` (citizen and satellite review panels), `Queue.tsx` (badge), `Reports.tsx` (log, intake, place on the map, WhatsApp demo) |
+| Desk | `web/src/desk/CitizenActions.tsx` (the officials' panel), `web/src/desk/AlertDetail.tsx` (citizen and satellite review panels), `Queue.tsx` (badge), `Reports.tsx` (log, intake, place on the map) |
 | Portal | `web/src/portal/Portal.tsx` |
 | Tests | `api/tests/test_citizen.py` (14), `api/tests/test_incident_actions.py` (7), `pipeline/tests/test_review.py` (4), `e2e/tests/m15-citizen.spec.ts` (2) |
 

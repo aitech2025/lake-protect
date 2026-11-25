@@ -75,6 +75,9 @@ class RunIn(BaseModel):
 def start_run(name: str, body: RunIn, user: User = Depends(require_roles(*RUN_ROLES)), db: Session = Depends(get_db)) -> dict:
     if name not in CONNECTORS:
         raise HTTPException(404, "Unknown source")
+    if body.transport == "sample" and not body.dry_run:
+        # GeoGuard holds real data only (D-065): the fictional sample registers are previews.
+        raise HTTPException(422, "The sample register is a preview only: GeoGuard holds real data only")
     with db_guard(db):
         try:
             return engine.run(db, name, transport=body.transport, dry_run=body.dry_run, actor_id=user.id)

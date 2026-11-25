@@ -158,7 +158,7 @@ def record_run(body: RunIn, db: Session = Depends(get_db)) -> dict:
     # After the run is safely stored: the week's digest, once per person per week. It never fails the
     # run, or the pipeline would send the run again; the admin can send it from the Officials page.
     try:
-        digests = notify.send_digests(db, week, is_demo=False, at=utcnow())["sent"]
+        digests = notify.send_digests(db, week, at=utcnow())["sent"]
         db.commit()
     except Exception as exc:  # noqa: BLE001
         db.rollback()

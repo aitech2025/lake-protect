@@ -31,10 +31,8 @@ def list_audit(
         text(
             """
             SELECT l.id, l.actor_id, coalesce(u.name, 'System') AS actor, coalesce(u.role::text, 'system') AS actor_role,
-                   (coalesce(u.is_demo, false) OR coalesce(al.is_demo, false)) AS is_demo,
                    l.action, l.entity, l.entity_id, l.details, l.at, l.prev_hash, l.hash
             FROM audit_log l LEFT JOIN users u ON u.id = l.actor_id
-            LEFT JOIN alerts al ON l.entity = 'alert' AND al.id::text = l.entity_id
             WHERE (CAST(:entity AS text) IS NULL OR l.entity = :entity)
               AND (CAST(:eid AS text) IS NULL OR l.entity_id = :eid)
               AND (CAST(:actor AS bigint) IS NULL OR l.actor_id = :actor)
@@ -47,7 +45,7 @@ def list_audit(
     chain.record(db, actor_id=user.id, action="view.audit", entity="audit_log", details={"entity": entity, "entity_id": entity_id, "actor": actor})
     db.commit()
     items = [dict(r) for r in rows]
-    return {"items": items, "has_demo": any(i["is_demo"] for i in items)}
+    return {"items": items}
 
 
 @router.get("/verify")

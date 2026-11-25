@@ -5,7 +5,6 @@ import { api, type User } from "../api";
 import { homeFor, useAuth } from "../auth";
 import { usePageTitle } from "../components/Bits";
 import { Mark } from "../components/Layout";
-import { DemoBand, useDemoOnScreen } from "../demo";
 
 export function Login() {
   const { t, i18n } = useTranslation();
@@ -13,7 +12,6 @@ export function Login() {
   const nav = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
-  useDemoOnScreen(users.length > 0);
   usePageTitle(t("login.title"));
 
   useEffect(() => {
@@ -31,7 +29,6 @@ export function Login() {
 
   return (
     <>
-      <DemoBand />
       <div className="login">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
           <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>

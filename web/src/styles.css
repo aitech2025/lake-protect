@@ -70,9 +70,6 @@ p { margin: 0; }
 
 /* Shell ------------------------------------------------------------------------------------ */
 .shell { display: grid; grid-template-columns: 216px 1fr; grid-template-rows: auto 1fr; height: 100%; }
-.demo-band { grid-column: 1 / -1; display: flex; gap: 0.75rem; align-items: baseline; padding: 0.4rem 1rem;
-  background: repeating-linear-gradient(135deg, var(--violet) 0 14px, var(--violet-deep) 14px 28px); color: #fff; font-size: var(--step--1); }
-.demo-band strong { font-size: var(--step-0); }
 .rail { grid-row: 2; background: var(--surface-inverse); color: var(--text-on-inverse); display: flex; flex-direction: column; padding: 1.25rem 0.75rem; gap: 0.25rem; }
 .rail :focus-visible { outline-color: var(--focus-inverse); }
 .rail .brand { padding: 0 0.6rem 1.25rem; }
@@ -130,7 +127,6 @@ label.check { display: flex; gap: 0.5rem; align-items: flex-start; }
 .pill.watch { background: #e7e4ef; color: #4b3a6e; }
 .pill.closed { background: #eceeec; color: var(--ink-2); }
 .flag-overdue { color: var(--text-danger); font-weight: 700; }
-.demo-tag { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 0.05rem 0.4rem; border-radius: 3px; background: var(--violet-tint); color: var(--violet); border: 1px solid #cdb6ea; }
 
 /* Queue -------------------------------------------------------------------------------------- */
 .queue { display: grid; grid-template-columns: minmax(0, 3fr) minmax(360px, 2fr); gap: 1rem; height: calc(100vh - 210px); min-height: 520px; }
@@ -280,9 +276,6 @@ table.grid tr.clickable:hover td { background: #f5f8f6; }
 @media print {
   .rail { display: none; }
   .shell { display: block; }
-  /* Demo marking must survive printing (rule 6), whether or not the browser prints backgrounds. */
-  .demo-band { background: none; color: var(--ink); border: 2px solid var(--violet); }
-  .demo-band strong { color: var(--violet); }
 }
 
 .photo-row { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
@@ -315,10 +308,6 @@ aside > .panel:first-child { margin-top: 0; }
 .table-scroll > table.grid { border: 0; border-radius: 0; background: transparent; }
 
 /* Which world the desk shows: real lakes or the demo (dataset.tsx). */
-.dataset-switch { display: flex; flex-direction: column; gap: 0.35rem; padding: 0 0.6rem 1rem; }
-.dataset-switch .small { color: var(--text-on-inverse); opacity: 0.8; }
-.rail .dataset-switch .chip { background: transparent; color: var(--text-on-inverse); border-color: #4b6168; text-align: left; }
-.rail .dataset-switch .chip[aria-pressed="true"] { background: #7fb6dd; color: #0f2027; border-color: #7fb6dd; font-weight: 600; }
 
 /* The latest screen from space (desk/Screening.tsx). */
 .screen-summary { display: flex; flex-wrap: wrap; gap: 0.35rem 1rem; align-items: baseline; background: #eef4f8; border-left: 3px solid #1f6fa8; padding: 0.6rem 0.8rem; margin-bottom: 1rem; font-size: var(--step--1); }
@@ -444,16 +433,6 @@ tr.superseded td { color: var(--ink-2); text-decoration: line-through; text-deco
 .intake-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 1rem; }
 .intake-fields { display: grid; gap: 0.6rem; align-content: start; }
 .check { display: flex; gap: 0.45rem; align-items: flex-start; font-size: var(--step--1); }
-.wa-wrap { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; }
-.wa-phone { inline-size: min(100%, 24rem); border: 1px solid var(--rule); border-radius: 18px; background: #e7ded3; padding: 0.75rem; display: grid; gap: 0.6rem; }
-.wa-thread { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; max-block-size: 30rem; overflow-y: auto; }
-.wa-msg { max-inline-size: 85%; padding: 0.4rem 0.6rem; border-radius: 8px; white-space: pre-wrap; font-size: 0.92rem; display: grid; gap: 0.1rem; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08); }
-.wa-msg.in { justify-self: end; background: #d9fdd3; }
-.wa-msg.out { justify-self: start; background: #fff; }
-.wa-meta { font-size: 0.72rem; color: var(--ink-2); justify-self: end; }
-.wa-input { display: flex; gap: 0.4rem; }
-.wa-input input { flex: 1; padding: 0.5rem 0.7rem; border-radius: 999px; border: 1px solid var(--border-control); }
-.wa-tools { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 @media (max-width: 960px) {
   .reports-grid, .report-grid, .intake-grid { grid-template-columns: 1fr; }
 }

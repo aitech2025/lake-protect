@@ -11,7 +11,7 @@ import { Login } from "./desk/Login";
 import { Officials } from "./desk/Officials";
 import { Queue } from "./desk/Queue";
 import { Records } from "./desk/Records";
-import { ReportDetail, Reports, WhatsAppSim } from "./desk/Reports";
+import { ReportDetail, Reports } from "./desk/Reports";
 import { Sources } from "./desk/Sources";
 import { Monthly } from "./bulletin/Monthly";
 import { ReportPage, TrackPage } from "./portal/Portal";
@@ -42,7 +42,6 @@ export function App() {
         <Route path="/alerts" element={<Queue />} />
         <Route path="/alerts/:id" element={<AlertDetail />} />
         <Route path="/reports" element={<Reports />} />
-        <Route path="/reports/whatsapp" element={<WhatsAppSim />} />
         <Route path="/reports/:id" element={<ReportDetail />} />
         <Route path="/assets" element={<Assets />} />
         <Route path="/records" element={<Records />} />

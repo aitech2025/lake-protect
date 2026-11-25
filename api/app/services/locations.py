@@ -72,7 +72,7 @@ def _same_place(db: Session, geometry: dict, exclude: int | None) -> dict | None
                       WHERE bv.asset_id = a.id AND bv.kind IN ('ftl', 'parcel')
                       ORDER BY bv.version DESC LIMIT 1) b ON true
         CROSS JOIN g
-        WHERE a.is_demo = false AND a.monitored AND a.id <> coalesce(CAST(:x AS bigint), 0)
+        WHERE a.monitored AND a.id <> coalesce(CAST(:x AS bigint), 0)
           AND ST_Intersects(b.geom, ST_Transform(g.m, 4326))
         ORDER BY iou DESC NULLS LAST LIMIT 1
         """
@@ -238,8 +238,8 @@ def history(db: Session, asset_id: int) -> list[dict]:
     return [dict(r) for r in rows]
 
 
-def counts_by_type(db: Session, is_demo: bool | None = None) -> dict[str, int]:
+def counts_by_type(db: Session) -> dict[str, int]:
     rows = db.execute(text(
-        "SELECT type::text AS t, count(*) AS n FROM assets WHERE monitored AND (CAST(:d AS boolean) IS NULL OR is_demo = CAST(:d AS boolean)) GROUP BY 1"
-    ), {"d": is_demo}).all()
+        "SELECT type::text AS t, count(*) AS n FROM assets WHERE monitored GROUP BY 1"
+    )).all()
     return {r[0]: int(r[1]) for r in rows}

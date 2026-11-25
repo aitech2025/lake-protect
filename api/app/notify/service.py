@@ -259,32 +259,32 @@ def follow_up(db: Session, now: dt.datetime | None = None) -> dict:
 
 
 # Weekly digest ----------------------------------------------------------------------------------
-def send_digests(db: Session, week: str, is_demo: bool, at: dt.datetime | None = None) -> dict:
-    """One digest per person per week per dataset. Officials with no area get none."""
+def send_digests(db: Session, week: str, at: dt.datetime | None = None) -> dict:
+    """One digest per person per week. Officials with no area get none."""
     at = as_utc(at)
     sent, skipped = [], 0
     users = db.scalars(select(User).where(User.is_active.is_(True)).order_by(User.id)).all()
     for user in users:
         if db.scalar(select(Notification.id).where(Notification.user_id == user.id, Notification.kind == "weekly_digest",
-                                                   Notification.week == week, Notification.is_demo.is_(is_demo)).limit(1)):
+                                                   Notification.week == week).limit(1)):
             skipped += 1
             continue
-        payload = digest.build(db, user, week, is_demo, at)
+        payload = digest.build(db, user, week, at)
         if payload is None:
             skipped += 1
             continue
-        sent.append(create(db, user, "weekly_digest", payload, at=at, needs_ack=False, is_demo=is_demo, week=week).user_id)
+        sent.append(create(db, user, "weekly_digest", payload, at=at, needs_ack=False, is_demo=False, week=week).user_id)
     if sent:
         chain.record(db, actor_id=None, action="notify.weekly_digest", entity="notification",
-                     details={"week": week, "dataset": "demo" if is_demo else "real", "recipients": sent}, at=at)
+                     details={"week": week, "recipients": sent}, at=at)
     return {"week": week, "sent": len(sent), "skipped": skipped}
 
 
-def latest_week(db: Session, is_demo: bool) -> str | None:
-    """The ISO week of the latest weekly screen in a dataset."""
+def latest_week(db: Session) -> str | None:
+    """The ISO week of the latest weekly screen."""
     return db.scalar(text(
         "SELECT coalesce(s.week, to_char(r.as_of, 'IYYY-\"W\"IW')) FROM asset_screens s JOIN screen_runs r ON r.id = s.run_id "
-        "WHERE r.is_demo = :d ORDER BY r.as_of DESC, s.id DESC LIMIT 1"), {"d": is_demo})
+        "ORDER BY r.as_of DESC, s.id DESC LIMIT 1"))
 
 
 # Outbox -----------------------------------------------------------------------------------------
@@ -366,8 +366,6 @@ def pending_filter():
     )
 
 
-def unacknowledged_count(db: Session, user: User, is_demo: bool | None = None) -> int:
+def unacknowledged_count(db: Session, user: User) -> int:
     q = select(func.count()).select_from(Notification).where(Notification.user_id == user.id, *pending_filter())
-    if is_demo is not None:
-        q = q.where(Notification.is_demo.is_(is_demo))
     return int(db.scalar(q) or 0)

@@ -3,7 +3,7 @@
     python -m app.sources list
     python -m app.sources run hmda_lpc --transport sample            # dry run: shows what would happen
     python -m app.sources run hmda_lpc --transport file_drop --apply  # loads an officer's drop
-    python -m app.sources samples --apply                             # all four fictional samples, in order
+    python -m app.sources samples                                     # all four fictional samples, previewed in order
 
 Runs from the command line have no user; the audit log records them as the system.
 """
@@ -41,6 +41,10 @@ def main(argv: list[str] | None = None) -> int:
 
     names = [args.connector] if args.cmd == "run" else list(SAMPLE_ORDER)
     transport = args.transport if args.cmd == "run" else "sample"
+    if transport == "sample" and args.apply:
+        # GeoGuard holds real data only (DECISIONS.md D-065): the fictional samples are previews.
+        print("The sample registers are previews only: GeoGuard holds real data only", file=sys.stderr)
+        return 2
     with SessionLocal() as db:
         for name in names:
             try:

@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, NavLink, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
 import { api, ApiError } from "../api";
 import { MapView } from "../components/MapView";
 import "./portal.css";
 
 /**
  * The public side of GeoGuard (CONTEXT.md 17.8; DECISIONS.md D-062): report a problem on public
- * land, and check a report by its reference. No sign-in. English and Telugu. `?demo=1` uses the
- * fictional demo world, so nothing real is reported in a demo.
+ * land, and check a report by its reference. No sign-in. English and Telugu. Real places in Telangana
+ * only: the demo world is removed (D-065).
  */
 type Lang = "en" | "te";
 type L3 = { en: string; te: string };
 type View = {
   ref: string; status: string; status_label: L3; what: string; what_label: L3; place: L3 | null; created_at: string;
-  closed_reason: string | null; updates: boolean; is_demo: boolean; events: { kind: string; status: string; note: L3; at: string }[];
+  closed_reason: string | null; updates: boolean; events: { kind: string; status: string; note: L3; at: string }[];
 };
 type Config = { whats: { key: string; label: L3 }[]; updates: { sms_updates: boolean; whatsapp: boolean }; stats: { received: number; checking: number; closed: number } };
 
@@ -50,16 +50,14 @@ function fmt(value: string, lang: Lang, withTime = false): string {
   return new Date(value).toLocaleString(locale, opts);
 }
 
-function Shell({ lang, setLang, demo, children }: { lang: Lang; setLang: (l: Lang) => void; demo: boolean; children: ReactNode }) {
+function Shell({ lang, setLang, children }: { lang: Lang; setLang: (l: Lang) => void; children: ReactNode }) {
   const { i18n } = useTranslation();
   const t = i18n.getFixedT(lang);
-  const q = demo ? "?demo=1" : "";
   useEffect(() => {
     document.title = `${t("citizen.title")} · GeoGuard`;
   }, [t]);
   return (
     <div className={`portal lang-${lang}`} lang={lang} data-testid="portal">
-      {demo && <div className="portal-demo" role="status" data-testid="portal-demo">{t("citizen.demo_note")}</div>}
       <header className="portal-head">
         <div className="brand">
           <span className="brand-name">GeoGuard</span>
@@ -74,8 +72,8 @@ function Shell({ lang, setLang, demo, children }: { lang: Lang; setLang: (l: Lan
         </div>
       </header>
       <nav className="portal-tabs" aria-label="GeoGuard">
-        <NavLink to={`/report${q}`} end data-testid="tab-report">{t("citizen.tab_report")}</NavLink>
-        <NavLink to={`/report/track${q}`} data-testid="tab-track">{t("citizen.tab_track")}</NavLink>
+        <NavLink to="/report" end data-testid="tab-report">{t("citizen.tab_report")}</NavLink>
+        <NavLink to="/report/track" data-testid="tab-track">{t("citizen.tab_track")}</NavLink>
       </nav>
       <main className="portal-main">{children}</main>
       <footer className="portal-foot">
@@ -84,7 +82,6 @@ function Shell({ lang, setLang, demo, children }: { lang: Lang; setLang: (l: Lan
         <p>{t("citizen.not_finding")}</p>
         <p>{t("citizen.other_ways")} {t("citizen.whatsapp_soon")}</p>
         <p className="portal-links">
-          {demo ? <Link to="/report">{t("citizen.real_link")}</Link> : <Link to="/report?demo=1" data-testid="portal-demo-link">{t("citizen.demo_link")}</Link>}
           <Link to="/login">{t("citizen.staff")}</Link>
         </p>
       </footer>
@@ -97,9 +94,6 @@ function errorText(e: unknown): string {
 }
 
 export function ReportPage() {
-  const [params] = useSearchParams();
-  const demo = params.get("demo") === "1";
-  const dataset = demo ? "demo" : "real";
   const [lang, setLang] = usePortalLang();
   const { i18n } = useTranslation();
   const t = i18n.getFixedT(lang);
@@ -114,7 +108,6 @@ export function ReportPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
-  const [demoCode, setDemoCode] = useState<string | null>(null);
   const [codeSent, setCodeSent] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -129,8 +122,8 @@ export function ReportPage() {
   useEffect(() => () => previews.forEach((u) => URL.revokeObjectURL(u)), [previews]);
 
   useEffect(() => {
-    api<Config>(`/citizen/config?dataset=${dataset}`).then(setCfg).catch(() => setCfg(null));
-  }, [dataset, done]);
+    api<Config>("/citizen/config").then(setCfg).catch(() => setCfg(null));
+  }, [done]);
 
   const locate = () => {
     if (!navigator.geolocation) {
@@ -152,12 +145,10 @@ export function ReportPage() {
 
   const sendCode = async () => {
     setPhoneNote(null);
-    setDemoCode(null);
     try {
-      const out = await api<any>("/citizen/otp", { json: { phone, dataset } });
+      const out = await api<any>("/citizen/otp", { json: { phone } });
       setCodeSent(true);
       setSentTo(out.to ?? null);
-      if (out.demo_code) setDemoCode(out.demo_code);
     } catch (e) {
       setPhoneNote(errorText(e));
     }
@@ -181,7 +172,7 @@ export function ReportPage() {
     if (token && !consent) return setProblem(t("citizen.need_consent"));
     const form = new FormData();
     form.append("data", JSON.stringify({
-      dataset, language: lang, what, lon: pin[0], lat: pin[1], location_text: landmark || null, description: description || null,
+      language: lang, what, lon: pin[0], lat: pin[1], location_text: landmark || null, description: description || null,
       name: token ? name || null : null, phone_token: token && consent ? token : null,
     }));
     photos.forEach((f) => form.append("photos", f));
@@ -197,12 +188,12 @@ export function ReportPage() {
 
   const reset = () => {
     setDone(null); setPin(null); setFit(null); setLandmark(""); setWhat(""); setPhotos([]); setDescription("");
-    setCode(""); setCodeSent(false); setDemoCode(null); setToken(null); setVerifiedTo(null); setConsent(false); setCopied(false);
+    setCode(""); setCodeSent(false); setToken(null); setVerifiedTo(null); setConsent(false); setCopied(false);
   };
 
   if (done) {
     return (
-      <Shell lang={lang} setLang={setLang} demo={demo}>
+      <Shell lang={lang} setLang={setLang}>
         <section className="portal-card done" data-testid="report-done">
           <h1>{t("citizen.thanks")}</h1>
           <p>{t("citizen.your_ref")}</p>
@@ -215,7 +206,7 @@ export function ReportPage() {
             {done.events.map((ev, i) => <li key={i}><span>{ev.note[lang]}</span></li>)}
           </ol>
           <p className="portal-actions">
-            <Link className="btn" to={`/report/track/${done.ref}${demo ? "?demo=1" : ""}`} data-testid="see-status">{t("citizen.see_status")}</Link>
+            <Link className="btn" to={`/report/track/${done.ref}`} data-testid="see-status">{t("citizen.see_status")}</Link>
             <button type="button" className="btn secondary" onClick={reset}>{t("citizen.another")}</button>
           </p>
         </section>
@@ -224,7 +215,7 @@ export function ReportPage() {
   }
 
   return (
-    <Shell lang={lang} setLang={setLang} demo={demo}>
+    <Shell lang={lang} setLang={setLang}>
       <section className="portal-intro">
         <h1>{t("citizen.title")}</h1>
         <p>{t("citizen.lede")}</p>
@@ -235,9 +226,9 @@ export function ReportPage() {
           <legend>{t("citizen.step_place")}</legend>
           <p className="muted">{t("citizen.place_help")}</p>
           <div className="portal-map">
-            <MapView base={demo ? "demo" : "s2"} draft={pin ? [pin] : []} fit={fit} onMapClick={(p) => setPin(p)} testId="portal-map" />
+            <MapView draft={pin ? [pin] : []} fit={fit} onMapClick={(p) => setPin(p)} testId="portal-map" />
           </div>
-          {!demo && <p className="small muted">{t("citizen.map_note")}</p>}
+          <p className="small muted">{t("citizen.map_note")}</p>
           <div className="portal-row">
             <button type="button" className="btn secondary" onClick={locate}>{t("citizen.use_location")}</button>
             <span className="small" role="status" data-testid="pin-status">
@@ -291,7 +282,7 @@ export function ReportPage() {
 
         <fieldset className="portal-card">
           <legend>{t("citizen.step_updates")}</legend>
-          {!demo && cfg && !cfg.updates.sms_updates ? (
+          {cfg && !cfg.updates.sms_updates ? (
             <p className="note" data-testid="updates-unavailable">{t("citizen.updates_unavailable")}</p>
           ) : verifiedTo ? (
             <>
@@ -301,12 +292,11 @@ export function ReportPage() {
             </>
           ) : (
             <>
-              <p className="small muted">{t("citizen.updates_help")}{demo ? ` ${t("citizen.demo_phone")}` : ""}</p>
+              <p className="small muted">{t("citizen.updates_help")}</p>
               <div className="portal-row">
                 <label className="field grow">{t("citizen.phone")}<input type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} data-testid="phone" /></label>
                 <button type="button" className="btn secondary" disabled={phone.replace(/\D/g, "").length < 10} onClick={() => void sendCode()} data-testid="send-code">{t("citizen.send_code")}</button>
               </div>
-              {demoCode && <p className="note" data-testid="demo-code">{t("citizen.demo_code", { code: demoCode })}</p>}
               {codeSent && (
                 <div className="portal-row">
                   <label className="field grow">{t("citizen.code")}<input inputMode="numeric" maxLength={6} value={code} onChange={(e) => setCode(e.target.value)} data-testid="code" /></label>
@@ -329,8 +319,6 @@ export function ReportPage() {
 
 export function TrackPage() {
   const { ref: routeRef } = useParams();
-  const [params] = useSearchParams();
-  const demo = params.get("demo") === "1";
   const nav = useNavigate();
   const [lang, setLang] = usePortalLang();
   const { i18n } = useTranslation();
@@ -347,10 +335,10 @@ export function TrackPage() {
   }, [routeRef]);
 
   return (
-    <Shell lang={lang} setLang={setLang} demo={demo}>
+    <Shell lang={lang} setLang={setLang}>
       <section className="portal-card">
         <h1>{t("citizen.tab_track")}</h1>
-        <form className="portal-row" onSubmit={(e) => { e.preventDefault(); if (ref.trim()) nav(`/report/track/${ref.trim().toUpperCase()}${demo ? "?demo=1" : ""}`); }}>
+        <form className="portal-row" onSubmit={(e) => { e.preventDefault(); if (ref.trim()) nav(`/report/track/${ref.trim().toUpperCase()}`); }}>
           <label className="field grow">{t("citizen.track_help")}
             <input value={ref} onChange={(e) => setRef(e.target.value)} placeholder="GGR-XXXX-XXXX" data-testid="track-ref" />
           </label>

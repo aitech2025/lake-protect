@@ -2,8 +2,6 @@
 
 - GET  /reports                       reports, newest first, with filters
 - POST /reports/intake                staff enter a 1070 call, a Praja Vani petition or a visit
-- GET  /reports/whatsapp-simulator    the demo WhatsApp conversation of the signed-in user
-- POST /reports/whatsapp-simulator    send a demo WhatsApp message
 - GET  /reports/{id}                  one report: history, messages to the citizen, duplicates
 - GET  /reports/{id}/photos/{n}       a photo (metadata already removed)
 - POST /reports/{id}/place            an official puts a report with no place on the map
@@ -14,8 +12,6 @@ Officials never see a citizen's number or name: only whether updates go to a ver
 """
 from __future__ import annotations
 
-import base64
-import binascii
 from typing import Literal
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Response, UploadFile
@@ -24,10 +20,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.audit import chain
-from app.citizen import service, whatsapp
+from app.citizen import service
 from app.clock import utcnow
 from app.db import get_db
-from app.models import CitizenChat, CitizenMessage, CitizenReport, User
+from app.models import CitizenReport, User
 from app.security import current_user
 from app.storage import store
 
@@ -46,12 +42,10 @@ def _fail(exc: service.CitizenError) -> HTTPException:
 
 
 @router.get("")
-def list_reports(dataset: Literal["demo", "real"] | None = None, status: str | None = None, channel: str | None = None,
+def list_reports(status: str | None = None, channel: str | None = None,
                  asset_id: int | None = None, alert_id: int | None = None, limit: int = Query(200, ge=1, le=500),
                  user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
     q = select(CitizenReport)
-    if dataset is not None:
-        q = q.where(CitizenReport.is_demo.is_(dataset == "demo"))
     if status == "open":
         q = q.where(CitizenReport.status != "CLOSED")
     elif status:
@@ -70,7 +64,6 @@ def list_reports(dataset: Literal["demo", "real"] | None = None, status: str | N
 
 class IntakeIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    dataset: Literal["demo", "real"] = "real"
     channel: Literal["helpline_1070", "praja_vani", "walk_in"]
     source_ref: str | None = None
     language: Literal["en", "te"] = "te"
@@ -99,68 +92,12 @@ async def intake(data: str = Form(...), photos: list[UploadFile] = File(default=
                 db, channel=body.channel, language=body.language, what=body.what, at=utcnow(), source=service.source_hash(f"staff:{user.id}"),
                 lon=body.lon, lat=body.lat, location_text=body.location_text, description=body.description, photos=blobs,
                 phone=phone, phone_verified_via="staff" if phone else None, wants_updates=bool(phone), source_ref=body.source_ref,
-                entered_by=user, is_demo=body.dataset == "demo",
+                entered_by=user,
             )
     except service.CitizenError as exc:
         raise _fail(exc) from exc
     db.commit()
     return {**service.desk_row(db, report), "events": service.events_of(db, report.id, internal=True)}
-
-
-def _sim_number(user: User) -> str:
-    """A fictional WhatsApp number per desk user: +91 0000 …, which no real mobile can have."""
-    return f"910000{user.id:06d}"
-
-
-def _chat_view(db: Session, user: User) -> dict:
-    chat = db.scalar(select(CitizenChat).where(CitizenChat.wa_hash == whatsapp.wa_hash(_sim_number(user)), CitizenChat.is_demo.is_(True)))
-    if chat is None:
-        return {"number": "+" + _sim_number(user), "state": "new", "messages": []}
-    rows = db.scalars(select(CitizenMessage).where(CitizenMessage.chat_id == chat.id).order_by(CitizenMessage.id))
-    msgs = [{"id": m.id, "direction": m.direction, "text": m.text, "status": m.status, "detail": m.detail, "at": m.at.isoformat()} for m in rows]
-    if chat.report_id:
-        # Later updates on the report go to the same number, like a real WhatsApp thread.
-        updates = list(db.scalars(select(CitizenMessage).where(CitizenMessage.report_id == chat.report_id, CitizenMessage.kind == "update")
-                                  .order_by(CitizenMessage.id)))
-        retried = {m.retry_of for m in updates if m.retry_of}
-        for m in (u for u in updates if u.id not in retried):  # each update once, at its latest attempt
-            msgs.append({"id": m.id, "direction": "out", "text": m.text, "status": m.status, "detail": m.detail, "at": m.at.isoformat()})
-        msgs.sort(key=lambda x: (x["at"], x["id"]))
-    return {"number": "+" + _sim_number(user), "state": chat.state, "report_id": chat.report_id, "messages": msgs}
-
-
-@router.get("/whatsapp-simulator")
-def simulator_view(user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    return _chat_view(db, user)
-
-
-class SimIn(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    type: Literal["text", "location", "image"]
-    text: str | None = None
-    latitude: float | None = None
-    longitude: float | None = None
-    photo_b64: str | None = None
-
-
-@router.post("/whatsapp-simulator")
-def simulator_send(body: SimIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    """Demo only: the same conversation a citizen has on WhatsApp, with a fictional number."""
-    message: dict = {"type": body.type}
-    if body.type == "text":
-        message["text"] = body.text or ""
-    elif body.type == "location":
-        if body.latitude is None or body.longitude is None:
-            raise HTTPException(422, "A location needs latitude and longitude")
-        message.update(latitude=body.latitude, longitude=body.longitude)
-    else:
-        try:
-            message["data"] = base64.b64decode(body.photo_b64 or "", validate=True) or None
-        except (binascii.Error, ValueError) as exc:
-            raise HTTPException(422, "The photo is not valid base64") from exc
-    replies = whatsapp.handle(db, _sim_number(user), message, is_demo=True, at=utcnow())
-    db.commit()
-    return {"replies": replies, **_chat_view(db, user)}
 
 
 @router.get("/{report_id}")

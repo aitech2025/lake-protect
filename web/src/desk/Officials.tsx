@@ -5,25 +5,21 @@ import { Link } from "react-router-dom";
 import { api, fmtDateTime } from "../api";
 import { useAsync, usePageTitle } from "../components/Bits";
 import { PageState, TableRegion } from "../components/PageState";
-import { useDataset } from "../dataset";
-import { useDemoOnScreen } from "../demo";
 
 type Person = {
   id: number; username: string; name: string; role: string; language: string; email: string | null; phone: string | null;
   channels: string[]; areas: { district: string; mandal: string | null }[]; unacknowledged: number;
 };
-type KnownArea = { district: string; dataset: string; assets: number; mandals: { mandal: string; assets: number }[] };
+type KnownArea = { district: string; assets: number; mandals: { mandal: string; assets: number }[] };
 const OUTSIDE = ["email", "sms", "whatsapp"] as const;
 
 /** Admin only (DECISIONS.md D-059): who covers which area, how each is reached, and what was delivered. */
 export function Officials() {
   const { t } = useTranslation();
-  const { dataset } = useDataset();
   const people = useAsync(() => api<Person[]>("/users"), []);
   const areas = useAsync(() => api<{ items: KnownArea[] }>("/areas"), []);
-  const log = useAsync(() => api<any>(`/notifications/deliveries?dataset=${dataset}&limit=150`), [dataset]);
+  const log = useAsync(() => api<any>("/notifications/deliveries?limit=150"), []);
   const [message, setMessage] = useState<string | null>(null);
-  useDemoOnScreen(dataset === "demo");
   usePageTitle(t("officials.title"));
 
   const run = async (path: string, json?: unknown) => {
@@ -48,7 +44,7 @@ export function Officials() {
         </div>
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
           <button className="btn secondary" onClick={() => void run("/notifications/run")} data-testid="run-outbox">{t("officials.run")}</button>
-          <button className="btn" onClick={() => void run("/notifications/digests", { dataset })} data-testid="send-digest">{t("officials.digest")}</button>
+          <button className="btn" onClick={() => void run("/notifications/digests", {})} data-testid="send-digest">{t("officials.digest")}</button>
         </div>
       </div>
       {message && <p className="banner info" role="status" data-testid="officials-message">{message}</p>}
@@ -180,7 +176,7 @@ function PersonCard({ p, known, onSaved }: { p: Person; known: KnownArea[]; onSa
             <div className="area-add">
               <select value={district} onChange={(e) => { setDistrict(e.target.value); setMandal(""); }} aria-label={t("officials.district")} data-testid="area-district">
                 <option value="">{t("officials.district")}</option>
-                {known.map((k) => <option key={`${k.dataset}-${k.district}`} value={k.district}>{k.district} ({t(`dataset.${k.dataset}`)}, {k.assets})</option>)}
+                {known.map((k) => <option key={k.district} value={k.district}>{k.district} ({k.assets})</option>)}
               </select>
               <select value={mandal} onChange={(e) => setMandal(e.target.value)} disabled={!district} aria-label={t("officials.mandal")} data-testid="area-mandal">
                 <option value="">{t("officials.whole_district")}</option>

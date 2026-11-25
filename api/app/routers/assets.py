@@ -61,8 +61,7 @@ _LIST_SQL = text(
     WHERE (CAST(:area_user AS bigint) IS NULL
            OR ST_Intersects(b.geom, (SELECT u.area_geom FROM users u WHERE u.id = CAST(:area_user AS bigint))))
       AND (CAST(:asset_id AS bigint) IS NULL OR a.id = CAST(:asset_id AS bigint))
-      AND (CAST(:demo AS boolean) IS NULL OR a.is_demo = CAST(:demo AS boolean))
-    ORDER BY a.is_demo DESC, a.name
+    ORDER BY a.name
     """
 )
 
@@ -81,14 +80,9 @@ def _area_user(user: User) -> int | None:
     return None
 
 
-def _demo_flag(dataset: str | None) -> bool | None:
-    return None if dataset is None else dataset == "demo"
-
-
 @router.get("/assets")
-def list_assets(dataset: Literal["demo", "real"] | None = None, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    """`dataset` keeps real lakes and the fictional demo world apart (section 13, demo data rules)."""
-    rows = db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": None, "demo": _demo_flag(dataset)}).mappings().all()
+def list_assets(user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    rows = db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": None}).mappings().all()
     chain.record(db, actor_id=user.id, action="view.assets", entity="asset", details={"count": len(rows)})
     db.commit()
     return {"type": "FeatureCollection", "features": [_feature(dict(r)) for r in rows]}
@@ -96,7 +90,7 @@ def list_assets(dataset: Literal["demo", "real"] | None = None, user: User = Dep
 
 @router.get("/assets/{asset_id}")
 def get_asset(asset_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    row = db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": asset_id, "demo": None}).mappings().first()
+    row = db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": asset_id}).mappings().first()
     if row is None:
         raise HTTPException(404, "Asset not found")
     chain.record(db, actor_id=user.id, action="view.asset", entity="asset", entity_id=asset_id)
@@ -106,7 +100,7 @@ def get_asset(asset_id: int, user: User = Depends(current_user), db: Session = D
 
 @router.get("/assets/{asset_id}/boundaries")
 def list_boundaries(asset_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    if db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": asset_id, "demo": None}).first() is None:
+    if db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": asset_id}).first() is None:
         raise HTTPException(404, "Asset not found")
     versions = bsvc.all_versions(db, asset_id)
     current = {r["id"] for r in bsvc.current_boundary_set(db, asset_id).values()}
@@ -122,9 +116,9 @@ def list_boundaries(asset_id: int, user: User = Depends(current_user), db: Sessi
 
 
 @router.get("/categories")
-def list_categories(dataset: Literal["demo", "real"] | None = None, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+def list_categories(user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
     """The kinds of land GeoGuard watches now, and those planned (app/categories.yaml)."""
-    return {"items": categories.as_list(loc_svc.counts_by_type(db, _demo_flag(dataset))), "limits": categories.limits(),
+    return {"items": categories.as_list(loc_svc.counts_by_type(db)), "limits": categories.limits(),
             "policy_cutoff_date": rules.policy_cutoff_date().isoformat()}
 
 

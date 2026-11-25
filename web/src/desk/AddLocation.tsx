@@ -90,8 +90,8 @@ export function AddLocation({ cats, context, onAdded, onCancel, onOpen }: {
   const [check, setCheck] = useState<Check | null>(null);
   const [error, setError] = useState<{ text: string; assetId?: number } | null>(null);
   const [busy, setBusy] = useState(false);
-  const areas = useAsync(() => api<{ items: { district: string; dataset: string; mandals: { mandal: string }[] }[] }>("/areas"), []);
-  const districts = (areas.data?.items ?? []).filter((a) => a.dataset === "real");
+  const areas = useAsync(() => api<{ items: { district: string; mandals: { mandal: string }[] }[] }>("/areas"), []);
+  const districts = areas.data?.items ?? [];
   const mandals = districts.find((d) => d.district.toLowerCase() === f.district.trim().toLowerCase())?.mandals ?? [];
 
   useEffect(() => {
@@ -230,7 +230,7 @@ export function AddLocation({ cats, context, onAdded, onCancel, onOpen }: {
             <>
               <p className="small muted">{t("locations.draw_help")}</p>
               <div className="mapbox" style={{ height: 340 }}>
-                <MapView base="s2" boundaries={context} draft={points} draftClosed={closed}
+                <MapView boundaries={context} draft={points} draftClosed={closed}
                   onMapClick={closed ? undefined : (p) => setPoints((ps) => [...ps, p])} testId="draw-map" />
               </div>
               <div className="draw-tools">
@@ -247,7 +247,7 @@ export function AddLocation({ cats, context, onAdded, onCancel, onOpen }: {
               </label>
               {fileNote && <p className="banner warn" role="alert">{fileNote}</p>}
               <div className="mapbox" style={{ height: 300 }}>
-                <MapView base="s2" boundaries={preview} />
+                <MapView boundaries={preview} />
               </div>
             </>
           )}

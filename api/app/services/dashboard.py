@@ -10,9 +10,9 @@ opens exactly the incidents behind it.
 
 A level whose assets all lack the next area (the real lakes have no village) is skipped, and the
 lakes are listed directly. Only locations being watched count as watched and in the weekly figures;
-a location whose watch was stopped still shows while it has incidents (D-061). Assets with no district are grouped as "area not recorded". Real and
-demo assets are never mixed. Everyone sees every area: areas decide who is notified, not who may
-look.
+a location whose watch was stopped still shows while it has incidents (D-061). Assets with no
+district are grouped as "area not recorded". Everyone sees every area: areas decide who is
+notified, not who may look. GeoGuard holds real data only (D-065).
 """
 from __future__ import annotations
 
@@ -43,14 +43,13 @@ _ASSETS = text(
     LEFT JOIN LATERAL (
         SELECT ST_PointOnSurface(geom) AS p, status::text AS status FROM boundaries
         WHERE asset_id = a.id AND kind IN ('ftl', 'parcel') ORDER BY valid_from DESC, version DESC LIMIT 1) b ON true
-    WHERE a.is_demo = :demo
     ORDER BY a.name
     """
 )
 _WEEKS = text(
     """
     SELECT DISTINCT coalesce(s.week, to_char(r.as_of, 'IYYY-"W"IW')) AS week
-    FROM asset_screens s JOIN screen_runs r ON r.id = s.run_id WHERE r.is_demo = :demo
+    FROM asset_screens s JOIN screen_runs r ON r.id = s.run_id
     ORDER BY week DESC LIMIT :n
     """
 )
@@ -59,7 +58,7 @@ _SCREENS = text(
     SELECT DISTINCT ON (s.asset_id, coalesce(s.week, to_char(r.as_of, 'IYYY-"W"IW')))
            s.asset_id, coalesce(s.week, to_char(r.as_of, 'IYYY-"W"IW')) AS week, s.status, jsonb_array_length(s.changes) AS changes
     FROM asset_screens s JOIN screen_runs r ON r.id = s.run_id
-    WHERE r.is_demo = :demo AND coalesce(s.week, to_char(r.as_of, 'IYYY-"W"IW')) = ANY(:weeks)
+    WHERE coalesce(s.week, to_char(r.as_of, 'IYYY-"W"IW')) = ANY(:weeks)
     ORDER BY s.asset_id, coalesce(s.week, to_char(r.as_of, 'IYYY-"W"IW')), r.as_of DESC, s.id DESC
     """
 )
@@ -67,7 +66,7 @@ _ACKS = text(
     """
     SELECT n.alert_id, n.created_at, n.acknowledged_at
     FROM notifications n JOIN users u ON u.id = n.user_id
-    WHERE n.kind = 'incident_opened' AND u.role = 'viewer' AND n.is_demo = :demo AND n.created_at >= :since
+    WHERE n.kind = 'incident_opened' AND u.role = 'viewer' AND n.created_at >= :since
     """
 )
 
@@ -122,21 +121,21 @@ def _tone(f: dict) -> str:
     return "quiet"
 
 
-def overview(db: Session, user: User, *, is_demo: bool, district: str | None = None, mandal: str | None = None,
+def overview(db: Session, user: User, *, district: str | None = None, mandal: str | None = None,
              village: str | None = None, now: dt.datetime | None = None) -> dict:
     now = now or dt.datetime.now(dt.timezone.utc)
     path = {"district": district, "mandal": mandal, "village": village}
     depth = 0 if district is None else 1 if mandal is None else 2 if village is None else 3
     level = LEVELS[depth]
 
-    every = [dict(r) for r in db.execute(_ASSETS, {"demo": is_demo}).mappings()]
-    incidents = [i for i in alert_view.list_alerts(db) if i["is_demo"] == is_demo]
+    every = [dict(r) for r in db.execute(_ASSETS).mappings()]
+    incidents = alert_view.list_alerts(db)
     with_incidents = {i["asset_id"] for i in incidents}
     assets = [a for a in every if in_area(a, district, mandal, village) and (a["monitored"] or a["id"] in with_incidents)]
-    weeks = sorted(db.scalars(_WEEKS, {"demo": is_demo, "n": TREND_WEEKS}).all())
+    weeks = sorted(db.scalars(_WEEKS, {"n": TREND_WEEKS}).all())
     week = weeks[-1] if weeks else None
-    screens = {(r["asset_id"], r["week"]): dict(r) for r in db.execute(_SCREENS, {"demo": is_demo, "weeks": weeks or [""]}).mappings()}
-    acks = [dict(r) for r in db.execute(_ACKS, {"demo": is_demo, "since": now - ACK_WINDOW}).mappings()]
+    screens = {(r["asset_id"], r["week"]): dict(r) for r in db.execute(_SCREENS, {"weeks": weeks or [""]}).mappings()}
+    acks = [dict(r) for r in db.execute(_ACKS, {"since": now - ACK_WINDOW}).mappings()]
 
     # The next level down; skipped while every asset here lacks it (real lakes have no village).
     child_level = None
@@ -198,12 +197,11 @@ def overview(db: Session, user: User, *, is_demo: bool, district: str | None = N
             by_type[a["type"]] = by_type.get(a["type"], 0) + 1
     by_category = [{k: c[k] for k in ("name", "status", "label", "watched")} for c in categories.as_list(by_type) if c["status"] != "intake"]
 
-    crumbs = [{"level": "state", "name": "Demo State" if is_demo else "Telangana", "params": {}}]
+    crumbs = [{"level": "state", "name": "Telangana", "params": {}}]
     for i, lvl in enumerate(LEVELS[1:depth + 1], start=1):
         crumbs.append({"level": lvl, "name": path[lvl], "params": {k: path[k] for k in LEVELS[1:i + 1]}})
 
     return {
-        "dataset": "demo" if is_demo else "real",
         "level": level,
         "child_level": child_level or "asset",
         "path": crumbs,
@@ -215,7 +213,7 @@ def overview(db: Session, user: User, *, is_demo: bool, district: str | None = N
         "trend": trend,
         "pins": pins,
         "my_areas": routing.areas_of(db, user.id),
-        "area_source": None if is_demo else "Districts and mandals of the OpenStreetMap lakes come from OpenStreetMap boundaries, not the revenue record.",
+        "area_source": "Districts and mandals of the OpenStreetMap lakes come from OpenStreetMap boundaries, not the revenue record.",
         "as_of": now.isoformat(),
     }
 
@@ -224,12 +222,12 @@ def known_areas(db: Session) -> list[dict]:
     """Every district and mandal that holds an asset, for the admin's area picker."""
     rows = db.execute(text(
         """
-        SELECT btrim(district) AS district, btrim(mandal) AS mandal, is_demo, count(*) AS assets FROM assets
-        WHERE coalesce(btrim(district), '') <> '' GROUP BY 1, 2, 3 ORDER BY 3, 1, 2
+        SELECT btrim(district) AS district, btrim(mandal) AS mandal, count(*) AS assets FROM assets
+        WHERE coalesce(btrim(district), '') <> '' GROUP BY 1, 2 ORDER BY 1, 2
         """)).mappings().all()
-    out: dict[tuple, dict] = {}
+    out: dict[str, dict] = {}
     for r in rows:
-        d = out.setdefault((r["district"], r["is_demo"]), {"district": r["district"], "dataset": "demo" if r["is_demo"] else "real", "assets": 0, "mandals": []})
+        d = out.setdefault(r["district"], {"district": r["district"], "assets": 0, "mandals": []})
         d["assets"] += r["assets"]
         if r["mandal"]:
             d["mandals"].append({"mandal": r["mandal"], "assets": r["assets"]})

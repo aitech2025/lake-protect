@@ -3,8 +3,6 @@ import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../api";
 import { useAuth } from "../auth";
-import { DatasetSwitch, useDataset } from "../dataset";
-import { DemoBand } from "../demo";
 
 // Both roles see every page (D-057); what each may change is decided by the server. The Officials
 // page holds people's contact details, so only the admin has it (D-059).
@@ -29,10 +27,9 @@ export function notifyCountChanged(): void {
   window.dispatchEvent(new Event(COUNT_EVENT));
 }
 
-/** How many notifications wait for this person's acknowledgement, in the world on screen. */
+/** How many notifications wait for this person's acknowledgement. */
 function useUnacknowledged(): number {
   const { user } = useAuth();
-  const { dataset } = useDataset();
   const { pathname } = useLocation();
   const [n, setN] = useState(0);
   const [tick, setTick] = useState(0);
@@ -48,13 +45,13 @@ function useUnacknowledged(): number {
   useEffect(() => {
     if (!user) return;
     let live = true;
-    api<{ unacknowledged: number }>(`/notifications/count?dataset=${dataset}`)
+    api<{ unacknowledged: number }>("/notifications/count")
       .then((r) => live && setN(r.unacknowledged))
       .catch(() => undefined);
     return () => {
       live = false;
     };
-  }, [user, dataset, pathname, tick]);
+  }, [user, pathname, tick]);
   return n;
 }
 
@@ -98,14 +95,12 @@ export function Layout() {
   return (
     <div className="shell">
       <a className="skip-link" href="#main" onClick={skipToContent}>{t("nav.skip")}</a>
-      <DemoBand />
       <nav className="rail" aria-label={t("nav.label")}>
         <div className="brand">
           <Mark />
           <b>{t("app.name")}</b>
           <span className="small">{t("app.tagline")}</span>
         </div>
-        {user && <DatasetSwitch />}
         {NAV.filter((n) => user && n.roles.includes(user.role)).map((n) => (
           <NavLink key={n.to} to={n.to} data-testid={`nav-${n.to.slice(1)}`}>
             {t(n.key)}

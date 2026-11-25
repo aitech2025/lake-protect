@@ -64,7 +64,7 @@ export function fmtDateTime(value: string | null | undefined, lang = "en"): stri
   return new Date(value).toLocaleString(lang === "te" ? "te-IN" : "en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 }
 
-export type User = { id: number; username: string; name: string; role: string; language: string; is_demo: boolean };
+export type User = { id: number; username: string; name: string; role: string; language: string };
 
 export type AlertRow = {
   id: number;
@@ -139,7 +139,7 @@ export type DashRow = {
   category?: string; monitored?: boolean;
 };
 export type Overview = {
-  dataset: "demo" | "real"; level: string; child_level: string; path: { level: string; name: string; params: Record<string, string> }[];
+  level: string; child_level: string; path: { level: string; name: string; params: Record<string, string> }[];
   filters: Record<string, string>; week: string | null; figures: Figures; children: DashRow[];
   trend: { week: string; changed: number; clear_look: number; no_clear_look: number; new_incidents: number }[];
   pins: { asset_id: number; name: string; name_te: string | null; lon: number; lat: number; tone: Tone }[];

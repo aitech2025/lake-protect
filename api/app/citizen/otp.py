@@ -3,9 +3,7 @@
 Only hashes are stored. A code lasts 10 minutes and allows five tries; a phone can ask for three
 codes an hour. A verified phone gets a token that lasts 30 minutes, to attach to the report.
 
-- **In the demo** the code is shown on screen instead of sent, and only demo numbers (+91 0000…)
-  are accepted.
-- **For real data** the code goes by SMS. Until the State's SMS gateway and DLT template exist,
+- The code goes by SMS. Until the State's SMS gateway and DLT template exist,
   the portal says updates by SMS are not available yet, and the citizen keeps the reference
   number to check the status.
 """
@@ -21,7 +19,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.citizen import sender
-from app.citizen.service import CitizenError, TooMany, _key, is_demo_phone, normalise_phone, source_hash
+from app.citizen.service import CitizenError, TooMany, _key, normalise_phone, source_hash
 from app.models import CitizenOtp
 
 CODE_TTL = dt.timedelta(minutes=10)
@@ -38,29 +36,24 @@ def _code_hash(phone: str, code: str) -> str:
     return hmac.new(_key(), f"otp:{phone}:{code}".encode(), hashlib.sha256).hexdigest()
 
 
-def start(db: Session, phone_raw: str, *, is_demo: bool, at: dt.datetime) -> dict:
+def start(db: Session, phone_raw: str, *, at: dt.datetime) -> dict:
     phone = normalise_phone(phone_raw)
     if phone is None:
         raise CitizenError("Give your mobile number")
-    if is_demo != is_demo_phone(phone):
-        raise CitizenError("In the demo, use a demo number such as 0000000001" if is_demo else "Demo numbers work only in the demo")
     ph = source_hash(f"phone:{phone}")
     recent = db.scalar(select(func.count()).select_from(CitizenOtp).where(CitizenOtp.phone_hash == ph, CitizenOtp.created_at >= at - dt.timedelta(hours=1)))
     if (recent or 0) >= PER_HOUR:
         raise TooMany("Too many codes for this number. Please try again in an hour.")
     code = f"{secrets.randbelow(10**6):06d}"
-    if not is_demo:
-        if not sender.sms_ready():
-            raise NotAvailable("Updates by SMS are not available yet: the State's SMS gateway is not set up. "
-                               "Keep your reference number to check the status on this site.")
-        result = sender.send_sms(phone, "citizen_otp", {"code": code}, False)
-        if result.status != "sent":
-            raise NotAvailable(f"The code could not be sent: {result.detail}")
-    db.add(CitizenOtp(phone_hash=ph, code_hash=_code_hash(phone, code), attempts=0, expires_at=at + CODE_TTL, is_demo=is_demo, created_at=at))
+    if not sender.sms_ready():
+        raise NotAvailable("Updates by SMS are not available yet: the State's SMS gateway is not set up. "
+                           "Keep your reference number to check the status on this site.")
+    result = sender.send_sms(phone, "citizen_otp", {"code": code}, False)
+    if result.status != "sent":
+        raise NotAvailable(f"The code could not be sent: {result.detail}")
+    db.add(CitizenOtp(phone_hash=ph, code_hash=_code_hash(phone, code), attempts=0, expires_at=at + CODE_TTL, is_demo=False, created_at=at))
     db.flush()
-    out = {"sent": not is_demo, "to": sender.mask(phone), "expires_in": int(CODE_TTL.total_seconds())}
-    if is_demo:
-        out["demo_code"] = code
+    out = {"sent": True, "to": sender.mask(phone), "expires_in": int(CODE_TTL.total_seconds())}
     return out
 
 

@@ -104,16 +104,12 @@ def test_screening_tables_are_append_only(client, db):
                 db.execute(text(sql), {"i": run_id})
 
 
-def test_dataset_filter_keeps_real_and_demo_apart(client, db):
+def test_the_desk_lists_real_locations_with_no_demo_switch(client, db):
     real = _real(db)
-    demo = make_asset(db)
     analyst = make_user(db, "viewer")
-    real_ids = {f["id"] for f in client.get("/assets?dataset=real", headers=auth(analyst)).json()["features"]}
-    demo_ids = {f["id"] for f in client.get("/assets?dataset=demo", headers=auth(analyst)).json()["features"]}
-    assert real.id in real_ids and real.id not in demo_ids
-    assert demo.id in demo_ids and demo.id not in real_ids
-    for item in client.get("/alerts?dataset=real", headers=auth(analyst)).json()["items"]:
-        assert item["is_demo"] is False
+    ids = {f["id"] for f in client.get("/assets", headers=auth(analyst)).json()["features"]}
+    assert real.id in ids
+    assert client.get("/tiles/demo/14/1/1.png").status_code == 404  # the drawn demo map is gone (D-065)
 
 
 def _zip(files: dict[str, bytes]) -> bytes:

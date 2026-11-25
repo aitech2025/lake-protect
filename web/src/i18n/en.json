@@ -20,13 +20,9 @@
     "officials": "Officials",
     "reports": "Citizen reports"
   },
-  "demo": {
-    "badge": "Demo data",
-    "explain": "Fictional places, people and records. Nothing here is a finding."
-  },
   "login": {
     "title": "Sign in with a demo account",
-    "intro": "Each account is fictional. The admin runs the application; officials see everything and record reviews.",
+    "intro": "Each account is a role account, not a person. The admin runs the application; officials see everything and record reviews. Everything shown is real data.",
     "role": {
       "admin": "Runs the application: sources, documents and decisions on incidents",
       "viewer": "Sees every location, week and incident, and records reviews"
@@ -280,8 +276,6 @@
   },
   "assets": {
     "title": "Locations",
-    "dataset_demo": "Demo world",
-    "dataset_real": "Real lakes (OpenStreetMap)",
     "real_note": "The real lakes use OpenStreetMap outlines, and outlines drawn by the admin are estimates too: for watching only, never for field action. Every watched location is screened from Sentinel-2 satellite images each week.",
     "versions": "Boundary versions",
     "source": "Source",
@@ -444,8 +438,6 @@
     "none": "Nothing has waited over {{days}} days.",
     "print": "Print one page",
     "source": "Every figure comes from the system's records with no hand edits.",
-    "dataset_demo": "Demo world",
-    "dataset_real": "Real data",
     "reviewed": "reviewed by officials",
     "confirmed": "confirmed as real changes",
     "waiting": "waiting over {{days}} days",
@@ -468,11 +460,6 @@
     "saved": "Record saved.",
     "recorded": "Action recorded. The land stays on weekly watch.",
     "records": "Officer records"
-  },
-  "dataset": {
-    "label": "Showing",
-    "real": "Telangana (real data)",
-    "demo": "Demo world (fictional)"
   },
   "screen": {
     "title": "Screen from space, as of {{date}}",
@@ -501,8 +488,6 @@
     "sensor": {
       "sentinel-2": "Sentinel-2 optical",
       "sentinel-1": "Sentinel-1 radar",
-      "demo_synthetic_optical": "Demo image (synthetic)",
-      "demo_synthetic_radar": "Demo radar (synthetic)",
       "sentinel-2-l2a": "Sentinel-2 optical"
     },
     "flag": {
@@ -539,7 +524,7 @@
     "loaded": "Loaded: {{agency}} (run {{id}})",
     "preview_note": "Nothing has been written. This is exactly what loading would do.",
     "loaded_note": "Written to the register. Boundaries are added as new versions; nothing was overwritten.",
-    "sample_note": "Sample data is fictional and belongs to the demo world.",
+    "sample_note": "Sample data is fictional: it can be previewed, never loaded. GeoGuard holds real data only.",
     "records": "Records in this load",
     "seen_before": "seen before",
     "recent": "Recent loads",
@@ -927,7 +912,6 @@
     "send_code": "Send code",
     "code": "Code",
     "verify": "Verify",
-    "demo_code": "Demo: the code would arrive by SMS. It is {{code}}.",
     "verified": "Number verified. Updates will go to {{to}}.",
     "consent": "I agree that my number is used only to send updates on this report, and deleted 90 days after it closes.",
     "submit": "Send report",
@@ -956,10 +940,6 @@
     "other_ways": "You can also call the 1070 helpline, or tell Praja Vani. Staff enter those reports here too.",
     "whatsapp_soon": "WhatsApp reporting starts once the State's WhatsApp channel is set up.",
     "stats": "Last 30 days: {{received}} reports, {{checking}} being checked, {{closed}} closed.",
-    "demo_note": "Demo: a fictional place. Nothing sent here is real.",
-    "demo_phone": "In the demo, use a fictional number such as 0000000001.",
-    "demo_link": "Try the demo",
-    "real_link": "Report in Telangana",
     "staff": "Staff sign in",
     "failed": "The report could not be sent: {{why}}"
   },
@@ -971,7 +951,6 @@
     "closed": "Closed",
     "empty": "No citizen reports here.",
     "enter": "Enter a call or petition",
-    "simulator": "WhatsApp (demo)",
     "portal_link": "Open the public portal",
     "col": {
       "ref": "Reference",
@@ -1068,13 +1047,6 @@
     "intake_wants": "The caller wants updates by SMS, and agreed",
     "intake_submit": "Enter report",
     "intake_done": "Entered as {{ref}}. Read this reference back to the caller.",
-    "sim_title": "WhatsApp conversation (demo)",
-    "sim_lede": "The same conversation a citizen has on WhatsApp, from the fictional number {{number}}. Real messages arrive once the State's WhatsApp channel is set up.",
-    "sim_type": "Type a message",
-    "sim_send": "Send",
-    "sim_location": "Share location: click the map",
-    "sim_photo": "Send a photo",
-    "sim_held": "held",
     "on_incident": "Citizen reports of this place",
     "back": "All reports",
     "place_title": "Put it on the map",
@@ -1105,8 +1077,7 @@
     "review_change": "{{change}} of about {{area}} sq m, first seen {{date}}",
     "review_dates": "Images: before {{before}}, latest {{after}}",
     "source": {
-      "sentinel-2": "Sentinel-2, 10 m pixels: works smaller than about 1,000 sq m may not show",
-      "demo-synthetic": "Demo sensor (synthetic images)"
+      "sentinel-2": "Sentinel-2, 10 m pixels: works smaller than about 1,000 sq m may not show"
     },
     "pending_help": "The screener looks at the newest Sentinel-2 images within minutes when it is running (docker compose --profile screen up -d reviewer).",
     "next": "Next: review it, ask for a sharper image if the change is small, then decide with a note. The citizen is told each step.",

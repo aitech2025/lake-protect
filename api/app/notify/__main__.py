@@ -2,7 +2,7 @@
 
     python -m app.notify run [--every 60]            # the notifier service (docker compose)
     python -m app.notify tick                        # once
-    python -m app.notify digest --dataset real [--week 2026-W48]
+    python -m app.notify digest [--week 2026-W48]
 """
 from __future__ import annotations
 
@@ -30,7 +30,6 @@ def main() -> None:
     run.add_argument("--every", type=int, default=60)
     sub.add_parser("tick")
     dig = sub.add_parser("digest")
-    dig.add_argument("--dataset", choices=["real", "demo"], default="real")
     dig.add_argument("--week")
     args = parser.parse_args()
 
@@ -38,9 +37,8 @@ def main() -> None:
         print(json.dumps(tick_once()))
     elif args.cmd == "digest":
         with SessionLocal() as db:
-            demo = args.dataset == "demo"
-            week = args.week or service.latest_week(db, demo) or weeks_svc.iso_week(utcnow().date())
-            out = service.send_digests(db, week, demo, utcnow())
+            week = args.week or service.latest_week(db) or weeks_svc.iso_week(utcnow().date())
+            out = service.send_digests(db, week, utcnow())
             out["deliveries"] = service.send_pending(db, utcnow())
             db.commit()
         print(json.dumps(out))

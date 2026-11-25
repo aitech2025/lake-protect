@@ -1,45 +1,37 @@
 /**
- * M10 done-check: the desk switches between the real Hyderabad lakes and the fictional demo
- * world, never mixing them, and real maps use the offline Sentinel-2 base map.
+ * M10 and M18 done-check (DECISIONS.md D-065): GeoGuard shows real data only. There is no demo
+ * switch, no demo band and no drawn demo map: the desk lists the real lakes and their incidents
+ * on the offline Sentinel-2 base map.
  */
 import { expect, test } from "@playwright/test";
 import { login } from "./helpers";
 
-test("the desk shows real lakes on the Sentinel-2 map, apart from the demo world", async ({ page }) => {
+test("the desk shows only real lakes, on the Sentinel-2 map", async ({ page }) => {
   const tiles: string[] = [];
   page.on("request", (r) => {
     if (r.url().includes("/api/tiles/")) tiles.push(r.url());
   });
   await login(page, "demo.viewer2");
+  await expect(page.getByTestId("dataset-demo")).toHaveCount(0);
+  await expect(page.getByTestId("demo-badge")).toHaveCount(0);
 
-  // Demo world first (the default): demo band on screen, demo tiles only.
-  await expect(page.getByTestId("dataset-demo")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByTestId("demo-badge")).toBeVisible();
-
-  await page.getByTestId("dataset-real").click();
-  await expect(page.getByTestId("dataset-real")).toHaveAttribute("aria-pressed", "true");
   // The overview groups the real lakes by district (from OpenStreetMap boundaries, D-060).
+  await expect(page.getByTestId("dash-path")).toContainText("Telangana");
   await expect(page.getByTestId("dash-children")).toContainText("Medchal–Malkajgiri");
   await expect(page.getByText("not the revenue record")).toBeVisible();
   await page.getByTestId("nav-alerts").click();
   await expect(page.getByTestId("screening-summary")).toBeVisible();
-  // No demo record on screen, so no demo band.
-  await expect(page.getByTestId("demo-badge")).toHaveCount(0);
-  // Every alert listed is real.
-  for (const code of await page.locator('[data-testid^="alert-row-"]').evaluateAll((els) => els.map((e) => e.getAttribute("data-testid") ?? ""))) {
+  const rows = page.locator('[data-testid^="alert-row-"]');
+  await expect(rows.first()).toBeVisible();
+  for (const code of await rows.evaluateAll((els) => els.map((e) => e.textContent ?? ""))) {
     expect(code).not.toContain("DEMO-");
   }
   await expect.poll(() => tiles.some((u) => u.includes("/tiles/s2/"))).toBe(true);
+  expect(tiles.some((u) => u.includes("/tiles/demo/"))).toBe(false);
 
   await page.goto("/assets");
   await expect(page.locator(".list .row").first()).toBeVisible();
   const names = await page.locator(".list .row h3").allTextContents();
   expect(names.length).toBeGreaterThan(50);
   expect(names.some((n) => n.startsWith("Demo "))).toBe(false);
-
-  // The choice is remembered in this browser, and switching back restores the demo world.
-  await page.reload();
-  await expect(page.getByTestId("dataset-real")).toHaveAttribute("aria-pressed", "true");
-  await page.getByTestId("dataset-demo").click();
-  await expect(page.locator(".list .row h3").first()).toContainText("Demo");
 });

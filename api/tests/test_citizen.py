@@ -1,12 +1,12 @@
 """Citizen reports: every report opens an incident with a satellite review, worked in the regular flow
-(CONTEXT.md 17.8; DECISIONS.md D-062, D-063).
+(CONTEXT.md 17.8; DECISIONS.md D-062, D-063, D-065).
 
-Demo-world tests use the open-sea test location. The real-data tests use fictional reports at
-real coordinates, in the test database only.
+GeoGuard takes reports in Telangana only. These tests use fictional reports and fixtures at a
+Telangana test point (factories.TG_LON, TG_LAT) or at a real Hyderabad point, in the test database only.
+The satellite review always waits for the screener; the tests post its answers.
 """
 from __future__ import annotations
 
-import base64
 import datetime as dt
 import hashlib
 import hmac
@@ -19,13 +19,13 @@ from PIL import Image
 from sqlalchemy import select, text
 from sqlalchemy.exc import DBAPIError
 
-from app.citizen import service, whatsapp
+from app.citizen import sender, service, whatsapp
 from app.clock import utcnow
 from app.config import settings
 from app.models import Alert, Asset, Candidate, CitizenMessage, CitizenReport, ImageryRequest, Notification, SatelliteReview, Signal
 from app.notify import service as notify
-from app.seed.demo_world import World
-from tests.factories import PNG_B64, TEST_LAT, TEST_LON, auth, cover, decide, ingest, make_asset, make_user, offset, review
+from app.notify.channels import Result
+from tests.factories import PNG_B64, TEST_LAT, TEST_LON, TG_LAT, TG_LON, auth, cover, decide, ingest, make_asset, make_user, offset, square
 
 REF = r"^GGR-[0-9A-HJKMNP-TV-Z]{4}-[0-9A-HJKMNP-TV-Z]{4}$"
 TOKEN = {"X-Pipeline-Token": "test-token"}
@@ -42,8 +42,8 @@ def jpeg_with_gps() -> bytes:
     return buf.getvalue()
 
 
-def post_report(client, *, lon=TEST_LON, lat=TEST_LAT, what="dumping", language="en", photos=(), token=None, dataset="demo", **extra):
-    data = {"dataset": dataset, "language": language, "what": what, "lon": lon, "lat": lat, **extra}
+def post_report(client, *, lon=TG_LON, lat=TG_LAT, what="dumping", language="en", photos=(), token=None, **extra):
+    data = {"language": language, "what": what, "lon": lon, "lat": lat, **extra}
     if token:
         data["phone_token"] = token
     files = [("photos", (f"p{i}.jpg", p, "image/jpeg")) for i, p in enumerate(photos)]
@@ -52,6 +52,21 @@ def post_report(client, *, lon=TEST_LON, lat=TEST_LAT, what="dumping", language=
 
 def report_of(db, ref: str) -> CitizenReport:
     return db.scalar(select(CitizenReport).where(CitizenReport.ref == ref))
+
+
+def review_of(db, alert_id: int) -> SatelliteReview:
+    return db.scalar(select(SatelliteReview).where(SatelliteReview.alert_id == alert_id, SatelliteReview.kind == "automatic"))
+
+
+def change_found(today: dt.date, area: float = 1800) -> dict:
+    return {
+        "status": "done", "result": "change_found", "as_of": today.isoformat(), "before_date": (today - dt.timedelta(days=40)).isoformat(),
+        "after_date": (today - dt.timedelta(days=3)).isoformat(),
+        "scenes": [{"sensor": "sentinel-2-l2a", "scene_id": f"S2TEST_REVIEW_{area:.0f}", "acquired_at": f"{today - dt.timedelta(days=3)}T05:20:00Z",
+                    "cloud_pct": 2.5, "licence_notice": "Contains modified Copernicus Sentinel data 2026"}],
+        "before_png_b64": PNG_B64, "after_png_b64": PNG_B64,
+        "change": {"change_type": "building", "area_sq_m": area, "first_changed_at": (today - dt.timedelta(days=20)).isoformat()},
+    }
 
 
 @pytest.fixture(autouse=True)
@@ -64,37 +79,36 @@ def w(db):
     admin = make_user(db, "admin")
     north = make_user(db, "viewer")
     cover(db, north, "North")
-    lake = make_asset(db, district="North", mandal="Mandal A", name="Test Cheruvu North")
+    lake = make_asset(db, district="North", mandal="Mandal A", name="Test Cheruvu North", geometry=square(TG_LON, TG_LAT))
     return type("W", (), {"admin": admin, "north": north, "lake": lake})
 
 
-def test_a_report_opens_a_citizen_incident_reviewed_by_satellite_and_officials_are_told(client, db, w):
+def test_a_report_opens_a_citizen_incident_waiting_for_its_satellite_review_and_officials_are_told(client, db, w):
     resp = post_report(client, language="te", description="Lorries at night", photos=[jpeg_with_gps()])
     assert resp.status_code == 201, resp.text
     view = resp.json()
     assert re.match(REF, view["ref"]) and view["status"] == "CHECKING"
-    assert [e["kind"] for e in view["events"]] == ["received", "case_opened", "satellite_no_change"]
+    assert [e["kind"] for e in view["events"]] == ["received", "case_opened"]
     assert set(view["events"][0]["note"]) == {"en", "te"}  # no Urdu
     report = report_of(db, view["ref"])
+    assert report.is_demo is False
     alert = db.get(Alert, report.alert_id)
     assert (alert.origin, alert.report_id, alert.state, report.placed_by) == ("citizen", report.id, "OPEN", "pin")
     cand = db.get(Candidate, alert.candidate_id)
     assert (cand.asset_id, cand.sensor_basis, cand.change_type) == (w.lake.id, "citizen_report", "soil_fill")
     assert 2500 < float(cand.area_sq_m) < 3000  # the reported spot: a 30 m circle
-    assert cand.before_chip and cand.after_chip and len(cand.observation_ids) == 2  # the review's images and scenes
-    rv = db.scalar(select(SatelliteReview).where(SatelliteReview.alert_id == alert.id))
-    assert (rv.status, rv.result, rv.source) == ("done", "no_change", "demo-synthetic")
-    # The area's official and the admin are told, with the review's result in the sentence.
+    rv = review_of(db, alert.id)
+    assert (rv.status, rv.source) == ("pending", "sentinel-2")  # the screener answers it; there is no demo sensor
+    # The area's official and the admin are told.
     notes = db.scalars(select(Notification).where(Notification.alert_id == alert.id, Notification.kind == "incident_opened")).all()
     assert {n.user_id for n in notes} == {w.north.id, w.admin.id} and all(n.needs_ack for n in notes)
     body = next(n.body for n in notes if n.user_id == w.north.id)
-    assert "Reported by a citizen (web portal), reference " + view["ref"] in body
-    assert "reported by a citizen on" in body and "no change visible on satellite images up to" in body
-    # The incident page carries the report and the review; never the reporter.
+    assert "Reported by a citizen (web portal), reference " + view["ref"] in body and "reported by a citizen on" in body
+    # The incident page carries the report and the pending review; never the reporter.
     detail = client.get(f"/alerts/{alert.id}", headers=auth(w.north)).json()
     assert detail["origin"] == "citizen" and detail["citizen"]["ref"] == view["ref"] and detail["citizen"]["description"] == "Lorries at night"
-    assert detail["satellite_review"]["result"] == "no_change" and detail["candidate"]["has_image_pair"]
-    assert "reporter_phone" not in json.dumps(detail) and client.get(f"/alerts/{alert.id}/chips/after", headers=auth(w.north)).status_code == 200
+    assert detail["satellite_review"]["status"] == "pending" and "satellite review pending" in detail["summary"]
+    assert "reporter_phone" not in json.dumps(detail)
     # The photo kept has no metadata left.
     from app.storage import store
 
@@ -103,30 +117,27 @@ def test_a_report_opens_a_citizen_incident_reviewed_by_satellite_and_officials_a
     assert db.scalar(select(Signal).where(Signal.ref == view["ref"])).linked_alert_id == alert.id
 
 
-def test_outside_every_location_the_report_makes_a_reported_place_and_the_demo_review_finds_a_new_change(client, db, w):
-    world = World.load()
-    change = world.spec["unscreened_changes"][0]
-    c = world.change_m(change).centroid
-    lon, lat = world.to_lonlat(c.x, c.y)
-    view = post_report(client, lon=round(lon, 6), lat=round(lat, 6), what="dumping").json()
-    assert [e["kind"] for e in view["events"]] == ["received", "case_opened", "satellite_change_found"]
-    assert "first seen" in view["events"][-1]["note"]["en"]
+def test_outside_every_location_the_report_makes_a_reported_place_and_the_screeners_change_is_the_incidents(client, db, w):
+    lon, lat = offset(TG_LON, TG_LAT, east_m=3000)
+    view = post_report(client, lon=lon, lat=lat, what="dumping").json()
     report = report_of(db, view["ref"])
     alert = db.get(Alert, report.alert_id)
     place = db.get(Asset, db.get(Candidate, alert.candidate_id).asset_id)
-    assert (place.type, place.monitored, place.cohort, place.district) == ("reported_place", False, "D_UNNOTIFIED", "North")  # nearest demo area
-    rv = db.scalar(select(SatelliteReview).where(SatelliteReview.alert_id == alert.id))
-    assert rv.result == "change_found" and rv.change_type == "soil_fill" and float(rv.change_area_sq_m) > 1000
-    row = client.get(f"/alerts/{alert.id}", headers=auth(w.north)).json()
-    assert "the satellite shows a change of about" in row["summary"] and row["summary_te"]
-    assert "satellite_change_seen" in row["candidate"]["flags"]
+    assert (place.type, place.monitored, place.cohort) == ("reported_place", False, "D_UNNOTIFIED")
+    assert place.name == f"Reported place {view['ref']}"
     # A reported place is not on the weekly watch.
     assert place.id not in {a["id"] for a in client.get("/pipeline/watchlist", headers=TOKEN).json()["assets"]}
+    rid = review_of(db, alert.id).id
+    assert client.post(f"/pipeline/reviews/{rid}", json=change_found(dt.date.today()), headers=TOKEN).status_code == 200
+    assert client.get(f"/citizen/reports/{view['ref']}").json()["events"][-1]["kind"] == "satellite_change_found"
+    row = client.get(f"/alerts/{alert.id}", headers=auth(w.admin)).json()
+    assert "the satellite shows a change of about" in row["summary"] and row["summary_te"]
+    assert "satellite_change_seen" in row["candidate"]["flags"] and row["candidate"]["has_image_pair"]
 
 
-def test_a_real_report_waits_for_the_screener_whose_result_is_passed_on(client, db):
+def test_a_report_in_hyderabad_waits_for_the_screener_whose_result_is_passed_on(client, db):
     admin = make_user(db, "admin", is_demo=False)
-    view = post_report(client, lon=HYDERABAD[0], lat=HYDERABAD[1], dataset="real", what="construction").json()
+    view = post_report(client, lon=HYDERABAD[0], lat=HYDERABAD[1], what="construction").json()
     assert [e["kind"] for e in view["events"]] == ["received", "case_opened"]
     report = report_of(db, view["ref"])
     alert = db.get(Alert, report.alert_id)
@@ -137,17 +148,9 @@ def test_a_real_report_waits_for_the_screener_whose_result_is_passed_on(client, 
     pending = client.get("/pipeline/reviews", headers=TOKEN).json()["reviews"]
     mine = next(p for p in pending if p["alert_id"] == alert.id)
     assert (mine["ref"], round(mine["lon"], 4)) == (view["ref"], HYDERABAD[0]) and "parcel" in mine["asset"]["boundaries"]
-    today = dt.date.today()
     bad = client.post(f"/pipeline/reviews/{mine['id']}", json={"status": "done", "result": "change_found"}, headers=TOKEN)
     assert bad.status_code == 422  # a change found needs the change
-    body = {
-        "status": "done", "result": "change_found", "as_of": today.isoformat(), "before_date": (today - dt.timedelta(days=40)).isoformat(),
-        "after_date": (today - dt.timedelta(days=3)).isoformat(),
-        "scenes": [{"sensor": "sentinel-2-l2a", "scene_id": "S2TEST_REVIEW_1", "acquired_at": f"{today - dt.timedelta(days=3)}T05:20:00Z",
-                    "cloud_pct": 2.5, "licence_notice": "Contains modified Copernicus Sentinel data 2026"}],
-        "before_png_b64": PNG_B64, "after_png_b64": PNG_B64,
-        "change": {"change_type": "building", "area_sq_m": 1800, "first_changed_at": (today - dt.timedelta(days=20)).isoformat()},
-    }
+    body = change_found(dt.date.today())
     done = client.post(f"/pipeline/reviews/{mine['id']}", json=body, headers=TOKEN)
     assert done.status_code == 200 and done.json()["result"] == "change_found"
     assert client.post(f"/pipeline/reviews/{mine['id']}", json=body, headers=TOKEN).status_code == 409
@@ -159,10 +162,10 @@ def test_a_real_report_waits_for_the_screener_whose_result_is_passed_on(client, 
 
 
 def test_a_review_the_screener_cannot_finish_fails_after_three_tries(client, db):
-    view = post_report(client, lon=HYDERABAD[0], lat=HYDERABAD[1], dataset="real").json()
+    view = post_report(client, lon=HYDERABAD[0], lat=HYDERABAD[1]).json()
     rid = db.scalar(select(SatelliteReview.id).join(Alert, Alert.id == SatelliteReview.alert_id).join(CitizenReport, CitizenReport.id == Alert.report_id)
                     .where(CitizenReport.ref == view["ref"]))
-    for n in range(3):
+    for _ in range(3):
         out = client.post(f"/pipeline/reviews/{rid}", json={"status": "failed", "detail": "STAC search timed out"}, headers=TOKEN).json()
     assert out == {"id": rid, "status": "failed", "attempts": 3}
     assert rid not in {p["id"] for p in client.get("/pipeline/reviews", headers=TOKEN).json()["reviews"]}
@@ -191,10 +194,10 @@ def test_the_regular_flow_is_passed_on_to_the_citizen(client, db, w):
 
 
 def test_a_report_by_an_open_incident_joins_it_and_a_second_report_follows_the_first(client, db, w):
-    _, alert = ingest(db, w.lake)
+    _, alert = ingest(db, w.lake, geometry=square(TG_LON, TG_LAT, side_m=60))
     first = post_report(client).json()
     assert [e["kind"] for e in first["events"]] == ["received", "linked_incident"]
-    lon, lat = offset(TEST_LON, TEST_LAT, east_m=40)
+    lon, lat = offset(TG_LON, TG_LAT, east_m=40)
     second = post_report(client, lon=lon, lat=lat, what="construction").json()
     assert [e["kind"] for e in second["events"]] == ["received", "duplicate"]
     r1, r2 = report_of(db, first["ref"]), report_of(db, second["ref"])
@@ -207,7 +210,7 @@ def test_a_report_by_an_open_incident_joins_it_and_a_second_report_follows_the_f
 
 
 def test_words_that_name_a_location_place_the_report_and_others_wait_for_an_official(client, db, w):
-    form = {"channel": "helpline_1070", "language": "te", "what": "construction", "dataset": "demo",
+    form = {"channel": "helpline_1070", "language": "te", "what": "construction",
             "location_text": "near the bund of Test Cheruvu North, by the temple"}
     out = client.post("/reports/intake", data={"data": json.dumps(form)}, headers=auth(w.north)).json()
     report = db.get(CitizenReport, out["id"])
@@ -218,7 +221,8 @@ def test_words_that_name_a_location_place_the_report_and_others_wait_for_an_offi
     assert r2.alert_id is None and [e["kind"] for e in vague["events"]][-1] == "no_place"
     asks = db.scalars(select(Notification).where(Notification.report_id == r2.id)).all()
     assert [n.user_id for n in asks] == [w.admin.id] and asks[0].needs_ack
-    lon, lat = offset(TEST_LON, TEST_LAT, east_m=2500)
+    assert client.post(f"/reports/{r2.id}/place", json={"lon": TEST_LON, "lat": TEST_LAT}, headers=auth(w.admin)).status_code == 422  # not Telangana
+    lon, lat = offset(TG_LON, TG_LAT, east_m=2500)
     placed = client.post(f"/reports/{r2.id}/place", json={"lon": lon, "lat": lat}, headers=auth(w.admin)).json()
     assert placed["alert_id"] and placed["status"] == "CHECKING"
     assert asks[0].acknowledged_at is not None
@@ -227,18 +231,31 @@ def test_words_that_name_a_location_place_the_report_and_others_wait_for_an_offi
 
 def test_reports_are_refused_outside_the_state_without_a_place_or_in_urdu(client, db, w):
     assert post_report(client, lon=72.8, lat=19.0).status_code == 422
-    assert "demo world" in post_report(client, lon=78.47, lat=17.41).text
+    sea = post_report(client, lon=TEST_LON, lat=TEST_LAT)  # where the demo world was: no longer taken
+    assert sea.status_code == 422 and "must be in Telangana" in sea.text
     assert post_report(client, what="theft").status_code == 422
     assert post_report(client, language="ur").status_code == 422
-    assert client.post("/citizen/reports", data={"data": json.dumps({"dataset": "demo", "what": "dumping"})}).status_code == 422
+    assert client.post("/citizen/reports", data={"data": json.dumps({"what": "dumping"})}).status_code == 422
+    assert client.post("/citizen/reports", data={"data": json.dumps({"dataset": "demo", "what": "dumping", "lon": TG_LON, "lat": TG_LAT})}).status_code == 422
     assert "At most 3" in post_report(client, photos=[jpeg_with_gps()] * 4).text
 
 
-def test_updates_go_only_to_a_verified_phone_and_demo_messages_stay_here(client, db, w):
-    real = client.post("/citizen/otp", json={"phone": "9876543210", "dataset": "real"})
-    assert real.status_code == 409 and "not available yet" in real.text
-    start = client.post("/citizen/otp", json={"phone": "0000000001", "dataset": "demo"}).json()
-    token = client.post("/citizen/otp/verify", json={"phone": "+910000000001", "code": start["demo_code"]}).json()["token"]
+def test_updates_go_only_to_a_verified_phone(client, db, w, monkeypatch):
+    held = client.post("/citizen/otp", json={"phone": "9876543210"})
+    assert held.status_code == 409 and "not available yet" in held.text  # no SMS gateway yet
+    assert client.post("/citizen/otp", json={"phone": "0000000001"}).status_code == 422  # not a mobile number
+    sent: dict = {}
+
+    def fake_sms(phone, template, values, is_demo):
+        sent.update(values)
+        return Result("sent", "test gateway", phone)
+
+    with monkeypatch.context() as m:  # a stand-in gateway, for this request only
+        m.setattr(sender, "sms_ready", lambda: True)
+        m.setattr(sender, "send_sms", fake_sms)
+        start = client.post("/citizen/otp", json={"phone": "9876543210"}).json()
+    assert start["sent"] and sent["code"] not in json.dumps(start)  # the code goes only by SMS
+    token = client.post("/citizen/otp/verify", json={"phone": "9876543210", "code": sent["code"]}).json()["token"]
     view = post_report(client, token=token, name="Test Citizen").json()
     report = report_of(db, view["ref"])
     assert (report.phone_verified_via, report.wants_updates) == ("otp", True)
@@ -257,30 +274,32 @@ def test_updates_go_only_to_a_verified_phone_and_demo_messages_stay_here(client,
 
 def test_rate_limits(client, db, w):
     for i in range(service.PER_HOUR):
-        assert post_report(client, lon=offset(TEST_LON, TEST_LAT, east_m=300 * i)[0]).status_code == 201
+        assert post_report(client, lon=offset(TG_LON, TG_LAT, east_m=300 * i)[0]).status_code == 201
     assert post_report(client).status_code == 429
 
 
 def test_the_whatsapp_conversation_makes_a_report_and_its_incident(client, db, w):
+    number = "919000000002"  # a test number: the test gateway holds every reply
+
     def say(**msg):
-        r = client.post("/reports/whatsapp-simulator", json=msg, headers=auth(w.north))
-        assert r.status_code == 200, r.text
-        return r.json()["replies"]
+        return whatsapp.handle(db, number, msg, at=utcnow())
 
     welcome = say(type="text", text="hi")[0]
     assert "1 English" in welcome and "2 తెలుగు" in welcome and "اردو" not in welcome
     assert "📎" in say(type="text", text="2")[0]
-    say(type="location", latitude=TEST_LAT, longitude=TEST_LON)
+    assert say(type="location", latitude=TEST_LAT, longitude=TEST_LON)  # outside Telangana: asked again
+    say(type="location", latitude=TG_LAT, longitude=TG_LON)
     say(type="text", text="2")
     png = io.BytesIO()
     Image.new("RGB", (20, 20), (1, 2, 3)).save(png, format="PNG")
-    assert say(type="image", photo_b64=base64.b64encode(png.getvalue()).decode())[0] == "ఫోటో అందింది."
+    assert say(type="image", data=png.getvalue())[0] == "ఫోటో అందింది."
     say(type="text", text="A wall on the bund")
     done = say(type="text", text="YES")[0]
     ref = service.REF_RE.search(done).group(0)
     report = report_of(db, ref)
-    assert (report.channel, report.language, report.phone_verified_via) == ("whatsapp", "te", "whatsapp")
-    assert db.get(Alert, report.alert_id).origin == "citizen" and "ఉపగ్రహ" in done
+    assert (report.channel, report.language, report.phone_verified_via, report.is_demo) == ("whatsapp", "te", "whatsapp", False)
+    assert db.get(Alert, report.alert_id).origin == "citizen"
+    assert client.get("/reports/whatsapp-simulator", headers=auth(w.north)).status_code in (404, 422)  # the demo simulator is gone
 
 
 def test_the_whatsapp_webhook_needs_the_states_agreement_and_a_signature(client, db, w, monkeypatch):
@@ -300,14 +319,14 @@ def test_the_weekly_screen_tells_the_citizen_when_it_looks_again(client, db, w):
     view = post_report(client).json()
     today = utcnow().date()
     run = ScreenRun(as_of=today, rule_version="t", rules_sha256="a" * 64, collection="test", started_at=utcnow(), finished_at=utcnow(),
-                    assets_total=1, outcomes={}, is_demo=True)
+                    assets_total=1, outcomes={}, is_demo=False)
     db.add(run)
     db.flush()
     db.add(AssetScreen(run_id=run.id, asset_id=w.lake.id, status="no_candidate", looks=1, candidates=0, legacy_changes=0, counts={},
                        week="2026-W48", changes=[], last_look=today))
     db.flush()
-    assert service.on_screen_stored(db, run.id, utcnow()) == 0  # the review has just looked
-    assert service.on_screen_stored(db, run.id, utcnow() + dt.timedelta(days=8)) == 1
+    assert service.on_screen_stored(db, run.id, utcnow()) == 1
+    assert service.on_screen_stored(db, run.id, utcnow() + dt.timedelta(days=8)) == 0  # that look is already passed on
     assert client.get(f"/citizen/reports/{view['ref']}").json()["events"][-1]["kind"] == "satellite_checked"
 
 
@@ -318,9 +337,8 @@ def test_the_history_cannot_be_changed_and_the_planned_kind_cannot_be_added_by_h
         with db.begin_nested():
             db.execute(text("DELETE FROM citizen_report_events WHERE report_id = :r"), {"r": rid})
     admin = make_user(db, "admin", is_demo=False)
-    from tests.factories import square
-
     out = client.post("/assets", json={"type": "reported_place", "name": "x", "district": "x", "geometry": square(79.4, 18.6, side_m=200),
                                        "drawn": True, "status": "derived", "source_name": "x"}, headers=auth(admin))
     assert out.status_code == 422 and "made from citizens' reports" in out.text
-    assert client.get("/citizen/config?dataset=demo").json()["languages"] == ["en", "te"]
+    config = client.get("/citizen/config").json()
+    assert config["languages"] == ["en", "te"] and "dataset" not in config

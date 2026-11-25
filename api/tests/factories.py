@@ -15,6 +15,9 @@ _seq = itertools.count(1)
 
 # Open sea in the Bay of Bengal, inside UTM zone 44N: no real lake, parcel or person can sit here.
 TEST_LON, TEST_LAT = 81.50, 14.50
+# A point in Telangana, for tests of things the app takes only inside the State (citizen reports,
+# D-065). Rural land far from the watched lakes; the fixtures placed here exist in the test database only.
+TG_LON, TG_LAT = 79.20, 18.40
 
 
 def square(lon: float = TEST_LON, lat: float = TEST_LAT, side_m: float = 300.0) -> dict:

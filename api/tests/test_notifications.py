@@ -244,7 +244,7 @@ def _week(db, statuses: dict, as_of=dt.date(2025, 6, 18)):
 def test_the_weekly_digest_covers_each_officials_area_once(db, w):
     _, a = ingest(db, w.a_north)
     _week(db, {w.a_north: "candidate_found", w.a_south_b: "no_usable_look", w.a_south_c: "no_candidate", w.a_nowhere: "no_candidate"})
-    out = service.send_digests(db, "2025-W25", is_demo=True, at=T0 + H)
+    out = service.send_digests(db, "2025-W25", at=T0 + H)
     assert out["sent"] == 3  # two officials with areas, and the admin; not the official with none
     digests = {n.user_id: n for n in db.scalars(select(Notification).where(Notification.kind == "weekly_digest"))}
     north = digests[w.north.id].payload
@@ -257,22 +257,21 @@ def test_the_weekly_digest_covers_each_officials_area_once(db, w):
     admin = digests[w.admin.id].payload
     assert admin["scope"] == "all" and admin["figures"]["watched"] == 4 and admin["figures"]["waiting_for_you"] == 0
     assert "Waiting for your decision: 0." in digests[w.admin.id].body
-    assert service.send_digests(db, "2025-W25", is_demo=True, at=T0 + 2 * H)["sent"] == 0
+    assert service.send_digests(db, "2025-W25", at=T0 + 2 * H)["sent"] == 0
 
 
 # API --------------------------------------------------------------------------------------------
 def test_the_inbox_shows_only_my_notifications_and_acknowledges_them(client, db, w):
     _, a = ingest(db, w.a_north)
-    mine = client.get("/notifications?dataset=demo", headers=auth(w.north)).json()
+    mine = client.get("/notifications", headers=auth(w.north)).json()
     assert mine["unacknowledged"] == 1 and [i["alert_id"] for i in mine["items"]] == [a.id]
-    assert client.get("/notifications?dataset=real", headers=auth(w.north)).json()["items"] == []
     nid = mine["items"][0]["id"]
     assert client.post(f"/notifications/{nid}/ack", headers=auth(w.south)).status_code == 404
     detail = client.get(f"/alerts/{a.id}", headers=auth(w.north)).json()
     assert [n["id"] for n in detail["my_notifications"]] == [nid]
     assert client.post(f"/notifications/{nid}/ack", headers=auth(w.north)).json()["acknowledged"] == 1
     assert client.post(f"/notifications/{nid}/ack", headers=auth(w.north)).json()["acknowledged"] == 0
-    assert client.get("/notifications/count?dataset=demo", headers=auth(w.north)).json() == {"unacknowledged": 0}
+    assert client.get("/notifications/count", headers=auth(w.north)).json() == {"unacknowledged": 0}
     assert client.get(f"/alerts/{a.id}", headers=auth(w.north)).json()["my_notifications"] == []
 
 
@@ -280,15 +279,15 @@ def test_the_delivery_log_digests_and_runs_are_for_the_admin(client, db, w):
     ingest(db, w.a_north)
     for path, method in (("/notifications/deliveries", "get"), ("/notifications/channels", "get"), ("/notifications/run", "post")):
         assert getattr(client, method)(path, headers=auth(w.north)).status_code == 403
-    assert client.post("/notifications/digests", json={"dataset": "demo"}, headers=auth(w.north)).status_code == 403
-    assert client.post("/notifications/digests", json={"dataset": "real"}, headers=auth(w.admin)).status_code == 409
+    assert client.post("/notifications/digests", json={}, headers=auth(w.north)).status_code == 403
+    assert client.post("/notifications/digests", json={}, headers=auth(w.admin)).status_code == 409
     ran = client.post("/notifications/run", headers=auth(w.admin)).json()
     assert ran["deliveries"].get("sent", 0) >= 1
-    log = client.get("/notifications/deliveries?dataset=demo", headers=auth(w.admin)).json()
+    log = client.get("/notifications/deliveries", headers=auth(w.admin)).json()
     assert {(i["channel"], i["status"]) for i in log["items"]} >= {("email", "sent"), ("sms", "held"), ("whatsapp", "held")}
     assert {c["channel"]: c["ready"] for c in log["channels"]} == {"email": True, "sms": False, "whatsapp": False}
     _week(db, {w.a_north: "no_candidate"})
-    assert client.post("/notifications/digests", json={"dataset": "demo", "week": "2025-W25"}, headers=auth(w.admin)).json()["sent"] == 3
+    assert client.post("/notifications/digests", json={"week": "2025-W25"}, headers=auth(w.admin)).json()["sent"] == 3
 
 
 def test_the_admin_sets_contacts_channels_and_areas(client, db, w):
@@ -309,15 +308,15 @@ def test_the_admin_sets_contacts_channels_and_areas(client, db, w):
     _, c = ingest(db, w.a_south_c)
     assert w.idle.id in notes_for(db, c.id)
     areas = client.get("/areas", headers=auth(w.admin)).json()["items"]
-    assert {"district": "North", "dataset": "demo", "assets": 1, "mandals": [{"mandal": "Mandal A", "assets": 1}]} in areas
+    assert {"district": "North", "assets": 1, "mandals": [{"mandal": "Mandal A", "assets": 1}]} in areas
 
 
 def test_a_request_to_acknowledge_lapses_once_the_incident_is_decided(client, db, w):
     _, a = ingest(db, w.a_north)
-    assert client.get("/notifications/count?dataset=demo", headers=auth(w.north)).json() == {"unacknowledged": 1}
+    assert client.get("/notifications/count", headers=auth(w.north)).json() == {"unacknowledged": 1}
     decide(db, a, w.admin, to="DISMISSED")
-    assert client.get("/notifications/count?dataset=demo", headers=auth(w.north)).json() == {"unacknowledged": 0}
-    assert client.get("/notifications?dataset=demo&pending=true", headers=auth(w.north)).json()["items"] == []
+    assert client.get("/notifications/count", headers=auth(w.north)).json() == {"unacknowledged": 0}
+    assert client.get("/notifications?pending=true", headers=auth(w.north)).json()["items"] == []
     assert client.get(f"/alerts/{a.id}", headers=auth(w.north)).json()["my_notifications"] == []
     # It still counts as not acknowledged: the record is kept as it was.
     assert notes_for(db, a.id)[w.north.id].acknowledged_at is None

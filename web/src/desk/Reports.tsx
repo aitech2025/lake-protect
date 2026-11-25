@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api, fmtDate, fmtDateTime } from "../api";
@@ -7,8 +7,6 @@ import { AuthImage, useAsync, usePageTitle } from "../components/Bits";
 import { notifyCountChanged } from "../components/Layout";
 import { MapView, type Pin } from "../components/MapView";
 import { PageState, TableRegion } from "../components/PageState";
-import { baseFor, useDataset } from "../dataset";
-import { DemoTag, useDemoOnScreen } from "../demo";
 
 /** Citizen reports on the desk (CONTEXT.md 17.8; DECISIONS.md D-062). */
 type Row = {
@@ -16,7 +14,7 @@ type Row = {
   location_text: string | null; photos: number; asset_id: number | null; asset_name: string | null; asset_name_te: string | null; district: string | null;
   mandal: string | null; zone: string | null; alert_id: number | null; alert_code: string | null; alert_state: string | null; duplicate_of: number | null;
   duplicate_of_ref: string | null; duplicates: number; status: string; closed_reason: string | null; false_report: boolean; flags: string[];
-  updates: boolean; phone_masked: string | null; has_name: boolean; source_ref: string | null; is_demo: boolean; created_at: string;
+  updates: boolean; phone_masked: string | null; has_name: boolean; source_ref: string | null; created_at: string;
 };
 const STATUS_COLOUR: Record<string, string> = { RECEIVED: "#b5651d", CHECKING: "#1f6fa8", CLOSED: "#75848b" };
 
@@ -29,15 +27,13 @@ function placeLabel(r: Row, t: (k: string, o?: any) => string, lang: string): st
 export function Reports() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
-  const { dataset } = useDataset();
   const nav = useNavigate();
   const [filter, setFilter] = useState<"open" | "all" | "CLOSED">("open");
   const [intake, setIntake] = useState(false);
   const { data, error, status, loading, reload } = useAsync(
-    () => api<{ items: Row[] }>(`/reports?dataset=${dataset}${filter === "all" ? "" : `&status=${filter}`}`),
-    [dataset, filter],
+    () => api<{ items: Row[] }>(`/reports${filter === "all" ? "" : `?status=${filter}`}`),
+    [filter],
   );
-  useDemoOnScreen(dataset === "demo");
   usePageTitle(t("reports.title"));
   const items = data?.items ?? [];
   const pins: Pin[] = useMemo(
@@ -54,8 +50,7 @@ export function Reports() {
         </div>
         <div className="head-actions">
           <button type="button" className="btn" onClick={() => setIntake((x) => !x)} data-testid="intake-open">{t("reports.enter")}</button>
-          {dataset === "demo" && <Link className="btn secondary" to="/reports/whatsapp" data-testid="sim-open">{t("reports.simulator")}</Link>}
-          <a className="btn secondary" href={dataset === "demo" ? "/report?demo=1" : "/report"} target="_blank" rel="noreferrer">{t("reports.portal_link")}</a>
+          <a className="btn secondary" href="/report" target="_blank" rel="noreferrer">{t("reports.portal_link")}</a>
         </div>
       </div>
       {intake && <Intake onDone={() => { reload(); }} />}
@@ -68,7 +63,7 @@ export function Reports() {
       {data && (
         <div className="reports-grid">
           <div className="mapbox" style={{ height: 380 }}>
-            <MapView base={baseFor(dataset)} pins={pins} testId="reports-map" />
+            <MapView pins={pins} testId="reports-map" />
           </div>
           <TableRegion label={t("reports.title")}>
             <table className="grid" data-testid="reports-table">
@@ -79,7 +74,7 @@ export function Reports() {
                 {items.length === 0 && <tr><td colSpan={5} className="muted">{t("reports.empty")}</td></tr>}
                 {items.map((r) => (
                   <tr key={r.id} data-testid={`report-row-${r.ref}`}>
-                    <td><Link to={`/reports/${r.id}`}><code>{r.ref}</code></Link> {r.is_demo && <DemoTag />}<div className="small muted">{t(`reports.channel.${r.channel}`)}</div></td>
+                    <td><Link to={`/reports/${r.id}`}><code>{r.ref}</code></Link><div className="small muted">{t(`reports.channel.${r.channel}`)}</div></td>
                     <td>{fmtDateTime(r.created_at, lang)}</td>
                     <td>{t(`reports.what.${r.what}`)}{r.photos > 0 && <span className="small muted"> · {r.photos} 📷</span>}</td>
                     <td>{placeLabel(r, t, lang)}{r.alert_code && <div className="small"><Link to={`/alerts/${r.alert_id}`}>{r.alert_code}</Link></div>}
@@ -99,7 +94,6 @@ export function Reports() {
 
 function Intake({ onDone }: { onDone: () => void }) {
   const { t } = useTranslation();
-  const { dataset } = useDataset();
   const [f, setF] = useState({ channel: "helpline_1070", source_ref: "", language: "te", what: "dumping", location_text: "", description: "", caller_phone: "", wants_updates: false });
   const [pin, setPin] = useState<[number, number] | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -108,7 +102,7 @@ function Intake({ onDone }: { onDone: () => void }) {
     e.preventDefault();
     setMsg(null);
     const form = new FormData();
-    form.append("data", JSON.stringify({ ...f, dataset, lon: pin?.[0] ?? null, lat: pin?.[1] ?? null, source_ref: f.source_ref || null,
+    form.append("data", JSON.stringify({ ...f, lon: pin?.[0] ?? null, lat: pin?.[1] ?? null, source_ref: f.source_ref || null,
       location_text: f.location_text || null, description: f.description || null, caller_phone: f.wants_updates ? f.caller_phone : null }));
     try {
       const out = await api<any>("/reports/intake", { body: form });
@@ -144,7 +138,7 @@ function Intake({ onDone }: { onDone: () => void }) {
         <div>
           <p className="small muted">{t("reports.intake_place")}</p>
           <div className="mapbox" style={{ height: 300 }}>
-            <MapView base={baseFor(dataset)} draft={pin ? [pin] : []} onMapClick={(p) => setPin(p)} testId="intake-map" />
+            <MapView draft={pin ? [pin] : []} onMapClick={(p) => setPin(p)} testId="intake-map" />
           </div>
           {pin && <p className="small" data-testid="intake-pin">{pin[1].toFixed(5)}, {pin[0].toFixed(5)}</p>}
         </div>
@@ -160,7 +154,6 @@ export function ReportDetail() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const { data: r, error, status, loading, reload } = useAsync(() => api<any>(`/reports/${id}`), [id]);
-  useDemoOnScreen(!!r?.is_demo);
   usePageTitle(r ? `${t("reports.title")}: ${r.ref}` : t("reports.title"));
   const [pin, setPin] = useState<[number, number] | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -189,7 +182,7 @@ export function ReportDetail() {
       <p className="small"><Link to="/reports">← {t("reports.back")}</Link></p>
       <div className="page-head">
         <div>
-          <h1><code>{r.ref}</code> {r.is_demo && <DemoTag />}</h1>
+          <h1><code>{r.ref}</code></h1>
           <p className="muted">{t(`reports.what.${r.what}`)} · {t(`reports.channel.${r.channel}`)} · {fmtDateTime(r.created_at, lang)}</p>
         </div>
         <span className="pill" style={{ fontSize: "1rem", color: STATUS_COLOUR[r.status], background: "#eef1ef" }} data-testid="report-status">{t(`reports.status.${r.status}`)}</span>
@@ -252,14 +245,14 @@ export function ReportDetail() {
         <aside>
           {r.lon !== null ? (
             <div className="mapbox" style={{ height: 260 }}>
-              <MapView base={r.is_demo ? "demo" : "s2"} draft={[[r.lon, r.lat]]} fit={[r.lon - 0.004, r.lat - 0.003, r.lon + 0.004, r.lat + 0.003]} />
+              <MapView draft={[[r.lon, r.lat]]} fit={[r.lon - 0.004, r.lat - 0.003, r.lon + 0.004, r.lat + 0.003]} />
             </div>
           ) : (
             <section className="panel" data-testid="place-form">
               <h2 className="title-s">{t("reports.place_title")}</h2>
               <p className="small muted">{t("reports.place_help")}</p>
               <div className="mapbox" style={{ height: 300 }}>
-                <MapView base={r.is_demo ? "demo" : "s2"} draft={pin ? [pin] : []} onMapClick={(p) => setPin(p)} testId="place-map" />
+                <MapView draft={pin ? [pin] : []} onMapClick={(p) => setPin(p)} testId="place-map" />
               </div>
               {pin && <p className="small">{pin[1].toFixed(5)}, {pin[0].toFixed(5)}</p>}
               <button type="button" className="btn" disabled={!pin} onClick={() => void place()} data-testid="place-submit">{t("reports.place")}</button>
@@ -268,81 +261,6 @@ export function ReportDetail() {
           {msg && <p className="banner stop" role="alert">{msg}</p>}
           {r.status === "CLOSED" && r.closed_reason && <p className="note">{t(`reports.reason.${r.closed_reason}`)} · {fmtDate(r.updated_at, lang)}</p>}
         </aside>
-      </div>
-    </div>
-  );
-}
-
-/** Demo only: the WhatsApp conversation a citizen has, with a fictional number (D-062). */
-export function WhatsAppSim() {
-  const { t } = useTranslation();
-  const { dataset, setDataset } = useDataset();
-  const { data, reload } = useAsync(() => api<any>("/reports/whatsapp-simulator"), []);
-  const [chat, setChat] = useState<any>(null);
-  const [textIn, setTextIn] = useState("");
-  const [showMap, setShowMap] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const thread = useRef<HTMLOListElement>(null);
-  useDemoOnScreen(true);
-  usePageTitle(t("reports.sim_title"));
-  useEffect(() => {
-    if (dataset !== "demo") setDataset("demo");
-  }, [dataset, setDataset]);
-  useEffect(() => setChat(data), [data]);
-  useEffect(() => {
-    if (thread.current) thread.current.scrollTop = thread.current.scrollHeight;
-  }, [chat]);
-
-  const send = async (body: any) => {
-    setBusy(true);
-    try {
-      setChat(await api<any>("/reports/whatsapp-simulator", { json: body }));
-    } finally {
-      setBusy(false);
-    }
-  };
-  const sendPhoto = async (file: File | undefined) => {
-    if (!file) return;
-    const b64 = await new Promise<string>((ok) => {
-      const fr = new FileReader();
-      fr.onload = () => ok(String(fr.result).split(",")[1] ?? "");
-      fr.readAsDataURL(file);
-    });
-    await send({ type: "image", photo_b64: b64 });
-  };
-
-  return (
-    <div className="page" data-testid="wa-sim">
-      <p className="small"><Link to="/reports">← {t("reports.back")}</Link></p>
-      <h1>{t("reports.sim_title")}</h1>
-      <p className="muted">{t("reports.sim_lede", { number: chat?.number ?? "" })}</p>
-      <div className="wa-wrap">
-        <div className="wa-phone">
-          <ol className="wa-thread" data-testid="wa-thread" ref={thread} aria-live="polite">
-            {(chat?.messages ?? []).map((m: any) => (
-              <li key={m.id} className={`wa-msg ${m.direction}`} data-direction={m.direction}>
-                <span className="wa-text">{m.text}</span>
-                {m.direction === "out" && m.status !== "received" && <span className="wa-meta">{m.status === "held" ? t("reports.sim_held") : m.status}</span>}
-              </li>
-            ))}
-          </ol>
-          <form className="wa-input" onSubmit={(e) => { e.preventDefault(); if (textIn.trim()) { void send({ type: "text", text: textIn }); setTextIn(""); } }}>
-            <input value={textIn} onChange={(e) => setTextIn(e.target.value)} placeholder={t("reports.sim_type")} aria-label={t("reports.sim_type")} data-testid="wa-text" disabled={busy} />
-            <button type="submit" className="btn" disabled={busy} data-testid="wa-send">{t("reports.sim_send")}</button>
-          </form>
-          <div className="wa-tools">
-            <button type="button" className="btn secondary" onClick={() => setShowMap((x) => !x)} data-testid="wa-location">{t("reports.sim_location")}</button>
-            <label className="btn secondary portal-file">{t("reports.sim_photo")}
-              <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => { void sendPhoto(e.target.files?.[0]); e.target.value = ""; }} data-testid="wa-photo" />
-            </label>
-            <button type="button" className="btn quiet" onClick={() => reload()}>↻</button>
-          </div>
-        </div>
-        {showMap && (
-          <div className="mapbox" style={{ height: 420, flex: 1 }}>
-            <MapView base="demo" onMapClick={(p) => { setShowMap(false); void send({ type: "location", longitude: p[0], latitude: p[1] }); }} testId="wa-map" />
-          </div>
-        )}
       </div>
     </div>
   );

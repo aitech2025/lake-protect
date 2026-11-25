@@ -98,33 +98,22 @@ def new_ref(db: Session) -> str:
             return ref
 
 
-def dataset_of(lon: float, lat: float) -> bool | None:
-    """True for the fictional demo world, False for Telangana, None for anywhere else."""
-    cfg = engine.settings()
-    p = Point(lon, lat)
-    if box(*cfg["sample_bbox"]).contains(p):
-        return True
-    if box(*cfg["real_bbox"]).contains(p):
-        return False
-    return None
+def in_telangana(lon: float, lat: float) -> bool:
+    """Reports are taken for places in Telangana only (the box around the State)."""
+    return box(*engine.settings()["real_bbox"]).contains(Point(lon, lat))
 
 
 def normalise_phone(value: str | None) -> str | None:
     if not value or not value.strip():
         return None
     digits = re.sub(r"[^\d+]", "", value.strip())
-    if re.fullmatch(r"[6-9]\d{9}", digits) or re.fullmatch(r"0000\d{6}", digits):
+    if re.fullmatch(r"[6-9]\d{9}", digits):
         digits = "+91" + digits
     elif re.fullmatch(r"91\d{10}", digits):
         digits = "+" + digits
     if not re.fullmatch(r"\+[1-9]\d{7,14}", digits):
         raise CitizenError("Give a mobile number with 10 digits, or with +91")
     return digits
-
-
-def is_demo_phone(phone: str) -> bool:
-    """Demo numbers (+91 0000…) cannot belong to a real Indian mobile."""
-    return phone.startswith("+910000")
 
 
 def clean_photo(data: bytes) -> tuple[bytes, int, int]:
@@ -162,7 +151,7 @@ _MATCH = text(
     SELECT a.id, a.name, a.name_te, a.monitored, bv.kind::text AS kind,
            ST_Distance(bv.geom::geography, p.g::geography) AS d
     FROM boundary_versions bv JOIN assets a ON a.id = bv.asset_id CROSS JOIN p
-    WHERE a.is_demo = :demo AND bv.kind IN ('ftl', 'parcel', 'buffer', 'watch_ring')
+    WHERE bv.kind IN ('ftl', 'parcel', 'buffer', 'watch_ring')
       AND bv.valid_from <= CURRENT_DATE AND (bv.effective_valid_to IS NULL OR bv.effective_valid_to > CURRENT_DATE)
       AND ST_Intersects(bv.geom, p.g)
     ORDER BY CASE WHEN bv.kind IN ('ftl', 'parcel') THEN 0 WHEN bv.kind = 'buffer' THEN 1 ELSE 2 END, a.monitored DESC, d
@@ -172,8 +161,8 @@ _MATCH = text(
 ZONE = {"ftl": "inside", "parcel": "inside", "buffer": "buffer", "watch_ring": "watch_ring"}
 
 
-def match(db: Session, lon: float, lat: float, is_demo: bool) -> dict | None:
-    row = db.execute(_MATCH, {"lon": lon, "lat": lat, "demo": is_demo}).mappings().first()
+def match(db: Session, lon: float, lat: float) -> dict | None:
+    row = db.execute(_MATCH, {"lon": lon, "lat": lat}).mappings().first()
     return {**dict(row), "zone": ZONE[row["kind"]]} if row else None
 
 
@@ -193,15 +182,15 @@ def near_incident(db: Session, asset_id: int, lon: float | None, lat: float | No
     ), {"a": asset_id, "lon": lon, "lat": lat, "m": INCIDENT_M, "states": list(OPEN_INCIDENT)})
 
 
-def duplicate_root(db: Session, lon: float, lat: float, is_demo: bool, at: dt.datetime) -> CitizenReport | None:
+def duplicate_root(db: Session, lon: float, lat: float, at: dt.datetime) -> CitizenReport | None:
     rid = db.scalar(text(
         """
         SELECT coalesce(r.duplicate_of, r.id) FROM citizen_reports r
-        WHERE r.is_demo = :demo AND r.status <> 'CLOSED' AND r.geom IS NOT NULL AND r.created_at >= :since
+        WHERE r.status <> 'CLOSED' AND r.geom IS NOT NULL AND r.created_at >= :since
           AND ST_DWithin(r.geom::geography, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, :m)
         ORDER BY r.created_at, r.id LIMIT 1
         """
-    ), {"demo": is_demo, "lon": lon, "lat": lat, "m": DUPLICATE_M, "since": at - dt.timedelta(days=DUPLICATE_DAYS)})
+    ), {"lon": lon, "lat": lat, "m": DUPLICATE_M, "since": at - dt.timedelta(days=DUPLICATE_DAYS)})
     return db.get(CitizenReport, rid) if rid else None
 
 
@@ -266,7 +255,6 @@ def submit(
     wants_updates: bool = False,
     source_ref: str | None = None,
     entered_by: User | None = None,
-    is_demo: bool | None = None,
 ) -> CitizenReport:
     if channel not in CHANNELS:
         raise CitizenError(f"Unknown channel {channel}")
@@ -284,23 +272,14 @@ def submit(
         lon = lat = None
         if not location_text:
             raise CitizenError("Mark the place on the map, or say where it is")
-        if is_demo is None:
-            raise CitizenError("Mark the place on the map")
-    else:
-        found = dataset_of(lon, lat)
-        if found is None:
-            raise CitizenError("The place must be in Telangana")
-        if is_demo is not None and found != is_demo:
-            raise CitizenError("The place must be in the demo world" if is_demo else "The place must be in Telangana")
-        is_demo = found
+    elif not in_telangana(lon, lat):
+        raise CitizenError("The place must be in Telangana")
     if len(photos or []) + len(stored_photos or []) > MAX_PHOTOS:
         raise CitizenError(f"At most {MAX_PHOTOS} photos")
     if channel not in STAFF_CHANNELS:
         _rate_limit(db, source, at)
     if phone is not None and not (wants_updates and phone_verified_via):
         phone = None  # kept only to send updates, and only once verified
-    if phone and is_demo is False and is_demo_phone(phone):
-        raise CitizenError("Demo phone numbers work only in the demo")
     flags = []
     falses = db.scalar(select(func.count()).select_from(CitizenReport).where(CitizenReport.source_hash == source,
                                                                             CitizenReport.false_report.is_(True))) or 0
@@ -315,7 +294,7 @@ def submit(
         photos=kept, reporter_name=((reporter_name or "").strip()[:120] or None) if phone else None,
         reporter_phone=phone, phone_verified_via=phone_verified_via if phone else None, wants_updates=bool(phone),
         source_ref=(source_ref or "").strip() or None, entered_by=entered_by.id if entered_by else None,
-        status="RECEIVED", flags=flags, source_hash=source, is_demo=bool(is_demo), created_at=at, updated_at=at,
+        status="RECEIVED", flags=flags, source_hash=source, is_demo=False, created_at=at, updated_at=at,
     )
     db.add(report)
     db.flush()
@@ -325,7 +304,7 @@ def submit(
 
     placed_by = "pin"
     if lon is None:
-        guess = locate.from_words(db, location_text or description, report.is_demo)
+        guess = locate.from_words(db, location_text or description)
         if guess:
             lon, lat, placed_by = guess["lon"], guess["lat"], "description"
             add_event(db, report, "placed_from_words", status="RECEIVED", note=texts.note("placed_from_words", place={"en": guess["name"], "te": guess["name"]}),
@@ -357,13 +336,13 @@ def place(db: Session, report: CitizenReport, lon: float, lat: float, placed_by:
     report.geom = WKTElement(f"POINT({lon} {lat})", srid=4326)
     report.placed_by = placed_by
     db.flush()
-    root = duplicate_root(db, lon, lat, report.is_demo, at)
+    root = duplicate_root(db, lon, lat, at)
     if root is not None and root.id != report.id and root.alert_id:
         report.duplicate_of, report.asset_id, report.zone, report.alert_id = root.id, root.asset_id, root.zone, root.alert_id
         add_event(db, report, "duplicate", status=root.status, note=texts.note("duplicate"), at=at, internal=f"Same place as {root.ref}",
                   mirror=False, send=send, actor=actor)
     else:
-        m = match(db, lon, lat, report.is_demo)
+        m = match(db, lon, lat)
         if m:
             report.asset_id, report.zone = m["id"], m["zone"]
         existing = near_incident(db, m["id"], lon, lat) if m else None
@@ -382,9 +361,8 @@ def place(db: Session, report: CitizenReport, lon: float, lat: float, placed_by:
             if not m:
                 report.asset_id = db.scalar(text("SELECT c.asset_id FROM candidates c WHERE c.id = :c"), {"c": alert.candidate_id})
                 report.zone = "inside"
-            # Demo: the review answers at once and its note is the update; real data waits for the screener.
             add_event(db, report, "case_opened", status="CHECKING", note=texts.note("case_opened"), at=at, actor=actor,
-                      internal=f"Incident {alert.code} opened", send=send and not report.is_demo)
+                      internal=f"Incident {alert.code} opened", send=send)
             incident.request(db, alert, report, lon, lat, at, send=send)
             notify.incident_opened(db, alert, at)
     db.add(Signal(kind="citizen_report", asset_id=report.asset_id, geom=report.geom, received_at=at, ref=report.ref,
@@ -396,9 +374,8 @@ def place_by_official(db: Session, report: CitizenReport, user: User, lon: float
     """A report with no place: an official puts it on the map, and it goes on as any other."""
     if report.geom is not None or report.alert_id:
         raise CitizenError("This report already has its place")
-    found = dataset_of(lon, lat)
-    if found is None or found != report.is_demo:
-        raise CitizenError("The place must be in the demo world" if report.is_demo else "The place must be in Telangana")
+    if not in_telangana(lon, lat):
+        raise CitizenError("The place must be in Telangana")
     db.execute(text("DELETE FROM signals WHERE kind = 'citizen_report' AND ref = :r AND geom IS NULL"), {"r": report.ref})
     add_event(db, report, "placed", status="RECEIVED", note=texts.note("placed", place={"en": f"{lat:.5f}, {lon:.5f}", "te": f"{lat:.5f}, {lon:.5f}"}),
               at=at, actor=user, internal="Placed on the map by an official", send=False)
@@ -536,11 +513,11 @@ def public_view(db: Session, ref: str) -> dict | None:
         "what_label": texts.WHAT[report.what], "place": place_name(db, report) if report.asset_id else None,
         "channel": report.channel, "language": report.language, "created_at": report.created_at.isoformat(),
         "updated_at": report.updated_at.isoformat(), "closed_reason": report.closed_reason, "updates": report.wants_updates,
-        "is_demo": report.is_demo, "events": events_of(db, report.id, internal=False),
+        "events": events_of(db, report.id, internal=False),
     }
 
 
-def stats(db: Session, is_demo: bool, days: int = 30, now: dt.datetime | None = None) -> dict:
+def stats(db: Session, days: int = 30, now: dt.datetime | None = None) -> dict:
     now = now or dt.datetime.now(dt.timezone.utc)
     row = db.execute(text(
         """
@@ -548,9 +525,9 @@ def stats(db: Session, is_demo: bool, days: int = 30, now: dt.datetime | None = 
                count(*) FILTER (WHERE status = 'CHECKING') AS checking,
                count(*) FILTER (WHERE status = 'CLOSED') AS closed,
                count(*) FILTER (WHERE alert_id IS NOT NULL) AS with_incident
-        FROM citizen_reports WHERE is_demo = :d AND created_at >= :since
+        FROM citizen_reports WHERE created_at >= :since
         """
-    ), {"d": is_demo, "since": now - dt.timedelta(days=days)}).mappings().one()
+    ), {"since": now - dt.timedelta(days=days)}).mappings().one()
     return {"days": days, **{k: int(v) for k, v in row.items()}}
 
 
@@ -569,7 +546,7 @@ def desk_row(db: Session, r: CitizenReport) -> dict:
         "duplicate_of": r.duplicate_of, "duplicate_of_ref": root.ref if root else None, "duplicates": int(dups),
         "status": r.status, "closed_reason": r.closed_reason, "false_report": r.false_report, "flags": r.flags or [],
         "updates": r.wants_updates, "phone_masked": sender.mask(r.reporter_phone), "has_name": bool(r.reporter_name),
-        "source_ref": r.source_ref, "is_demo": r.is_demo, "created_at": r.created_at.isoformat(), "updated_at": r.updated_at.isoformat(),
+        "source_ref": r.source_ref, "created_at": r.created_at.isoformat(), "updated_at": r.updated_at.isoformat(),
     }
 
 

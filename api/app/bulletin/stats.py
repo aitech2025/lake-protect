@@ -41,15 +41,14 @@ def previous_month(month: str) -> str:
     return f"{year - (mon == 1)}-{(mon - 2) % 12 + 1:02d}"
 
 
-def _incidents(db: Session, demo: bool) -> list[dict]:
+def _incidents(db: Session) -> list[dict]:
     rows = db.execute(text(
         """
         SELECT al.id, al.code, al.created_at, al.resolution, a.name AS asset_name, a.id AS asset_id,
                c.change_type::text AS change_type,
                ST_X(ST_PointOnSurface(c.geom)) AS lon, ST_Y(ST_PointOnSurface(c.geom)) AS lat
         FROM alerts al JOIN candidates c ON c.id = al.candidate_id JOIN assets a ON a.id = c.asset_id
-        WHERE al.is_demo = :demo
-        """), {"demo": demo}).mappings().all()
+        """)).mappings().all()
     return [dict(r) for r in rows]
 
 
@@ -69,9 +68,9 @@ def _events(db: Session, ids: list[int], before: dt.datetime) -> dict[int, list[
     return out
 
 
-def compute(db: Session, month: str, *, demo: bool, now: dt.datetime | None = None) -> dict:
+def compute(db: Session, month: str, *, now: dt.datetime | None = None) -> dict:
     w = window(month, now)
-    incidents = [i for i in _incidents(db, demo) if i["created_at"] < w.cutoff]
+    incidents = [i for i in _incidents(db) if i["created_at"] < w.cutoff]
     by_id = {i["id"]: i for i in incidents}
     events = _events(db, list(by_id), w.cutoff)
 
@@ -101,11 +100,11 @@ def compute(db: Session, month: str, *, demo: bool, now: dt.datetime | None = No
             })
     waiting.sort(key=lambda o: (-o["days_waiting"], o["code"]))
     watched = db.scalar(text(
-        "SELECT count(DISTINCT a.id) FROM assets a JOIN boundaries b ON b.asset_id = a.id WHERE a.is_demo = :demo AND b.valid_from < :cut"
+        "SELECT count(DISTINCT a.id) FROM assets a JOIN boundaries b ON b.asset_id = a.id WHERE b.valid_from < :cut"
         # Watched at the cut-off: the last start or stop before it (D-061); no row means watched.
         " AND coalesce((SELECT m.monitored FROM monitoring_changes m WHERE m.asset_id = a.id AND m.at < :cut"
         " ORDER BY m.at DESC, m.id DESC LIMIT 1), true)"),
-        {"demo": demo, "cut": w.cutoff.date() + dt.timedelta(days=1)})
+        {"cut": w.cutoff.date() + dt.timedelta(days=1)})
     by_state: dict[str, int] = {}
     for o in waiting:
         by_state[o["state"]] = by_state.get(o["state"], 0) + 1
@@ -113,7 +112,6 @@ def compute(db: Session, month: str, *, demo: bool, now: dt.datetime | None = No
         "month": month,
         "as_of": w.cutoff.isoformat(),
         "complete_month": w.cutoff == w.end,
-        "dataset": "demo" if demo else "real",
         "wait_days": WAIT_DAYS,
         "counts": {"watched": watched, "new_alerts": len(new), "reviewed": len(reviewed), "confirmed": len(confirmed), "waiting": len(waiting)},
         "change_types": change_types,
@@ -123,8 +121,8 @@ def compute(db: Session, month: str, *, demo: bool, now: dt.datetime | None = No
     }
 
 
-def bulletin(db: Session, month: str, *, demo: bool, now: dt.datetime | None = None) -> dict:
-    this = compute(db, month, demo=demo, now=now)
-    last = compute(db, previous_month(month), demo=demo, now=now)
+def bulletin(db: Session, month: str, *, now: dt.datetime | None = None) -> dict:
+    this = compute(db, month, now=now)
+    last = compute(db, previous_month(month), now=now)
     this["last_month"] = {"month": last["month"], "counts": last["counts"]}
     return this

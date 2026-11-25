@@ -21,7 +21,7 @@ def month_label(month: str) -> str:
     return f"{MONTHS[int(m) - 1]} {y}"
 
 
-def map_svg(db: Session, stats: dict, *, demo: bool, width: int = 640, height: int = 400) -> str:
+def map_svg(db: Session, stats: dict, *, width: int = 640, height: int = 400) -> str:
     """Every lake and parcel, with this month's new incidents and those waiting for a decision marked."""
     rows = db.execute(text(
         """
@@ -29,8 +29,7 @@ def map_svg(db: Session, stats: dict, *, demo: bool, width: int = 640, height: i
         FROM assets a
         JOIN LATERAL (SELECT geom FROM boundary_versions bv WHERE bv.asset_id = a.id AND bv.kind IN ('ftl','parcel')
                       ORDER BY bv.version DESC LIMIT 1) b ON true
-        WHERE a.is_demo = :demo
-        """), {"demo": demo}).mappings().all()
+        """)).mappings().all()
     pts = [c for r in rows for poly in (r["g"]["coordinates"] if r["g"]["type"] == "MultiPolygon" else [r["g"]["coordinates"]]) for c in poly[0]]
     if not pts:
         return f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}"></svg>'

@@ -15,7 +15,7 @@ any time returns its status; RESTART starts again.
 - **Real messages** arrive at the webhook once the State has a WhatsApp Business agreement (its own
   number or MeeSeva on WhatsApp). Each is signed with the app secret, and unsigned messages are
   refused.
-- **Until then**, the desk's simulator sends demo messages through the same conversation.
+- **Until then** nothing arrives: the desk's demo simulator is removed with the demo world (D-065).
 
 **Privacy.** The number is kept on the open chat only to reply, and removed after 24 hours without
 a message. It stays on the report only if the citizen asked for updates.
@@ -48,11 +48,11 @@ def signature_ok(raw_body: bytes, header: str | None) -> bool:
     return hmac.compare_digest(header.removeprefix("sha256="), good)
 
 
-def _chat(db: Session, wa_id: str, is_demo: bool, at: dt.datetime) -> CitizenChat:
+def _chat(db: Session, wa_id: str, at: dt.datetime) -> CitizenChat:
     h = wa_hash(wa_id)
-    chat = db.scalar(select(CitizenChat).where(CitizenChat.wa_hash == h, CitizenChat.is_demo.is_(is_demo)))
+    chat = db.scalar(select(CitizenChat).where(CitizenChat.wa_hash == h))
     if chat is None:
-        chat = CitizenChat(wa_hash=h, wa_id=wa_id, state="new", draft={}, is_demo=is_demo, updated_at=at)
+        chat = CitizenChat(wa_hash=h, wa_id=wa_id, state="new", draft={}, is_demo=False, updated_at=at)
         db.add(chat)
         db.flush()
     chat.wa_id = wa_id
@@ -97,9 +97,9 @@ def _status_reply(db: Session, ref: str, lang: str) -> str:
                                                          note=texts.pick(last, lang))
 
 
-def handle(db: Session, wa_id: str, message: dict, *, is_demo: bool, at: dt.datetime) -> list[str]:
+def handle(db: Session, wa_id: str, message: dict, *, at: dt.datetime) -> list[str]:
     """One incoming message; returns the replies, which are also logged and sent (or held)."""
-    chat = _chat(db, wa_id, is_demo, at)
+    chat = _chat(db, wa_id, at)
     kind = message.get("type")
     body = (message.get("text") or "").strip()
     _log(db, chat, "in", body if kind == "text" else f"[{kind}]", at)
@@ -134,7 +134,7 @@ def _step(db: Session, chat: CitizenChat, wa_id: str, kind: str | None, body: st
     if chat.state == "place":
         if kind == "location":
             lon, lat = float(message["longitude"]), float(message["latitude"])
-            if service.dataset_of(lon, lat) is not chat.is_demo:
+            if not service.in_telangana(lon, lat):
                 return [texts.pick(texts.BOT["outside"], lang)]
             draft.update(lon=lon, lat=lat)
         elif kind == "text" and len(body) >= 3:
@@ -196,7 +196,7 @@ def _step(db: Session, chat: CitizenChat, wa_id: str, kind: str | None, body: st
                 db, channel="whatsapp", language=lang, what=draft["what"], at=at, source=wa_hash(wa_id),
                 lon=draft.get("lon"), lat=draft.get("lat"), location_text=draft.get("location_text"), description=description,
                 stored_photos=draft.get("photos", []), phone=f"+{wa_id}" if wants else None,
-                phone_verified_via="whatsapp" if wants else None, wants_updates=wants, is_demo=chat.is_demo,
+                phone_verified_via="whatsapp" if wants else None, wants_updates=wants,
             )
         except service.TooMany:
             chat.state, chat.draft = "done", {}

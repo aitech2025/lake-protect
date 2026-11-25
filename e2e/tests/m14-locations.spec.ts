@@ -10,7 +10,6 @@ import { login, shot } from "./helpers";
 test("the admin adds, refuses a duplicate of, and stops watching a location", async ({ page }) => {
   await login(page, "demo.admin");
   await page.goto("/assets");
-  await page.getByTestId("dataset-real").click();
 
   // What GeoGuard watches now, and what is planned.
   await expect(page.getByTestId("kind-card-water_body")).toContainText("99 watched");

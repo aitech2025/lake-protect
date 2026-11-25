@@ -8,7 +8,6 @@
   @font-face { font-family: "Noto Sans"; src: url("{{ fonts.bold }}"); font-weight: 700; }
   @page { size: A4; margin: 14mm 14mm 12mm; }
   body { font-family: "Noto Sans", sans-serif; font-size: 9.5pt; color: #1c2b33; line-height: 1.35; }
-  .demo { background: #6e3fa3; color: #fff; font-weight: 700; padding: 1.5mm 3mm; margin-bottom: 3mm; font-size: 8.5pt; }
   h1 { font-size: 17pt; margin: 0; }
   .sub { color: #4a5a62; margin: 0.5mm 0 4mm; }
   .counts { display: flex; gap: 3mm; margin-bottom: 4mm; }
@@ -28,7 +27,6 @@
 </style>
 </head>
 <body>
-{% if dataset == "demo" %}<div class="demo">Demo data: fictional places, people and records. Not a finding.</div>{% endif %}
 <h1>Monthly page: {{ label }}</h1>
 <p class="sub">{% if complete_month %}Whole month.{% else %}Month to date, as of {{ as_of[:10] }}.{% endif %} Compared with {{ last_label }}.</p>
 

@@ -149,11 +149,9 @@ def test_hydraa_upgrades_a_preliminary_lake_and_adds_recovered_land(db, client, 
     assert parcel.survey_numbers == ["41", "42"]
 
     analyst = make_user(db, "viewer")
-    listed = {f["properties"]["asset_key"]: f["properties"] for f in client.get("/assets?dataset=demo", headers=auth(analyst)).json()["features"]}
+    listed = {f["properties"]["asset_key"]: f["properties"] for f in client.get("/assets", headers=auth(analyst)).json()["features"]}
     assert listed["sample-hydraa-hyd-rec-s-01"]["mode"] == "ACTION"
     assert listed["sample-lpc-s-002"]["boundary_status"] == "final_notification"
-    real = client.get("/assets?dataset=real", headers=auth(analyst)).json()["features"]
-    assert not any(f["properties"]["asset_key"].startswith("sample-") for f in real)
 
 
 def test_land_records_load_without_owner_names_and_fill_survey_numbers(db, client, isolated_storage):
@@ -286,13 +284,10 @@ def test_sources_api_roles_and_listing(db, client, isolated_storage):
     preview = client.post("/sources/hmda_lpc/runs", json=body, headers=auth(team.admin))
     assert preview.status_code == 200 and preview.json()["counts"]["assets_created"] == 3
 
+    # GeoGuard holds real data only (D-065): the app never writes the fictional sample register.
     applied = client.post("/sources/hmda_lpc/runs", json={"transport": "sample", "dry_run": False}, headers=auth(team.admin))
-    assert applied.status_code == 200 and applied.json()["run_id"]
-    runs = client.get("/sources/runs", headers=auth(team.viewer)).json()["items"]
-    assert runs[0]["id"] == applied.json()["run_id"] and runs[0]["actor_id"] == team.admin.id
-    assert any(i["action"] == "created" for i in runs[0]["items"])
-    after = {s["name"]: s for s in client.get("/sources", headers=auth(team.admin)).json()["items"]}
-    assert after["hmda_lpc"]["last_run"]["id"] == runs[0]["id"]
+    assert applied.status_code == 422 and "preview only" in applied.json()["detail"]
+    assert client.get("/sources/runs", headers=auth(team.viewer)).json()["items"] == []  # a preview writes nothing
 
 
 @pytest.mark.parametrize("statement", [

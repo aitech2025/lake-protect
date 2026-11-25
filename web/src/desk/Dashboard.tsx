@@ -6,8 +6,6 @@ import { isAdmin, useAuth } from "../auth";
 import { useAsync, usePageTitle } from "../components/Bits";
 import { MapView, type Pin } from "../components/MapView";
 import { PageState, TableRegion } from "../components/PageState";
-import { baseFor, useDataset } from "../dataset";
-import { useDemoOnScreen } from "../demo";
 import "./dashboard.css";
 
 const LEVELS = ["district", "mandal", "village"] as const;
@@ -37,7 +35,6 @@ export function Dashboard() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const { user } = useAuth();
-  const { dataset } = useDataset();
   const nav = useNavigate();
   const [params, setParams] = useSearchParams();
   const area: Record<string, string> = {};
@@ -46,8 +43,7 @@ export function Dashboard() {
     if (v !== null) area[k] = v;
   });
   const key = query(area);
-  const { data, error, status, loading, reload } = useAsync(() => api<Overview>(`/dashboard${query({ dataset, ...area })}`), [dataset, key]);
-  useDemoOnScreen(dataset === "demo" && Boolean(data));
+  const { data, error, status, loading, reload } = useAsync(() => api<Overview>(`/dashboard${query(area)}`), [key]);
   usePageTitle(t("dashboard.title"));
 
   const go = (p: Record<string, string>) => setParams(p);
@@ -111,7 +107,7 @@ export function Dashboard() {
           {data.area_source && <p className="small muted" style={{ marginBottom: "0.75rem" }}>{t("dashboard.area_source")}</p>}
           <div className="dash-grid">
             <div className="mapbox" style={{ height: 360 }}>
-              <MapView base={baseFor(dataset)} pins={pins} testId="dashboard-map" />
+              <MapView pins={pins} testId="dashboard-map" />
               <div className="legend">
                 {(Object.keys(TONE) as Tone[]).map((k) => (
                   <span key={k}><i className="pin" style={{ width: 10, height: 10, borderWidth: 2, background: TONE[k].colour }} />{t(`dashboard.tone.${k}`)}</span>

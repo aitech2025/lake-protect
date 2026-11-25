@@ -1,6 +1,5 @@
 """GET /bulletins/{month}: the monthly page (section 9.4), from the database only."""
 import re
-from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy import select
@@ -25,27 +24,27 @@ def _check(month: str) -> None:
 
 
 @router.get("/{month}")
-def get_bulletin(month: str, dataset: Literal["demo", "real"] = "demo", user: User = Depends(require_roles(*READERS)), db: Session = Depends(get_db)) -> dict:
+def get_bulletin(month: str, user: User = Depends(require_roles(*READERS)), db: Session = Depends(get_db)) -> dict:
     _check(month)
-    out = stats.bulletin(db, month, demo=dataset == "demo")
-    out["map_svg"] = render.map_svg(db, out, demo=dataset == "demo")
-    chain.record(db, actor_id=user.id, action="view.bulletin", entity="bulletin", entity_id=month, details={"dataset": dataset})
+    out = stats.bulletin(db, month)
+    out["map_svg"] = render.map_svg(db, out)
+    chain.record(db, actor_id=user.id, action="view.bulletin", entity="bulletin", entity_id=month)
     db.commit()
     return out
 
 
 @router.get("/{month}/pdf")
-def get_bulletin_pdf(month: str, dataset: Literal["demo", "real"] = "demo", user: User = Depends(require_roles(*READERS)), db: Session = Depends(get_db)) -> Response:
+def get_bulletin_pdf(month: str, user: User = Depends(require_roles(*READERS)), db: Session = Depends(get_db)) -> Response:
     """Builds the one-page PDF from the current records and keeps a copy with its figures."""
     _check(month)
-    out = stats.bulletin(db, month, demo=dataset == "demo")
-    pdf = render.render_pdf(out, render.map_svg(db, out, demo=dataset == "demo"))
+    out = stats.bulletin(db, month)
+    pdf = render.render_pdf(out, render.map_svg(db, out))
     now = utcnow()
-    key = store.put_object(f"bulletins/{dataset}/{month}/{now.strftime('%Y%m%dT%H%M%S')}.pdf", pdf)
+    key = store.put_object(f"bulletins/{month}/{now.strftime('%Y%m%dT%H%M%S')}.pdf", pdf)
     row = Bulletin(month=month, stats={k: v for k, v in out.items() if k != "new_alert_points"}, pdf_path=key, generated_at=now)
     db.add(row)
     db.flush()
-    chain.record(db, actor_id=user.id, action="export.bulletin_pdf", entity="bulletin", entity_id=month, details={"dataset": dataset, "bulletin_id": row.id})
+    chain.record(db, actor_id=user.id, action="export.bulletin_pdf", entity="bulletin", entity_id=month, details={"bulletin_id": row.id})
     db.commit()
     return Response(pdf, media_type="application/pdf", headers={"Content-Disposition": f'inline; filename="geoguard-{month}.pdf"'})
 

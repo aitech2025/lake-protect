@@ -209,13 +209,13 @@ def _citizen_block(db: Session, alert: Alert) -> dict | None:
     asset = db.get(Asset, db.get(Candidate, alert.candidate_id).asset_id)
     area_source = None
     if asset.type == "reported_place":
-        area_source = "nearest demo location" if asset.is_demo else (locate.AREA_SOURCE if asset.district else None)
+        area_source = locate.AREA_SOURCE if asset.district else None
     return {
         "report_id": r.id, "ref": r.ref, "channel": r.channel, "language": r.language, "what": r.what, "description": r.description,
         "location_text": r.location_text, "placed_by": r.placed_by, "photos": len(r.photos or []), "created_at": _iso(r.created_at),
         "lon": lon, "lat": lat, "updates": r.wants_updates, "source_ref": r.source_ref, "reported_place": asset.type == "reported_place",
         "area_source": area_source,
-        "survey_numbers": locate.survey_numbers(db, lon, lat, r.is_demo) if lon is not None else [],
+        "survey_numbers": locate.survey_numbers(db, lon, lat) if lon is not None else [],
     }
 
 

@@ -24,7 +24,7 @@ def list_records(kind: str, user: User = Depends(require_roles(Role.admin, Role.
     items = [{k: v for k, v in r.items() if k != "geom"} for r in rows]
     chain.record(db, actor_id=user.id, action="view.records", entity=kind, details={"count": len(items)})
     db.commit()
-    return {"kind": kind, "items": items, "has_demo": any(i.get("is_demo") for i in items)}
+    return {"kind": kind, "items": items}
 
 
 @router.post("/{kind}/import", status_code=201)

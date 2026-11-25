@@ -398,6 +398,39 @@ officials review and the admin decides.
 
 This widens D-057 for citizen incidents only: there an official may take the admin's steps.
 
+### D-065: Real data only; the demo world and its maps are removed (owner, 25 Nov 2026)
+The owner asked to remove the demo world and every demo map, so that GeoGuard holds only real
+data. Asked how people would sign in, since every account was a demo account, the owner chose to
+**keep the demo accounts** and remove only the demo world.
+
+Built as M18. This reverses CONTEXT.md section 13's two-world rule and D-044's "demo and real
+apart".
+
+- **Removed:**
+  - **The demo world:** its seed (`app/seed/demo*.py`, `data/demo/world.yml`) and fictional
+    places, incidents, reports and records.
+  - **The drawn demo map:** tiles and route.
+  - **The demo sensor** that answered citizens' satellite reviews at once.
+  - **The portal's demo mode:** `?demo=1`, demo phone numbers and on-screen codes.
+  - **The desk:** the WhatsApp simulator, the demo/real switch and the demo badges.
+- **Existing databases:** migration 0012 deletes every demo and sample row, then every row that
+  pointed at one.
+  - **Kept:** the role accounts, and the audit log whole, so its hash chain still verifies.
+  - **How:** it switches the append-only guards off for its own transaction only, so it needs
+    the database owner's superuser role, as in the Docker image.
+- **The role accounts** (`demo.admin`, `demo.viewer1`, `demo.viewer2`) stay. They now come from
+  `data/accounts.yml`, with real districts only, and still sign in with one click. They are role
+  accounts, not people; real sign-in waits for the State's identity system.
+- **Citizen reports** are taken in Telangana only (the State's box). Every satellite review and
+  look waits for the screener (`lp review-reports`, needs internet).
+- **The fictional sample registers** (source templates, D-015) stay as previews: the app and the
+  `app.sources` command refuse to load them.
+- **Tests** keep their fictional fixtures in the test database. Fixtures that must be in the State
+  use a Telangana test point (`tests/factories.py`). `is_demo` stays in the schema: it is false
+  for every real record and marks test fixtures only.
+- **Reset:** `app.seed.reset` now loads the real lakes and the role accounts. `lp replay` puts the
+  saved real screen back.
+
 ## Errors and gaps found in CONTEXT.md
 
 ### E-001: `boundaries` is append-only but has `valid_to` (section 7, invariant 12)

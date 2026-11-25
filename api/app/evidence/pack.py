@@ -168,7 +168,7 @@ def build(db: Session, alert: Alert, user: User, at: dt.datetime | None = None) 
                       "area_sq_m": f"{float(cand.area_sq_m):,.0f}", "area_acres": f"{float(cand.area_sq_m) / 4046.86:.2f}", "sensor_basis": cand.sensor_basis,
                       "sensor_label": LABELS["sensor"][cand.sensor_basis]},
         "observations": [{"sensor": o.sensor, "scene_id": o.scene_id, "acquired_at": _iso(o.acquired_at), "licence_notice": o.licence_notice} for o in observations],
-        "resolution": "Synthetic demo image drawn at 10 m per pixel" if alert.is_demo else "Sentinel-2, 10 m per pixel",
+        "resolution": "Sentinel-2, 10 m per pixel",
         "chips": {"before": _data_uri(before, "image/png") if before else "", "after": _data_uri(after, "image/png") if after else ""},
         "processing": processing,
         "hashed_files": hashed,

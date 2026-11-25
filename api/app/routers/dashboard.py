@@ -6,7 +6,6 @@
 """
 from __future__ import annotations
 
-from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -24,7 +23,6 @@ router = APIRouter(tags=["dashboard"])
 
 @router.get("/dashboard")
 def get_dashboard(
-    dataset: Literal["demo", "real"] = "demo",
     district: str | None = None,
     mandal: str | None = None,
     village: str | None = None,
@@ -33,8 +31,8 @@ def get_dashboard(
 ) -> dict:
     if (mandal is not None and district is None) or (village is not None and mandal is None):
         raise HTTPException(422, "Give the area from the top: a mandal needs its district, a village its mandal")
-    out = dashboard.overview(db, user, is_demo=dataset == "demo", district=district, mandal=mandal, village=village, now=utcnow())
-    chain.record(db, actor_id=user.id, action="view.dashboard", entity="dashboard", details={"dataset": dataset, **out["filters"]})
+    out = dashboard.overview(db, user, district=district, mandal=mandal, village=village, now=utcnow())
+    chain.record(db, actor_id=user.id, action="view.dashboard", entity="dashboard", details=out["filters"])
     db.commit()
     return out
 

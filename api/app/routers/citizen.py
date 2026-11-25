@@ -50,13 +50,12 @@ def _fail(exc: service.CitizenError) -> HTTPException:
 
 
 @router.get("/config")
-def config(dataset: Literal["demo", "real"] = "real", db: Session = Depends(get_db)) -> dict:
+def config(db: Session = Depends(get_db)) -> dict:
     return {
-        "dataset": dataset,
         "languages": list(texts.LANGS),
         "whats": [{"key": k, "label": texts.WHAT[k]} for k in texts.WHAT_ORDER],
         "updates": sender.status(),
-        "stats": service.stats(db, dataset == "demo"),
+        "stats": service.stats(db),
         "limits": {"photos": service.MAX_PHOTOS, "photo_mb": service.MAX_PHOTO_BYTES // (1024 * 1024), "description": 1000},
         "helpline": "1070",
     }
@@ -64,7 +63,6 @@ def config(dataset: Literal["demo", "real"] = "real", db: Session = Depends(get_
 
 class ReportIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    dataset: Literal["demo", "real"] = "real"
     language: Literal["en", "te"] = "en"
     what: str
     lon: float | None = Field(default=None, ge=-180, le=180)
@@ -92,7 +90,6 @@ async def submit(request: Request, data: str = Form(...), photos: list[UploadFil
                 db, channel="web", language=body.language, what=body.what, at=now, source=source_of(request),
                 lon=body.lon, lat=body.lat, location_text=body.location_text, description=body.description, photos=blobs,
                 reporter_name=body.name, phone=phone, phone_verified_via="otp" if phone else None, wants_updates=bool(phone),
-                is_demo=body.dataset == "demo",
             )
     except service.CitizenError as exc:
         raise _fail(exc) from exc
@@ -114,13 +111,12 @@ def status(ref: str, request: Request, db: Session = Depends(get_db)) -> dict:
 class OtpIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     phone: str
-    dataset: Literal["demo", "real"] = "real"
 
 
 @router.post("/otp")
 def otp_start(body: OtpIn, db: Session = Depends(get_db)) -> dict:
     try:
-        out = otp.start(db, body.phone, is_demo=body.dataset == "demo", at=utcnow())
+        out = otp.start(db, body.phone, at=utcnow())
     except service.CitizenError as exc:
         raise _fail(exc) from exc
     db.commit()
@@ -165,7 +161,7 @@ async def whatsapp_incoming(request: Request, db: Session = Depends(get_db)) -> 
 
     handled = 0
     for wa_id, message in whatsapp.parse_webhook(json.loads(raw or b"{}")):
-        whatsapp.handle(db, wa_id, message, is_demo=False, at=utcnow())
+        whatsapp.handle(db, wa_id, message, at=utcnow())
         handled += 1
     db.commit()
     return {"handled": handled}

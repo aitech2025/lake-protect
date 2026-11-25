@@ -47,7 +47,7 @@ def d(db):
 
 
 def view(db, user, **path):
-    return dashboard.overview(db, user, is_demo=True, now=NOW, **path)
+    return dashboard.overview(db, user, now=NOW, **path)
 
 
 def test_the_state_level_counts_everything_and_groups_by_district(db, d):
@@ -69,7 +69,7 @@ def test_the_state_level_counts_everything_and_groups_by_district(db, d):
 def test_drilling_down_by_mandal_village_and_skipping_a_missing_level(db, d):
     north = view(db, d.official, district="North")
     assert [c["name"] for c in north["children"]] == ["Mandal A", "Mandal B"]
-    assert [p["name"] for p in north["path"]] == ["Demo State", "North"]
+    assert [p["name"] for p in north["path"]] == ["Telangana", "North"]
     mandal_a = view(db, d.official, district="North", mandal="mandal a")  # case does not matter
     assert mandal_a["child_level"] == "village" and [c["name"] for c in mandal_a["children"]] == ["Village 1", "Village 2"]
     mandal_b = view(db, d.official, district="North", mandal="Mandal B")
@@ -79,11 +79,6 @@ def test_drilling_down_by_mandal_village_and_skipping_a_missing_level(db, d):
     row = village["children"][0]
     assert (row["kind"], row["asset_id"], row["week_status"], row["tone"]) == ("asset", d.a.v1.id, "candidate_found", "waiting")
     assert [p["level"] for p in village["path"]] == ["state", "district", "mandal", "village"]
-
-
-def test_real_and_demo_are_never_mixed(db, d):
-    out = dashboard.overview(db, d.official, is_demo=False, now=NOW)
-    assert out["figures"]["assets"] == 0 and out["children"] == [] and out["week"] is None
 
 
 def test_acknowledged_within_24_hours(db, d):
@@ -97,15 +92,15 @@ def test_acknowledged_within_24_hours(db, d):
 def test_every_number_opens_the_same_incidents(client, db, d, monkeypatch):
     monkeypatch.setattr("app.routers.alerts.utcnow", lambda: NOW)
     monkeypatch.setattr("app.routers.dashboard.utcnow", lambda: NOW)
-    out = client.get("/dashboard?dataset=demo", headers=auth(d.official)).json()
+    out = client.get("/dashboard", headers=auth(d.official)).json()
     for child in out["children"]:
         q = "&".join(f"{k}={v}" for k, v in child["params"].items())
-        listed = client.get(f"/alerts?dataset=demo&state=OPEN,UNDER_REVIEW&{q}", headers=auth(d.official)).json()["count"]
+        listed = client.get(f"/alerts?state=OPEN,UNDER_REVIEW&{q}", headers=auth(d.official)).json()["count"]
         assert listed == child["figures"]["open"] + child["figures"]["under_review"], child["name"]
-        waiting = client.get(f"/alerts?dataset=demo&waiting=true&{q}", headers=auth(d.official)).json()["count"]
+        waiting = client.get(f"/alerts?waiting=true&{q}", headers=auth(d.official)).json()["count"]
         assert waiting == child["figures"]["waiting"], child["name"]
-    assert client.get("/dashboard?dataset=demo&mandal=Mandal A", headers=auth(d.official)).status_code == 422
-    assert client.get("/dashboard?dataset=demo&district=North&mandal=Mandal A", headers=auth(d.admin)).json()["level"] == "mandal"
+    assert client.get("/dashboard?mandal=Mandal A", headers=auth(d.official)).status_code == 422
+    assert client.get("/dashboard?district=North&mandal=Mandal A", headers=auth(d.admin)).json()["level"] == "mandal"
 
 
 def test_a_stopped_location_no_longer_counts_as_watched_but_its_incidents_still_show(db, d):

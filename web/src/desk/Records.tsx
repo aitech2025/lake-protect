@@ -5,7 +5,6 @@ import { api, fmtDate } from "../api";
 import { useAuth } from "../auth";
 import { useAsync, usePageTitle } from "../components/Bits";
 import { PageState, TableRegion } from "../components/PageState";
-import { DemoTag, useDemoOnScreen } from "../demo";
 
 const KINDS = ["permits", "works", "court-cases"] as const;
 
@@ -14,8 +13,7 @@ export function Records() {
   const { user } = useAuth();
   const [kind, setKind] = useState<(typeof KINDS)[number]>("permits");
   const [message, setMessage] = useState<string | null>(null);
-  const { data, error, status, loading, reload } = useAsync(() => api<{ items: any[]; has_demo: boolean }>(`/records/${kind}`), [kind]);
-  useDemoOnScreen(Boolean(data?.has_demo));
+  const { data, error, status, loading, reload } = useAsync(() => api<{ items: any[] }>(`/records/${kind}`), [kind]);
   usePageTitle(t("records.title"));
   const canImport = user?.role === "admin";
 
@@ -58,10 +56,10 @@ export function Records() {
       {!error && data && data.items.length > 0 && (
         <TableRegion label={t(`records.${kind}`)}>
           <table className="grid">
-            <thead><tr>{cols[kind].map(([h]) => <th key={h}>{t(`records.col.${h}`)}</th>)}<th /></tr></thead>
+            <thead><tr>{cols[kind].map(([h]) => <th key={h}>{t(`records.col.${h}`)}</th>)}</tr></thead>
             <tbody>
               {data.items.map((r) => (
-                <tr key={r.id}>{cols[kind].map(([h, f]) => <td key={h}>{f(r)}</td>)}<td>{r.is_demo && <DemoTag />}</td></tr>
+                <tr key={r.id}>{cols[kind].map(([h, f]) => <td key={h}>{f(r)}</td>)}</tr>
               ))}
             </tbody>
           </table>

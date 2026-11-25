@@ -5,14 +5,12 @@ import { Link } from "react-router-dom";
 import { api, fmtDateTime } from "../api";
 import { useAsync, usePageTitle } from "../components/Bits";
 import { PageState, TableRegion } from "../components/PageState";
-import { useDemoOnScreen } from "../demo";
 
 export function Audit() {
   const { t, i18n } = useTranslation();
   const month = new Date().toISOString().slice(0, 7);
   const [check, setCheck] = useState<any | null>(null);
-  const { data, error, status, loading, reload } = useAsync(() => api<{ items: any[]; has_demo: boolean }>("/audit?limit=150"), []);
-  useDemoOnScreen(Boolean(data?.has_demo));
+  const { data, error, status, loading, reload } = useAsync(() => api<{ items: any[] }>("/audit?limit=150"), []);
   usePageTitle(t("audit.title"));
   const { data: sample } = useAsync(() => api<any>(`/audit/closure-sample?month=${month}&n=5`), [month]);
   // Until the log has loaded, show no log tools: a refused or failed load must not look like an empty log.

@@ -6,8 +6,6 @@ import { StatePill, useAsync, usePageTitle } from "../components/Bits";
 import { CHANGE_TYPES, GROUP_COLOUR, GROUP_OF, STATES } from "../components/labels";
 import { MapView, type Pin } from "../components/MapView";
 import { PageState } from "../components/PageState";
-import { baseFor, useDataset } from "../dataset";
-import { useDemoOnScreen } from "../demo";
 import { ScreeningSummary } from "./Screening";
 
 type Filter = "active" | "all" | (typeof STATES)[number];
@@ -25,9 +23,7 @@ export function Queue() {
   const [filter, setFilter] = useState<Filter>(linked.length ? "all" : "active");
   const [change, setChange] = useState("");
   const [cohort, setCohort] = useState("");
-  const { dataset } = useDataset();
-  const { data, error, status, reload } = useAsync(() => api<{ items: AlertRow[]; has_demo: boolean }>(`/alerts?dataset=${dataset}${linkedQuery}`), [dataset, linkedQuery]);
-  useDemoOnScreen(Boolean(data?.has_demo));
+  const { data, error, status, reload } = useAsync(() => api<{ items: AlertRow[] }>(`/alerts${linkedQuery.replace(/^&/, "?")}`), [linkedQuery]);
   usePageTitle(t("queue.title"));
 
   const items = useMemo(() => {
@@ -88,7 +84,7 @@ export function Queue() {
           <button className="btn quiet" onClick={() => { setParams({}); setFilter("active"); }} data-testid="linked-clear">{t("queue.linked_clear")}</button>
         </p>
       )}
-      {dataset === "real" && <ScreeningSummary />}
+      <ScreeningSummary />
       <div className="chips" role="group" aria-label={t("queue.state")} style={{ marginBottom: "1rem" }}>
         {FILTERS.map((f) => (
           <button key={f} className="chip" aria-pressed={filter === f} onClick={() => setFilter(f)} data-testid={`group-${f}`}>
@@ -99,7 +95,7 @@ export function Queue() {
       <PageState error={error} status={status} onRetry={reload} />
       <div className="queue">
         <div className="mapbox">
-          <MapView base={baseFor(dataset)} pins={pins} testId="queue-map" />
+          <MapView pins={pins} testId="queue-map" />
           <div className="legend">
             {STATES.map((s) => (
               <span key={s}><i className="pin" style={{ width: 10, height: 10, borderWidth: 2, background: GROUP_COLOUR[GROUP_OF[s]] }} />{t(`state.${s}`)}</span>
@@ -108,7 +104,7 @@ export function Queue() {
         </div>
         <div className="list" data-testid="alert-list">
           <PageState loading={!data && !error} />
-          {items.length === 0 && data && <p className="muted" style={{ padding: "1rem" }}>{t(dataset === "real" ? "queue.empty_real" : "queue.empty")}</p>}
+          {items.length === 0 && data && <p className="muted" style={{ padding: "1rem" }}>{t("queue.empty_real")}</p>}
           {items.map((r) => (
             <Link key={r.id} to={`/alerts/${r.id}`} className="row" data-testid={`alert-row-${r.code}`}>
               <span className="bar" style={{ background: GROUP_COLOUR[GROUP_OF[r.state]] }} />

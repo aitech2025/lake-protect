@@ -4,8 +4,6 @@ import { Link } from "react-router-dom";
 import { api, fmtDateTime, type Note } from "../api";
 import { useAsync, usePageTitle } from "../components/Bits";
 import { PageState } from "../components/PageState";
-import { useDataset } from "../dataset";
-import { useDemoOnScreen } from "../demo";
 import { notifyCountChanged } from "../components/Layout";
 
 const KIND_CLASS: Record<Note["kind"], string> = {
@@ -22,15 +20,13 @@ const KIND_CLASS: Record<Note["kind"], string> = {
 export function Inbox() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
-  const { dataset } = useDataset();
   const [pending, setPending] = useState(true);
   const [busy, setBusy] = useState<number | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const { data, error, status, loading, reload } = useAsync(
-    () => api<{ items: Note[]; unacknowledged: number }>(`/notifications?dataset=${dataset}${pending ? "&pending=true" : ""}`),
-    [dataset, pending],
+    () => api<{ items: Note[]; unacknowledged: number }>(`/notifications${pending ? "?pending=true" : ""}`),
+    [pending],
   );
-  useDemoOnScreen(dataset === "demo" && Boolean(data?.items.length));
   usePageTitle(t("inbox.title"));
 
   const ack = async (n: Note) => {

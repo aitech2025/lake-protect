@@ -36,7 +36,7 @@ def scenario(db):
 
 def test_counts_and_waiting_list_for_a_closed_month(db, scenario):
     _, a = scenario
-    out = stats.bulletin(db, "2025-10", demo=True, now=t(11, 20))
+    out = stats.bulletin(db, "2025-10", now=t(11, 20))
     assert out["complete_month"] is True
     assert out["counts"] == {"watched": 5, "new_alerts": 3, "reviewed": 1, "confirmed": 1, "waiting": 1}
     assert [(w["code"], w["state"], w["days_waiting"]) for w in out["waiting"]] == [(a["a1"].code, "OPEN", 29)]
@@ -46,7 +46,7 @@ def test_counts_and_waiting_list_for_a_closed_month(db, scenario):
 
 def test_current_month_is_worked_out_as_of_now(db, scenario):
     _, a = scenario
-    out = stats.compute(db, "2025-11", demo=True, now=t(11, 20))
+    out = stats.compute(db, "2025-11", now=t(11, 20))
     assert out["complete_month"] is False
     assert {w["code"] for w in out["waiting"]} == {a["a1"].code, a["a3"].code}
     assert out["counts"]["new_alerts"] == 0
@@ -55,13 +55,13 @@ def test_current_month_is_worked_out_as_of_now(db, scenario):
 def test_monthly_pdf_is_one_page_even_with_many_waiting(db, scenario):
     for _ in range(12):
         ingest(db, make_asset(db), at=t(10, 9), first_changed=dt.date(2025, 9, 25), last_clear=dt.date(2025, 9, 15))
-    out = stats.bulletin(db, "2025-10", demo=True, now=t(11, 20))
+    out = stats.bulletin(db, "2025-10", now=t(11, 20))
     assert out["counts"]["waiting"] == 13
-    pdf = render.render_pdf(out, render.map_svg(db, out, demo=True))
+    pdf = render.render_pdf(out, render.map_svg(db, out))
     reader = PdfReader(io.BytesIO(pdf))
     assert len(reader.pages) == 1
     text = " ".join(reader.pages[0].extract_text().split())
-    assert "Monthly page: October 2025" in text and "Demo data" in text and "and 5 more" in text and "Land fill" in text
+    assert "Monthly page: October 2025" in text and "Demo data" not in text and "and 5 more" in text and "Land fill" in text
 
 
 def test_bulletin_api_for_both_roles(db, client, scenario):

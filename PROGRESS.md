@@ -28,6 +28,7 @@ data in the app), then M3.
 | M15 Citizen channels: portal, WhatsApp, staff intake, updates back | Done | API 361, pipeline 29, browser 6 | be69e84 |
 | M16 Citizen reports open incidents with a satellite review; no Urdu | Done | API 365, pipeline 32, browser 6 | 6bbcd8c |
 | M17 Officials and the admin work citizens' incidents: acknowledge, notes, looks, legal records, decide, watch | Done | API 375, pipeline 33, browser 7 | 27fbb13 |
+| M18 Real data only: demo world and maps removed, role accounts kept | Done | API 366, pipeline 33, browser 7 | M18 commit |
 
 ## M0 Scaffold: done
 
@@ -241,6 +242,36 @@ removed, is `reports/m2-tuning/README.md`.
   upload, the area rounding case). Browser 15 passed on fresh demos: `m10-real` (switch, no demo
   record on the real side, Sentinel-2 tiles requested, 99 real lakes listed) with the M5 to M8
   suites, then the M9 walkthrough with no internet.
+
+## M18 Real data only: the demo world and its maps are removed: done
+
+Owner's request, 25 Nov 2026 (D-065). The owner kept the demo accounts as role accounts.
+
+- **Removed:**
+  - **The demo world:** its seed and its fictional places, incidents, reports and records.
+  - **Maps and modes:** the drawn demo map and its tiles, the demo sensor, and the portal's demo
+    mode.
+  - **The desk:** the WhatsApp simulator, the demo/real switch and the demo badges, and the
+    `dataset` parameter of every endpoint.
+- **Migration 0012:** deletes demo and sample rows and everything that pointed at them. The audit
+  log is kept, and its chain verifies.
+  - **Checked on the preview:** 21 demo locations and 23 demo incidents gone; 99 real lakes,
+    58 real incidents, 3 role accounts and 442 audit entries kept.
+- **Seed:**
+  - `data/accounts.yml` and `app/seed/accounts.py` load the role accounts, with real districts.
+  - `app.seed.reset` loads the real lakes and the role accounts.
+  - `scripts/e2e.sh` resets, then replays the saved screen.
+- **Citizens:** reports in Telangana only. Every satellite review and look waits for the screener.
+- **Sample registers:** previews only, in the app and on the command line.
+- **Tests:**
+  - **API:** 366 passed (fewer files for the wording check). `test_demo_seed.py` is gone; the citizen and officer-action tests use a
+    Telangana test point and post the screener's answers.
+  - **Pipeline:** 33 passed.
+  - **Browser:** 7 passed, all on real data.
+    - `m9-desk` replaces `m9-demo`: two roles, no internet, a real incident reviewed, dismissed
+      and closed; the audit chain verified.
+    - `m15-citizen` reports at Mallampet Cheruvu and answers the looks as the screener would.
+    - `m10-real` checks there is no switch, band or demo tile.
 
 ## M17 Officials and the admin work citizens' incidents: done
 

@@ -11,10 +11,9 @@ Once a report has a place:
      found for the pin.
    - **The legal check runs and is kept**, but it never closes a citizen incident on its own: an
      official always reviews it.
-4. **The satellite review:**
-   - **Demo data:** the demo world answers at once.
-   - **Real data:** it waits for the screener (`lp review-reports`), which looks at the newest
-     Sentinel-2 images of the place.
+4. **The satellite review:** it waits for the screener (`lp review-reports`, the `reviewer`
+   service), which looks at the newest Sentinel-2 images of the place. (The demo world's instant
+   answers are removed, D-065.)
    - **What it adds:** the result, the dates and the before and after images, which become the
      incident's images and observations.
 
@@ -30,13 +29,12 @@ import hashlib
 import json
 
 from geoalchemy2.elements import WKTElement
-from shapely.geometry import Point
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from app.audit import chain
 from app.citizen import locate, texts
-from app.models import Alert, Asset, Candidate, CitizenReport, MonitoringChange, Observation, SatelliteReview, ScreenRun
+from app.models import Alert, Asset, Candidate, CitizenReport, MonitoringChange, Observation, SatelliteReview
 from app.rules import config as rules
 from app.rules import legal_check
 from app.services import boundaries as bsvc
@@ -48,7 +46,7 @@ SPOT_M = 30
 PLACE_M = 50
 NEAR_M = 150
 RULES = "citizen-v1"
-LICENCE_DEMO = "Demo world: synthetic imagery. Not satellite data"
+LICENCE_S2 = "Contains modified Copernicus Sentinel data"
 REVIEW_NOTE = {"change_found": "review_change", "no_change": "review_no_change", "no_clear_look": "review_no_look"}
 MAX_ATTEMPTS = 3
 
@@ -62,8 +60,8 @@ def _circle(db: Session, lon: float, lat: float, radius_m: float) -> dict:
 def reported_place(db: Session, report: CitizenReport, lon: float, lat: float, area: dict, at: dt.datetime) -> Asset:
     """A place outside every watched location, so the report's incident has a place and a boundary."""
     asset = Asset(
-        asset_key=f"rep-{report.ref.lower()}", name=f"{'Demo reported' if report.is_demo else 'Reported'} place {report.ref}",
-        name_te=f"{'డెమో ' if report.is_demo else ''}పౌరులు తెలిపిన ప్రదేశం {report.ref}",
+        asset_key=f"rep-{report.ref.lower()}", name=f"Reported place {report.ref}",
+        name_te=f"పౌరులు తెలిపిన ప్రదేశం {report.ref}",
         type="reported_place", cohort=rules.cohort_for_status("derived").value, district=area.get("district"),
         mandal=area.get("mandal"), village=area.get("village"), survey_numbers=[], baseline_date=rules.policy_cutoff_date(),
         is_demo=report.is_demo, added_at=at,
@@ -87,7 +85,7 @@ def create(db: Session, report: CitizenReport, lon: float, lat: float, matched: 
     if matched:
         asset = db.get(Asset, matched["id"])
     else:
-        area = locate.area_of(db, lon, lat, report.is_demo, None)
+        area = locate.area_of(db, lon, lat, None)
         asset = reported_place(db, report, lon, lat, area, at)
     primary = bsvc.primary_of(bsvc.boundary_set_at(db, asset.id, at.date()))
     spot = bsvc.to_multipolygon(_circle(db, lon, lat, SPOT_M))
@@ -113,12 +111,10 @@ def create(db: Session, report: CitizenReport, lon: float, lat: float, matched: 
 
 # The satellite review ---------------------------------------------------------------------------
 def request(db: Session, alert: Alert, report: CitizenReport, lon: float, lat: float, at: dt.datetime, *, send: bool = True) -> SatelliteReview:
-    review = SatelliteReview(alert_id=alert.id, status="pending", source="demo-synthetic" if report.is_demo else "sentinel-2",
-                             requested_at=at, scenes=[], attempts=0, is_demo=report.is_demo)
+    review = SatelliteReview(alert_id=alert.id, status="pending", source="sentinel-2", requested_at=at, scenes=[], attempts=0,
+                             is_demo=report.is_demo)
     db.add(review)
     db.flush()
-    if report.is_demo:
-        record(db, review, demo_result(db, report, lon, lat, at), at, tell_officials=False, send=send)
     return review
 
 
@@ -165,7 +161,7 @@ def record(db: Session, review: SatelliteReview, result: dict, at: dt.datetime, 
         row = db.scalar(select(Observation).where(Observation.scene_id == s["scene_id"], Observation.sensor == s["sensor"]))
         if row is None:
             row = Observation(sensor=s["sensor"], scene_id=s["scene_id"], acquired_at=s["acquired_at"], cloud_pct=s.get("cloud_pct"),
-                              stac_href=s.get("stac_href"), licence_notice=s.get("licence_notice") or LICENCE_DEMO, is_demo=review.is_demo)
+                              stac_href=s.get("stac_href"), licence_notice=s.get("licence_notice") or LICENCE_S2, is_demo=review.is_demo)
             db.add(row)
             db.flush()
         obs_ids.append(row.id)
@@ -193,21 +189,15 @@ EARLIEST_LOOK = dt.date(2017, 1, 1)  # Sentinel-2 L2A over Telangana; older date
 
 def request_look(db: Session, alert: Alert, user, look_date: dt.date | None, at: dt.datetime) -> SatelliteReview:
     """An official asks for a satellite look at the place: the latest, or the newest clear image on or
-    before a date, to compare with others (D-064). Demo data answers at once; real data waits for the
-    screener."""
+    before a date, to compare with others (D-064). The screener answers it."""
     if look_date is not None and not (EARLIEST_LOOK <= look_date <= at.date()):
         raise ValueError(f"Choose a date between {EARLIEST_LOOK:%d %b %Y} and today")
-    report = db.get(CitizenReport, alert.report_id)
     review = SatelliteReview(alert_id=alert.id, kind="requested", requested_by=user.id, look_date=look_date, status="pending",
-                             source="demo-synthetic" if alert.is_demo else "sentinel-2", requested_at=at, scenes=[], attempts=0,
-                             is_demo=alert.is_demo)
+                             source="sentinel-2", requested_at=at, scenes=[], attempts=0, is_demo=False)
     db.add(review)
     db.flush()
     chain.record(db, actor_id=user.id, action="incident.satellite_look_requested", entity="alert", entity_id=alert.id, at=at,
                  details={"review_id": review.id, "look_date": look_date.isoformat() if look_date else "latest"})
-    if alert.is_demo:
-        lon, lat = db.execute(text("SELECT ST_X(geom), ST_Y(geom) FROM citizen_reports WHERE id = :i"), {"i": report.id}).one()
-        record(db, review, demo_result(db, report, lon, lat, at, look_date=look_date, requested=True), at, tell_officials=False)
     return review
 
 
@@ -223,63 +213,6 @@ def failed(db: Session, review: SatelliteReview, detail: str, at: dt.datetime) -
 def pending(db: Session, limit: int = 20) -> list[SatelliteReview]:
     return list(db.scalars(select(SatelliteReview).where(SatelliteReview.status == "pending", SatelliteReview.is_demo.is_(False))
                            .order_by(SatelliteReview.requested_at).limit(limit)))
-
-
-# The demo world's answer ------------------------------------------------------------------------
-# Set by the demo seeder while it runs, before any weekly screen exists to date the world.
-SEED_DAY: dt.date | None = None
-
-
-def _seed_day(db: Session, at: dt.datetime) -> dt.date:
-    """Day 0 of the demo world: the seed day, which is the date of its latest weekly screen."""
-    if SEED_DAY is not None:
-        return SEED_DAY
-    return db.scalar(select(ScreenRun.as_of).where(ScreenRun.is_demo.is_(True)).order_by(ScreenRun.as_of.desc()).limit(1)) or at.date()
-
-
-def demo_result(db: Session, report: CitizenReport, lon: float, lat: float, at: dt.datetime, look_date: dt.date | None = None,
-                requested: bool = False) -> dict:
-    """What the demo sensor shows at the pin. Changes after the last weekly screen
-    (`unscreened_changes` in world.yml) are found here first; everywhere else shows no change."""
-    from app.seed import demo_render as render
-    from app.seed.demo_world import World
-
-    world = World.load()
-    e, n = world.from_lonlat(lon, lat)
-    here = Point(e, n)
-    seed = _seed_day(db, at)
-    after_date = look_date or at.date()
-    day = (after_date - seed).days
-    found = next((c for c in world.spec.get("unscreened_changes", [])
-                  if c["first_changed"] <= day and world.change_m(c).distance(here) <= NEAR_M), None)
-    before_date = after_date - dt.timedelta(days=30)
-    label = "Look" if requested else None
-
-    def scene(d: dt.date) -> dict:
-        return {"sensor": "demo_synthetic_optical", "scene_id": f"DEMO-REVIEW-{d.isoformat()}", "acquired_at": dt.datetime.combine(d, dt.time(5, 0), tzinfo=dt.timezone.utc),
-                "cloud_pct": 4.0, "licence_notice": LICENCE_DEMO}
-
-    if found:
-        window = render.chip_window(world, found)
-        first = seed + dt.timedelta(days=found["first_changed"])
-        return {
-            "result": "change_found", "as_of": after_date, "before_date": before_date, "after_date": after_date,
-            "scenes": [scene(before_date), scene(after_date)],
-            "before_png": render.render_chip(world, found, when=before_date, after=False, window=window),
-            "after_png": render.render_chip(world, found, when=after_date, after=True, window=window, label=label),
-            "change": {"change_type": found["change"]["type"], "area_sq_m": round(world.change_m(found).area, 1), "first_changed_at": first},
-            "detail": "Demo sensor: a change the weekly screen has not seen yet",
-        }
-    nearest = min(world.spec["assets"], key=lambda a: Point(*world.asset_centre_m(a)).distance(here))
-    pseudo = {"key": f"review-{report.ref}", "asset": nearest["key"], "change": {"type": "other", "shape": "inside", "offset": [0, 0], "size": [10, 10]}}
-    window = (e, n, 560.0)
-    return {
-        "result": "no_change", "as_of": after_date, "before_date": before_date, "after_date": after_date,
-        "scenes": [scene(before_date), scene(after_date)],
-        "before_png": render.render_chip(world, pseudo, when=before_date, after=False, window=window, show_change=False),
-        "after_png": render.render_chip(world, pseudo, when=after_date, after=True, window=window, show_change=False, label=label),
-        "detail": "Demo sensor: no change at the pin",
-    }
 
 
 def decode(b64: str | None) -> bytes | None:

@@ -7,8 +7,6 @@ import { isAdmin, useAuth } from "../auth";
 import { BoundarySeal, useAsync, usePageTitle } from "../components/Bits";
 import { MapView } from "../components/MapView";
 import { PageState, TableRegion } from "../components/PageState";
-import { baseFor, useDataset } from "../dataset";
-import { DemoTag, useDemoOnScreen } from "../demo";
 import { AddLocation, pick, type Categories } from "./AddLocation";
 import { Documents, WeeklyRecord } from "./AssetRecord";
 import { CoverageLine, ScreeningSummary } from "./Screening";
@@ -125,22 +123,19 @@ function WatchControl({ assetId, p, onChanged }: { assetId: number; p: any; onCh
 export function Assets() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
-  const { dataset, setDataset } = useDataset();
   const { user } = useAuth();
   const [params] = useSearchParams();
   const linked = params.get("asset");
   const [selected, setSelected] = useState<number | null>(linked ? Number(linked) : null);
-  const [firstDataset] = useState(dataset);
   useEffect(() => {
-    if (dataset !== firstDataset) setSelected(null);
-  }, [dataset, firstDataset]);
-  const { data, error, status, loading, reload } = useAsync(() => api<{ features: any[] }>(`/assets?dataset=${dataset}`), [dataset]);
-  const cats = useAsync(() => api<Categories>(`/categories?dataset=${dataset}`), [dataset]);
+  }, []);
+  const { data, error, status, loading, reload } = useAsync(() => api<{ features: any[] }>("/assets"), []);
+  const cats = useAsync(() => api<Categories>("/categories"), []);
   const [kind, setKind] = useState("all");
   const [showStopped, setShowStopped] = useState(false);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState<string | null>(null);
-  const all = useMemo(() => (data?.features ?? []).filter((f) => f.properties.is_demo === (dataset === "demo")), [data, dataset]);
+  const all = useMemo(() => data?.features ?? [], [data]);
   const stopped = all.filter((f) => !f.properties.monitored).length;
   const features = useMemo(
     // Places made from citizens' reports are not watched until an official adds them (D-063, D-064),
@@ -153,7 +148,6 @@ export function Assets() {
     const c = cats.data?.items.find((x) => x.name === category);
     return c ? pick(c.one, lang) : category;
   };
-  useDemoOnScreen(dataset === "demo" && features.length > 0);
   usePageTitle(t("assets.title"));
   const { data: versions } = useAsync(() => (selected ? api<{ features: any[] }>(`/assets/${selected}/boundaries`) : Promise.resolve(null)), [selected]);
   const { data: register } = useAsync(() => (selected ? api<any>(`/assets/${selected}/register`) : Promise.resolve(null)), [selected]);
@@ -171,7 +165,6 @@ export function Assets() {
   );
 
   const startAdding = () => {
-    if (dataset !== "real") setDataset("real");
     setSelected(null);
     setAdded(null);
     setAdding(true);
@@ -187,7 +180,7 @@ export function Assets() {
         {isAdmin(user) && !adding && <button type="button" className="btn" onClick={startAdding} data-testid="add-location-open">{t("locations.add")}</button>}
       </div>
       {added && <p className="banner info" role="status" data-testid="added-message">{t("locations.added", { name: added })}</p>}
-      {adding && cats.data && dataset === "real" && (
+      {adding && cats.data && (
         <AddLocation
           cats={cats.data}
           context={mapFc}
@@ -209,12 +202,12 @@ export function Assets() {
           <input type="checkbox" checked={showStopped} onChange={(e) => setShowStopped(e.target.checked)} data-testid="show-stopped" /> {t("locations.show_stopped", { n: stopped })}
         </label>
       )}
-      {dataset === "real" && <p className="note" style={{ marginBottom: "1rem" }}>{t("assets.real_note")}</p>}
-      {dataset === "real" && <ScreeningSummary />}
+      <p className="note" style={{ marginBottom: "1rem" }}>{t("assets.real_note")}</p>
+      <ScreeningSummary />
       <PageState loading={loading && !data} error={error} status={status} onRetry={reload} />
       <div className="queue" style={{ height: "auto" }}>
         <div className="mapbox" style={{ height: 520 }}>
-          <MapView base={baseFor(dataset)} boundaries={selected ? selectedFc : mapFc} />
+          <MapView boundaries={selected ? selectedFc : mapFc} />
         </div>
         <div className="list" style={{ maxHeight: 520 }}>
           {features.map((f) => {
@@ -223,7 +216,7 @@ export function Assets() {
               <button key={f.id} className="row" style={{ width: "100%", border: 0, background: selected === f.id ? "#eef3f0" : "transparent", textAlign: "left" }} onClick={() => setSelected(f.id)}>
                 <span className="bar" style={{ background: !p.monitored ? "#9aa5a0" : p.category === "water_body" ? "#1f6fa8" : "#b08a3e" }} />
                 <span>
-                  <h3>{lang === "te" && p.name_te ? p.name_te : p.name} {p.is_demo && <DemoTag />} {!p.monitored && <span className="pill closed">{t("locations.not_watched")}</span>}</h3>
+                  <h3>{lang === "te" && p.name_te ? p.name_te : p.name} {!p.monitored && <span className="pill closed">{t("locations.not_watched")}</span>}</h3>
                   <span className="meta">
                     <span>{labelOf(p.category)}</span>
                     <span>{t(`cohort.${p.cohort}`)}</span>
@@ -231,7 +224,7 @@ export function Assets() {
                     {p.area_acres !== null && <span>{t("assets.acres", { acres: p.area_acres })}</span>}
                     <span>{t("assets.baseline", { date: fmtDate(p.baseline_date, lang) })}</span>
                   </span>
-                  {!p.is_demo && <CoverageLine p={p} />}
+                  <CoverageLine p={p} />
                 </span>
                 <span><BoundarySeal status={p.boundary_status} version={p.boundary_version} /></span>
               </button>

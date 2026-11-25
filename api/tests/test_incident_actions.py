@@ -1,7 +1,7 @@
 """What officials and the admin do on an incident a citizen reported (DECISIONS.md D-064).
 
-Demo-world tests use the open-sea test location and the demo world's unscreened change. The
-weekly-watch test uses a fictional report at a real point, in the test database only.
+Fictional reports and fixtures at a Telangana test point (factories.TG_LON, TG_LAT) or a real
+Hyderabad point, in the test database only. The tests post the screener's answers to satellite looks.
 """
 from __future__ import annotations
 
@@ -14,15 +14,14 @@ from sqlalchemy.exc import DBAPIError
 
 from app.clock import utcnow
 from app.config import settings
-from app.models import Alert, Asset, Candidate, CitizenReport, CourtCase, Notification
-from app.seed.demo_world import World
-from tests.factories import TEST_LAT, TEST_LON, auth, cover, ingest, make_asset, make_user
+from app.models import Alert, Asset, Candidate, CitizenReport, CourtCase, Notification, SatelliteReview
+from tests.factories import PNG_B64, TG_LAT, TG_LON, auth, cover, ingest, make_asset, make_user, offset, square
 
 TOKEN = {"X-Pipeline-Token": "test-token"}
 
 
-def report(client, db, *, lon=TEST_LON, lat=TEST_LAT, dataset="demo", what="dumping") -> Alert:
-    data = {"dataset": dataset, "language": "te", "what": what, "lon": lon, "lat": lat, "description": "Soil dumped at night"}
+def report(client, db, *, lon=TG_LON, lat=TG_LAT, what="dumping") -> Alert:
+    data = {"language": "te", "what": what, "lon": lon, "lat": lat, "description": "Soil dumped at night"}
     resp = client.post("/citizen/reports", data={"data": json.dumps(data)})
     assert resp.status_code == 201, resp.text
     r = db.scalar(select(CitizenReport).where(CitizenReport.ref == resp.json()["ref"]))
@@ -45,7 +44,7 @@ def w(db):
     north = make_user(db, "viewer")
     other = make_user(db, "viewer")
     cover(db, north, "North")
-    lake = make_asset(db, district="North", mandal="Mandal A", name="Test Cheruvu North")
+    lake = make_asset(db, district="North", mandal="Mandal A", name="Test Cheruvu North", geometry=square(TG_LON, TG_LAT))
     return type("W", (), {"admin": admin, "north": north, "other": other, "lake": lake})
 
 
@@ -72,21 +71,37 @@ def test_officials_acknowledge_and_add_notes_and_the_first_acknowledgement_start
             db.execute(text("UPDATE incident_notes SET text = 'x' WHERE alert_id = :a"), {"a": alert.id})
 
 
+def answer(client, review_id: int, result: str, as_of: str, after_date: str) -> dict:
+    """The screener's answer to a review or a look (lp review-reports)."""
+    body = {"status": "done", "result": result, "as_of": as_of, "after_date": after_date, "after_png_b64": PNG_B64,
+            "scenes": [{"sensor": "sentinel-2-l2a", "scene_id": f"S2TEST_{review_id}", "acquired_at": f"{after_date}T05:20:00Z"}]}
+    if result == "change_found":
+        body.update(before_date=as_of, before_png_b64=PNG_B64,
+                    change={"change_type": "soil_fill", "area_sq_m": 2400, "first_changed_at": after_date})
+    out = client.post(f"/pipeline/reviews/{review_id}", json=body, headers=TOKEN)
+    assert out.status_code == 200, out.text
+    return out.json()
+
+
 def test_satellite_looks_latest_and_by_date_compare_without_replacing_the_evidence(client, db, w):
-    world = World.load()
-    c = world.change_m(world.spec["unscreened_changes"][0]).centroid
-    lon, lat = world.to_lonlat(c.x, c.y)
-    alert = report(client, db, lon=round(lon, 6), lat=round(lat, 6))
+    alert = report(client, db)
+    first = db.scalar(select(SatelliteReview).where(SatelliteReview.alert_id == alert.id, SatelliteReview.kind == "automatic"))
+    today, past = dt.date.today(), dt.date.today() - dt.timedelta(days=60)
+    answer(client, first.id, "change_found", (today - dt.timedelta(days=30)).isoformat(), (today - dt.timedelta(days=2)).isoformat())
     cand = db.get(Candidate, alert.candidate_id)
+    db.refresh(cand)
     evidence = (cand.before_chip, cand.after_chip)
     latest = client.post(f"/alerts/{alert.id}/satellite-looks", json={}, headers=auth(w.north)).json()
-    past = (dt.date.today() - dt.timedelta(days=60)).isoformat()
-    earlier = client.post(f"/alerts/{alert.id}/satellite-looks", json={"date": past}, headers=auth(w.admin)).json()
-    assert (latest["status"], latest["result"]) == ("done", "change_found")
-    assert (earlier["status"], earlier["result"]) == ("done", "no_change")  # before the change: compare the two
+    earlier = client.post(f"/alerts/{alert.id}/satellite-looks", json={"date": past.isoformat()}, headers=auth(w.admin)).json()
+    assert latest["status"] == earlier["status"] == "pending"  # the screener answers each look
+    items = {r["id"]: r for r in client.get("/pipeline/reviews", headers=TOKEN).json()["reviews"]}
+    assert (items[latest["id"]]["look_date"], items[earlier["id"]]["look_date"]) == (None, past.isoformat())
+    answer(client, latest["id"], "change_found", today.isoformat(), (today - dt.timedelta(days=2)).isoformat())
+    answer(client, earlier["id"], "no_change", past.isoformat(), (past - dt.timedelta(days=3)).isoformat())
     looks = client.get(f"/alerts/{alert.id}", headers=auth(w.north)).json()["looks"]
-    assert [x["kind"] for x in looks] == ["automatic", "requested", "requested"] and looks[2]["look_date"] == past
-    assert looks[2]["after_date"] == past and looks[1]["requested_by"] == w.north.name
+    assert [x["kind"] for x in looks] == ["automatic", "requested", "requested"] and looks[2]["look_date"] == past.isoformat()
+    assert [x["result"] for x in looks] == ["change_found", "change_found", "no_change"]  # before the change: compare the two
+    assert looks[2]["after_date"] == (past - dt.timedelta(days=3)).isoformat() and looks[1]["requested_by"] == w.north.name
     img = client.get(f"/alerts/{alert.id}/looks/{earlier['id']}/after", headers=auth(w.north))
     assert img.status_code == 200 and img.content.startswith(b"\x89PNG")
     db.refresh(cand)
@@ -94,19 +109,18 @@ def test_satellite_looks_latest_and_by_date_compare_without_replacing_the_eviden
     assert client.post(f"/alerts/{alert.id}/satellite-looks", json={"date": "2015-06-01"}, headers=auth(w.north)).status_code == 422
     future = (dt.date.today() + dt.timedelta(days=2)).isoformat()
     assert client.post(f"/alerts/{alert.id}/satellite-looks", json={"date": future}, headers=auth(w.north)).status_code == 422
-    _, satellite = ingest(db, w.lake)
+    far_lake = make_asset(db, district="North", geometry=square(*offset(TG_LON, TG_LAT, east_m=5000)))
+    _, satellite = ingest(db, far_lake, geometry=square(*offset(TG_LON, TG_LAT, east_m=5000), side_m=60))
     assert client.post(f"/alerts/{satellite.id}/satellite-looks", json={}, headers=auth(w.north)).status_code == 422
 
 
 def test_a_real_look_waits_for_the_screener_and_comes_back_to_whoever_asked(client, db):
     official = make_user(db, "viewer", is_demo=False)
-    alert = report(client, db, lon=78.4740, lat=17.3850, dataset="real")
+    alert = report(client, db, lon=78.4740, lat=17.3850)
     asked = client.post(f"/alerts/{alert.id}/satellite-looks", json={"date": "2025-01-15"}, headers=auth(official)).json()
     assert asked["status"] == "pending"
     items = {r["id"]: r for r in client.get("/pipeline/reviews", headers=TOKEN).json()["reviews"]}
     assert items[asked["id"]]["kind"] == "requested" and items[asked["id"]]["look_date"] == "2025-01-15"
-    from tests.factories import PNG_B64
-
     body = {"status": "done", "result": "no_change", "as_of": "2025-01-15", "after_date": "2025-01-12", "after_png_b64": PNG_B64,
             "scenes": [{"sensor": "sentinel-2-l2a", "scene_id": "S2TEST_LOOK", "acquired_at": "2025-01-12T05:20:00Z"}]}
     assert client.post(f"/pipeline/reviews/{asked['id']}", json=body, headers=TOKEN).json()["result"] == "no_change"
@@ -129,10 +143,8 @@ def test_a_sharper_image_an_official_asks_for_waits_for_the_admin(client, db, w)
     first = detail["imagery_requests"][0]
     assert (first["requested_by"], first["decided_by"], first["decision_note"], first["note"]) == (w.north.name, w.admin.name, "Within budget", "Need to see the posts")
     assert public(client, db, alert)["events"][-1]["kind"] == "sharper_images"
-    from tests.factories import offset, square
-
-    far_lake = make_asset(db, district="North", geometry=square(*offset(TEST_LON, TEST_LAT, east_m=5000)))
-    _, satellite = ingest(db, far_lake, geometry=square(*offset(TEST_LON, TEST_LAT, east_m=5000), side_m=60))
+    far_lake = make_asset(db, district="North", geometry=square(*offset(TG_LON, TG_LAT, east_m=5000)))
+    _, satellite = ingest(db, far_lake, geometry=square(*offset(TG_LON, TG_LAT, east_m=5000), side_m=60))
     assert client.post(f"/alerts/{satellite.id}/imagery-request", json={"provider": "isro_nrsc"}, headers=auth(w.north)).status_code == 403
 
 
@@ -173,9 +185,7 @@ def test_officials_approve_or_decline_with_notes_then_close(client, db, w):
     assert client.post(f"/alerts/{approved.id}/decision", json={"decision": "close", "note": ""}, headers=auth(w.north)).status_code == 422
     assert client.post(f"/alerts/{approved.id}/decision", json={"decision": "close", "note": "Sent to Irrigation"}, headers=auth(w.north)).json()["state"] == "CLOSED"
 
-    from tests.factories import offset
-
-    lon, lat = offset(TEST_LON, TEST_LAT, east_m=3000)
+    lon, lat = offset(TG_LON, TG_LAT, east_m=3000)
     declined = report(client, db, lon=lon, lat=lat)
     out = client.post(f"/alerts/{declined.id}/decision", json={"decision": "decline", "note": "Patta land", "citizen_department": "revenue",
                                                                "citizen_false_report": True}, headers=auth(w.admin))
@@ -184,14 +194,14 @@ def test_officials_approve_or_decline_with_notes_then_close(client, db, w):
     assert view["closed_reason"] == "passed_on" and "Revenue" in view["events"][-1]["note"]["en"]
     assert db.get(CitizenReport, declined.report_id).false_report is True
     # Incidents the satellite found keep the admin's decision (D-057).
-    _, satellite = ingest(db, w.lake, at=utcnow())
+    _, satellite = ingest(db, w.lake, at=utcnow(), geometry=square(TG_LON, TG_LAT, side_m=60))
     assert client.post(f"/alerts/{satellite.id}/decision", json={"decision": "approve", "note": "x"}, headers=auth(w.admin)).status_code == 422
     assert client.post(f"/alerts/{satellite.id}/transitions", json={"to": "UNDER_REVIEW", "note": "x"}, headers=auth(w.north)).status_code == 403
 
 
 def test_the_place_goes_on_the_weekly_watch(client, db):
     official = make_user(db, "viewer", is_demo=False)
-    alert = report(client, db, lon=78.4740, lat=17.3850, dataset="real")
+    alert = report(client, db, lon=78.4740, lat=17.3850)
     place = db.get(Asset, db.get(Candidate, alert.candidate_id).asset_id)
     assert place.monitored is False
     assert client.post(f"/alerts/{alert.id}/watch", json={"reason": " "}, headers=auth(official)).status_code == 422

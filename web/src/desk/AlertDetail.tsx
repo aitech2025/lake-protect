@@ -8,7 +8,6 @@ import { AuthImage, BoundarySeal, LineSwatch, StatePill, useAsync, usePageTitle 
 import { DatedBracket } from "../components/DatedBracket";
 import { MapView } from "../components/MapView";
 import { PageState } from "../components/PageState";
-import { useDemoOnScreen } from "../demo";
 import { AckBanner } from "./Inbox";
 import { notifyCountChanged } from "../components/Layout";
 import { CitizenMain, CitizenSide } from "./CitizenActions";
@@ -54,7 +53,6 @@ export function AlertDetail() {
   const lang = i18n.language;
   const { user } = useAuth();
   const { data: a, error, status, reload } = useAsync(() => api<any>(`/alerts/${id}`), [id]);
-  useDemoOnScreen(Boolean(a?.is_demo));
   // A review or a decision acknowledges this person's notification: refresh the side bar's count.
   useEffect(() => {
     if (a) notifyCountChanged();
@@ -151,7 +149,7 @@ export function AlertDetail() {
           <section className="section">
             <h2 className="title-s">{t("detail.map_title")}</h2>
             <div className="mapbox" style={{ height: 380 }}>
-              <MapView base={a.is_demo ? "demo" : "s2"} boundaries={boundaries} changes={changes} testId="detail-map" />
+              <MapView boundaries={boundaries} changes={changes} testId="detail-map" />
               <div className="legend">
                 <span><LineSwatch colour="#1f6fa8" />{t("boundary.legend_solid")}</span>
                 <span><LineSwatch colour="#1f6fa8" dash="6 4" />{t("boundary.legend_dashed")}</span>

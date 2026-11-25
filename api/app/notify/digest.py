@@ -2,8 +2,7 @@
 
 Sent after each weekly screen. It counts the assets watched and seen clearly, names those with no
 clear look, lists each change found that week with its incident, and says what is waiting for the
-reader: reviews for an official, decisions for the admin. Real and demo assets are never mixed:
-each dataset has its own digest.
+reader: reviews for an official, decisions for the admin.
 """
 from __future__ import annotations
 
@@ -26,15 +25,15 @@ def week_dates(week: str) -> tuple[dt.date, dt.date]:
     return monday, monday + dt.timedelta(days=6)
 
 
-def build(db: Session, user: User, week: str, is_demo: bool, at: dt.datetime) -> dict | None:
+def build(db: Session, user: User, week: str, at: dt.datetime) -> dict | None:
     """The digest's facts for this user, or None when the user covers no area."""
     areas = routing.areas_of(db, user.id)
     admin = user.role == Role.admin.value
     if not admin and not areas:
         return None
     scope = routing.scope_sql(user)
-    params = {"demo": is_demo, "week": week}
-    assets = db.execute(text(f"SELECT a.id, a.name, a.name_te FROM assets a WHERE a.is_demo = :demo AND a.monitored AND {scope} ORDER BY a.name"), params).mappings().all()
+    params = {"week": week}
+    assets = db.execute(text(f"SELECT a.id, a.name, a.name_te FROM assets a WHERE a.monitored AND {scope} ORDER BY a.name"), params).mappings().all()
     ids = [a["id"] for a in assets] or [0]
     screens = {
         r["asset_id"]: r
@@ -42,7 +41,7 @@ def build(db: Session, user: User, week: str, is_demo: bool, at: dt.datetime) ->
             """
             SELECT DISTINCT ON (s.asset_id) s.asset_id, s.status, s.changes
             FROM asset_screens s JOIN screen_runs r ON r.id = s.run_id
-            WHERE coalesce(s.week, to_char(r.as_of, 'IYYY-"W"IW')) = :week AND r.is_demo = :demo AND s.asset_id = ANY(:ids)
+            WHERE coalesce(s.week, to_char(r.as_of, 'IYYY-"W"IW')) = :week AND s.asset_id = ANY(:ids)
             ORDER BY s.asset_id, r.as_of DESC, s.id DESC
             """), {**params, "ids": ids}).mappings()
     }
@@ -67,7 +66,7 @@ def build(db: Session, user: User, week: str, is_demo: bool, at: dt.datetime) ->
                (SELECT l.zone::text FROM legal_checks l WHERE l.candidate_id = c.id ORDER BY l.id DESC LIMIT 1) AS zone,
                EXISTS (SELECT 1 FROM incident_reviews r WHERE r.alert_id = al.id AND r.reviewer_id = :uid) AS reviewed_by_me
         FROM alerts al JOIN candidates c ON c.id = al.candidate_id JOIN assets a ON a.id = c.asset_id
-        WHERE a.is_demo = :demo AND {scope}
+        WHERE {scope}
         """), {**params, "uid": user.id}).mappings().all()
     start_t = dt.datetime.combine(start, dt.time(), tzinfo=dt.timezone.utc)
     end_t = start_t + dt.timedelta(days=7)
@@ -89,7 +88,6 @@ def build(db: Session, user: User, week: str, is_demo: bool, at: dt.datetime) ->
         "week": week,
         "from": start.isoformat(),
         "to": end.isoformat(),
-        "dataset": "demo" if is_demo else "real",
         "role": user.role,
         "scope": "all" if admin else "areas",
         "areas": [routing.area_label(a) for a in areas] if not admin else [],
