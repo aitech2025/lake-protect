@@ -140,8 +140,8 @@ def ingest_social_signals(body: SocialBatchIn, db: Session = Depends(get_db)):
         db.execute(text("SELECT pg_advisory_xact_lock(hashtextextended(:key,0))"), {"key": lock_key})
         needle = '%"provider_post_id": "' + signal["provider_post_id"] + '"%'
         existing = db.execute(text("""
-            SELECT id FROM signals WHERE kind=:kind AND ref LIKE :needle LIMIT 1
-        """), {"kind": "social_" + signal["provider"], "needle": needle}).scalar_one_or_none()
+            SELECT id FROM signals WHERE kind=:kind AND CAST(ref AS jsonb) ->> 'provider_post_id' = :post_id LIMIT 1
+        """), {"kind": "social_" + signal["provider"], "post_id": signal["provider_post_id"]}).scalar_one_or_none()
         if existing is not None:
             duplicates += 1
             continue
