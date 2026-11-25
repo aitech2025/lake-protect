@@ -55,3 +55,16 @@ def test_too_few_clear_looks_or_a_failure_say_so():
     failed = result(scenes=3)
     failed.counts["error"] = "TimeoutError: STAC"
     assert result_for(item(), failed) == {"status": "failed", "detail": "TimeoutError: STAC"}
+
+
+def test_a_look_an_official_asked_for_shows_the_image_of_its_date():
+    import base64
+
+    from lake_protect.review import look_day
+
+    asked = {**item(), "kind": "requested", "look_date": "2025-03-01"}
+    assert look_day(asked, dt.date(2026, 11, 25)) == dt.date(2025, 3, 1)
+    assert look_day(item(), dt.date(2026, 11, 25)) == dt.date(2026, 11, 25)
+    body = result_for(asked, result([cand(60)]))
+    assert body["result"] == "change_found" and "before_png_b64" not in body
+    assert base64.b64decode(body["after_png_b64"]) == b"\x89PNG-test" and body["after_date"] == "2026-11-22"

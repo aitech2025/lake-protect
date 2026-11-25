@@ -108,7 +108,9 @@ def incident_decided(db: Session, alert: Alert, actor: User, note_text: str | No
     asset = _asset_of(db, alert)
     reviewers = db.scalars(select(User).join(IncidentReview, IncidentReview.reviewer_id == User.id)
                            .where(IncidentReview.alert_id == alert.id, User.is_active.is_(True)).distinct()).all()
-    people = {u.id: u for u in [*routing.officials_for(db, asset), *reviewers] if u.id != actor.id}
+    # An official's decision on a citizen's incident also goes to every admin (D-064).
+    admins = routing.admins(db) if actor.role != Role.admin.value else []
+    people = {u.id: u for u in [*routing.officials_for(db, asset), *reviewers, *admins] if u.id != actor.id}
     payload = {**messages.incident_payload(alert_view.row_for(db, alert.id)), "decision": alert.state, "note": note_text}
     out = [create(db, u, "incident_decided", payload, at=at, needs_ack=False, is_demo=alert.is_demo, alert_id=alert.id)
            for u in people.values() if not _already(db, u.id, "incident_decided", alert_id=alert.id)]
@@ -119,12 +121,15 @@ def incident_decided(db: Session, alert: Alert, actor: User, note_text: str | No
 
 
 # Acknowledging ----------------------------------------------------------------------------------
-def satellite_review(db: Session, alert: Alert, at: dt.datetime | None = None) -> list[Notification]:
-    """A citizen incident's satellite review is back (D-063): the people told about the incident hear the result."""
+def satellite_review(db: Session, alert: Alert, at: dt.datetime | None = None, only: int | None = None) -> list[Notification]:
+    """A citizen incident's satellite review is back (D-063): the people told about the incident hear the
+    result. A look an official asked for goes to that official only (`only`, D-064)."""
     at = as_utc(at)
     asset = _asset_of(db, alert)
     base = messages.incident_payload(alert_view.row_for(db, alert.id))
     people = {u.id: u for u in routing.officials_for(db, asset) + routing.admins(db)}
+    if only is not None:
+        people = {only: db.get(User, only)}
     return [create(db, u, "satellite_review", base, at=at, needs_ack=False, is_demo=alert.is_demo, alert_id=alert.id) for u in people.values()]
 
 

@@ -11,6 +11,7 @@ import { PageState } from "../components/PageState";
 import { useDemoOnScreen } from "../demo";
 import { AckBanner } from "./Inbox";
 import { notifyCountChanged } from "../components/Layout";
+import { CitizenMain, CitizenSide } from "./CitizenActions";
 
 const OUTCOMES = ["real_change", "not_real", "needs_site_visit"] as const;
 
@@ -34,7 +35,7 @@ export function ChangeSummary({ a }: { a: any }) {
     // A citizen incident: what was reported, when, and what the satellite review shows (D-063).
     return <p className="change-summary" data-testid="change-summary">{i18n.language === "te" && a.summary_te ? a.summary_te : a.summary}</p>;
   }
-  const zone = a.zone ? t(a.asset_type === "recovered_parcel" && a.zone === "inside_ftl" ? "incident.where.parcel_inside" : `incident.where.${a.zone}`) : "";
+  const zone = a.zone ? t(a.asset_type && a.asset_type !== "lake" && a.zone === "inside_ftl" ? "incident.where.parcel_inside" : `incident.where.${a.zone}`) : "";
   return (
     <p className="change-summary" data-testid="change-summary">
       {t("incident.summary", {
@@ -77,7 +78,7 @@ export function AlertDetail() {
   }
 
   const assetName = lang === "te" && a.asset.name_te ? a.asset.name_te : a.asset.name;
-  const isParcel = a.asset.type === "recovered_parcel";
+  const isParcel = a.asset.type !== "lake"; // every other kind of location has a parcel boundary
   const lc = a.legal_check;
   const cand = a.candidate;
   const obs = cand.observations;
@@ -106,7 +107,7 @@ export function AlertDetail() {
       <div className="detail">
         <section className="panel detail-decision" aria-labelledby="next-step-title">
           <h2 id="next-step-title" className="title-s">{t("detail.actions_title")}</h2>
-          <Actions alert={a} onDone={reload} />
+          {a.officer ? <CitizenSide a={a} onDone={reload} /> : <Actions alert={a} onDone={reload} />}
           {a.satellite_review && <SatelliteReviewPanel a={a} />}
         </section>
 
@@ -139,6 +140,8 @@ export function AlertDetail() {
               </figure>
             </div>
           ) : null}
+
+          {a.officer && <CitizenMain a={a} onDone={reload} />}
 
           <section className="section panel">
             <h2 className="title-s">{t("detail.bracket_title")}</h2>

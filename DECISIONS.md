@@ -337,6 +337,67 @@ with a reason, link).
   confirmed, dismissed, or dismissed as passed to a department. The admin may mark the report as
   false when dismissing. Officials' notes stay inside.
 
+### D-064: Officials and the admin work a citizen's incident from one panel (owner, 25 Nov 2026)
+The owner asked that when an official sees an incident a citizen reported, they can:
+- acknowledge it and add notes;
+- request a satellite image of the reported place: the latest, or a past date to compare;
+- approve, decline or close it, with notes;
+- attach the legal records.
+
+For now **both roles do all of it** (owner's answer): officials and the admin alike review, attach
+legal data, request images, approve or decline with notes, and add the place to the weekly watch.
+The owner chose **both kinds of image**: a fresh Sentinel-2 look at once, and a sharper paid image
+that the admin approves before anything is ordered.
+
+Built as M17 (`docs/citizen.md` section 5a). On incidents the satellite found, D-057's split stays:
+officials review and the admin decides.
+
+- **Acknowledge:**
+  - once per person, with an optional note;
+  - clears what that person was sent about the incident;
+  - the first acknowledgement moves an open incident to under review, and the citizen is told
+    "An official is reviewing it".
+- **Notes:** any number, by either role. They are kept for good (append-only) and never shown to
+  citizens.
+- **Satellite looks:**
+  - **Kinds:** the latest clear image, or the newest one on or before a chosen date (from 1 Jan
+    2017, when Sentinel-2 images of Telangana start, to today).
+  - **Kept apart:** each look is kept next to the first review. It never replaces the incident's
+    own images, so the evidence stays what it was when the incident opened.
+  - **Comparing:** officials tick two looks to see them side by side.
+  - **Demo:** answered at once.
+  - **Real:** answered by `lp review-reports` with `as_of` set to the chosen date.
+  - **Who hears the result:** only the person who asked.
+- **Sharper image:**
+  - an official's request waits for the admin, who approves or declines it with a note;
+  - the admin's own request is approved as made;
+  - nothing is ordered in the prototype, and the citizen is told sharper images were asked for.
+- **Legal records:**
+  - **Snapshot:** a dated snapshot of what the app holds at the spot, each item with its source:
+    - land records under the reported spot;
+    - the boundary's status and notification reference;
+    - the location's legal documents, court cases, permits and authorised works;
+    - the latest legal check.
+  - **What is not connected:** the snapshot also lists the sources not yet connected, to be
+    checked by hand: the Section 22A list, Bhu Bharati, live CCMS and eCourts status, and police
+    FIRs.
+  - **Kept:** snapshots are append-only, so an earlier one is never changed.
+  - **Documents:** either role can attach a legal document (a file or a reference). It is kept on
+    the location too.
+- **Approve, decline, close:**
+  - **Notes:** required on each step.
+  - **Approve** confirms and **decline** dismisses, optionally as passed to a department or marked
+    false.
+  - **An open incident** has its review started first.
+  - **The admin is told** of every decision an official takes.
+- **Weekly watch:**
+  - a reported place (D-063, not watched) can be put on the weekly watch with a reason and a
+    better name, by either role;
+  - every screen from then on looks at it;
+  - the citizen is told.
+
+This widens D-057 for citizen incidents only: there an official may take the admin's steps.
+
 ## Errors and gaps found in CONTEXT.md
 
 ### E-001: `boundaries` is append-only but has `valid_to` (section 7, invariant 12)

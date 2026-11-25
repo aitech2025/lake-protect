@@ -26,7 +26,8 @@ data in the app), then M3.
 | M13 Downstream: notifications by area, overview | Done | API 308, pipeline 29, browser 4 | b03bb99 |
 | M14 GeoGuard: kinds of land, admin adds and stops watching locations | Done | API 334, pipeline 29, browser 5 | 789c555 |
 | M15 Citizen channels: portal, WhatsApp, staff intake, updates back | Done | API 361, pipeline 29, browser 6 | be69e84 |
-| M16 Citizen reports open incidents with a satellite review; no Urdu | Done | API 365, pipeline 32, browser 6 | M16 commit |
+| M16 Citizen reports open incidents with a satellite review; no Urdu | Done | API 365, pipeline 32, browser 6 | 6bbcd8c |
+| M17 Officials and the admin work citizens' incidents: acknowledge, notes, looks, legal records, decide, watch | Done | API 375, pipeline 33, browser 7 | M17 commit |
 
 ## M0 Scaffold: done
 
@@ -240,6 +241,44 @@ removed, is `reports/m2-tuning/README.md`.
   upload, the area rounding case). Browser 15 passed on fresh demos: `m10-real` (switch, no demo
   record on the real side, Sentinel-2 tiles requested, 99 real lakes listed) with the M5 to M8
   suites, then the M9 walkthrough with no internet.
+
+## M17 Officials and the admin work citizens' incidents: done
+
+Owner's request, 25 Nov 2026 (D-064). Design: `docs/citizen.md` section 5a.
+
+- **Migration 0011:**
+  - `incident_notes` (notes and acknowledgements, append-only);
+  - `incident_legal_records` (dated legal snapshots, append-only);
+  - satellite reviews gain `kind` (automatic or requested), `requested_by` and `look_date`;
+  - sharper-image requests gain a status (requested, approved, declined), the decider and a note;
+  - legal documents can name the incident they were attached to.
+- **API** (`api/app/citizen/actions.py`, `/alerts/{id}/…`):
+  - `acknowledge`, `notes`;
+  - `satellite-looks` and `looks/{id}/{before|after}`;
+  - `imagery-requests/{id}/decision`;
+  - `legal-records`, `documents`;
+  - `decision` (approve, decline, close), `watch`.
+
+  Both roles may use them on citizen incidents. The incident detail carries notes, looks, the
+  latest legal snapshot, attached documents, the watch state and what the user may do.
+- **Pipeline:** `lp review-reports` answers requested looks as of their date, with the latest clear
+  image of that date.
+- **Desk:** a new panel on citizen incidents (`web/src/desk/CitizenActions.tsx`):
+  - **Side column:** acknowledge, decide, sharper image, weekly watch.
+  - **Main column:** satellite looks with side-by-side comparison, notes, legal records and
+    documents.
+  - **Languages:** English and Telugu.
+- **Fixes on the way:**
+  - the review and step routes now refuse inside a savepoint;
+  - every non-lake location reads "inside the parcel", not "inside the lake boundary".
+- **Tests:**
+  - **API:** 375 passed, including `test_incident_actions.py` (7).
+  - **Pipeline:** 33 passed.
+  - **Browser:** 7 passed. `m15-citizen` now goes through the panel:
+    1. the official acknowledges, adds a note, compares a look of two months ago with today's,
+       attaches the legal records and a document, asks for a sharper image and approves;
+    2. the admin approves the image and closes;
+    3. a new test puts a report on open ground onto the weekly watch.
 
 ## M16 Citizen reports open incidents with a satellite review; no Urdu: done
 

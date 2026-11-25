@@ -35,8 +35,23 @@ def aoi_for(item: dict) -> AssetAOI:
     )
 
 
+def look_day(item: dict, today: dt.date) -> dt.date:
+    """The date the review looks at: the date an official chose (D-064), or today."""
+    return dt.date.fromisoformat(item["look_date"]) if item.get("look_date") else today
+
+
 def result_for(item: dict, r: AssetResult) -> dict:
-    """The body for POST /pipeline/reviews/{id}."""
+    """The body for POST /pipeline/reviews/{id}. A look an official asked for carries the latest clear
+    image as of its date, so two looks compare like for like (D-064)."""
+    body = _result(item, r)
+    if item.get("kind") == "requested" and body["status"] == "done" and r.week_image_png:
+        body["after_png_b64"] = base64.b64encode(r.week_image_png).decode()
+        body["after_date"] = (r.week_image_date or r.last_look).isoformat() if (r.week_image_date or r.last_look) else body.get("after_date")
+        body.pop("before_png_b64", None)
+    return body
+
+
+def _result(item: dict, r: AssetResult) -> dict:
     status = coverage_status(r)
     if status == "failed":
         return {"status": "failed", "detail": str(r.counts.get("error", "The screen failed"))[:400]}

@@ -71,7 +71,7 @@ FROM alerts al
 JOIN candidates c ON c.id = al.candidate_id
 JOIN assets a ON a.id = c.asset_id
 LEFT JOIN citizen_reports cr ON cr.id = al.report_id
-LEFT JOIN satellite_reviews sr ON sr.alert_id = al.id
+LEFT JOIN satellite_reviews sr ON sr.alert_id = al.id AND sr.kind = 'automatic'
 LEFT JOIN LATERAL (SELECT * FROM legal_checks l WHERE l.candidate_id = c.id ORDER BY l.id DESC LIMIT 1) lc ON true
 WHERE (CAST(:alert_id AS bigint) IS NULL OR al.id = CAST(:alert_id AS bigint))
   AND (CAST(:asset_id AS bigint) IS NULL OR a.id = CAST(:asset_id AS bigint))
@@ -222,7 +222,7 @@ def _citizen_block(db: Session, alert: Alert) -> dict | None:
 def _review_block(db: Session, alert: Alert) -> dict | None:
     from app.models import SatelliteReview
 
-    rv = db.scalar(select(SatelliteReview).where(SatelliteReview.alert_id == alert.id))
+    rv = db.scalar(select(SatelliteReview).where(SatelliteReview.alert_id == alert.id, SatelliteReview.kind == "automatic"))
     if rv is None:
         return None
     return {
@@ -231,6 +231,42 @@ def _review_block(db: Session, alert: Alert) -> dict | None:
         "change_area_sq_m": float(rv.change_area_sq_m) if rv.change_area_sq_m is not None else None,
         "first_changed_at": _iso(rv.first_changed_at), "detail": rv.detail, "attempts": rv.attempts,
         "has_images": bool(rv.after_chip),
+    }
+
+
+def _officer_blocks(db: Session, alert: Alert, asset: Asset, users: dict, user: User) -> dict:
+    """Notes, satellite looks, legal records, documents and the weekly watch (D-064)."""
+    from app.citizen import actions
+    from app.models import IncidentLegalRecord, SatelliteReview
+
+    looks = [
+        {"id": r.id, "kind": r.kind, "status": r.status, "result": r.result, "look_date": _iso(r.look_date), "before_date": _iso(r.before_date),
+         "after_date": _iso(r.after_date), "has_before": bool(r.before_chip), "has_after": bool(r.after_chip), "source": r.source,
+         "requested_by": users[r.requested_by].name if r.requested_by in users else None, "requested_at": _iso(r.requested_at),
+         "change_area_sq_m": float(r.change_area_sq_m) if r.change_area_sq_m is not None else None, "detail": r.detail}
+        for r in db.scalars(select(SatelliteReview).where(SatelliteReview.alert_id == alert.id).order_by(SatelliteReview.id))
+    ]
+    legal = db.scalars(select(IncidentLegalRecord).where(IncidentLegalRecord.alert_id == alert.id).order_by(IncidentLegalRecord.id.desc())).all()
+    docs = db.scalars(select(AssetDocument).where(AssetDocument.alert_id == alert.id).order_by(AssetDocument.id)).all()
+    notes = actions.notes_of(db, alert.id)
+    citizen = alert.origin == "citizen"
+    return {
+        "notes": notes,
+        "looks": looks,
+        "legal_records": None if not legal else {"id": legal[0].id, "at": _iso(legal[0].at), "by": users[legal[0].attached_by].name,
+                                                 "records": legal[0].records, "snapshots": len(legal)},
+        "documents_attached": [{"id": d.id, "doc_type": d.doc_type, "title": d.title, "reference": d.reference, "issued_on": _iso(d.issued_on),
+                                "has_file": bool(d.file_key), "sha256": d.sha256, "added_by": users[d.added_by].name if d.added_by in users else None}
+                               for d in docs],
+        "watch": {"asset_id": asset.id, "name": asset.name, "monitored": asset.monitored, "reported_place": asset.type == "reported_place"},
+        "officer": None if not citizen else {
+            "acknowledged_by_me": any(n["kind"] == "acknowledged" and n["author"] == user.name for n in notes),
+            "acknowledged_by": [n["author"] for n in notes if n["kind"] == "acknowledged"],
+            "can_decide": alert.state in lifecycle.REVIEWABLE,
+            "can_close": alert.state in (lifecycle.S.CONFIRMED.value, lifecycle.S.DISMISSED.value),
+            "can_approve_imagery": user.role == "admin",
+            "can_watch": not asset.monitored,
+        },
     }
 
 
@@ -334,8 +370,12 @@ def detail(db: Session, alert: Alert, user: User) -> dict:
         "citizen": _citizen_block(db, alert),
         "satellite_review": _review_block(db, alert),
         "imagery_requests": [
-            {"id": r.id, "provider": r.provider, "area_sq_km": float(r.area_sq_km), "est_cost_usd": float(r.est_cost_usd) if r.est_cost_usd is not None else None, "status": r.status}
-            for r in db.scalars(select(ImageryRequest).where(ImageryRequest.alert_id == alert.id))
+            {"id": r.id, "provider": r.provider, "area_sq_km": float(r.area_sq_km), "est_cost_usd": float(r.est_cost_usd) if r.est_cost_usd is not None else None,
+             "status": r.status, "note": r.note, "requested_by": users[r.requested_by].name if r.requested_by in users else None,
+             "created_at": _iso(r.created_at), "decided_by": users[r.decided_by].name if r.decided_by in users else None,
+             "decided_at": _iso(r.decided_at), "decision_note": r.decision_note}
+            for r in db.scalars(select(ImageryRequest).where(ImageryRequest.alert_id == alert.id).order_by(ImageryRequest.id))
         ],
+        **_officer_blocks(db, alert, asset, users, user),
         "policy_cutoff_date": rules.policy_cutoff_date().isoformat(),
     }

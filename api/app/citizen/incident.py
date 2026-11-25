@@ -142,10 +142,24 @@ def record(db: Session, review: SatelliteReview, result: dict, at: dt.datetime, 
     change = result.get("change") or {}
     review.change_type, review.change_area_sq_m = change.get("change_type"), change.get("area_sq_m")
     review.first_changed_at = change.get("first_changed_at")
+    automatic = review.kind == "automatic"
     if result.get("before_png"):
-        review.before_chip = candidate.before_chip = _chip_key(alert, "before", result["before_png"])
+        review.before_chip = _chip_key(alert, "before", result["before_png"])
     if result.get("after_png"):
-        review.after_chip = candidate.after_chip = _chip_key(alert, "after", result["after_png"])
+        review.after_chip = _chip_key(alert, "after" if automatic else f"look-{review.id}", result["after_png"])
+    if not automatic:
+        # A look an official asked for: kept to compare, never replacing the incident's own images.
+        db.flush()
+        chain.record(db, actor_id=None, action="citizen.satellite_look", entity="alert", entity_id=alert.id, at=at,
+                     details={"review_id": review.id, "result": review.result, "look_date": str(review.look_date) if review.look_date else None,
+                              "after_date": str(review.after_date) if review.after_date else None})
+        if tell_officials:
+            from app.notify import service as notify
+
+            notify.satellite_review(db, alert, at, only=review.requested_by)
+        return
+    candidate.before_chip = review.before_chip or candidate.before_chip
+    candidate.after_chip = review.after_chip or candidate.after_chip
     obs_ids = []
     for s in result.get("scenes", []):
         row = db.scalar(select(Observation).where(Observation.scene_id == s["scene_id"], Observation.sensor == s["sensor"]))
@@ -174,6 +188,29 @@ def record(db: Session, review: SatelliteReview, result: dict, at: dt.datetime, 
         notify.satellite_review(db, alert, at)
 
 
+EARLIEST_LOOK = dt.date(2017, 1, 1)  # Sentinel-2 L2A over Telangana; older dates have no images here
+
+
+def request_look(db: Session, alert: Alert, user, look_date: dt.date | None, at: dt.datetime) -> SatelliteReview:
+    """An official asks for a satellite look at the place: the latest, or the newest clear image on or
+    before a date, to compare with others (D-064). Demo data answers at once; real data waits for the
+    screener."""
+    if look_date is not None and not (EARLIEST_LOOK <= look_date <= at.date()):
+        raise ValueError(f"Choose a date between {EARLIEST_LOOK:%d %b %Y} and today")
+    report = db.get(CitizenReport, alert.report_id)
+    review = SatelliteReview(alert_id=alert.id, kind="requested", requested_by=user.id, look_date=look_date, status="pending",
+                             source="demo-synthetic" if alert.is_demo else "sentinel-2", requested_at=at, scenes=[], attempts=0,
+                             is_demo=alert.is_demo)
+    db.add(review)
+    db.flush()
+    chain.record(db, actor_id=user.id, action="incident.satellite_look_requested", entity="alert", entity_id=alert.id, at=at,
+                 details={"review_id": review.id, "look_date": look_date.isoformat() if look_date else "latest"})
+    if alert.is_demo:
+        lon, lat = db.execute(text("SELECT ST_X(geom), ST_Y(geom) FROM citizen_reports WHERE id = :i"), {"i": report.id}).one()
+        record(db, review, demo_result(db, report, lon, lat, at, look_date=look_date, requested=True), at, tell_officials=False)
+    return review
+
+
 def failed(db: Session, review: SatelliteReview, detail: str, at: dt.datetime) -> None:
     review.attempts += 1
     review.detail = detail[:500]
@@ -200,7 +237,8 @@ def _seed_day(db: Session, at: dt.datetime) -> dt.date:
     return db.scalar(select(ScreenRun.as_of).where(ScreenRun.is_demo.is_(True)).order_by(ScreenRun.as_of.desc()).limit(1)) or at.date()
 
 
-def demo_result(db: Session, report: CitizenReport, lon: float, lat: float, at: dt.datetime) -> dict:
+def demo_result(db: Session, report: CitizenReport, lon: float, lat: float, at: dt.datetime, look_date: dt.date | None = None,
+                requested: bool = False) -> dict:
     """What the demo sensor shows at the pin. Changes after the last weekly screen
     (`unscreened_changes` in world.yml) are found here first; everywhere else shows no change."""
     from app.seed import demo_render as render
@@ -210,11 +248,12 @@ def demo_result(db: Session, report: CitizenReport, lon: float, lat: float, at: 
     e, n = world.from_lonlat(lon, lat)
     here = Point(e, n)
     seed = _seed_day(db, at)
-    day = (at.date() - seed).days
+    after_date = look_date or at.date()
+    day = (after_date - seed).days
     found = next((c for c in world.spec.get("unscreened_changes", [])
                   if c["first_changed"] <= day and world.change_m(c).distance(here) <= NEAR_M), None)
-    after_date = at.date()
     before_date = after_date - dt.timedelta(days=30)
+    label = "Look" if requested else None
 
     def scene(d: dt.date) -> dict:
         return {"sensor": "demo_synthetic_optical", "scene_id": f"DEMO-REVIEW-{d.isoformat()}", "acquired_at": dt.datetime.combine(d, dt.time(5, 0), tzinfo=dt.timezone.utc),
@@ -227,7 +266,7 @@ def demo_result(db: Session, report: CitizenReport, lon: float, lat: float, at: 
             "result": "change_found", "as_of": after_date, "before_date": before_date, "after_date": after_date,
             "scenes": [scene(before_date), scene(after_date)],
             "before_png": render.render_chip(world, found, when=before_date, after=False, window=window),
-            "after_png": render.render_chip(world, found, when=after_date, after=True, window=window),
+            "after_png": render.render_chip(world, found, when=after_date, after=True, window=window, label=label),
             "change": {"change_type": found["change"]["type"], "area_sq_m": round(world.change_m(found).area, 1), "first_changed_at": first},
             "detail": "Demo sensor: a change the weekly screen has not seen yet",
         }
@@ -238,7 +277,7 @@ def demo_result(db: Session, report: CitizenReport, lon: float, lat: float, at: 
         "result": "no_change", "as_of": after_date, "before_date": before_date, "after_date": after_date,
         "scenes": [scene(before_date), scene(after_date)],
         "before_png": render.render_chip(world, pseudo, when=before_date, after=False, window=window, show_change=False),
-        "after_png": render.render_chip(world, pseudo, when=after_date, after=True, window=window, show_change=False),
+        "after_png": render.render_chip(world, pseudo, when=after_date, after=True, window=window, show_change=False, label=label),
         "detail": "Demo sensor: no change at the pin",
     }
 

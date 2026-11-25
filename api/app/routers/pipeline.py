@@ -195,7 +195,8 @@ def pending_reviews(db: Session = Depends(get_db)) -> dict:
         bset = bsvc.current_boundary_set(db, asset.id)
         out.append({
             "id": rv.id, "alert_id": alert.id, "code": alert.code, "ref": report.ref, "lon": lon, "lat": lat,
-            "reported_at": report.created_at.isoformat(), "attempts": rv.attempts,
+            "reported_at": report.created_at.isoformat(), "attempts": rv.attempts, "kind": rv.kind,
+            "look_date": rv.look_date.isoformat() if rv.look_date else None,
             "asset": {"id": asset.id, "asset_key": asset.asset_key, "name": asset.name, "baseline_date": asset.baseline_date.isoformat(),
                       "boundaries": {k: {"version": b["version"], "status": b["status"], "geometry": b["geometry"]} for k, b in bset.items()}},
         })

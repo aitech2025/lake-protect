@@ -11,6 +11,11 @@ the resolution consistent with the state. Every step and every review writes an 
 
 Notifications (D-059): a review, or an admin's step, acknowledges what that person was sent about
 the incident. A decision (confirmed or dismissed) tells the area's officials and its reviewers.
+
+Citizen incidents (D-064): officials take the admin's steps too. They start the review (by
+acknowledging), approve (confirm) or decline (dismiss), and close, each with a note. The admin is
+told of every official's decision. Incidents found by the satellite keep D-057's split: officials
+review and the admin decides.
 """
 from __future__ import annotations
 
@@ -96,6 +101,8 @@ def transition(
         raise Refused(f"There is no step from {alert.state} to {to}")
     who, label = step
     role = actor.role if actor else SYSTEM
+    if who == Role.admin.value and role == Role.viewer.value and alert.origin == "citizen":
+        who = Role.viewer.value  # on a citizen's incident an official may take this step (D-064)
     # A viewer's first review moves an incident to UNDER_REVIEW through review(), never directly.
     if role != who and not (to == S.UNDER_REVIEW.value and details and details.get("by_review")):
         raise Refused(f"Only the {who} can take this step ({label})", 403)
@@ -119,7 +126,7 @@ def transition(
         details={"from": frm, "to": to, "role": role, "step": label, "note": note, "resolution": alert.resolution, **(details or {})},
         at=at,
     )
-    if actor is not None and actor.role == Role.admin.value:
+    if actor is not None and (actor.role == Role.admin.value or alert.origin == "citizen"):
         from app.notify import service as notify
 
         notify.acknowledge_for_alert(db, actor, alert, "decision", at)
@@ -143,7 +150,7 @@ def auto_close(db: Session, alert: Alert, verdict: str, at: dt.datetime | None =
 def review(db: Session, alert: Alert, user: User, outcome: str, note: str, at: dt.datetime | None = None) -> IncidentReview:
     """A viewer's review. The first one moves the incident from OPEN to UNDER_REVIEW."""
     at = as_utc(at)
-    if user.role != Role.viewer.value:
+    if user.role != Role.viewer.value and alert.origin != "citizen":
         raise Refused("Reviews are recorded by viewers (the officials); the admin decides", 403)
     if alert.state not in REVIEWABLE:
         raise Refused(f"This incident is {alert.state}; reviews are taken while it is open or under review")
@@ -170,6 +177,14 @@ def review(db: Session, alert: Alert, user: User, outcome: str, note: str, at: d
 def allowed_actions(db: Session, alert: Alert, user: User) -> list[dict]:
     """What this user can do next. The server still checks every step."""
     out = []
+    if alert.origin == "citizen":
+        # Both roles act on a citizen's incident (D-064); the incident page shows its own panel.
+        for (frm, to), (who, label) in STEPS.items():
+            if frm == alert.state and who == Role.admin.value:
+                out.append({"action": "transition", "to": to, "label": label})
+        if alert.resolution == Resolution.confirmed.value and user.role == Role.admin.value:
+            out.append({"action": "evidence_pack", "label": "Generate the evidence pack"})
+        return out
     if user.role == Role.viewer.value:
         reviewed = db.scalar(select(IncidentReview.id).where(IncidentReview.alert_id == alert.id, IncidentReview.reviewer_id == user.id).limit(1))
         if alert.state in REVIEWABLE:

@@ -340,6 +340,11 @@ class ImageryRequest(Base):
     requested_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
     approved_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
     created_at: Mapped[dt.datetime] = mapped_column(TZ)
+    # Migration 0011: an official's request, then the admin's approval or refusal (D-064).
+    note: Mapped[str | None] = mapped_column(Text)
+    decided_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    decided_at: Mapped[dt.datetime | None] = mapped_column(TZ)
+    decision_note: Mapped[str | None] = mapped_column(Text)
 
 
 class Signal(Base):
@@ -525,6 +530,7 @@ class AssetDocument(Base):
     supersedes_id: Mapped[int | None] = mapped_column(ForeignKey("asset_documents.id"))
     added_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
     added_at: Mapped[dt.datetime] = mapped_column(TZ, server_default="now()")
+    alert_id: Mapped[int | None] = mapped_column(ForeignKey("alerts.id"))  # migration 0011: attached to an incident
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
@@ -691,4 +697,34 @@ class SatelliteReview(Base):
     first_changed_at: Mapped[dt.date | None] = mapped_column(Date)
     detail: Mapped[str | None] = mapped_column(Text)
     attempts: Mapped[int] = mapped_column(Integer, default=0)
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Migration 0011: 'automatic' (when the report arrives) or 'requested' by an official, for the
+    # latest image or a past date.
+    kind: Mapped[str] = mapped_column(Text, server_default="automatic")
+    requested_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    look_date: Mapped[dt.date | None] = mapped_column(Date)
+
+
+class IncidentNote(Base):
+    """Append-only: an official's acknowledgement or note on an incident (migration 0011)."""
+
+    __tablename__ = "incident_notes"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    alert_id: Mapped[int] = mapped_column(ForeignKey("alerts.id"))
+    author_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    kind: Mapped[str] = mapped_column(Text)
+    text: Mapped[str] = mapped_column(Text)
+    at: Mapped[dt.datetime] = mapped_column(TZ)
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class IncidentLegalRecord(Base):
+    """Append-only: the legal records at an incident's place, as they stood when attached (migration 0011)."""
+
+    __tablename__ = "incident_legal_records"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    alert_id: Mapped[int] = mapped_column(ForeignKey("alerts.id"))
+    attached_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    at: Mapped[dt.datetime] = mapped_column(TZ)
+    records: Mapped[dict] = mapped_column(JSONB)
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)

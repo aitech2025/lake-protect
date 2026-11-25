@@ -220,7 +220,7 @@ def review_reports(
 
     import httpx
 
-    from lake_protect.review import aoi_for, result_for
+    from lake_protect.review import aoi_for, look_day, result_for
     from lake_protect.screen import run
 
     while True:
@@ -231,7 +231,7 @@ def review_reports(
             for item in items:
                 typer.echo(f"Review {item['id']}: incident {item['code']}, report {item['ref']}, {item['asset']['name']}")
                 try:
-                    results, _ = run([aoi_for(item)], dt.date.today(), workers=workers, use_radar=radar, log=typer.echo)
+                    results, _ = run([aoi_for(item)], look_day(item, dt.date.today()), workers=workers, use_radar=radar, log=typer.echo)
                     body = result_for(item, results[0])
                 except Exception as exc:  # a review that fails is reported, and tried again later
                     body = {"status": "failed", "detail": f"{type(exc).__name__}: {exc}"[:400]}

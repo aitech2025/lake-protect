@@ -73,6 +73,10 @@ NOTES = {
         "en": "Officials have asked for sharper satellite images of this place.",
         "te": "ఈ ప్రదేశం యొక్క మరింత స్పష్టమైన ఉపగ్రహ చిత్రాలను అధికారులు కోరారు.",
     },
+    "added_to_watch": {
+        "en": "This place is now on GeoGuard's weekly watch: {place}.",
+        "te": "ఈ ప్రదేశం ఇప్పుడు GeoGuard వారపు పరిశీలనలో ఉంది: {place}.",
+    },
     "linked_incident": {
         "en": "It matches a change officials are already reviewing at {place}.",
         "te": "{place} వద్ద అధికారులు ఇప్పటికే పరిశీలిస్తున్న మార్పుతో ఇది సరిపోలుతోంది.",

@@ -73,6 +73,7 @@ def render_chip(
     window: tuple[float, float, float] | None = None,
     out_px: int = 512,
     show_change: bool = True,
+    label: str | None = None,
 ) -> bytes:
     """`show_change=False` draws the place with no change at all: a citizen's report where the demo
     world has nothing (D-063)."""
@@ -136,7 +137,8 @@ def render_chip(
 
     # Labels
     draw.rectangle([0, 0, out_px, 30], fill=(0, 0, 0, 160))
-    draw.text((10, 6), f"{'After' if after else 'Before'}  {when.isoformat()}  ·  demo sensor, 10 m pixels", font=font(14, bold=True), fill=(255, 255, 255))
+    title = label or ("After" if after else "Before")
+    draw.text((10, 6), f"{title}  {when.isoformat()}  ·  demo sensor, 10 m pixels", font=font(14, bold=True), fill=(255, 255, 255))
     draw.rectangle([0, out_px - 26, out_px, out_px], fill=(150, 20, 20))
     draw.text((10, out_px - 22), DEMO_MARK, font=font(12, bold=True), fill=(255, 255, 255))
     bar_px = 100 * scale

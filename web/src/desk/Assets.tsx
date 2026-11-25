@@ -143,7 +143,8 @@ export function Assets() {
   const all = useMemo(() => (data?.features ?? []).filter((f) => f.properties.is_demo === (dataset === "demo")), [data, dataset]);
   const stopped = all.filter((f) => !f.properties.monitored).length;
   const features = useMemo(
-    // Places made from citizens' reports are never watched, so choosing their kind shows them (D-063).
+    // Places made from citizens' reports are not watched until an official adds them (D-063, D-064),
+    // so choosing their kind shows them all.
     () => all.filter((f) => (kind === "all" || f.properties.category === kind)
       && (showStopped || f.properties.monitored || f.id === selected || kind === "citizen_reported")),
     [all, kind, showStopped, selected],

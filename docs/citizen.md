@@ -1,4 +1,4 @@
-# Citizen channels: a report opens an incident, and the citizen hears back (M15, M16)
+# Citizen channels: a report opens an incident, and the citizen hears back (M15, M16, M17)
 
 Built 25 November 2026 to CONTEXT.md section 17.8 (DECISIONS.md D-062). Changed the same day at
 the owner's request (D-063):
@@ -9,6 +9,10 @@ the owner's request (D-063):
   3. it tells the officials;
   4. the officials work the report as an incident, with reviews, a sharper image, a decision and
      closing, each with a note.
+
+The owner then asked (D-064) that officials and the admin alike can acknowledge it, add notes,
+compare satellite looks of the place by date, attach the legal records, approve or decline, and
+put the place on the weekly watch. See section 5a.
 
 ## 1. The flow
 
@@ -98,8 +102,29 @@ them.
 
 **What stays inside, and false reports:**
 - Officials' notes stay inside. Citizens read only these fixed notes.
-- When dismissing, the admin can also mark the report as false. Two false reports from one source
-  flag its later reports for officials. They are not blocked.
+- When declining, an official or the admin can also mark the report as false. Two false reports
+  from one source flag its later reports for officials. They are not blocked.
+
+## 5a. What officials and the admin do on a citizen's incident (M17, D-064)
+
+The incident page shows one panel for citizen incidents (`web/src/desk/CitizenActions.tsx`). Both
+roles can use all of it.
+
+| Step | What happens | Citizen reads |
+|---|---|---|
+| **Acknowledge** (optional note) | Once per person. Clears that person's notifications for the incident. The first one starts the review. | "An official is reviewing it." |
+| **Add a note** | Kept for good, shown with author and time. | Nothing: notes stay inside. |
+| **Satellite look**, latest or on a date | **Demo:** answered at once. **Real:** `lp review-reports` answers it as of that date. The incident's own images are never replaced. Tick two looks to compare them side by side. | Nothing |
+| **Sharper image** | **Official's request:** waits for the admin's approval or decline, with a note. **Admin's request:** approved as made. Nothing is ordered in the prototype. | "Officials have asked for sharper satellite images of this place." |
+| **Attach the legal records** | A dated snapshot, kept beside the earlier ones: land records at the spot, boundary, documents, court cases, permits, authorised works, the legal check, and the sources still to check by hand. | Nothing |
+| **Attach a legal document** | A file or a reference. It is kept on the location too. | Nothing |
+| **Approve** or **Decline**, with a note | Starts the review if it is still open. Decline can pass the report to a department or mark it false. The admin is told of an official's decision. | As in section 5 |
+| **Close**, with a note | After approving or declining. | Nothing new |
+| **Add to the weekly watch** (reason, optional name) | For a reported place that is not watched yet. Every screen from then on looks at it. | "This place is now on GeoGuard's weekly watch: …" |
+
+API: `POST /alerts/{id}/acknowledge`, `/notes`, `/satellite-looks`, `/imagery-request`,
+`/imagery-requests/{rid}/decision` (admin), `/legal-records`, `/documents`, `/decision`, `/watch`.
+Look images: `GET /alerts/{id}/looks/{review_id}/{before|after}`.
 
 ## 6. How citizens hear back
 
@@ -132,10 +157,11 @@ Demo messages never leave the machine. A held message is never sent later.
 | Intake, placing, events, steps passed on | `api/app/citizen/service.py` |
 | Words (English, Telugu) | `api/app/citizen/texts.py` |
 | Real reviews | `pipeline/lake_protect/review.py`, `lp review-reports`, the `reviewer` service; `GET`/`POST /pipeline/reviews` |
-| Sharper imagery | `api/app/services/imagery.py` |
-| Desk | `web/src/desk/AlertDetail.tsx` (citizen and satellite review panels, dismissing to a department), `Queue.tsx` (badge), `Reports.tsx` (log, intake, place on the map, WhatsApp demo) |
+| Sharper imagery (official's request, admin's approval) | `api/app/services/imagery.py` |
+| Officials' actions: acknowledge, notes, legal records, documents, decisions, weekly watch | `api/app/citizen/actions.py`, `api/migrations/versions/0011_incident_actions.py` |
+| Desk | `web/src/desk/CitizenActions.tsx` (the officials' panel), `web/src/desk/AlertDetail.tsx` (citizen and satellite review panels), `Queue.tsx` (badge), `Reports.tsx` (log, intake, place on the map, WhatsApp demo) |
 | Portal | `web/src/portal/Portal.tsx` |
-| Tests | `api/tests/test_citizen.py` (14), `pipeline/tests/test_review.py` (3), `e2e/tests/m15-citizen.spec.ts` |
+| Tests | `api/tests/test_citizen.py` (14), `api/tests/test_incident_actions.py` (7), `pipeline/tests/test_review.py` (4), `e2e/tests/m15-citizen.spec.ts` (2) |
 
 ## 9. Not built yet
 

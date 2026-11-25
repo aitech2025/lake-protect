@@ -56,6 +56,7 @@ def add(
     supersedes_id: int | None = None,
     actor_id: int | None = None,
     at: dt.datetime | None = None,
+    alert_id: int | None = None,
 ) -> AssetDocument:
     """Add a document. Give `content` to store a new file, or `file_key` and `file_sha256` to point at
     a file already in the store (a source snapshot)."""
@@ -89,7 +90,7 @@ def add(
         asset_id=asset.id, doc_type=doc_type, title=title.strip(), reference=(reference or "").strip() or None,
         issued_on=issued_on, issued_by=issued_by, file_key=file_key, file_name=file_name, content_type=content_type,
         sha256=sha if file_key else None, byte_size=size, source_url=source_url, source_snapshot_id=source_snapshot_id,
-        supersedes_id=supersedes_id, added_by=actor_id, is_demo=asset.is_demo,
+        supersedes_id=supersedes_id, added_by=actor_id, is_demo=asset.is_demo, alert_id=alert_id,
     )
     if at is not None:
         doc.added_at = at
@@ -121,7 +122,7 @@ def as_dict(d: AssetDocument, superseded: set[int]) -> dict:
         "has_file": bool(d.file_key), "file_name": d.file_name, "content_type": d.content_type, "sha256": d.sha256,
         "byte_size": d.byte_size, "source_url": d.source_url, "source_snapshot_id": d.source_snapshot_id,
         "supersedes_id": d.supersedes_id, "superseded": d.id in superseded, "added_at": d.added_at.isoformat() if d.added_at else None,
-        "is_demo": d.is_demo,
+        "is_demo": d.is_demo, "alert_id": d.alert_id,
     }
 
 
