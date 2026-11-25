@@ -24,6 +24,7 @@ from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from app.audit import chain
+from app.citizen import service as citizen
 from app.clock import utcnow
 from app.db import db_guard, get_db
 from app.models import Asset, AssetScreen, ScreenRun, User
@@ -163,7 +164,17 @@ def record_run(body: RunIn, db: Session = Depends(get_db)) -> dict:
         chain.record(db, actor_id=None, action="notify.digest_failed", entity="screen_run", entity_id=run.id,
                      details={"week": week, "error": type(exc).__name__})
         db.commit()
-    return {"run_id": run.id, "assets": len(body.assets), "coverage": statuses, "digests": digests}
+    # Citizens whose reported place was seen clearly, with no change, are told (D-062). Best effort too.
+    try:
+        checked = citizen.on_screen_stored(db, run.id, utcnow())
+        db.commit()
+    except Exception as exc:  # noqa: BLE001
+        db.rollback()
+        checked = 0
+        chain.record(db, actor_id=None, action="citizen.screen_update_failed", entity="screen_run", entity_id=run.id,
+                     details={"error": type(exc).__name__})
+        db.commit()
+    return {"run_id": run.id, "assets": len(body.assets), "coverage": statuses, "digests": digests, "citizen_reports_checked": checked}
 
 
 _TILE = re.compile(r"^(\d{1,2})/(\d{1,7})/(\d{1,7})\.(jpg|png)$")

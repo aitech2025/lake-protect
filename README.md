@@ -29,6 +29,7 @@ docker compose exec -e LP_ALLOW_RESET=true api python -m app.seed.reset   # real
 | Service | Address |
 |---|---|
 | Desk | http://localhost:8180 |
+| Citizen portal | http://localhost:8180/report (demo world: `/report?demo=1`) |
 | API | http://localhost:8100/health (also under `/api` on the app's address) |
 | Database | localhost:5544, bound to this machine only |
 | Notifier | Reminders, escalations to the admin and the email outbox, every minute (`docker compose logs notifier`) |
@@ -52,6 +53,15 @@ map or uploading a GeoJSON or KML file. The next weekly screen includes it. Remo
 **Stop watching**, with a reason: nothing is deleted, and it can be watched again. The kinds of land
 watched now and planned are listed in `api/app/categories.yaml`. Design:
 [docs/locations.md](docs/locations.md).
+
+**Citizens.**
+- **How they report:**
+  - on the public portal at `/report`, with no sign-in, in English, Telugu or Urdu;
+  - on WhatsApp, once the State's channel exists (the desk has a demo simulator);
+  - through staff, who enter 1070 calls and Praja Vani petitions on **Citizen reports**.
+- **How they hear back:** each report gets a reference. Its status page `/report/track/<ref>` shows
+  every step in their language, and SMS or WhatsApp updates start once a gateway is set up.
+- **Design:** [docs/citizen.md](docs/citizen.md).
 
 The demo script is in [docs/DEMO.md](docs/DEMO.md). After the first build the laptop needs no
 internet: tiles, image pairs, fonts and the app are all local.

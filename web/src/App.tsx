@@ -11,8 +11,10 @@ import { Login } from "./desk/Login";
 import { Officials } from "./desk/Officials";
 import { Queue } from "./desk/Queue";
 import { Records } from "./desk/Records";
+import { ReportDetail, Reports, WhatsAppSim } from "./desk/Reports";
 import { Sources } from "./desk/Sources";
 import { Monthly } from "./bulletin/Monthly";
+import { ReportPage, TrackPage } from "./portal/Portal";
 
 function RequireUser({ children }: { children: ReactNode }) {
   const { user, ready } = useAuth();
@@ -29,12 +31,19 @@ export function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      {/* The public portal for citizens (D-062): no sign-in. */}
+      <Route path="/report" element={<ReportPage />} />
+      <Route path="/report/track" element={<TrackPage />} />
+      <Route path="/report/track/:ref" element={<TrackPage />} />
       <Route element={<RequireUser><Layout /></RequireUser>}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/officials" element={<Officials />} />
         <Route path="/alerts" element={<Queue />} />
         <Route path="/alerts/:id" element={<AlertDetail />} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/reports/whatsapp" element={<WhatsAppSim />} />
+        <Route path="/reports/:id" element={<ReportDetail />} />
         <Route path="/assets" element={<Assets />} />
         <Route path="/records" element={<Records />} />
         <Route path="/sources" element={<Sources />} />

@@ -42,8 +42,22 @@ def test_seeded_demo(db, client, isolated_storage):
     _open_sea(db)
     _notifications(db, seeded, isolated_storage)
     _dashboard(db)
+    _citizen_reports(db, seeded)
     assert chain.verify(db)["ok"] is True
     _chips(db, isolated_storage)
+
+
+def _citizen_reports(db, seeded):
+    """Every channel and every way a report ends (D-062), all fictional."""
+    assert seeded["citizen_reports"] == {
+        "r-full-path": "CLOSED/incident_confirmed", "r-not-real": "CLOSED/incident_dismissed", "r-outside": "CLOSED/passed_on",
+        "r-kunta": "CLOSED/no_change_seen", "r-parcel-a": "CHECKING", "r-headline": "CHECKING", "r-headline-whatsapp": "CHECKING",
+    }
+    rows = db.execute(text("SELECT channel, reporter_phone, is_demo, duplicate_of IS NOT NULL AS dup FROM citizen_reports")).all()
+    assert {r[0] for r in rows} == {"web", "whatsapp", "helpline_1070", "praja_vani"} and all(r[2] for r in rows)
+    assert all(p is None or p.startswith("+910000") for _, p, _, _ in rows) and sum(r[3] for r in rows) == 1
+    kinds = db.scalars(text("SELECT e.kind FROM citizen_report_events e JOIN citizen_reports r ON r.id = e.report_id ORDER BY e.id")).all()
+    assert {"change_found", "duplicate", "check_not_visible", "closed_passed_on", "closed_incident_confirmed", "satellite_checked"} <= set(kinds)
 
 
 def _incident_paths(db, seeded):

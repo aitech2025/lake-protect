@@ -43,7 +43,8 @@ export function Login() {
           </div>
           <button className="btn secondary" onClick={() => void i18n.changeLanguage(i18n.language === "te" ? "en" : "te")}>{t("nav.language")}</button>
         </div>
-        <h2 style={{ marginTop: "2.5rem" }}>{t("login.title")}</h2>
+        <p style={{ marginTop: "1.5rem" }}><a className="btn secondary" href="/report" data-testid="citizen-portal-link">{t("login.citizen")}</a></p>
+        <h2 style={{ marginTop: "2rem" }}>{t("login.title")}</h2>
         <p className="muted">{t("login.intro")}</p>
         {error && <p className="error">{t("error.load", { msg: error })}</p>}
         <div className="roles">

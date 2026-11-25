@@ -26,6 +26,7 @@ from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from app.audit import chain
+from app.citizen import service as citizen
 from app.evidence import pack as pack_svc
 from app.models import Alert, Asset, AssetScreen, AuthorisedWork, CourtCase, OfficialArea, Permit, ScreenRun, User
 from app.notify import service as notify
@@ -69,6 +70,7 @@ class Seeder:
         self.alerts: dict[str, Alert] = {}
         self.ingests: dict[str, list[dict]] = {}  # scenario key -> ingest results, in order
         self.plan: list[tuple[dt.datetime, int, str, Callable[[], None]]] = []
+        self.reports: dict[str, object] = {}
 
     def day(self, n: float, minutes: int = 0) -> dt.datetime:
         return self.T + dt.timedelta(days=n, minutes=minutes)
@@ -228,6 +230,77 @@ class Seeder:
             when += dt.timedelta(days=1)
         self._add(self.T, "notifier", lambda: notify.tick(self.db, self.T))
 
+    # Citizen reports (D-062) ----------------------------------------------------------------------
+    def _report_point(self, spec: dict) -> tuple[float, float]:
+        dx, dy = spec.get("offset", [0, 0])
+        if "near" in spec:
+            sc = next(s for s in self.world.spec["scenarios"] if s["key"] == spec["near"])
+            c = self.world.change_m(sc).centroid
+            e, n = c.x, c.y
+        elif "asset" in spec:
+            e, n = self.world.asset_centre_m(self.world.asset(spec["asset"]))
+        else:
+            e, n = spec["at"]
+        lon, lat = self.world.to_lonlat(e + dx, n + dy)
+        return round(lon, 6), round(lat, 6)
+
+    @staticmethod
+    def _demo_photo(label: str) -> bytes:
+        """A drawn picture, plainly marked as a demo, never a real photograph."""
+        import io
+
+        from PIL import Image, ImageDraw
+
+        img = Image.new("RGB", (640, 480), (150, 175, 205))
+        d = ImageDraw.Draw(img)
+        d.rectangle([0, 260, 640, 480], fill=(96, 128, 76))
+        d.polygon([(120, 330), (260, 230), (420, 330)], fill=(132, 96, 60))
+        d.rectangle([0, 0, 640, 34], fill=(75, 58, 110))
+        d.text((12, 10), f"DEMO PHOTO (fictional): {label}", fill=(255, 255, 255))
+        out = io.BytesIO()
+        img.save(out, format="JPEG", quality=85)
+        return out.getvalue()
+
+    def plan_citizen(self) -> None:
+        for spec in self.world.spec.get("citizen_reports", []):
+            when = self.day(spec["day"], minutes=150)
+            self._add(when, f"citizen {spec['key']}: report", self._citizen_report(spec, when))
+            for i, step in enumerate(spec.get("steps", [])):
+                at = self.day(step["day"], minutes=-40 + 20 * i)
+                self._add(at, f"citizen {spec['key']}: {step['do']}", self._citizen_step(spec, step, at))
+
+    def _citizen_report(self, spec: dict, when: dt.datetime) -> Callable[[], None]:
+        def run() -> None:
+            lon, lat = self._report_point(spec)
+            channel = spec["channel"]
+            phone = spec.get("phone")
+            via = None
+            if phone:
+                via = "whatsapp" if channel == "whatsapp" else "staff" if channel in citizen.STAFF_CHANNELS else "otp"
+            report = citizen.submit(
+                self.db, channel=channel, language=spec["language"], what=spec["what"], at=when,
+                source=citizen.source_hash(f"demo-seed:{spec['key']}"), lon=lon, lat=lat, description=spec.get("description"),
+                photos=[self._demo_photo(spec["what"])] if spec.get("photo") else [], phone=phone, phone_verified_via=via,
+                wants_updates=bool(phone), source_ref=spec.get("source_ref"), entered_by=self.users.get(spec.get("by", "")),
+                is_demo=True,
+            )
+            self.reports[spec["key"]] = report
+
+        return run
+
+    def _citizen_step(self, spec: dict, step: dict, at: dt.datetime) -> Callable[[], None]:
+        def run() -> None:
+            report = self.reports[spec["key"]]
+            by = self.users[step["by"]]
+            if step["do"] == "check":
+                citizen.record_check(self.db, report, by, step["outcome"], step["note"], at)
+            elif step["do"] == "close":
+                citizen.close(self.db, report, by, step["reason"], step["note"], at, department=step.get("department"))
+            else:
+                raise ValueError(f"Unknown citizen step {step['do']}")
+
+        return run
+
     # Weekly records -----------------------------------------------------------------------------
     def _open_on(self, alert_id: int, day: dt.date) -> bool:
         """Was this incident still open (not yet dismissed or closed) at the end of that day?"""
@@ -298,6 +371,7 @@ class Seeder:
         self.seed_documents()
         for sc in self.world.spec["scenarios"]:
             self.plan_scenario(sc)
+        self.plan_citizen()
         self.plan_notifier()
         for when, _, label, fn in sorted(self.plan, key=lambda p: (p[0], p[1])):
             try:
@@ -305,6 +379,8 @@ class Seeder:
             except lifecycle.Refused as exc:
                 raise RuntimeError(f"Demo step refused ({label}): {exc.message}") from exc
         weeks = self.seed_weeks()
+        last_run = self.db.scalar(select(ScreenRun.id).where(ScreenRun.is_demo.is_(True)).order_by(ScreenRun.as_of.desc(), ScreenRun.id.desc()).limit(1))
+        satellite_checked = citizen.on_screen_stored(self.db, last_run, self.T) if last_run else 0
         latest = weeks_svc.iso_week(self.T.date())
         digests = notify.send_digests(self.db, latest, is_demo=True, at=self.T)
         notify.tick(self.db, self.T + dt.timedelta(minutes=1))
@@ -317,6 +393,8 @@ class Seeder:
             "weekly_records": weeks,
             "notifications": self.db.scalar(text("SELECT count(*) FROM notifications WHERE is_demo")),
             "digests": digests["sent"],
+            "citizen_reports": {k: f"{r.status}{'/' + r.closed_reason if r.closed_reason else ''}" for k, r in self.reports.items()},
+            "citizen_satellite_checked": satellite_checked,
         }
 
 

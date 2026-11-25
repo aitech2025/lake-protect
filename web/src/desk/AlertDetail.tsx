@@ -159,6 +159,8 @@ export function AlertDetail() {
             </ul>
           </section>
 
+          <CitizenReportsOn alertId={a.id} />
+
           <p className="statement" data-testid="statement">{t("statement.imagery")}</p>
         </div>
 
@@ -407,5 +409,26 @@ function EvidencePanel({ alert, onChange }: { alert: any; onChange: () => void }
       )}
       {error && <p className="error" role="alert">{error}</p>}
     </div>
+  );
+}
+
+/** Citizens' reports of this place (D-062): references and what they saw, never who they are. */
+function CitizenReportsOn({ alertId }: { alertId: number }) {
+  const { t, i18n } = useTranslation();
+  const { data } = useAsync(() => api<{ items: any[] }>(`/reports?alert_id=${alertId}`), [alertId]);
+  if (!data || data.items.length === 0) return null;
+  return (
+    <section className="section panel" data-testid="citizen-reports-on">
+      <h2 className="title-s">{t("reports.on_incident")} ({data.items.length})</h2>
+      <ul className="review-list">
+        {data.items.map((r) => (
+          <li key={r.id}>
+            <Link to={`/reports/${r.id}`}><code>{r.ref}</code></Link>
+            <span className="small muted">{t(`reports.channel.${r.channel}`)}, {fmtDateTime(r.created_at, i18n.language)} · {t(`reports.status.${r.status}`)}</span>
+            <span>{t(`reports.what.${r.what}`)}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

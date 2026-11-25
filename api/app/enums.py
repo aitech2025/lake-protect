@@ -157,6 +157,7 @@ class NotificationKind(StrEnum):
     reminder = "reminder"  # not acknowledged within 24 hours: sent again
     not_acknowledged = "not_acknowledged"  # to the admin: an official has not acknowledged in 48 hours
     weekly_digest = "weekly_digest"  # after each weekly screen: the official's area that week
+    citizen_report = "citizen_report"  # a citizen's report in the area (D-062): needs acknowledgement
 
 
 class Channel(StrEnum):

@@ -170,6 +170,8 @@ def compose(kind: str, language: str, p: dict) -> Message:
     language = lang(language)
     if kind == "weekly_digest":
         return digest_message(language, p)
+    if kind == "citizen_report" or p.get("report"):
+        return report_message(kind, language, p)
     asset = (p.get("asset_name_te") or p["asset_name"]) if language == "te" else p["asset_name"]
     change = CHANGE_TE.get(p["change_type"], p["change_label"]) if language == "te" else p["change_label"]
     values = {
@@ -195,6 +197,70 @@ def compose(kind: str, language: str, p: dict) -> Message:
     if kind == "not_acknowledged":
         return Message(t(language, "not_acknowledged.subject", official=p["official_name"], **values),
                        t(language, "not_acknowledged.body", official=p["official_name"], notified=_date(p["notified_at"]), **values))
+    raise ValueError(f"Unknown notification kind {kind}")
+
+
+REPORT_TEXT = {
+    "en": {
+        "subject": "Citizen report {code}: {what} at {asset}",
+        "body": "A citizen reported: {what}.\nPlace: {asset}, {area}.\n{description}Received by {channel} on {opened}.\n{flags}"
+                "Please check it against the satellite images and records, record your check and acknowledge this message:\n{link}",
+        "reminder.subject": "Reminder: citizen report {code} at {asset} is waiting for you",
+        "reminder.body": "You were notified on {notified} and have not acknowledged it yet.\n\n{what}.\nPlace: {asset}, {area}.\n{link}",
+        "not_acknowledged.subject": "{official} has not acknowledged citizen report {code}",
+        "not_acknowledged.body": "{official} was notified on {notified} about citizen report {code} at {asset}, {area}, "
+                                 "and has not acknowledged it within 48 hours.\n{link}",
+        "description": "In their words: \"{text}\"\n",
+        "flag.incident": "It is next to incident {incident}, which is open.\n",
+        "flag.not_watched": "The place is not on the watch list: add it as a location, or pass the report to the right department.\n",
+        "flag.no_place": "No pin was given: place it from the description.\n",
+        "flag.repeat_false": "Earlier reports from the same source were closed as false.\n",
+    },
+    "te": {
+        "subject": "పౌరుల సమాచారం {code}: {asset} వద్ద {what}",
+        "body": "ఒక పౌరుడు తెలిపారు: {what}.\nప్రదేశం: {asset}, {area}.\n{description}{opened} న {channel} ద్వారా అందింది.\n{flags}"
+                "దయచేసి ఉపగ్రహ చిత్రాలు, రికార్డులతో పరిశీలించి, మీ పరిశీలనను నమోదు చేసి, ఈ సందేశం అందినట్లు నిర్ధారించండి:\n{link}",
+        "reminder.subject": "గుర్తు: {asset} వద్ద పౌరుల సమాచారం {code} మీ కోసం వేచి ఉంది",
+        "reminder.body": "మీకు {notified} న తెలియజేశాం; ఇంకా అందినట్లు నిర్ధారించలేదు.\n\n{what}.\nప్రదేశం: {asset}, {area}.\n{link}",
+        "not_acknowledged.subject": "{official} పౌరుల సమాచారం {code} అందినట్లు నిర్ధారించలేదు",
+        "not_acknowledged.body": "{asset}, {area} వద్ద పౌరుల సమాచారం {code} గురించి {official} కు {notified} న తెలియజేశాం; "
+                                 "48 గంటల్లో అందినట్లు నిర్ధారించలేదు.\n{link}",
+        "description": "వారి మాటల్లో: \"{text}\"\n",
+        "flag.incident": "ఇది తెరిచి ఉన్న సంఘటన {incident} పక్కనే ఉంది.\n",
+        "flag.not_watched": "ఈ ప్రదేశం పరిశీలన జాబితాలో లేదు: దాన్ని ప్రదేశంగా చేర్చండి, లేదా సంబంధిత శాఖకు పంపండి.\n",
+        "flag.no_place": "పిన్ ఇవ్వలేదు: వివరణ ఆధారంగా ప్రదేశాన్ని గుర్తించండి.\n",
+        "flag.repeat_false": "ఇదే మూలం నుండి వచ్చిన గత సమాచారాలు తప్పుడువిగా ముగిశాయి.\n",
+    },
+}
+
+
+def report_message(kind: str, language: str, p: dict) -> Message:
+    from app.citizen import texts as ctexts
+
+    tx = REPORT_TEXT[language]
+    asset = (p.get("asset_name_te") or p["asset_name"]) if language == "te" else p["asset_name"]
+    what = p.get("what_te") if language == "te" else p["what_label"]
+    values = {"code": p["code"], "asset": asset, "what": what, "area": area_text(p.get("area"), language), "link": p["link"],
+              "opened": _date(p["opened_at"]), "channel": ctexts.pick(ctexts.CHANNEL.get(p.get("channel"), {"en": p.get("channel", "")}), language)}
+    if kind == "citizen_report":
+        flags = ""
+        if p.get("incident_code"):
+            flags += tx["flag.incident"].format(incident=p["incident_code"])
+        if p.get("not_watched") and not p.get("no_place"):
+            flags += tx["flag.not_watched"]
+        if p.get("no_place"):
+            flags += tx["flag.no_place"]
+        if p.get("repeat_false"):
+            flags += tx["flag.repeat_false"]
+        if p.get("unrouted") and not p.get("not_watched"):
+            flags += t(language, "incident_opened.unrouted")
+        description = tx["description"].format(text=p["description"]) if p.get("description") else ""
+        return Message(tx["subject"].format(**values), tx["body"].format(flags=flags, description=description, **values))
+    if kind == "reminder":
+        return Message(tx["reminder.subject"].format(**values), tx["reminder.body"].format(notified=_date(p["notified_at"]), **values))
+    if kind == "not_acknowledged":
+        return Message(tx["not_acknowledged.subject"].format(official=p["official_name"], **values),
+                       tx["not_acknowledged.body"].format(official=p["official_name"], notified=_date(p["notified_at"]), **values))
     raise ValueError(f"Unknown notification kind {kind}")
 
 

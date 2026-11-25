@@ -7,6 +7,9 @@ Events, called inside the same transaction as the change that causes them:
 - incident_decided: the admin confirmed or dismissed an incident. The area's officials and every
   official who reviewed it are told. No acknowledgement is needed.
 - acknowledgement: in the inbox, or by acting on the incident (a review, or the admin's step).
+- citizen_report (D-062): a citizen's report in the area. Its area's officials and every admin are
+  told; it needs acknowledgement unless it already sits on an incident. Recording a check on the
+  report, or closing it, acknowledges it. Outside channels carry it by email only.
 
 Follow-up, run by the notifier every minute (`python -m app.notify run`):
 - 24 hours without an acknowledgement while the incident is still open or under review: a
@@ -20,13 +23,13 @@ from __future__ import annotations
 
 import datetime as dt
 
-from sqlalchemy import func, select, text
+from sqlalchemy import func, or_, select, text
 from sqlalchemy.orm import Session
 
 from app.audit import chain
 from app.clock import as_utc
 from app.enums import Role
-from app.models import Alert, Asset, Candidate, IncidentReview, Notification, NotificationDelivery, User
+from app.models import Alert, Asset, Candidate, CitizenReport, IncidentReview, Notification, NotificationDelivery, User
 from app.notify import channels, digest, messages, routing
 from app.services import alert_view
 
@@ -49,6 +52,8 @@ def _queue(db: Session, note: Notification, user: User, at: dt.datetime) -> None
     for channel in OUTSIDE:
         if channel not in (user.channels or []) or not channels.carries(channel, note.kind):
             continue
+        if note.report_id and channel != "email":
+            continue  # the SMS and WhatsApp templates are worded for incidents
         addr = channels.address(channel, user)
         masked = channels.mask_email(addr) if channel == "email" else channels.mask_phone(addr)
         if not addr:
@@ -59,9 +64,9 @@ def _queue(db: Session, note: Notification, user: User, at: dt.datetime) -> None
 
 
 def create(db: Session, user: User, kind: str, payload: dict, *, at: dt.datetime, needs_ack: bool, is_demo: bool,
-           alert_id: int | None = None, week: str | None = None, about_id: int | None = None) -> Notification:
+           alert_id: int | None = None, week: str | None = None, about_id: int | None = None, report_id: int | None = None) -> Notification:
     msg = messages.compose(kind, user.language, payload)
-    note = Notification(user_id=user.id, kind=kind, alert_id=alert_id, week=week, about_id=about_id, subject=msg.subject,
+    note = Notification(user_id=user.id, kind=kind, alert_id=alert_id, report_id=report_id, week=week, about_id=about_id, subject=msg.subject,
                         body=msg.body, payload=payload, needs_ack=needs_ack, created_at=at, is_demo=is_demo)
     db.add(note)
     db.flush()
@@ -114,6 +119,36 @@ def incident_decided(db: Session, alert: Alert, actor: User, note_text: str | No
 
 
 # Acknowledging ----------------------------------------------------------------------------------
+def citizen_report(db: Session, report: CitizenReport, at: dt.datetime | None = None) -> list[Notification]:
+    """A citizen's report: the area's officials and every admin. Duplicates of a report tell no one again."""
+    from app.citizen import texts
+
+    at = as_utc(at)
+    asset = db.get(Asset, report.asset_id) if report.asset_id else None
+    officials = routing.officials_for(db, asset) if asset else []
+    alert = db.get(Alert, report.alert_id) if report.alert_id else None
+    payload = {
+        "report": True, "report_id": report.id, "code": report.ref,
+        "asset_name": asset.name if asset else texts.PLACE_UNWATCHED["en"],
+        "asset_name_te": (asset.name_te or asset.name) if asset else texts.PLACE_UNWATCHED["te"],
+        "area": {"district": asset.district, "mandal": asset.mandal, "village": asset.village} if asset else None,
+        "what": report.what, "what_label": texts.WHAT[report.what]["en"], "what_te": texts.WHAT[report.what]["te"],
+        "description": (report.description or "")[:300], "channel": report.channel, "opened_at": report.created_at.isoformat(),
+        "link": messages.link(f"/reports/{report.id}"), "incident_code": alert.code if alert else None,
+        "not_watched": asset is None, "no_place": report.geom is None, "repeat_false": "repeat_false_reports" in (report.flags or []),
+        "unrouted": not officials,
+    }
+    people = {u.id: u for u in officials + routing.admins(db)}
+    out = []
+    for user in people.values():
+        if db.scalar(select(Notification.id).where(Notification.user_id == user.id, Notification.report_id == report.id,
+                                                   Notification.about_id.is_(None))):
+            continue
+        out.append(create(db, user, "citizen_report", payload, at=at, needs_ack=report.alert_id is None, is_demo=report.is_demo,
+                          report_id=report.id))
+    return out
+
+
 def _ack(db: Session, notes: list[Notification], user: User, at: dt.datetime, via: str, alert_id: int | None) -> int:
     for n in notes:
         n.acknowledged_at = max(at, n.created_at)
@@ -140,8 +175,24 @@ def acknowledge(db: Session, note: Notification, user: User, at: dt.datetime | N
         raise Refused("This notification needs no acknowledgement", 422)
     if note.acknowledged_at is not None:
         return 0
-    notes = _open_for(db, user.id, note.alert_id) if note.alert_id else [note]
+    if note.alert_id:
+        notes = _open_for(db, user.id, note.alert_id)
+    elif note.report_id:
+        notes = _open_for_report(db, user.id, note.report_id)
+    else:
+        notes = [note]
     return _ack(db, notes, user, at, "inbox", note.alert_id)
+
+
+def _open_for_report(db: Session, user_id: int, report_id: int) -> list[Notification]:
+    return list(db.scalars(select(Notification).where(
+        Notification.user_id == user_id, Notification.report_id == report_id, Notification.needs_ack.is_(True),
+        Notification.acknowledged_at.is_(None)).order_by(Notification.id)))
+
+
+def acknowledge_for_report(db: Session, user: User, report: CitizenReport, via: str, at: dt.datetime | None = None) -> int:
+    """Recording a check on a citizen's report, or closing it, acknowledges what this person was sent about it."""
+    return _ack(db, _open_for_report(db, user.id, report.id), user, as_utc(at), via, None)
 
 
 def acknowledge_for_alert(db: Session, user: User, alert: Alert, via: str, at: dt.datetime | None = None) -> int:
@@ -152,9 +203,12 @@ def acknowledge_for_alert(db: Session, user: User, alert: Alert, via: str, at: d
 # Follow-up --------------------------------------------------------------------------------------
 _UNACKED = text(
     """
-    SELECT n.id FROM notifications n JOIN alerts al ON al.id = n.alert_id JOIN users u ON u.id = n.user_id
-    WHERE n.kind = 'incident_opened' AND n.acknowledged_at IS NULL AND n.created_at <= :before
-      AND al.state IN ('OPEN', 'UNDER_REVIEW') AND u.is_active
+    SELECT n.id FROM notifications n JOIN users u ON u.id = n.user_id
+    LEFT JOIN alerts al ON al.id = n.alert_id LEFT JOIN citizen_reports cr ON cr.id = n.report_id
+    WHERE n.kind::text IN ('incident_opened', 'citizen_report') AND n.needs_ack AND n.acknowledged_at IS NULL
+      AND n.created_at <= :before AND u.is_active
+      AND ((n.kind::text = 'incident_opened' AND al.state IN ('OPEN', 'UNDER_REVIEW'))
+           OR (n.kind::text = 'citizen_report' AND cr.status <> 'CLOSED'))
     ORDER BY n.id
     """
 )
@@ -169,7 +223,8 @@ def follow_up(db: Session, now: dt.datetime | None = None) -> dict:
             continue
         user = db.get(User, note.user_id)
         payload = {**note.payload, "notified_at": note.created_at.isoformat()}
-        create(db, user, "reminder", payload, at=now, needs_ack=True, is_demo=note.is_demo, alert_id=note.alert_id, about_id=note.id)
+        create(db, user, "reminder", payload, at=now, needs_ack=True, is_demo=note.is_demo, alert_id=note.alert_id, about_id=note.id,
+               report_id=note.report_id)
         reminders += 1
     for nid in db.scalars(_UNACKED, {"before": now - ESCALATE_AFTER}).all():
         note = db.get(Notification, nid)
@@ -180,7 +235,8 @@ def follow_up(db: Session, now: dt.datetime | None = None) -> dict:
         for admin in routing.admins(db):
             if _already(db, admin.id, "not_acknowledged", about_id=note.id):
                 continue
-            create(db, admin, "not_acknowledged", payload, at=now, needs_ack=False, is_demo=note.is_demo, alert_id=note.alert_id, about_id=note.id)
+            create(db, admin, "not_acknowledged", payload, at=now, needs_ack=False, is_demo=note.is_demo, alert_id=note.alert_id, about_id=note.id,
+                   report_id=note.report_id)
             escalations += 1
     if reminders or escalations:
         chain.record(db, actor_id=None, action="notify.follow_up", entity="notification",
@@ -247,9 +303,16 @@ def send_pending(db: Session, now: dt.datetime | None = None, limit: int = 200) 
 
 
 def tick(db: Session, now: dt.datetime | None = None) -> dict:
+    from app.citizen import sender as citizen_sender
+    from app.citizen import service as citizen
+    from app.citizen import whatsapp
+
     now = as_utc(now)
     out = follow_up(db, now)
     out["deliveries"] = send_pending(db, now)
+    out["citizen_messages"] = citizen_sender.send_pending(db, now)
+    out["chats_closed"] = whatsapp.close_idle(db, now)
+    out["contacts_removed"] = citizen.purge_contacts(db, now)
     return out
 
 
@@ -271,7 +334,7 @@ def deliveries_for(db: Session, ids: list[int]) -> dict[int, list[dict]]:
 
 def as_dict(note: Notification, deliveries: list[dict] | None = None) -> dict:
     return {
-        "id": note.id, "kind": note.kind, "alert_id": note.alert_id, "week": note.week, "about_id": note.about_id,
+        "id": note.id, "kind": note.kind, "alert_id": note.alert_id, "report_id": note.report_id, "week": note.week, "about_id": note.about_id,
         "subject": note.subject, "body": note.body, "payload": note.payload, "needs_ack": note.needs_ack,
         "created_at": note.created_at.isoformat(), "acknowledged_at": note.acknowledged_at.isoformat() if note.acknowledged_at else None,
         "ack_via": note.ack_via, "is_demo": note.is_demo, "deliveries": deliveries or [],
@@ -279,12 +342,13 @@ def as_dict(note: Notification, deliveries: list[dict] | None = None) -> dict:
 
 
 def pending_filter():
-    """Waiting for acknowledgement: not acknowledged, and its incident still open or under review.
-    Once the incident is decided the request lapses; it still counts as not acknowledged in time."""
+    """Waiting for acknowledgement: not acknowledged, and its incident still open or under review, or its
+    citizen report not closed. Once decided or closed the request lapses; it still counts as late."""
     return (
         Notification.needs_ack.is_(True),
         Notification.acknowledged_at.is_(None),
-        Notification.alert_id.in_(select(Alert.id).where(Alert.state.in_(("OPEN", "UNDER_REVIEW")))),
+        or_(Notification.alert_id.in_(select(Alert.id).where(Alert.state.in_(("OPEN", "UNDER_REVIEW")))),
+            Notification.report_id.in_(select(CitizenReport.id).where(CitizenReport.status != "CLOSED"))),
     )
 
 

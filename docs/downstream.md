@@ -11,7 +11,7 @@ The owner chose the scope (DECISIONS.md D-059 and D-060):
 - notify officials by area;
 - add a drill-down dashboard.
 
-Not in this build: feeds to department systems, a weekly report page per district, and citizen reporting.
+Not in this build: feeds to department systems and a weekly report page per district. Citizen reporting followed in M15 (`docs/citizen.md`).
 
 ## 1. The three layers
 
@@ -183,4 +183,4 @@ Emails written in file mode are in the storage volume: `docker compose exec api 
 - **A weekly report page per district.**
 - **Delivery receipts:** read receipts and delivery reports from SMS and WhatsApp gateways.
 - **Further escalation:** after the admin, to a senior officer. There is no such role now (D-057).
-- **Citizen reporting** (CONTEXT.md 17.8).
+- **Citizen reporting** (CONTEXT.md 17.8): built in M15, see `docs/citizen.md`.

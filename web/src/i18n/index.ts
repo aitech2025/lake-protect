@@ -2,6 +2,7 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import en from "./en.json";
 import te from "./te.json";
+import ur from "./ur.json";
 
 function savedLanguage(): string {
   try {
@@ -12,7 +13,8 @@ function savedLanguage(): string {
 }
 
 i18n.use(initReactI18next).init({
-  resources: { en: { translation: en }, te: { translation: te } },
+  // Urdu covers the citizen portal only (D-062); the desk stays in English and Telugu.
+  resources: { en: { translation: en }, te: { translation: te }, ur: { translation: ur } },
   lng: savedLanguage(),
   fallbackLng: "en",
   interpolation: { escapeValue: false },

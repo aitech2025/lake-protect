@@ -252,3 +252,74 @@ scenarios:
       - {day: -70, do: decide, to: CONFIRMED, by: demo.admin, note: Real change inside the notified FTL.}
       - {day: -66, do: pack, by: demo.admin}
       - {day: -40, do: close, by: demo.admin, note: Fill removed under demo order DEMO/ORDER/2026/012. The land stays on weekly watch.}
+
+# Citizen reports (DECISIONS.md D-062). Fictional reporters with demo numbers (+91 0000…, which no
+# real mobile can have) and drawn demo photos. `near` puts the pin by a scenario's change; `asset`
+# by a location's centre; `at` anywhere, in metres east and north of the origin.
+citizen_reports:
+  - key: r-full-path
+    near: full_path
+    day: -47
+    channel: web
+    language: te
+    what: dumping
+    description: Soil heaped on the edge of the cheruvu over two nights.
+  - key: r-headline
+    near: headline
+    day: -4
+    channel: web
+    language: te
+    what: dumping
+    photo: true
+    phone: "+910000000101"
+    description: Tractors tipping soil at the edge of the cheruvu in the evenings.
+  - key: r-headline-whatsapp
+    near: headline
+    offset: [40, 25]
+    day: -3
+    channel: whatsapp
+    language: ur
+    what: dumping
+    phone: "+910000000102"
+    description: Mud lorries at night near the bund.
+  - key: r-not-real
+    near: not_real
+    day: -28
+    channel: web
+    language: en
+    what: dumping
+    description: Looks like fresh soil on the water's edge.
+  - key: r-parcel-a
+    asset: demo-parcel-a
+    offset: [30, 10]
+    day: -6
+    channel: helpline_1070
+    by: demo.viewer1
+    source_ref: 1070/DEMO/0412
+    language: te
+    what: fencing
+    description: Caller says stone posts and wire went up along the road side of the parcel.
+    steps:
+      - {day: -5, do: check, by: demo.viewer1, outcome: not_visible, note: Posts and wire are too small for the 10 m images. Nothing visible yet.}
+  - key: r-kunta
+    asset: demo-kunta-4
+    day: -9
+    channel: web
+    language: en
+    what: clearing
+    photo: true
+    description: Bushes cut on the tank bed.
+    steps:
+      - {day: -8, do: check, by: demo.viewer1, outcome: not_visible, note: No change on this week's image.}
+      - {day: -6, do: close, by: demo.admin, reason: no_change_seen, note: Weeds cleared by the tank users' group. No fill and no structure.}
+  - key: r-outside
+    at: [5200, 4300]
+    day: -12
+    channel: praja_vani
+    by: demo.viewer2
+    source_ref: PV/DEMO/2026/031
+    language: en
+    what: construction
+    description: Petition about a shed going up on a field next to the village road.
+    steps:
+      - {day: -10, do: close, by: demo.admin, reason: passed_on, department: revenue, note: Patta land outside every watched location. Sent to the Tahsildar.}

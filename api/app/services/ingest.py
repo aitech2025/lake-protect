@@ -227,6 +227,9 @@ def ingest(db: Session, body: CandidateIn, *, at: dt.datetime | None = None) -> 
         lifecycle.auto_close(db, alert, verdict, at=at)
         return _out(alert, candidate, check, "closed_by_legal_check")
     notify.incident_opened(db, alert, at)
+    from app.citizen import service as citizen
+
+    citizen.on_incident_opened(db, alert, at)  # citizens who reported this place are told (D-062)
     return _out(alert, candidate, check, "created")
 
 

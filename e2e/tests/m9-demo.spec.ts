@@ -67,7 +67,8 @@ test("the demo runs end to end with two roles and no internet", async ({ browser
   await expect(opened).toContainText("Land fill");
   await expect(opened.getByTestId("delivery-email")).toContainText("sent");
   await expect(opened.getByTestId("delivery-whatsapp")).toContainText("held");
-  await expect(page.getByTestId("note-reminder").filter({ hasText: "Demo Cheruvu 1" })).toHaveCount(1);
+  // The incident's reminder (a citizen report of the same place has its own, D-062).
+  await expect(page.getByTestId("note-reminder").filter({ hasText: "Demo Cheruvu 1" }).filter({ hasText: "Reminder: incident" })).toHaveCount(1);
   await page.screenshot({ path: shot("m13-03-inbox"), fullPage: true });
 
   // 3. The official opens a lake: week by week, with images, and its legal documents.

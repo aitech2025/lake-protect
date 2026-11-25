@@ -1,0 +1,57 @@
+/* The public portal (D-062): one column, large targets, readable on a phone in the sun.
+   Logical properties throughout, so Urdu reads right to left without separate rules. */
+.portal { min-height: 100vh; background: var(--paper, #f3f5f2); color: var(--ink); }
+.portal.lang-ur { font-family: "Noto Nastaliq Urdu", "Noto Sans", sans-serif; line-height: 2.2; }
+.portal.lang-ur input, .portal.lang-ur textarea, .portal.lang-ur button { font-family: inherit; }
+.portal-demo { background: repeating-linear-gradient(135deg, #4b3a6e 0 14px, #57457d 14px 28px); color: #fff; padding: 0.45rem 1rem; font-weight: 600; text-align: center; }
+.portal-head { display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; align-items: center; justify-content: space-between; padding: 1rem clamp(1rem, 4vw, 2rem); background: var(--ink); color: #fff; }
+.portal-head .brand { display: grid; gap: 0.1rem; }
+.portal-head .brand-name { font-size: 1.35rem; font-weight: 700; letter-spacing: 0.01em; }
+.portal-head .brand-tag { font-size: var(--step--1); opacity: 0.85; }
+.portal-langs { display: flex; gap: 0.35rem; }
+.portal-langs button { background: transparent; color: #fff; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: var(--radius-pill); padding: 0.35rem 0.85rem; cursor: pointer; font-size: var(--step--1); min-height: 2.2rem; }
+.portal-langs button[aria-pressed="true"] { background: #fff; color: var(--ink); border-color: #fff; }
+.portal-tabs { display: flex; gap: 0.25rem; padding: 0 clamp(1rem, 4vw, 2rem); background: var(--ink); }
+.portal-tabs a { color: #fff; text-decoration: none; padding: 0.6rem 1rem; border-block-end: 3px solid transparent; font-weight: 600; }
+.portal-tabs a[aria-current="page"], .portal-tabs a:hover { border-block-end-color: var(--amber, #e0a526); }
+.portal-main { max-width: 46rem; margin: 0 auto; padding: 1.25rem 1rem 2rem; display: grid; gap: 1rem; }
+.portal-intro h1 { font-size: clamp(1.5rem, 4vw, 2rem); margin: 0 0 0.4rem; }
+.portal-intro p { margin: 0 0 0.4rem; }
+.portal-form { display: grid; gap: 1rem; }
+.portal-card { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-m); padding: 1rem 1.1rem; display: grid; gap: 0.7rem; margin: 0; min-width: 0; }
+.portal-card legend { font-weight: 700; font-size: 1.1rem; padding: 0 0.25rem; }
+.portal-card h1 { font-size: 1.4rem; margin: 0; }
+.portal-card h2 { font-size: 1.1rem; margin: 0.5rem 0 0; }
+.portal-map { height: 320px; border-radius: var(--radius-s); overflow: hidden; border: 1px solid var(--rule); }
+.portal-row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: flex-end; }
+.portal-row .grow { flex: 1 1 12rem; }
+.portal-whats { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.5rem; }
+.portal-what { display: flex; gap: 0.55rem; align-items: center; padding: 0.75rem 0.85rem; border: 1px solid var(--border-control); border-radius: var(--radius-s); background: var(--surface-raised, #fff); cursor: pointer; min-height: 3rem; }
+.portal-what.on { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); background: #eef3f0; }
+.portal-what input { inline-size: 1.15rem; block-size: 1.15rem; flex: none; }
+.portal-photos { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.portal-photos figure { margin: 0; display: grid; gap: 0.2rem; justify-items: start; }
+.portal-photos img { inline-size: 7.5rem; block-size: 7.5rem; object-fit: cover; border-radius: var(--radius-s); border: 1px solid var(--rule); }
+.portal-file { position: relative; justify-self: start; cursor: pointer; }
+.portal-file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.portal .check { display: flex; gap: 0.5rem; align-items: flex-start; font-size: var(--step--1); }
+.portal .check input { margin-block-start: 0.3rem; flex: none; }
+.portal .ok { color: #1f5a40; font-weight: 600; }
+.portal-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0; }
+.portal .btn.big { font-size: 1.1rem; padding: 0.75rem 1.5rem; min-height: 3rem; }
+.portal .ref { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: clamp(1.6rem, 6vw, 2.2rem); font-weight: 700; letter-spacing: 0.06em; margin: 0; text-align: start; }
+.portal .done h1 { color: #1f5a40; }
+.portal-status { font-weight: 700; margin: 0; }
+.portal-status.s-CLOSED { color: var(--ink-2); }
+.portal-status.s-CHECKING { color: #164f78; }
+.portal-timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; border-inline-start: 3px solid var(--rule); padding-inline-start: 0.9rem; }
+.portal-timeline li { display: grid; gap: 0.1rem; }
+.portal-timeline time { font-size: var(--step--1); color: var(--ink-2); }
+.portal-foot { max-width: 46rem; margin: 0 auto; padding: 0 1rem 2.5rem; font-size: var(--step--1); color: var(--ink-2); }
+.portal-foot h2 { font-size: 1rem; color: var(--ink); margin: 0.5rem 0 0.25rem; }
+.portal-foot p { margin: 0 0 0.5rem; }
+.portal-links { display: flex; flex-wrap: wrap; gap: 1rem; }
+@media (max-width: 600px) {
+  .portal-map { height: 260px; }
+  .portal-head .brand-tag { display: none; }
+}

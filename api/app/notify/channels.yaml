@@ -12,7 +12,7 @@
 # A held message is never sent later: once a channel is set up, only new messages go out on it.
 
 email:
-  kinds: [incident_opened, incident_decided, reminder, not_acknowledged, weekly_digest]
+  kinds: [incident_opened, incident_decided, reminder, not_acknowledged, weekly_digest, citizen_report]
 
 sms:
   agreement_ref: null          # the State's gateway agreement
@@ -34,6 +34,15 @@ sms:
       dlt_template_id: null
       text: "GeoGuard: {#var#} has not acknowledged incident {#var#} at {#var#} in 48 hours. {#var#}"
       vars: [official, code, asset, link]
+    # To citizens (D-062): only the reference, the status and the link; the note is on the portal.
+    citizen_update:
+      dlt_template_id: null
+      text: "GeoGuard: your report {#var#} is now {#var#}. See what happened: {#var#}"
+      vars: [ref, status, link]
+    citizen_otp:
+      dlt_template_id: null
+      text: "{#var#} is your GeoGuard code to get updates on your report. It is valid for 10 minutes. Do not share it."
+      vars: [code]
 
 whatsapp:
   agreement_ref: null          # the State's provider agreement, or the MeeSeva on WhatsApp order
@@ -44,3 +53,5 @@ whatsapp:
     incident_opened: {name: lp_incident_opened_v1, approved: false, params: [code, asset, summary, link]}
     reminder: {name: lp_incident_reminder_v1, approved: false, params: [code, asset, link]}
     not_acknowledged: {name: lp_not_acknowledged_v1, approved: false, params: [official, code, asset, link]}
+    # To citizens, outside the 24-hour conversation window (D-062).
+    citizen_update: {name: gg_citizen_update_v1, approved: false, params: [ref, status, link]}

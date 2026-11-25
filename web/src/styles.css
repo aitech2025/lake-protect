@@ -17,7 +17,8 @@
   --focus: #1f6fa8;
   --radius-s: 4px;
   --radius-m: 8px;
-  --font: "Noto Sans", "Noto Sans Telugu", system-ui, sans-serif;
+  /* Urdu (D-062) falls back to the bundled Nastaliq font, so Arabic script joins correctly offline. */
+  --font: "Noto Sans", "Noto Sans Telugu", "Noto Nastaliq Urdu", system-ui, sans-serif;
   --step--1: 0.8125rem;
   --step-0: 0.9375rem;
   --step-1: 1.125rem;
@@ -426,4 +427,34 @@ tr.superseded td { color: var(--ink-2); text-decoration: line-through; text-deco
 @media (max-width: 860px) {
   .add-grid { grid-template-columns: 1fr; }
   .kind-card { min-width: 0; flex: 1 1 9rem; }
+}
+
+/* Citizen reports on the desk (D-062). */
+.head-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-start; }
+.reports-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 1rem; align-items: start; }
+.report-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+.report-grid aside { display: grid; gap: 1rem; }
+.report-grid aside .panel + .panel { margin-top: 0; }
+.report-grid form.panel { display: grid; gap: 0.6rem; }
+.report-photos { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.report-photo { inline-size: 12rem; block-size: 9rem; object-fit: cover; border-radius: var(--radius-s); border: 1px solid var(--rule); background: var(--surface-sunken); }
+.report-history { list-style: none; margin: 0; padding: 0 0 0 0.9rem; border-left: 3px solid var(--rule); display: grid; gap: 0.75rem; }
+.report-history li { display: grid; gap: 0.15rem; }
+.citizen-words { margin: 0.25rem 0 0; padding: 0.5rem 0.8rem; border-left: 3px solid var(--amber); background: #fbf6ea; white-space: pre-wrap; }
+.intake { display: grid; gap: 0.6rem; margin-bottom: 1rem; }
+.intake-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 1rem; }
+.intake-fields { display: grid; gap: 0.6rem; align-content: start; }
+.check { display: flex; gap: 0.45rem; align-items: flex-start; font-size: var(--step--1); }
+.wa-wrap { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; }
+.wa-phone { inline-size: min(100%, 24rem); border: 1px solid var(--rule); border-radius: 18px; background: #e7ded3; padding: 0.75rem; display: grid; gap: 0.6rem; }
+.wa-thread { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; max-block-size: 30rem; overflow-y: auto; }
+.wa-msg { max-inline-size: 85%; padding: 0.4rem 0.6rem; border-radius: 8px; white-space: pre-wrap; font-size: 0.92rem; display: grid; gap: 0.1rem; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08); }
+.wa-msg.in { justify-self: end; background: #d9fdd3; }
+.wa-msg.out { justify-self: start; background: #fff; }
+.wa-meta { font-size: 0.72rem; color: var(--ink-2); justify-self: end; }
+.wa-input { display: flex; gap: 0.4rem; }
+.wa-input input { flex: 1; padding: 0.5rem 0.7rem; border-radius: 999px; border: 1px solid var(--border-control); }
+.wa-tools { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+@media (max-width: 960px) {
+  .reports-grid, .report-grid, .intake-grid { grid-template-columns: 1fr; }
 }

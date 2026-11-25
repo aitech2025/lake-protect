@@ -11,18 +11,21 @@ from app.routers import (
     auth,
     bulletins,
     candidates,
+    citizen,
     dashboard,
     documents,
     notifications,
     pipeline,
     records,
+    reports,
     sources,
     tiles,
     users,
 )
 
 app = FastAPI(title="GeoGuard API", version="0.1.0")
-for module in (auth, assets, candidates, pipeline, alerts, records, sources, documents, audit, users, tiles, bulletins, notifications, dashboard):
+for module in (auth, assets, candidates, pipeline, alerts, records, sources, documents, audit, users, tiles, bulletins, notifications, dashboard,
+               citizen, reports):
     app.include_router(module.router)
 
 

@@ -1051,7 +1051,7 @@ Reason: if names were visible as soon as a change was detected, an alert could b
 | Case-readiness checklist and evidence pack | Built | Revenue and Irrigation verification steps (17.6, gate C) |
 | Monthly page | Built | Drill-down dashboard from State to survey number (17.7) |
 | Field app, offline, in English and Telugu | Built | GPO as a field user outside HYDRAA's area |
-| Citizen reporting | `signals` table only | Portal, WhatsApp intake and status updates (17.8) |
+| Citizen reporting | `signals` table only | Portal, WhatsApp intake and status updates (17.8). Built in M15 (DECISIONS.md D-062) |
 | Roles | Eight | `revenue_officer`, `irrigation_officer`, `citizen` (17.2) |
 
 ### 17.12 Sources for this section

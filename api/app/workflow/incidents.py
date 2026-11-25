@@ -113,6 +113,9 @@ def transition(
         notify.acknowledge_for_alert(db, actor, alert, "decision", at)
         if to in (S.CONFIRMED.value, S.DISMISSED.value):
             notify.incident_decided(db, alert, actor, note, at)
+            from app.citizen import service as citizen
+
+            citizen.on_incident_decided(db, alert, to, at)  # their reports close with the decision (D-062)
     return {"status": "applied", "from": frm, "state": alert.state, "resolution": alert.resolution}
 
 

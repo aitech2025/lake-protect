@@ -109,8 +109,9 @@ export type AlertRow = {
 export type Delivery = { channel: "email" | "sms" | "whatsapp"; status: string; attempt: number; to_masked: string | null; detail: string | null; at: string };
 export type Note = {
   id: number;
-  kind: "incident_opened" | "incident_decided" | "reminder" | "not_acknowledged" | "weekly_digest";
+  kind: "incident_opened" | "incident_decided" | "reminder" | "not_acknowledged" | "weekly_digest" | "citizen_report";
   alert_id: number | null;
+  report_id?: number | null;
   week: string | null;
   subject: string;
   body: string;

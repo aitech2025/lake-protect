@@ -13,6 +13,7 @@ const NAV: { to: string; key: string; roles: string[] }[] = [
   { to: "/dashboard", key: "nav.dashboard", roles: BOTH },
   { to: "/inbox", key: "nav.inbox", roles: BOTH },
   { to: "/alerts", key: "nav.queue", roles: BOTH },
+  { to: "/reports", key: "nav.reports", roles: BOTH },
   { to: "/assets", key: "nav.assets", roles: BOTH },
   { to: "/records", key: "nav.records", roles: BOTH },
   { to: "/sources", key: "nav.sources", roles: BOTH },

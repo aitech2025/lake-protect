@@ -24,7 +24,8 @@ data in the app), then M3.
 | M11 Asset creation engine (templates) | Done | API 284, browser 2 new (m11-sources) | 507d359 |
 | M12 Weekly record, incidents, documents, two roles | Done | API 263, pipeline 27, browser 4 | 76c6593 |
 | M13 Downstream: notifications by area, overview | Done | API 308, pipeline 29, browser 4 | b03bb99 |
-| M14 GeoGuard: kinds of land, admin adds and stops watching locations | Done | API 334, pipeline 29, browser 5 | M14 commit |
+| M14 GeoGuard: kinds of land, admin adds and stops watching locations | Done | API 334, pipeline 29, browser 5 | 789c555 |
+| M15 Citizen channels: portal, WhatsApp, staff intake, updates back | Done | API 361, pipeline 29, browser 6 | M15 commit |
 
 ## M0 Scaffold: done
 
@@ -238,6 +239,49 @@ removed, is `reports/m2-tuning/README.md`.
   upload, the area rounding case). Browser 15 passed on fresh demos: `m10-real` (switch, no demo
   record on the real side, Sentinel-2 tiles requested, 99 real lakes listed) with the M5 to M8
   suites, then the M9 walkthrough with no internet.
+
+## M15 Citizen channels, upstream and downstream: done
+
+Owner's request, 25 Nov 2026 (D-062). Design: `docs/citizen.md`.
+
+- **Migration 0009:**
+  - `citizen_reports`;
+  - `citizen_report_events` and `citizen_messages` (append-only);
+  - `citizen_otps`, `citizen_chats`;
+  - the `citizen_report` notification kind, with `report_id` on notifications.
+- **In:**
+  - the public portal `/report` (English, Telugu, Urdu right to left; map pin or your location,
+    photos, verified phone);
+  - the WhatsApp conversation (signed webhook, refused until the State's agreement exists; a demo
+    simulator on the desk);
+  - staff intake for 1070, Praja Vani and visits.
+- **On arrival:**
+  - a reference;
+  - placed on a location;
+  - merged with a nearby open report;
+  - linked to a nearby incident;
+  - a signal;
+  - the area's officials and the admin notified, with reminders.
+- **Out:**
+  - **Every step is a public note in three languages**, on the status page `/report/track/<ref>`
+    and by SMS or WhatsApp (held until a gateway exists).
+  - **Steps come from** officials' checks, the admin's closing reasons, the linked incident
+    (opened, confirmed, dismissed) and the weekly screen.
+- **Privacy:**
+  - contacts are optional, verified, masked to officials, and removed 90 days after closing;
+  - photos lose their EXIF;
+  - rate limits use hashes;
+  - repeated false reports are flagged.
+- **Demo:** seven fictional reports across the four channels and every way a report ends.
+- **Tests:**
+  - API 361 passed, including `test_citizen.py` (13);
+  - pipeline 29 passed;
+  - browser 6 passed, including the new `m15-citizen`: portal in Urdu and English, verified demo
+    phone, an official's check, the admin passing it on, the citizen's Telugu status page, and the
+    WhatsApp conversation.
+
+  They ran on the preview stack. The demo reset was run twice over citizen data, to prove 0009 goes
+  down and up.
 
 ## M14 GeoGuard: kinds of land, and locations the admin adds or stops watching: done
 

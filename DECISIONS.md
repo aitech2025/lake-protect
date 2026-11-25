@@ -241,6 +241,56 @@ M14 (`docs/locations.md`).
   - Every start and stop is an append-only `monitoring_changes` row. The database lets
     `assets.monitored` change only through one.
 
+### D-062: Citizen channels, upstream and downstream (owner, 25 Nov 2026)
+The owner asked for the citizen interaction channels, both ways. Built as M15 to CONTEXT.md 17.8
+(`docs/citizen.md`).
+
+- **Upstream:**
+  - a public web portal (`/report`, no sign-in);
+  - a WhatsApp conversation;
+  - staff entry for 1070 calls, Praja Vani petitions and visits.
+
+  Every report:
+  - gets a random reference;
+  - is placed on a watched location (inside, buffer, watch ring) or outside them;
+  - is merged with an open report within 100 m from the last 60 days;
+  - is linked to an incident within 150 m;
+  - becomes a `signals` row;
+  - is notified to the area's officials and the admin by the D-059 routing, needing acknowledgement
+    unless it already sits on an incident.
+
+  A report never makes a finding on its own.
+- **Downstream:**
+  - **Every step is an event** with a public note in English, Telugu and Urdu. Notes never name an
+    officer, owner or claimant, never show evidence, and never judge lawfulness.
+  - **Where citizens read them:** on the status page by reference, and by SMS or WhatsApp if they
+    asked for updates.
+  - **Steps the system takes:** an incident opening on the place, the admin's decision (which
+    closes the report), and the weekly screen seeing the place clearly with no change.
+  - **Steps officials take:** they record checks; the admin closes with one of four reasons or
+    passes the report to a named department.
+- **Channels that need the State:**
+  - SMS needs the gateway and two DLT templates.
+  - WhatsApp needs a Business agreement (HYDRAA's number or MeeSeva on WhatsApp), the app secret
+    and an approved template.
+  - Until then their messages are held and never sent later, and the WhatsApp webhook refuses
+    messages.
+  - The portal says SMS updates are not available yet and does not ask for a number.
+  - The desk has a WhatsApp simulator for demo data.
+- **Privacy (DPDP Act 2023):**
+  - Name and phone are optional, kept only for updates and only once verified (one-time password,
+    WhatsApp, or staff).
+  - They are removed 90 days after closing.
+  - Officials see a masked number only.
+  - Photos are re-encoded, which drops EXIF.
+  - Rate limits use a salted hash of the address.
+  - The history and messages are append-only in the database.
+  - Repeated false reports flag their source; they are not blocked.
+- **Urdu** is on the portal only. The desk stays English and Telugu. The Noto Nastaliq Urdu font is
+  bundled, so the offline demo renders it.
+- **Not in this build:** WhatsApp photo download (needs the provider's media token), voice notes,
+  a public map or district figures, and overview figures for reports.
+
 ## Errors and gaps found in CONTEXT.md
 
 ### E-001: `boundaries` is append-only but has `valid_to` (section 7, invariant 12)

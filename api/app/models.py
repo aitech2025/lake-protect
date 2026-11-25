@@ -545,6 +545,7 @@ class Notification(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     kind: Mapped[str] = mapped_column(NOTIFICATION_KIND)
     alert_id: Mapped[int | None] = mapped_column(ForeignKey("alerts.id"))
+    report_id: Mapped[int | None] = mapped_column(ForeignKey("citizen_reports.id"))  # migration 0009
     week: Mapped[str | None] = mapped_column(Text)
     about_id: Mapped[int | None] = mapped_column(ForeignKey("notifications.id"))
     subject: Mapped[str] = mapped_column(Text)
@@ -569,3 +570,96 @@ class NotificationDelivery(Base):
     to_masked: Mapped[str | None] = mapped_column(Text)
     detail: Mapped[str | None] = mapped_column(Text)
     at: Mapped[dt.datetime] = mapped_column(TZ)
+
+
+# Citizen reports (migration 0009, DECISIONS.md D-062) -------------------------------------------
+class CitizenReport(Base):
+    __tablename__ = "citizen_reports"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    ref: Mapped[str] = mapped_column(Text, unique=True)
+    channel: Mapped[str] = mapped_column(Text)
+    language: Mapped[str] = mapped_column(Text, default="en")
+    what: Mapped[str] = mapped_column(Text)
+    description: Mapped[str | None] = mapped_column(Text)
+    geom = mapped_column(Geometry("POINT", srid=4326, spatial_index=False), nullable=True)
+    location_text: Mapped[str | None] = mapped_column(Text)
+    photos: Mapped[list] = mapped_column(JSONB, default=list)
+    reporter_name: Mapped[str | None] = mapped_column(Text)
+    reporter_phone: Mapped[str | None] = mapped_column(Text)
+    phone_verified_via: Mapped[str | None] = mapped_column(Text)
+    wants_updates: Mapped[bool] = mapped_column(Boolean, default=False)
+    source_ref: Mapped[str | None] = mapped_column(Text)
+    entered_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    asset_id: Mapped[int | None] = mapped_column(ForeignKey("assets.id"))
+    zone: Mapped[str | None] = mapped_column(Text)
+    alert_id: Mapped[int | None] = mapped_column(ForeignKey("alerts.id"))
+    duplicate_of: Mapped[int | None] = mapped_column(ForeignKey("citizen_reports.id"))
+    status: Mapped[str] = mapped_column(Text, default="RECEIVED")
+    closed_reason: Mapped[str | None] = mapped_column(Text)
+    false_report: Mapped[bool] = mapped_column(Boolean, default=False)
+    flags: Mapped[list[str]] = mapped_column(ARRAY(Text), default=list)
+    source_hash: Mapped[str] = mapped_column(Text)
+    contact_purged_at: Mapped[dt.datetime | None] = mapped_column(TZ)
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[dt.datetime] = mapped_column(TZ)
+    updated_at: Mapped[dt.datetime] = mapped_column(TZ)
+
+
+class CitizenReportEvent(Base):
+    """Append-only. `public_note` is {en, te, ur}: what the citizen sees."""
+
+    __tablename__ = "citizen_report_events"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    report_id: Mapped[int] = mapped_column(ForeignKey("citizen_reports.id"))
+    kind: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(Text)
+    public_note: Mapped[dict] = mapped_column(JSONB)
+    internal_note: Mapped[str | None] = mapped_column(Text)
+    actor_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    at: Mapped[dt.datetime] = mapped_column(TZ)
+
+
+class CitizenChat(Base):
+    __tablename__ = "citizen_chats"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    wa_hash: Mapped[str] = mapped_column(Text)
+    wa_id: Mapped[str | None] = mapped_column(Text)
+    language: Mapped[str | None] = mapped_column(Text)
+    state: Mapped[str] = mapped_column(Text)
+    draft: Mapped[dict] = mapped_column(JSONB, default=dict)
+    report_id: Mapped[int | None] = mapped_column(ForeignKey("citizen_reports.id"))
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+    updated_at: Mapped[dt.datetime] = mapped_column(TZ)
+
+
+class CitizenMessage(Base):
+    """Append-only: every message to or from a citizen on SMS or WhatsApp, address masked."""
+
+    __tablename__ = "citizen_messages"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    report_id: Mapped[int | None] = mapped_column(ForeignKey("citizen_reports.id"))
+    chat_id: Mapped[int | None] = mapped_column(ForeignKey("citizen_chats.id"))
+    direction: Mapped[str] = mapped_column(Text)
+    channel: Mapped[str] = mapped_column(Text)
+    kind: Mapped[str] = mapped_column(Text)
+    language: Mapped[str] = mapped_column(Text)
+    to_masked: Mapped[str | None] = mapped_column(Text)
+    text: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(Text)
+    attempt: Mapped[int] = mapped_column(Integer, default=0)
+    retry_of: Mapped[int | None] = mapped_column(ForeignKey("citizen_messages.id"))
+    detail: Mapped[str | None] = mapped_column(Text)
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+    at: Mapped[dt.datetime] = mapped_column(TZ)
+
+
+class CitizenOtp(Base):
+    __tablename__ = "citizen_otps"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    phone_hash: Mapped[str] = mapped_column(Text)
+    code_hash: Mapped[str] = mapped_column(Text)
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    expires_at: Mapped[dt.datetime] = mapped_column(TZ)
+    verified_at: Mapped[dt.datetime | None] = mapped_column(TZ)
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[dt.datetime] = mapped_column(TZ)

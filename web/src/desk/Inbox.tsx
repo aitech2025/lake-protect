@@ -10,6 +10,7 @@ import { notifyCountChanged } from "../components/Layout";
 
 const KIND_CLASS: Record<Note["kind"], string> = {
   incident_opened: "review",
+  citizen_report: "field",
   reminder: "legal",
   not_acknowledged: "legal",
   incident_decided: "officer",
@@ -71,6 +72,7 @@ export function Inbox() {
             <p className="note-body">{n.body}</p>
             <div className="note-foot">
               {n.alert_id && <Link to={`/alerts/${n.alert_id}`} className="btn secondary" data-testid="note-open">{t("inbox.open_incident")}</Link>}
+              {n.report_id && <Link to={`/reports/${n.report_id}`} className="btn secondary" data-testid="note-open-report">{t("inbox.open_report")}</Link>}
               {n.kind === "weekly_digest" && <Link to="/dashboard" className="btn secondary">{t("inbox.open_overview")}</Link>}
               {n.needs_ack && !n.acknowledged_at && (
                 <button className="btn" disabled={busy === n.id} onClick={() => void ack(n)} data-testid="note-ack">{t("inbox.ack")}</button>
