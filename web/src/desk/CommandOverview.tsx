@@ -30,6 +30,7 @@ export function CommandOverview() {
   const [theme, setTheme] = useState<Theme>((document.documentElement.dataset.theme as Theme) || "dark");
   const [layers, setLayers] = useState<Record<LayerKey, boolean>>({ boundaries: true, ftl: true, changes: true, pins: true });
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedAssetId, setSelectedAssetId] = useState<number | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(true);
   const [inspectorOpen, setInspectorOpen] = useState(true);
   const [compare, setCompare] = useState(false);
@@ -73,8 +74,7 @@ export function CommandOverview() {
   }).sort((a,b) => Number(b.overdue) - Number(a.overdue) || (b.priority_score ?? -1) - (a.priority_score ?? -1)), [alerts, category, query]);
 
   const selectedAlert = filteredAlerts.find((a) => a.id === selectedId) ?? alerts.find((a) => a.id === selectedId) ?? null;
-  const selectedAsset = assets.find((a) => Number(a.properties?.id ?? a.id) === selectedAlert?.asset_id)
-    ?? assets.find((a) => Number(a.properties?.id ?? a.id) === selectedId) ?? null;
+  const selectedAsset = assets.find((a) => Number(a.properties?.id ?? a.id) === (selectedAlert?.asset_id ?? selectedAssetId)) ?? null;
 
   const boundaries = useMemo(() => ({
     type: "FeatureCollection" as const,
@@ -100,10 +100,16 @@ export function CommandOverview() {
     id: a.id, lon: a.lon, lat: a.lat,
     colour: a.overdue ? "#ef4444" : ["ACTION", "VERIFY"].includes(a.mode) ? "#f59e0b" : "#06b6d4",
     label: a.asset_name, big: selectedId === a.id,
-    onClick: () => { setSelectedId(a.id); setInspectorOpen(true); },
+    onClick: () => selectAlert(a),
   })), [filteredAlerts, selectedId]);
 
-  const selectAlert = (a: AlertRow) => { setSelectedId(a.id); setInspectorOpen(true); };
+  const selectAlert = (a: AlertRow) => { setSelectedId(a.id); setSelectedAssetId(a.asset_id); setInspectorOpen(true); };
+  const selectAssetOnMap = (id: number) => {
+    const linked = alerts.find((a) => a.asset_id === id);
+    setSelectedAssetId(id);
+    setSelectedId(linked?.id ?? null);
+    setInspectorOpen(true);
+  };
   const toggleLayer = (key: LayerKey) => setLayers((old) => ({ ...old, [key]: !old[key] }));
   const activeCount = alerts.filter((a) => !a.state.startsWith("CLOSED")).length;
   const criticalCount = alerts.filter((a) => a.overdue || (a.priority_score ?? 0) >= 80).length;
@@ -160,7 +166,7 @@ export function CommandOverview() {
           <div className="geo-map-canvas">
             <MapView boundaries={layers.boundaries || layers.ftl ? boundaries : undefined}
               changes={layers.changes ? changes : undefined} pins={layers.pins ? pins : []}
-              fit={focusFit} theme={theme}
+              fit={focusFit} theme={theme} onAssetClick={selectAssetOnMap}
               layerVisibility={{ boundaries: layers.boundaries, ftl: layers.ftl, changes: layers.changes }} />
             <div className="geo-map-stamp"><b>HYDERABAD REGION</b><span>Illustrative operational view · source dates vary by asset</span></div>
             <div className="geo-map-legend">
@@ -174,7 +180,7 @@ export function CommandOverview() {
               <button title="Zoom in" onClick={() => window.dispatchEvent(new CustomEvent("geoguard:zoom", { detail: 1 }))}>＋</button>
               <button title="Zoom out" onClick={() => window.dispatchEvent(new CustomEvent("geoguard:zoom", { detail: -1 }))}>－</button>
               <button title="Toggle before and after comparison" className={compare ? "active" : ""} onClick={() => setCompare(!compare)}>⇆</button>
-              <button title="Reset view" onClick={() => { setSelectedId(null); setInspectorOpen(false); }}>⌖</button>
+              <button title="Reset view" onClick={() => { setSelectedId(null); setSelectedAssetId(null); setInspectorOpen(false); }}>⌖</button>
             </div>
             {compare && <div className="geo-compare-control"><div><b>BASELINE</b><span>Boundary reference</span></div><input aria-label="Before and after comparison divider" type="range" min="5" max="95" value={swipe} onChange={(e) => setSwipe(Number(e.target.value))} /><div><b>LATEST</b><span>Current alert overlay</span></div><p>Swipe preview only. Historical raster pairing is not yet connected.</p></div>}
             <div className="geo-map-bottomline"><span>Coordinates <b>17.4239° N, 78.4738° E</b></span><span>Scale indicative · not for cadastral measurement</span></div>
@@ -196,6 +202,19 @@ export function CommandOverview() {
             </section>
             <section className="geo-inspector-section"><div className="geo-section-label">EVIDENCE STATUS</div><div className="geo-evidence-placeholder"><span>▧</span><div><b>Satellite evidence timeline</b><small>Open the case to inspect available imagery, provenance and field evidence.</small></div></div><p className="geo-disclaimer">A geospatial screening signal is not a legal finding. Boundary status and supporting records must be verified by the competent authority.</p></section>
             <div className="geo-inspector-actions"><Link className="geo-primary-action" to={`/alerts/${selectedAlert.id}`}>Open case file <span>↗</span></Link><Link className="geo-secondary-action" to="/assets">Asset registry</Link></div>
+          </> : selectedAsset ? <>
+            <div className="geo-inspector-tags"><span className="geo-tag" style={{color:"#6ee7b7",background:"rgba(16,185,129,.14)"}}>ASSET RECORD</span><span className="geo-tag neutral">{String(selectedAsset.properties?.boundary_status ?? "STATUS NOT VERIFIED").replaceAll("_"," ")}</span></div>
+            <div className="geo-telemetry">
+              <div><small>REGISTERED AREA</small><b>{selectedAsset.properties?.area_acres != null ? Number(selectedAsset.properties.area_acres).toFixed(2) + " acres" : "—"}</b><span>As recorded in asset registry</span></div>
+              <div><small>OPEN ALERTS</small><b>{alerts.filter((a) => a.asset_id === Number(selectedAsset.properties?.id ?? selectedAsset.id) && !a.state.startsWith("CLOSED")).length}</b><span>Linked active cases</span></div>
+              <div><small>BOUNDARY STATUS</small><b>{String(selectedAsset.properties?.boundary_status ?? "Not recorded").replaceAll("_"," ")}</b><span>Registry status</span></div>
+              <div><small>BASELINE REFERENCE</small><b>{fmtDate(selectedAsset.properties?.baseline_date,"en")}</b><span>Reference date, not latest pass</span></div>
+            </div>
+            <section className="geo-inspector-section"><div className="geo-section-label">ASSET REGISTRY</div>
+              <dl className="geo-facts"><dt>Asset category</dt><dd>{String(selectedAsset.properties?.asset_type ?? selectedAsset.properties?.boundary_kind ?? "Public asset").replaceAll("_"," ")}</dd><dt>Asset reference</dt><dd className="geo-mono">{selectedAsset.properties?.asset_code ?? selectedAsset.properties?.id ?? selectedAsset.id}</dd><dt>Governance status</dt><dd>{String(selectedAsset.properties?.boundary_status ?? "Not verified").replaceAll("_"," ")}</dd><dt>Monitoring mode</dt><dd>{String(selectedAsset.properties?.mode ?? "Not recorded")}</dd></dl>
+            </section>
+            <section className="geo-inspector-section"><p className="geo-disclaimer">Registry details are shown as recorded. Legal boundaries must be checked against the current authenticated notification and survey record.</p></section>
+            <div className="geo-inspector-actions"><Link className="geo-primary-action" to="/assets">Open asset registry <span>↗</span></Link><Link className="geo-secondary-action" to="/alerts">View incident register</Link></div>
           </> : <div className="geo-empty-inspector"><span>◎</span><b>No asset selected</b><p>Select a priority alert or mapped asset to inspect its location, change signal and governance record.</p></div>}
         </aside>}
       </div>
