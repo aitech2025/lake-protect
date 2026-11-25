@@ -104,16 +104,6 @@ export function CommandOverview() {
   })), [filteredAlerts, selectedId]);
 
   const selectAlert = (a: AlertRow) => { setSelectedId(a.id); setInspectorOpen(true); };
-  const selectAsset = (id: number) => {
-    const a = alerts.find((x) => x.asset_id === id);
-    setSelectedId(a?.id ?? id);
-    setInspectorOpen(true);
-  };
-  const changeTheme = (next: Theme) => {
-    setTheme(next);
-    document.documentElement.dataset.theme = next;
-    try { localStorage.setItem("lp.theme", next); } catch { /* optional preference */ }
-  };
   const toggleLayer = (key: LayerKey) => setLayers((old) => ({ ...old, [key]: !old[key] }));
   const activeCount = alerts.filter((a) => !a.state.startsWith("CLOSED")).length;
   const criticalCount = alerts.filter((a) => a.overdue || (a.priority_score ?? 0) >= 80).length;
