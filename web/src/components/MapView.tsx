@@ -1,6 +1,6 @@
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { API_BASE } from "../api";
 
 export type Pin = { id: number | string; lon: number; lat: number; colour: string; label?: string; big?: boolean; onClick?: () => void };
@@ -58,7 +58,14 @@ function bboxOf(fcs: GeoJSON.FeatureCollection[]): [number, number, number, numb
   return Number.isFinite(w) ? [w, s, e, n] : null;
 }
 
-export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, height = "100%", testId, theme = "light", layerVisibility = {}, onAssetClick, interactive = true, measure = false, onMeasureChange }: Props) {
+export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, height = "100%", testId, theme: themeProp, layerVisibility = {}, onAssetClick, interactive = true, measure = false, onMeasureChange }: Props) {
+  const [globalTheme, setGlobalTheme] = useState<"dark" | "light">(() => document.documentElement.dataset.theme === "light" ? "light" : "dark");
+  const theme = themeProp ?? globalTheme;
+  useEffect(() => {
+    const sync = (event: Event) => setGlobalTheme((event as CustomEvent<"dark" | "light">).detail);
+    window.addEventListener("geoguard:theme", sync);
+    return () => window.removeEventListener("geoguard:theme", sync);
+  }, []);
   const ref = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const markers = useRef<maplibregl.Marker[]>([]);
