@@ -14,6 +14,7 @@ type Props = {
   testId?: string;
   theme?: "dark" | "light";
   layerVisibility?: { boundaries?: boolean; ftl?: boolean; changes?: boolean };
+  onAssetClick?: (id: number) => void;
 };
 
 const EMPTY: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
@@ -54,11 +55,13 @@ function bboxOf(fcs: GeoJSON.FeatureCollection[]): [number, number, number, numb
   return Number.isFinite(w) ? [w, s, e, n] : null;
 }
 
-export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, height = "100%", testId, theme = "light", layerVisibility = {} }: Props) {
+export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, height = "100%", testId, theme = "light", layerVisibility = {}, onAssetClick }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const markers = useRef<maplibregl.Marker[]>([]);
   const loaded = useRef(false);
+  const onAssetClickRef = useRef(onAssetClick);
+  useEffect(() => { onAssetClickRef.current = onAssetClick; }, [onAssetClick]);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -76,6 +79,15 @@ export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, h
       m.addLayer({ id: "primary-confirmed", type: "line", source: "boundaries", filter: certaintyIs("confirmed"), paint: { "line-color": "#1f6fa8", "line-width": 2.6 } });
       m.addLayer({ id: "primary-preliminary", type: "line", source: "boundaries", filter: certaintyIs("preliminary"), paint: { "line-color": "#1f6fa8", "line-width": 2.6, "line-dasharray": [3, 2] } });
       m.addLayer({ id: "primary-estimated", type: "line", source: "boundaries", filter: certaintyIs("estimated"), paint: { "line-color": "#1f6fa8", "line-width": 2.6, "line-dasharray": [0.6, 2] } });
+      const assetClick = (event: maplibregl.MapLayerMouseEvent) => {
+        const feature = event.features?.[0];
+        const raw = feature?.properties?.id ?? feature?.id;
+        const id = Number(raw);
+        if (Number.isFinite(id)) onAssetClickRef.current?.(id);
+      };
+      m.on("click", "primary-fill", assetClick);
+      m.on("mouseenter", "primary-fill", () => { m.getCanvas().style.cursor = "pointer"; });
+      m.on("mouseleave", "primary-fill", () => { m.getCanvas().style.cursor = ""; });
       m.addLayer({ id: "change-fill", type: "fill", source: "changes", paint: { "fill-color": "#e0a526", "fill-opacity": 0.55 } });
       m.addLayer({ id: "change-line", type: "line", source: "changes", paint: { "line-color": "#7a4f05", "line-width": 1.6 } });
       loaded.current = true;
