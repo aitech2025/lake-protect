@@ -5,7 +5,10 @@ import { Layout } from "./components/Layout";
 import { AlertDetail } from "./desk/AlertDetail";
 import { Assets } from "./desk/Assets";
 import { Audit } from "./desk/Audit";
+import { Dashboard } from "./desk/Dashboard";
+import { Inbox } from "./desk/Inbox";
 import { Login } from "./desk/Login";
+import { Officials } from "./desk/Officials";
 import { Queue } from "./desk/Queue";
 import { Records } from "./desk/Records";
 import { Sources } from "./desk/Sources";
@@ -27,6 +30,9 @@ export function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route element={<RequireUser><Layout /></RequireUser>}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/inbox" element={<Inbox />} />
+        <Route path="/officials" element={<Officials />} />
         <Route path="/alerts" element={<Queue />} />
         <Route path="/alerts/:id" element={<AlertDetail />} />
         <Route path="/assets" element={<Assets />} />

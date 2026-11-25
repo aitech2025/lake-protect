@@ -14,7 +14,10 @@
     "language": "తెలుగు",
     "label": "Main navigation",
     "skip": "Skip to content",
-    "sources": "Sources"
+    "sources": "Sources",
+    "dashboard": "Overview",
+    "inbox": "Inbox",
+    "officials": "Officials"
   },
   "demo": {
     "badge": "Demo data",
@@ -173,7 +176,11 @@
     "reviews": "Reviews: {{count}}",
     "court": "Court case",
     "boundary_unconfirmed": "Boundary not confirmed",
-    "seen_again": "Seen again"
+    "seen_again": "Seen again",
+    "linked": "From the overview:",
+    "linked_week": "new in {{week}}",
+    "linked_asset": "one lake or parcel",
+    "linked_clear": "Show all incidents"
   },
   "detail": {
     "back": "All incidents",
@@ -234,7 +241,10 @@
     "reopened": "Reopened: change persists",
     "by": "by {{name}}",
     "incident.reviewed": "Reviewed: {{outcome}}",
-    "document.added": "Document added"
+    "document.added": "Document added",
+    "notify.incident_opened": "Officials notified",
+    "notify.incident_decided": "Officials told of the decision",
+    "notification.acknowledged": "Notification acknowledged"
   },
   "notify": {
     "reviewer": "reviewer",
@@ -656,5 +666,148 @@
     "add": "Add a document",
     "file_hint": "File (PDF, PNG or JPEG)",
     "save": "Save document"
+  },
+  "dashboard": {
+    "title": "Overview",
+    "lede": "Week {{week}}. Every underlined number opens the incidents behind it.",
+    "no_week": "No weekly screen yet.",
+    "my_area": "My area",
+    "path": "Where you are",
+    "not_recorded": "Area not recorded",
+    "area_source": "Districts and mandals of the real lakes come from OpenStreetMap boundaries, not the revenue record.",
+    "boundary": "{{n}} of {{total}} with a confirmed boundary",
+    "no_clear_look": "{{n}} without a clear look",
+    "ack_none": "No notifications to officials in the last 30 days",
+    "ack_of": "{{n}} of {{total}} in the last 30 days",
+    "empty": "No lakes or parcels here.",
+    "trend_title": "The last weeks",
+    "trend": {
+      "changed": "Lakes and parcels with a change",
+      "new_incidents": "New incidents"
+    },
+    "as_table": "Show as a table",
+    "figure": {
+      "assets": "lakes and parcels watched",
+      "clear_look": "seen clearly this week",
+      "changed": "with a change this week",
+      "new_incidents": "new incidents this week",
+      "open": "awaiting review",
+      "under_review": "under review",
+      "waiting": "waiting over 14 days",
+      "confirmed": "confirmed, being acted on",
+      "ack": "notifications acknowledged within 24 hours"
+    },
+    "tone": {
+      "waiting": "Waiting over 14 days",
+      "open": "Open incidents",
+      "changed": "Change this week",
+      "no_look": "No clear look",
+      "quiet": "No open incident"
+    },
+    "level": {
+      "district": "District",
+      "mandal": "Mandal",
+      "village": "Village",
+      "asset": "Lake or parcel"
+    },
+    "by": {
+      "district": "By district",
+      "mandal": "By mandal",
+      "village": "By village",
+      "asset": "Lakes and parcels"
+    },
+    "col": {
+      "status": "Now",
+      "assets": "Watched",
+      "clear_look": "Seen clearly",
+      "changed": "Changed",
+      "new_incidents": "New",
+      "open": "Awaiting review",
+      "under_review": "Under review",
+      "waiting": "Over 14 days",
+      "confirmed": "Confirmed",
+      "week": "Week"
+    }
+  },
+  "inbox": {
+    "title": "Inbox",
+    "lede": "Waiting for your acknowledgement: {{count}}",
+    "count_label": "{{count}} waiting for acknowledgement",
+    "show": "Show",
+    "pending": "Needs acknowledgement",
+    "all": "All",
+    "empty_pending": "Nothing waits for your acknowledgement.",
+    "empty": "No notifications yet.",
+    "kind": {
+      "incident_opened": "New incident",
+      "incident_decided": "Decision",
+      "reminder": "Reminder",
+      "not_acknowledged": "Not acknowledged",
+      "weekly_digest": "Weekly digest"
+    },
+    "open_incident": "Open the incident",
+    "open_overview": "Open the overview",
+    "ack": "Acknowledge",
+    "acked": "Acknowledged {{date}}, {{via}}",
+    "via": {
+      "inbox": "in the inbox",
+      "review": "by reviewing",
+      "decision": "by deciding"
+    },
+    "channel": {
+      "in_app": "In the app",
+      "email": "Email",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp"
+    },
+    "status": {
+      "queued": "queued",
+      "sent": "sent",
+      "held": "held",
+      "failed": "failed",
+      "skipped": "skipped"
+    },
+    "banner": "You were notified about this incident on {{date}}.",
+    "banner_reminded": "A reminder followed.",
+    "banner_viewer": "Recording your review acknowledges it.",
+    "banner_admin": "Your next step on it acknowledges it."
+  },
+  "officials": {
+    "title": "Officials",
+    "lede": "Who covers which area, and how each is told. An incident notifies the officials whose area holds it, and the admin.",
+    "run": "Send queued now",
+    "digest": "Send this week’s digest",
+    "digest_sent": "Digest for {{week}}: {{n}} sent.",
+    "ran": "Outbox run: {{n}} deliveries.",
+    "channels": "Channels",
+    "ready": "Ready",
+    "held": "Not set up: messages are held",
+    "people": "People",
+    "unacked": "{{n}} not acknowledged",
+    "email": "Work email",
+    "phone": "Mobile (+91…)",
+    "channels_for": "Tell this person by",
+    "areas": "Areas covered",
+    "admin_all": "The admin is told about every incident.",
+    "no_areas": "No area: this official gets no notifications.",
+    "remove": "Remove {{area}}",
+    "district": "District",
+    "mandal": "Mandal",
+    "whole_district": "Whole district",
+    "add_area": "Add area",
+    "save": "Save",
+    "saved": "Saved.",
+    "log": "Delivery log",
+    "not_yet": "Not yet",
+    "col": {
+      "when": "When",
+      "to": "To",
+      "what": "Notification",
+      "channel": "Channel",
+      "status": "Status",
+      "detail": "Detail",
+      "ack": "Acknowledged"
+    },
+    "digest_already": "Digest for {{week}}: already sent to everyone."
   }
 }

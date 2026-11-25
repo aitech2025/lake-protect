@@ -31,6 +31,7 @@ ALERT_STATE = pg_enum(enums.AlertState, "alert_state")
 INCIDENT_STATE = pg_enum(enums.IncidentState, "incident_state")
 FIELD_OUTCOME = pg_enum(enums.FieldOutcome, "field_outcome")
 ROLE = pg_enum(enums.Role, "role")
+NOTIFICATION_KIND = pg_enum(enums.NotificationKind, "notification_kind")
 READINESS_STATUS = pg_enum(enums.ReadinessStatus, "readiness_status")
 
 MULTIPOLYGON = Geometry("MULTIPOLYGON", srid=4326, spatial_index=False)
@@ -51,6 +52,10 @@ class User(Base):
     area_geom = mapped_column(MULTIPOLYGON, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Work contact details and channels (migration 0007). Only the admin sees or changes them.
+    email: Mapped[str | None] = mapped_column(Text)
+    phone: Mapped[str | None] = mapped_column(Text)
+    channels: Mapped[list[str]] = mapped_column(ARRAY(Text), default=lambda: ["in_app", "email"])
 
 
 class Asset(Base):
@@ -501,3 +506,49 @@ class AssetDocument(Base):
     added_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
     added_at: Mapped[dt.datetime] = mapped_column(TZ, server_default="now()")
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class OfficialArea(Base):
+    """A district, or a mandal within one, that an official covers (migration 0007)."""
+
+    __tablename__ = "official_areas"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    district: Mapped[str] = mapped_column(Text)
+    mandal: Mapped[str | None] = mapped_column(Text)
+    added_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    added_at: Mapped[dt.datetime] = mapped_column(TZ)
+
+
+class Notification(Base):
+    """One notification to one person (0007). Kept for good; only its acknowledgement can be set, once."""
+
+    __tablename__ = "notifications"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    kind: Mapped[str] = mapped_column(NOTIFICATION_KIND)
+    alert_id: Mapped[int | None] = mapped_column(ForeignKey("alerts.id"))
+    week: Mapped[str | None] = mapped_column(Text)
+    about_id: Mapped[int | None] = mapped_column(ForeignKey("notifications.id"))
+    subject: Mapped[str] = mapped_column(Text)
+    body: Mapped[str] = mapped_column(Text)
+    payload: Mapped[dict] = mapped_column(JSONB, default=dict)
+    needs_ack: Mapped[bool] = mapped_column(Boolean)
+    created_at: Mapped[dt.datetime] = mapped_column(TZ)
+    acknowledged_at: Mapped[dt.datetime | None] = mapped_column(TZ)
+    ack_via: Mapped[str | None] = mapped_column(Text)
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class NotificationDelivery(Base):
+    """One attempt to deliver a notification on an outside channel (0007). Append-only."""
+
+    __tablename__ = "notification_deliveries"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    notification_id: Mapped[int] = mapped_column(ForeignKey("notifications.id"))
+    channel: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(Text)
+    attempt: Mapped[int] = mapped_column(Integer, default=0)
+    to_masked: Mapped[str | None] = mapped_column(Text)
+    detail: Mapped[str | None] = mapped_column(Text)
+    at: Mapped[dt.datetime] = mapped_column(TZ)

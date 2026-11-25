@@ -8,6 +8,9 @@
 `transition` is the only code that changes `alert.state`. It switches on `lp.state_machine` for
 the one UPDATE; a database trigger refuses every other state change, and a check constraint keeps
 the resolution consistent with the state. Every step and every review writes an audit event.
+
+Notifications (D-059): a review, or an admin's step, acknowledges what that person was sent about
+the incident. A decision (confirmed or dismissed) tells the area's officials and its reviewers.
 """
 from __future__ import annotations
 
@@ -104,6 +107,12 @@ def transition(
         details={"from": frm, "to": to, "role": role, "step": label, "note": note, "resolution": alert.resolution, **(details or {})},
         at=at,
     )
+    if actor is not None and actor.role == Role.admin.value:
+        from app.notify import service as notify
+
+        notify.acknowledge_for_alert(db, actor, alert, "decision", at)
+        if to in (S.CONFIRMED.value, S.DISMISSED.value):
+            notify.incident_decided(db, alert, actor, note, at)
     return {"status": "applied", "from": frm, "state": alert.state, "resolution": alert.resolution}
 
 
@@ -133,6 +142,9 @@ def review(db: Session, alert: Alert, user: User, outcome: str, note: str, at: d
     if alert.state == S.OPEN.value:
         transition(db, alert, S.UNDER_REVIEW.value, actor=user, note="First review recorded", at=at,
                    details={"by_review": True, "review_id": row.id})
+    from app.notify import service as notify
+
+    notify.acknowledge_for_alert(db, user, alert, "review", at)
     return row
 
 

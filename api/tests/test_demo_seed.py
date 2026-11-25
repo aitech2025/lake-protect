@@ -20,7 +20,9 @@ from app.models import (
     ScreenRun,
     User,
 )
+from app.models import Notification, NotificationDelivery
 from app.seed import demo
+from app.services import dashboard
 from app.seed.demo_render import TileRenderer, render_chip, render_week
 from app.seed.demo_world import World
 from tests.factories import auth
@@ -38,6 +40,8 @@ def test_seeded_demo(db, client, isolated_storage):
     _weekly_record_names_the_change(db, client)
     _fictional(db)
     _open_sea(db)
+    _notifications(db, seeded, isolated_storage)
+    _dashboard(db)
     assert chain.verify(db)["ok"] is True
     _chips(db, isolated_storage)
 
@@ -120,6 +124,50 @@ def _fictional(db):
         assert all(r.is_demo for r in db.scalars(select(model)))
     assert all(u.is_demo and u.name.startswith("Demo ") for u in db.scalars(select(User)))
     assert all(s.startswith("D-") for a in db.scalars(select(Asset)) for s in a.survey_numbers)
+
+
+def _notes(db, username: str, kind: str, asset_key: str) -> list[Notification]:
+    return db.scalars(text(
+        """SELECT n.id FROM notifications n JOIN users u ON u.id = n.user_id JOIN alerts al ON al.id = n.alert_id
+           JOIN candidates c ON c.id = al.candidate_id JOIN assets a ON a.id = c.asset_id
+           WHERE u.username = :u AND n.kind = :k AND a.asset_key = :a ORDER BY n.id"""), {"u": username, "k": kind, "a": asset_key}).all()
+
+
+def _notifications(db, seeded, isolated_storage):
+    """D-059: each open incident told its area's official and the admin; follow-ups ran each morning."""
+    assert seeded["digests"] == 3 and seeded["notifications"] > 20
+    # The headline, found two days ago in the north, is still unacknowledged: a reminder, and the admin told.
+    assert len(_notes(db, "demo.viewer2", "incident_opened", "demo-cheruvu-1")) == 1
+    assert _notes(db, "demo.viewer1", "incident_opened", "demo-cheruvu-1") == []
+    assert len(_notes(db, "demo.viewer2", "reminder", "demo-cheruvu-1")) == 1
+    assert len(_notes(db, "demo.admin", "not_acknowledged", "demo-cheruvu-1")) == 1
+    # Reviewed within a day in the south: acknowledged by the review, no reminder.
+    built = db.get(Notification, _notes(db, "demo.viewer1", "incident_opened", "demo-cheruvu-4")[0])
+    assert built.ack_via == "review" and _notes(db, "demo.viewer1", "reminder", "demo-cheruvu-4") == []
+    # A decision tells the area's official and the reviewer.
+    assert _notes(db, "demo.viewer2", "incident_decided", "demo-cheruvu-2") and _notes(db, "demo.viewer1", "incident_decided", "demo-cheruvu-2")
+    # Changes closed at once by the legal check told no one.
+    assert _notes(db, "demo.admin", "incident_opened", "demo-cheruvu-3") == []
+    # Channels: emails in the local outbox; SMS and WhatsApp held, as no gateway exists.
+    latest = dict(db.execute(text(
+        """SELECT d.channel || ':' || d.status, count(*) FROM (
+             SELECT DISTINCT ON (notification_id, channel) channel, status FROM notification_deliveries
+             ORDER BY notification_id, channel, id DESC) d GROUP BY 1""")).all())
+    assert latest.get("email:sent", 0) > 10 and latest.get("sms:held", 0) > 0 and latest.get("whatsapp:held", 0) > 0
+    assert not {k for k in latest if k.endswith(":queued")}
+    sent = db.scalar(select(NotificationDelivery).where(NotificationDelivery.status == "sent", NotificationDelivery.channel == "email"))
+    key = sent.detail.split(": ", 1)[1]
+    assert isolated_storage.get_object(key).startswith(b"From: Lake Protect")
+    assert all(n.is_demo for n in db.scalars(select(Notification)))
+
+
+def _dashboard(db):
+    viewer = db.scalar(select(User).where(User.username == "demo.viewer2"))
+    out = dashboard.overview(db, viewer, is_demo=True)
+    assert [c["name"] for c in out["children"]] == ["Demo North District", "Demo South District"]
+    assert out["figures"]["assets"] == 20 and out["week"] is not None
+    north = dashboard.overview(db, viewer, is_demo=True, district="Demo North District", mandal="Demo Mandal 1")
+    assert [c["name"] for c in north["children"]] == ["Demo Village 1", "Demo Village 2"]
 
 
 def _open_sea(db):

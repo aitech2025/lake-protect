@@ -22,7 +22,8 @@ data in the app), then M3.
 | M10 Real data in the app | Done | API 249, pipeline 25, browser 15 passed | M10 commit |
 | M3 Radar and scored backtest | Radar check for built-up done; backtest not started | | |
 | M11 Asset creation engine (templates) | Done | API 284, browser 2 new (m11-sources) | 507d359 |
-| M12 Weekly record, incidents, documents, two roles | Done | API 263, pipeline 27, browser 4 | M12 commit |
+| M12 Weekly record, incidents, documents, two roles | Done | API 263, pipeline 27, browser 4 | 76c6593 |
+| M13 Downstream: notifications by area, overview | Done | API 308, pipeline 29, browser 4 | M13 commit |
 
 ## M0 Scaffold: done
 
@@ -236,6 +237,50 @@ removed, is `reports/m2-tuning/README.md`.
   upload, the area rounding case). Browser 15 passed on fresh demos: `m10-real` (switch, no demo
   record on the real side, Sentinel-2 tiles requested, 99 real lakes listed) with the M5 to M8
   suites, then the M9 walkthrough with no internet.
+
+## M13 Downstream: notifications by area and the overview: done
+
+Owner's request, 25 Nov 2026 (D-059, D-060). Design: `docs/downstream.md`.
+
+- **Migration 0007:**
+  - contact details and channels on users;
+  - `official_areas`;
+  - `notifications`, kept for good: only the acknowledgement can be set, once;
+  - `notification_deliveries`, append-only.
+
+  The demo reset migrates down to 0001 and up again through it.
+- **Notifications** (`api/app/notify/`):
+  - routing by area;
+  - English and Telugu messages;
+  - acknowledgement in the inbox or by acting on the incident;
+  - a reminder after 24 hours, and the admin told after 48;
+  - the weekly digest after each stored screen;
+  - email to a local outbox or SMTP; SMS and WhatsApp as held templates;
+  - the `notifier` service, every minute.
+- **Overview** (`api/app/services/dashboard.py`, `web/src/desk/Dashboard.tsx`):
+  - State, district, mandal, village, lake;
+  - figures that open the incident list with the same filters;
+  - a map, an 8-week trend, and rows per area.
+
+  It is now the home page.
+- **Desk:**
+  - Inbox, with a count in the side bar;
+  - an acknowledgement banner on the incident page;
+  - the admin's Officials page: channels, contacts, areas, delivery log, send digest.
+- **Real lakes:** `lp assets-areas` placed all 99 in 5 districts and 27 mandals, from
+  OpenStreetMap boundaries. The loader updates and logs a changed area. On the preview, the
+  replayed screen of 22 Nov 2026 notified:
+  - the official covering Medchal–Malkajgiri and Sangareddy of 43 incidents;
+  - the official covering Ranga Reddy of 15;
+  - the admin of all 58.
+- **Demo:**
+  - two fictional districts, four mandals and eight villages;
+  - officials with areas, fictional contacts and channels;
+  - the notifier's follow-up each simulated morning: 82 notifications and 3 digests.
+- **Tests:** API 308 passed; pipeline 29 passed; browser 4 passed (`m9-demo` walkthrough with no
+  internet, now from the overview through the inbox and the Officials page; `m10-real`;
+  `m11-sources`). These ran on the preview stack (`docker compose -p lakeprotect-preview`); the
+  dev database still needs the reset described in README.
 
 ## M12 Weekly record, incidents, legal documents, two roles: done
 

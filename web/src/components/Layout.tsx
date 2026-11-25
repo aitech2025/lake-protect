@@ -1,20 +1,61 @@
-import { useEffect, useRef, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { api } from "../api";
 import { useAuth } from "../auth";
-import { DatasetSwitch } from "../dataset";
+import { DatasetSwitch, useDataset } from "../dataset";
 import { DemoBand } from "../demo";
 
-// Both roles see every page (D-057); what each may change is decided by the server.
+// Both roles see every page (D-057); what each may change is decided by the server. The Officials
+// page holds people's contact details, so only the admin has it (D-059).
 const BOTH = ["admin", "viewer"];
 const NAV: { to: string; key: string; roles: string[] }[] = [
+  { to: "/dashboard", key: "nav.dashboard", roles: BOTH },
+  { to: "/inbox", key: "nav.inbox", roles: BOTH },
   { to: "/alerts", key: "nav.queue", roles: BOTH },
   { to: "/assets", key: "nav.assets", roles: BOTH },
   { to: "/records", key: "nav.records", roles: BOTH },
   { to: "/sources", key: "nav.sources", roles: BOTH },
   { to: "/monthly", key: "nav.monthly", roles: BOTH },
   { to: "/audit", key: "nav.audit", roles: BOTH },
+  { to: "/officials", key: "nav.officials", roles: ["admin"] },
 ];
+
+const COUNT_EVENT = "lp:notify-count";
+
+/** Pages that acknowledge a notification call this, so the side bar's count updates at once. */
+export function notifyCountChanged(): void {
+  window.dispatchEvent(new Event(COUNT_EVENT));
+}
+
+/** How many notifications wait for this person's acknowledgement, in the world on screen. */
+function useUnacknowledged(): number {
+  const { user } = useAuth();
+  const { dataset } = useDataset();
+  const { pathname } = useLocation();
+  const [n, setN] = useState(0);
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const bump = () => setTick((x) => x + 1);
+    window.addEventListener(COUNT_EVENT, bump);
+    const timer = window.setInterval(bump, 60_000);
+    return () => {
+      window.removeEventListener(COUNT_EVENT, bump);
+      window.clearInterval(timer);
+    };
+  }, []);
+  useEffect(() => {
+    if (!user) return;
+    let live = true;
+    api<{ unacknowledged: number }>(`/notifications/count?dataset=${dataset}`)
+      .then((r) => live && setN(r.unacknowledged))
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, [user, dataset, pathname, tick]);
+  return n;
+}
 
 export function Mark() {
   // Lake outline with a solid boundary and a dashed buffer: the product's own line language.
@@ -30,6 +71,7 @@ export function Layout() {
   const { t, i18n } = useTranslation();
   const { user, logout } = useAuth();
   const { pathname } = useLocation();
+  const unacknowledged = useUnacknowledged();
   const mainRef = useRef<HTMLElement>(null);
   const firstRender = useRef(true);
   const toggle = () => void i18n.changeLanguage(i18n.language === "te" ? "en" : "te");
@@ -64,8 +106,11 @@ export function Layout() {
         </div>
         {user && <DatasetSwitch />}
         {NAV.filter((n) => user && n.roles.includes(user.role)).map((n) => (
-          <NavLink key={n.to} to={n.to}>
+          <NavLink key={n.to} to={n.to} data-testid={`nav-${n.to.slice(1)}`}>
             {t(n.key)}
+            {n.to === "/inbox" && unacknowledged > 0 && (
+              <span className="nav-count" data-testid="inbox-count" aria-label={t("inbox.count_label", { count: unacknowledged })}>{unacknowledged}</span>
+            )}
           </NavLink>
         ))}
         <div className="who">

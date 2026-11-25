@@ -4,7 +4,7 @@
 
 Append-only tables cannot be emptied row by row, by design, so a reset rebuilds the schema:
 migrate down to nothing, migrate up, load the real assets, then seed the fictional demo. Generated
-chips and field photos are removed. Base-map tiles are kept unless --tiles is passed.
+chips, field photos and the email outbox are removed. Base-map tiles are kept unless --tiles is passed.
 """
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ def main() -> None:
     cfg.attributes["url"] = settings.database_url
     command.downgrade(cfg, "0001")  # keep PostGIS: the image's other extensions depend on it
     command.upgrade(cfg, "head")
-    for folder in ("chips", "field", "packs", "bulletins"):
+    for folder in ("chips", "field", "packs", "bulletins", "outbox"):
         shutil.rmtree(store.local_path(folder), ignore_errors=True)
 
     with SessionLocal() as db:

@@ -28,6 +28,10 @@ def test_relation_with_inner_ring_has_a_hole():
 def test_rebuild_from_saved_response_matches_committed_file(tmp_path):
     out = tmp_path / "assets.geojson"
     build(ROOT / "data/case_lake_search.yml", ROOT / "data/sources/overpass_water_orr.json", out, refetch=False)
+    # As `lp assets-osm` does: districts and mandals from the saved boundaries (D-060).
+    from lake_protect.osm_areas import run as place_areas
+
+    place_areas(out, ROOT / "data/sources/overpass_admin_orr.json", [78.22, 17.20, 78.72, 17.62], refetch=False)
     rebuilt = json.loads(out.read_text(encoding="utf-8"))
     committed = json.loads((ROOT / "data/assets.geojson").read_text(encoding="utf-8"))
     assert rebuilt["features"] == committed["features"]

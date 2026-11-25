@@ -21,6 +21,7 @@ from app.models import (
     ImageryRequest,
     IncidentReview,
     LegalCheck,
+    Notification,
     Observation,
     User,
 )
@@ -52,7 +53,7 @@ _LIST_SQL = """
 SELECT al.id, al.code, al.state::text AS state, al.resolution, al.closed_at, al.related_alert_id,
        al.priority_score, al.is_demo, al.created_at, al.updated_at,
        a.id AS asset_id, a.name AS asset_name, a.name_te AS asset_name_te, a.cohort::text AS cohort,
-       a.type::text AS asset_type, c.id AS candidate_id, c.change_type::text AS change_type,
+       a.type::text AS asset_type, a.district, a.mandal, a.village, c.id AS candidate_id, c.change_type::text AS change_type,
        c.stage_estimate::text AS stage_estimate, c.area_sq_m, c.first_changed_at, c.last_clear_at,
        c.sensor_basis::text AS sensor_basis, c.confidence, c.flags,
        lc.zone::text AS zone, lc.alert_class::text AS alert_class, lc.boundary_status::text AS checked_boundary_status,
@@ -95,7 +96,29 @@ def _row_out(row: dict) -> dict:
     return out
 
 
-def list_alerts(db: Session, *, state=None, change_type=None, cohort=None, asset_id=None) -> list[dict]:
+# Open and not yet decided for longer than this: "waiting" on the monthly page and the dashboard.
+WAITING_DAYS = 14
+# In an area filter, "-" means "not recorded": an asset with no district, mandal or village.
+NOT_RECORDED = "-"
+
+
+def _same(have: str | None, want: str) -> bool:
+    want = "" if want == NOT_RECORDED else want
+    return (have or "").strip().lower() == want.strip().lower()
+
+
+def in_area(row: dict, district: str | None = None, mandal: str | None = None, village: str | None = None) -> bool:
+    """Does an incident or asset row fall in an area? Names match without regard to case."""
+    return all(want is None or _same(row.get(k), want) for k, want in (("district", district), ("mandal", mandal), ("village", village)))
+
+
+def is_waiting(row: dict, now: dt.datetime) -> bool:
+    """Open or under review for more than 14 whole days: the monthly page's rule."""
+    return row["state"] in lifecycle.REVIEWABLE and (now - row["created_at"]).days > WAITING_DAYS
+
+
+def list_alerts(db: Session, *, state=None, change_type=None, cohort=None, asset_id=None, district=None, mandal=None,
+                village=None, waiting: bool = False, new_in_week: str | None = None, now: dt.datetime | None = None) -> list[dict]:
     rows = db.execute(text(_LIST_SQL), {"alert_id": None, "asset_id": asset_id}).mappings().all()
     out = [_row_out(dict(r)) for r in rows]
     if state:
@@ -104,7 +127,22 @@ def list_alerts(db: Session, *, state=None, change_type=None, cohort=None, asset
         out = [r for r in out if r["change_type"] in set(change_type.split(","))]
     if cohort:
         out = [r for r in out if r["cohort"] in set(cohort.split(","))]
+    if any(v is not None for v in (district, mandal, village)):
+        out = [r for r in out if in_area(r, district, mandal, village)]
+    if waiting:
+        now = now or dt.datetime.now(dt.timezone.utc)
+        out = [r for r in out if is_waiting(r, now)]
+    if new_in_week:
+        out = [r for r in out if r["resolution"] != "auto" and "{}-W{:02d}".format(*r["created_at"].isocalendar()[:2]) == new_in_week]
     return out
+
+
+def row_for(db: Session, alert_id: int) -> dict:
+    """One incident's list row: what changed, where, and its flags (for notifications)."""
+    row = db.execute(text(_LIST_SQL), {"alert_id": alert_id, "asset_id": None}).mappings().first()
+    if row is None:
+        raise HTTPException(404, "Incident not found")
+    return _row_out(dict(row))
 
 
 def get_visible(db: Session, alert_id: int) -> Alert:
@@ -203,6 +241,14 @@ def detail(db: Session, alert: Alert, user: User) -> dict:
             for t in timeline
         ],
         "allowed_actions": lifecycle.allowed_actions(db, alert, user),
+        # What this person was sent about the incident and has not acknowledged yet, while it is
+        # still open or under review (D-059).
+        "my_notifications": [] if alert.state not in lifecycle.REVIEWABLE else [
+            {"id": n.id, "kind": n.kind, "created_at": _iso(n.created_at)}
+            for n in db.scalars(select(Notification).where(Notification.user_id == user.id, Notification.alert_id == alert.id,
+                                                           Notification.needs_ack.is_(True), Notification.acknowledged_at.is_(None))
+                                .order_by(Notification.id))
+        ],
         "evidence_packs": [
             {"id": p.id, "version": p.version, "generated_at": _iso(p.generated_at), "manifest_sha256": p.manifest_sha256, "counsel_reviewed": p.counsel_reviewed}
             for p in db.scalars(select(EvidencePack).where(EvidencePack.alert_id == alert.id).order_by(EvidencePack.version))

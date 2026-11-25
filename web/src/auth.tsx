@@ -66,8 +66,9 @@ export function useAuth(): AuthState {
   return useContext(AuthContext);
 }
 
+/** Everyone starts at the overview of their state, district and lakes (D-060). */
 export function homeFor(_role: string): string {
-  return "/alerts";
+  return "/dashboard";
 }
 
 /** Two roles (D-057): the admin runs the application, viewers are the officials. */

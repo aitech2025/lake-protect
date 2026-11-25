@@ -9,7 +9,7 @@ import pytest
 from sqlalchemy import text
 
 from app.config import settings
-from tests.factories import auth, make_asset, make_user
+from tests.factories import auth, cover, make_asset, make_user
 
 TOKEN = {"X-Pipeline-Token": "test-token"}
 SHA = "a" * 64
@@ -217,3 +217,29 @@ def test_screening_runs_are_listed_per_dataset(client, db):
     viewer = make_user(db, "viewer")
     assert len(client.get("/screening/runs?dataset=real", headers=auth(viewer)).json()["items"]) >= 1
     assert client.get("/screening/runs?dataset=demo", headers=auth(viewer)).json()["items"] == []
+
+
+def test_a_run_sends_the_weekly_digest_once_per_week(client, db):
+    real = _real(db, district="Ranga Reddy", mandal="Gandipet")
+    official = make_user(db, "viewer")
+    cover(db, official, "Ranga Reddy")
+    make_user(db, "admin")
+    assert client.post("/pipeline/runs", json=_run([real.id]), headers=TOKEN).json()["digests"] == 2
+    assert client.post("/pipeline/runs", json=_run([real.id]), headers=TOKEN).json()["digests"] == 0
+    digest = client.get("/notifications?dataset=real", headers=auth(official)).json()["items"][0]
+    assert digest["kind"] == "weekly_digest" and digest["week"] == "2026-W47"
+    assert digest["payload"]["figures"]["clear_look"] == 1 and "Ranga Reddy" in digest["body"]
+
+
+def test_a_failing_digest_never_fails_the_stored_run(client, db, monkeypatch):
+    from app.notify import service
+
+    def broken(*a, **k):
+        raise RuntimeError("digest broke")
+
+    monkeypatch.setattr(service, "send_digests", broken)
+    real = _real(db)
+    resp = client.post("/pipeline/runs", json=_run([real.id]), headers=TOKEN)
+    assert resp.status_code == 201 and resp.json()["digests"] == 0
+    assert db.scalar(text("SELECT count(*) FROM screen_runs WHERE id = :i"), {"i": resp.json()["run_id"]}) == 1
+    assert db.scalar(text("SELECT count(*) FROM audit_log WHERE action = 'notify.digest_failed'")) == 1

@@ -104,3 +104,41 @@ export type AlertRow = {
   geometry: GeoJSON.Geometry;
   flags: string[];
 };
+
+/** A notification in the inbox (DECISIONS.md D-059). */
+export type Delivery = { channel: "email" | "sms" | "whatsapp"; status: string; attempt: number; to_masked: string | null; detail: string | null; at: string };
+export type Note = {
+  id: number;
+  kind: "incident_opened" | "incident_decided" | "reminder" | "not_acknowledged" | "weekly_digest";
+  alert_id: number | null;
+  week: string | null;
+  subject: string;
+  body: string;
+  payload: Record<string, any>;
+  needs_ack: boolean;
+  created_at: string;
+  acknowledged_at: string | null;
+  ack_via: "inbox" | "review" | "decision" | null;
+  is_demo: boolean;
+  deliveries: Delivery[];
+};
+
+/** The drill-down dashboard (DECISIONS.md D-060). */
+export type Figures = {
+  assets: number; clear_look: number; no_clear_look: number; changed: number; new_incidents: number; open: number;
+  under_review: number; waiting: number; confirmed: number; court_matters: number; boundary_confirmed: number;
+  ack_considered: number; ack_on_time: number;
+};
+export type Tone = "waiting" | "open" | "changed" | "no_look" | "quiet";
+export type DashRow = {
+  kind: "area" | "asset"; level: string; name: string; name_te?: string | null; not_recorded?: boolean; asset_id?: number;
+  cohort?: string; week_status?: string | null; params: Record<string, string>; figures: Figures; tone: Tone; lon: number | null; lat: number | null;
+};
+export type Overview = {
+  dataset: "demo" | "real"; level: string; child_level: string; path: { level: string; name: string; params: Record<string, string> }[];
+  filters: Record<string, string>; week: string | null; figures: Figures; children: DashRow[];
+  trend: { week: string; changed: number; clear_look: number; no_clear_look: number; new_incidents: number }[];
+  pins: { asset_id: number; name: string; name_te: string | null; lon: number; lat: number; tone: Tone }[];
+  my_areas: { district: string; mandal: string | null }[]; area_source: string | null; as_of: string;
+};
+

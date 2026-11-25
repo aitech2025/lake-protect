@@ -11,6 +11,15 @@ x-api-env: &api-env
   LP_STORAGE_DIR: /var/lp/storage
   LP_DATA_DIR: /srv/data
   LP_REPO_DIR: /srv/repo
+  # Notifications (DECISIONS.md D-059). Email goes to the local outbox folder unless set to smtp.
+  LP_PUBLIC_URL: ${LP_PUBLIC_URL:-http://localhost:8180}
+  LP_EMAIL_TRANSPORT: ${LP_EMAIL_TRANSPORT:-file}
+  LP_SMTP_HOST: ${LP_SMTP_HOST:-}
+  LP_SMTP_PORT: ${LP_SMTP_PORT:-587}
+  LP_SMTP_USER: ${LP_SMTP_USER:-}
+  LP_SMTP_PASSWORD: ${LP_SMTP_PASSWORD:-}
+  LP_SMS_TOKEN: ${LP_SMS_TOKEN:-}
+  LP_WHATSAPP_TOKEN: ${LP_WHATSAPP_TOKEN:-}
 
 services:
   db:
@@ -54,7 +63,20 @@ services:
       timeout: 5s
       retries: 30
 
-  # The escalation worker was removed with the timers on 24 Nov 2026 (DECISIONS.md D-057).
+  # The notifier (DECISIONS.md D-059): reminders after 24 hours, the admin told after 48, and the
+  # outbox of emails and messages, every minute. It replaces the escalation worker removed with
+  # the timers on 24 Nov 2026 (D-057).
+  notifier:
+    image: lakeprotect-api:dev
+    command: python -m app.notify run --every 60
+    environment: *api-env
+    volumes:
+      - ./api:/srv/api
+      - ./data:/srv/data:ro
+      - lp_storage:/var/lp/storage
+    depends_on:
+      api:
+        condition: service_healthy
 
   web:
     build:

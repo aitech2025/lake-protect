@@ -2,7 +2,8 @@
 
 - GET  /pipeline/watchlist   real assets with the boundary set in force, for `lp screen`
 - POST /pipeline/runs        a screening run and, for every asset, its week: coverage, the week's
-                             image and what changed (DECISIONS.md D-057)
+                             image and what changed (DECISIONS.md D-057). Then the weekly digest
+                             goes to every official and the admin (D-059).
 - POST /pipeline/basemap     a zip of Sentinel-2 base-map tiles (`lp basemap`)
 
 And the desk's read side:
@@ -23,8 +24,10 @@ from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from app.audit import chain
+from app.clock import utcnow
 from app.db import db_guard, get_db
 from app.models import Asset, AssetScreen, ScreenRun, User
+from app.notify import service as notify
 from app.routers.candidates import pipeline_token
 from app.security import current_user
 from app.services import boundaries as bsvc
@@ -147,7 +150,18 @@ def record_run(body: RunIn, db: Session = Depends(get_db)) -> dict:
             details={"as_of": body.as_of.isoformat(), "rule_version": body.rule_version, "rules_sha256": body.rules_sha256, "coverage": statuses, "outcomes": body.outcomes},
         )
         db.commit()
-    return {"run_id": run.id, "assets": len(body.assets), "coverage": statuses}
+    # After the run is safely stored: the week's digest, once per person per week. It never fails the
+    # run, or the pipeline would send the run again; the admin can send it from the Officials page.
+    try:
+        digests = notify.send_digests(db, week, is_demo=False, at=utcnow())["sent"]
+        db.commit()
+    except Exception as exc:  # noqa: BLE001
+        db.rollback()
+        digests = 0
+        chain.record(db, actor_id=None, action="notify.digest_failed", entity="screen_run", entity_id=run.id,
+                     details={"week": week, "error": type(exc).__name__})
+        db.commit()
+    return {"run_id": run.id, "assets": len(body.assets), "coverage": statuses, "digests": digests}
 
 
 _TILE = re.compile(r"^(\d{1,2})/(\d{1,7})/(\d{1,7})\.(jpg|png)$")

@@ -51,6 +51,35 @@ def assets_osm(
     for case, hits in result["matches"].items():
         label = "no OSM match" if not hits else ("unique" if len(hits) == 1 else f"AMBIGUOUS x{len(hits)}")
         typer.echo(f"  {case:<24} {label:<14} " + "; ".join(f"{h['name']} [{h['osm']}, {h['area_acres']} ac]" for h in hits))
+    if Path(AREAS_RAW).exists():
+        typer.echo("Re-applying districts and mandals from the saved boundaries (lp assets-areas).")
+        assets_areas(search=search, assets=out, raw=AREAS_RAW, refetch=False)
+
+
+AREAS_RAW = "data/sources/overpass_admin_orr.json"
+
+
+@app.command("assets-areas")
+def assets_areas(
+    search: str = typer.Option("data/case_lake_search.yml", help="Holds the bounding box."),
+    assets: str = typer.Option("data/assets.geojson", help="Asset file to update in place."),
+    raw: str = typer.Option(AREAS_RAW, help="Saved Overpass response of district and mandal boundaries."),
+    refetch: bool = typer.Option(False, help="Query Overpass again instead of using the saved response."),
+) -> None:
+    """Place each real lake in its district and mandal (OpenStreetMap boundaries, D-060)."""
+    from pathlib import Path
+
+    import yaml
+
+    from lake_protect.osm_areas import run
+
+    bbox = yaml.safe_load(Path(search).read_text(encoding="utf-8"))["bbox"]
+    result = run(Path(assets), Path(raw), bbox, refetch)
+    typer.echo(f"Boundaries: {result['boundaries']}; lakes: {result['features']}; with a district: {result['district']}; with a mandal: {result['mandal']}")
+    for key, n in result["by_area"].items():
+        typer.echo(f"  {n:>3}  {key}")
+    if result["unplaced"]:
+        typer.echo("Not placed: " + ", ".join(result["unplaced"]))
 
 
 def _date(value: str | None):

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api, fmtDate, type AlertRow } from "../api";
 import { StatePill, useAsync, usePageTitle } from "../components/Bits";
 import { CHANGE_TYPES, GROUP_COLOUR, GROUP_OF, STATES } from "../components/labels";
@@ -17,11 +17,16 @@ const FILTERS: Filter[] = ["active", ...STATES, "all"];
 export function Queue() {
   const { t, i18n } = useTranslation();
   const nav = useNavigate();
-  const [filter, setFilter] = useState<Filter>("active");
+  // The dashboard opens this list with its area and rule in the address (D-060): the server applies
+  // them, and the state chips start at "all" so they hide nothing the number counted.
+  const [params, setParams] = useSearchParams();
+  const linked = ["district", "mandal", "village", "state", "waiting", "week", "asset_id"].filter((k) => params.get(k) !== null);
+  const linkedQuery = linked.map((k) => `&${k}=${encodeURIComponent(params.get(k) ?? "")}`).join("");
+  const [filter, setFilter] = useState<Filter>(linked.length ? "all" : "active");
   const [change, setChange] = useState("");
   const [cohort, setCohort] = useState("");
   const { dataset } = useDataset();
-  const { data, error, status, reload } = useAsync(() => api<{ items: AlertRow[]; has_demo: boolean }>(`/alerts?dataset=${dataset}`), [dataset]);
+  const { data, error, status, reload } = useAsync(() => api<{ items: AlertRow[]; has_demo: boolean }>(`/alerts?dataset=${dataset}${linkedQuery}`), [dataset, linkedQuery]);
   useDemoOnScreen(Boolean(data?.has_demo));
   usePageTitle(t("queue.title"));
 
@@ -74,6 +79,15 @@ export function Queue() {
           </label>
         </div>
       </div>
+      {linked.length > 0 && (
+        <p className="banner info linked-filter" data-testid="linked-filter">
+          {t("queue.linked")}{" "}
+          {linked.map((k) => (
+            <b key={k}>{k === "waiting" ? t("dashboard.figure.waiting") : k === "state" ? (params.get(k) ?? "").split(",").map((x) => t(`state.${x}`)).join(", ") : k === "week" ? t("queue.linked_week", { week: params.get(k) }) : k === "asset_id" ? t("queue.linked_asset") : params.get(k) === "-" ? t("dashboard.not_recorded") : params.get(k)} · </b>
+          ))}
+          <button className="btn quiet" onClick={() => { setParams({}); setFilter("active"); }} data-testid="linked-clear">{t("queue.linked_clear")}</button>
+        </p>
+      )}
       {dataset === "real" && <ScreeningSummary />}
       <div className="chips" role="group" aria-label={t("queue.state")} style={{ marginBottom: "1rem" }}>
         {FILTERS.map((f) => (

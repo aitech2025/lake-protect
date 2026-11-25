@@ -9,6 +9,9 @@ baseline_date: the feature's `baseline_date` when the file gives one (DECISIONS.
 policy cut-off, 19 July 2024), otherwise the date the boundary was retrieved (D-014). Only change
 first seen after it can alert (rule 3). A changed baseline on an existing asset is updated and
 logged. The backtest sets its own per-case baseline and does not read this value.
+
+district, mandal and village: from the file (for the OpenStreetMap lakes, `lp assets-areas`, D-060).
+A changed area on an existing asset is updated and logged: it decides which officials are notified.
 """
 from __future__ import annotations
 
@@ -29,7 +32,7 @@ REQUIRED_BOUNDARY_FIELDS = ("kind", "status", "source_name", "source_url", "sour
 
 def load(db: Session, path: Path) -> dict:
     collection = json.loads(path.read_text(encoding="utf-8"))
-    created = versioned = unchanged = rebased = 0
+    created = versioned = unchanged = rebased = placed = 0
     for feature in collection["features"]:
         p = feature["properties"]
         b = p["boundary"]
@@ -74,6 +77,19 @@ def load(db: Session, path: Path) -> dict:
                 )
                 asset.baseline_date = baseline
                 rebased += 1
+            area = {k: p.get(k) for k in ("district", "mandal", "village")}
+            if area != {k: getattr(asset, k) for k in area}:
+                chain.record(
+                    db,
+                    actor_id=None,
+                    action="asset.area_changed",
+                    entity="asset",
+                    entity_id=asset.id,
+                    details={"from": {k: getattr(asset, k) for k in area}, "to": area, "source": p.get("area_source") or str(path.name)},
+                )
+                for k, v in area.items():
+                    setattr(asset, k, v)
+                placed += 1
             current = bsvc.primary_of(bsvc.current_boundary_set(db, asset.id))
             same = current is not None and db.scalar(
                 text("SELECT ST_Equals(geom, ST_GeomFromGeoJSON(:g)) FROM boundaries WHERE id = :i"),
@@ -100,6 +116,8 @@ def load(db: Session, path: Path) -> dict:
     out = {"created": created, "new_versions": versioned, "unchanged": unchanged}
     if rebased:
         out["baseline_changed"] = rebased
+    if placed:
+        out["area_changed"] = placed
     return out
 
 

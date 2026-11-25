@@ -21,7 +21,14 @@
   "licence": "Open Database Licence (ODbL). Attribution: (c) OpenStreetMap contributors",
   "overpass_endpoint": "https://overpass-api.de/api/interpreter",
   "retrieved_at": "2026-11-06T05:10:51+00:00",
-  "raw_response_sha256": "a1bfd42b759e4b9cd8f4a24f75f9c023bde30e7b60d3b3b724bbcb64e4b9d069"
+  "raw_response_sha256": "a1bfd42b759e4b9cd8f4a24f75f9c023bde30e7b60d3b3b724bbcb64e4b9d069",
+  "areas": {
+   "description": "district and mandal of each lake: the OSM boundary holding a point on its surface",
+   "licence": "Open Database Licence (ODbL). Attribution: (c) OpenStreetMap contributors",
+   "overpass_endpoint": "https://overpass-api.de/api/interpreter",
+   "retrieved_at": "2026-11-25T01:09:41+00:00",
+   "raw_response_sha256": "460a306ab7e739a574dc3f8a04494a208e6f986fad4cae2d67f08f0930fe3764"
+  }
  },
  "features": [
   {
@@ -105,8 +112,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Bachupally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 6.8,
@@ -129,7 +136,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -269,8 +277,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Bachupally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 11.83,
@@ -293,7 +301,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -825,8 +834,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Quthbullapur",
     "village": null,
     "survey_numbers": [],
     "area_acres": 26.92,
@@ -849,7 +858,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -1609,8 +1619,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Kukatpally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 11.43,
@@ -1632,7 +1642,8 @@
      "natural": "water"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -2152,8 +2163,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Kukatpally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 14.07,
@@ -2181,7 +2192,8 @@
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL. Name match only: not yet confirmed as the lake in any case report.",
     "match_status": {
      "Sunnam Cheruvu": "unique_name_match"
-    }
+    },
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -2485,8 +2497,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Ibrahimpatnam",
     "village": null,
     "survey_numbers": [],
     "area_acres": 403.72,
@@ -2509,7 +2521,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -2985,8 +2998,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Sangareddy",
+    "mandal": "Patancheruvu",
     "village": null,
     "survey_numbers": [],
     "area_acres": 120.63,
@@ -3009,7 +3022,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -3241,8 +3255,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Sangareddy",
+    "mandal": "Ameenpur",
     "village": null,
     "survey_numbers": [],
     "area_acres": 313.11,
@@ -3266,7 +3280,8 @@
      "wikidata": "Q58379737"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -3350,8 +3365,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Keesara",
     "village": null,
     "survey_numbers": [],
     "area_acres": 27.29,
@@ -3373,7 +3388,8 @@
      "natural": "water"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -3529,8 +3545,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Uppal",
     "village": null,
     "survey_numbers": [],
     "area_acres": 5.92,
@@ -3553,7 +3569,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -3745,8 +3762,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 7.33,
@@ -3769,7 +3786,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -3869,8 +3887,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Saroornagar",
     "village": null,
     "survey_numbers": [],
     "area_acres": 14.49,
@@ -3892,7 +3910,8 @@
      "natural": "water"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -4016,8 +4035,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 26.69,
@@ -4040,7 +4059,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -4988,8 +5008,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 7.4,
@@ -5012,7 +5032,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -5212,8 +5233,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Sangareddy",
+    "mandal": "Ramachandrapuram",
     "village": null,
     "survey_numbers": [],
     "area_acres": 8.88,
@@ -5236,7 +5257,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -5504,8 +5526,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Kukatpally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 7.95,
@@ -5527,7 +5549,8 @@
      "natural": "water"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -5915,8 +5938,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Kukatpally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 15.94,
@@ -5939,7 +5962,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -6219,8 +6243,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Kukatpally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 15.17,
@@ -6248,7 +6272,8 @@
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL. Name match only: not yet confirmed as the lake in any case report.",
     "match_status": {
      "Nalla Cheruvu": "ambiguous_name (2 OSM polygons)"
-    }
+    },
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -6648,8 +6673,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Uppal",
     "village": null,
     "survey_numbers": [],
     "area_acres": 17.19,
@@ -6672,7 +6697,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -6768,8 +6794,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Bachupally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 6.93,
@@ -6792,7 +6818,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -7004,8 +7031,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Hyderabad",
+    "mandal": "Bahadurpura",
     "village": null,
     "survey_numbers": [],
     "area_acres": 10.97,
@@ -7027,7 +7054,8 @@
      "natural": "water"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -7491,8 +7519,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Abdullapurmet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 63.46,
@@ -7515,7 +7543,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -7823,8 +7852,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Gandipet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 13.37,
@@ -7847,7 +7876,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -7911,8 +7941,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Sangareddy",
+    "mandal": "Ameenpur",
     "village": null,
     "survey_numbers": [],
     "area_acres": 28.36,
@@ -7935,7 +7965,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -8023,8 +8054,8 @@
     "name_te": "గండి కుంట",
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Sangareddy",
+    "mandal": "Ramachandrapuram",
     "village": null,
     "survey_numbers": [],
     "area_acres": 5.16,
@@ -8048,7 +8079,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -9268,8 +9300,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 88.39,
@@ -9292,7 +9324,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -9476,8 +9509,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 7.02,
@@ -9500,7 +9533,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -10868,8 +10902,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Gandipet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 70.02,
@@ -10896,7 +10930,8 @@
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL. Name match only: not yet confirmed as the lake in any case report.",
     "match_status": {
      "Pedda Cheruvu": "ambiguous_name (4 OSM polygons)"
-    }
+    },
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -11008,8 +11043,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 7.7,
@@ -11032,7 +11067,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -12416,8 +12452,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 63.76,
@@ -12441,7 +12477,8 @@
      "wikidata": "Q34887376"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -12529,8 +12566,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Kapra",
     "village": null,
     "survey_numbers": [],
     "area_acres": 64.44,
@@ -12554,7 +12591,8 @@
      "wikidata": "Q19892493"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -13170,8 +13208,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Hyderabad",
+    "mandal": "Bandlaguda",
     "village": null,
     "survey_numbers": [],
     "area_acres": 28.51,
@@ -13194,7 +13232,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -13450,8 +13489,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Hyderabad",
+    "mandal": "Bandlaguda",
     "village": null,
     "survey_numbers": [],
     "area_acres": 27.71,
@@ -13474,7 +13513,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -14338,8 +14378,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Rajendranagar",
     "village": null,
     "survey_numbers": [],
     "area_acres": 15.74,
@@ -14362,7 +14402,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -14502,8 +14543,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Rajendranagar",
     "village": null,
     "survey_numbers": [],
     "area_acres": 5.02,
@@ -14526,7 +14567,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -14986,8 +15028,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Sangareddy",
+    "mandal": "Ramachandrapuram",
     "village": null,
     "survey_numbers": [],
     "area_acres": 116.76,
@@ -15010,7 +15052,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -15286,8 +15329,8 @@
     "name_te": "మియాపూర్ చెరువు",
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 16.97,
@@ -15316,7 +15359,8 @@
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL. Name match only: not yet confirmed as the lake in any case report.",
     "match_status": {
      "Miyapur water body": "unique_name_match"
-    }
+    },
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -15556,8 +15600,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 18.65,
@@ -15580,7 +15624,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -16704,8 +16749,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Alwal",
     "village": null,
     "survey_numbers": [],
     "area_acres": 17.1,
@@ -16729,7 +16774,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -17637,8 +17683,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Bachupally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 36.12,
@@ -17661,7 +17707,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -18037,8 +18084,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Dundigal",
     "village": null,
     "survey_numbers": [],
     "area_acres": 100.35,
@@ -18066,7 +18113,8 @@
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL. Name match only: not yet confirmed as the lake in any case report.",
     "match_status": {
      "Mallampet Cheruvu": "ambiguous_name (2 OSM polygons)"
-    }
+    },
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -18262,8 +18310,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Sangareddy",
+    "mandal": "Patancheruvu",
     "village": null,
     "survey_numbers": [],
     "area_acres": 27.97,
@@ -18286,7 +18334,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -18418,8 +18467,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Balapur",
     "village": null,
     "survey_numbers": [],
     "area_acres": 55.42,
@@ -18442,7 +18491,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -18990,8 +19040,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Saroornagar",
     "village": null,
     "survey_numbers": [],
     "area_acres": 91.27,
@@ -19015,7 +19065,8 @@
      "wikidata": "Q7371574"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -20439,8 +20490,8 @@
     "name_te": "దుర్గం చెరువు",
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 91.59,
@@ -20470,7 +20521,8 @@
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL. Name match only: not yet confirmed as the lake in any case report.",
     "match_status": {
      "Durgam Cheruvu": "unique_name_match"
-    }
+    },
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -20782,8 +20834,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Medipally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 39.41,
@@ -20806,7 +20858,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -21042,8 +21095,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Hyderabad",
+    "mandal": "Shaikpet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 35.53,
@@ -21066,7 +21119,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -21190,8 +21244,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Hyderabad",
+    "mandal": "Saidabad",
     "village": null,
     "survey_numbers": [],
     "area_acres": 6.41,
@@ -21213,7 +21267,8 @@
      "natural": "water"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -21369,8 +21424,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Uppal",
     "village": null,
     "survey_numbers": [],
     "area_acres": 50.01,
@@ -21398,7 +21453,8 @@
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL. Name match only: not yet confirmed as the lake in any case report.",
     "match_status": {
      "Nalla Cheruvu": "ambiguous_name (2 OSM polygons)"
-    }
+    },
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -21598,8 +21654,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Uppal",
     "village": null,
     "survey_numbers": [],
     "area_acres": 78.46,
@@ -21627,7 +21683,8 @@
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL. Name match only: not yet confirmed as the lake in any case report.",
     "match_status": {
      "Pedda Cheruvu": "ambiguous_name (4 OSM polygons)"
-    }
+    },
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -21783,8 +21840,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Gandipet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 30.87,
@@ -21806,7 +21863,8 @@
      "natural": "water"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -22374,8 +22432,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Kukatpally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 16.11,
@@ -22398,7 +22456,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -22558,8 +22617,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Medipally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 28.12,
@@ -22582,7 +22641,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -22818,8 +22878,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Rajendranagar",
     "village": null,
     "survey_numbers": [],
     "area_acres": 15.82,
@@ -22842,7 +22902,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -23134,8 +23195,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Hyderabad",
+    "mandal": "Shaikpet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 8.11,
@@ -23159,7 +23220,8 @@
      "wikidata": "Q4855813"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -23935,8 +23997,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Balapur",
     "village": null,
     "survey_numbers": [],
     "area_acres": 31.65,
@@ -23959,7 +24021,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -24143,8 +24206,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Hayathnagar",
     "village": null,
     "survey_numbers": [],
     "area_acres": 19.89,
@@ -24167,7 +24230,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -24539,8 +24603,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Rajendranagar",
     "village": null,
     "survey_numbers": [],
     "area_acres": 77.36,
@@ -24563,7 +24627,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -24627,8 +24692,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Balapur",
     "village": null,
     "survey_numbers": [],
     "area_acres": 49.04,
@@ -24651,7 +24716,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -26043,8 +26109,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Kukatpally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 41.2,
@@ -26067,7 +26133,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -26167,8 +26234,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Uppal",
     "village": null,
     "survey_numbers": [],
     "area_acres": 15.64,
@@ -26190,7 +26257,8 @@
      "natural": "water"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -26546,8 +26614,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Hyderabad",
+    "mandal": "Shaikpet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 10.74,
@@ -26569,7 +26637,8 @@
      "natural": "water"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -27261,8 +27330,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 16.6,
@@ -27285,7 +27354,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -27449,8 +27519,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Bachupally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 25.39,
@@ -27473,7 +27543,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -27885,8 +27956,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Hyderabad",
+    "mandal": "Shaikpet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 6.29,
@@ -27909,7 +27980,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -28065,8 +28137,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Dundigal",
     "village": null,
     "survey_numbers": [],
     "area_acres": 7.49,
@@ -28093,7 +28165,8 @@
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL. Name match only: not yet confirmed as the lake in any case report.",
     "match_status": {
      "Mallampet Cheruvu": "ambiguous_name (2 OSM polygons)"
-    }
+    },
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -28177,8 +28250,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Hayathnagar",
     "village": null,
     "survey_numbers": [],
     "area_acres": 11.05,
@@ -28201,7 +28274,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -28545,8 +28619,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Hayathnagar",
     "village": null,
     "survey_numbers": [],
     "area_acres": 12.16,
@@ -28569,7 +28643,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -29629,8 +29704,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Shamirpet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 479.73,
@@ -29653,7 +29728,8 @@
      "wikidata": "Q7348705"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -30157,8 +30233,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Abdullapurmet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 61.91,
@@ -30181,7 +30257,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -30413,8 +30490,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Balapur",
     "village": null,
     "survey_numbers": [],
     "area_acres": 38.79,
@@ -30441,7 +30518,8 @@
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL. Name match only: not yet confirmed as the lake in any case report.",
     "match_status": {
      "Pedda Cheruvu": "ambiguous_name (4 OSM polygons)"
-    }
+    },
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -30841,8 +30919,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Balapur",
     "village": null,
     "survey_numbers": [],
     "area_acres": 40.46,
@@ -30864,7 +30942,8 @@
      "natural": "water"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -31136,8 +31215,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Kukatpally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 43.99,
@@ -31159,7 +31238,8 @@
      "natural": "water"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -31795,8 +31875,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Quthbullapur",
     "village": null,
     "survey_numbers": [],
     "area_acres": 310.46,
@@ -31820,7 +31900,8 @@
      "wikidata": "Q6172869"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -32152,8 +32233,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Malkajgiri",
     "village": null,
     "survey_numbers": [],
     "area_acres": 51.41,
@@ -32177,7 +32258,8 @@
      "wikidata": "Q19803491"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -32313,8 +32395,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Balapur",
     "village": null,
     "survey_numbers": [],
     "area_acres": 10.71,
@@ -32337,7 +32419,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -32905,8 +32988,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Abdullapurmet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 26.83,
@@ -32929,7 +33012,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -33217,8 +33301,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Gandipet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 47.13,
@@ -33242,7 +33326,8 @@
      "wikidata": "Q64094699"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -33742,8 +33827,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Gandipet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 61.25,
@@ -33766,7 +33851,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -33850,8 +33936,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Medipally",
     "village": null,
     "survey_numbers": [],
     "area_acres": 35.91,
@@ -33874,7 +33960,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -33966,8 +34053,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Sangareddy",
+    "mandal": "Ameenpur",
     "village": null,
     "survey_numbers": [],
     "area_acres": 23.43,
@@ -33990,7 +34077,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -34218,8 +34306,8 @@
     "name_te": "కొత్తగూడ చెరువు",
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 5.97,
@@ -34242,7 +34330,8 @@
      "natural": "water"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -34474,8 +34563,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 7.83,
@@ -34497,7 +34586,8 @@
      "natural": "water"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -34657,8 +34747,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Abdullapurmet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 5.72,
@@ -34686,7 +34776,8 @@
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL. Name match only: not yet confirmed as the lake in any case report.",
     "match_status": {
      "Pedda Cheruvu": "ambiguous_name (4 OSM polygons)"
-    }
+    },
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -35382,8 +35473,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Abdullapurmet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 86.36,
@@ -35406,7 +35497,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -35682,8 +35774,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Abdullapurmet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 27.87,
@@ -35706,7 +35798,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -35750,8 +35843,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 8.91,
@@ -35774,7 +35867,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -35922,8 +36016,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Abdullapurmet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 137.37,
@@ -35946,7 +36040,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -36302,8 +36397,8 @@
     "name_te": "పటేల్ చెరువు",
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 39.91,
@@ -36327,7 +36422,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -36563,8 +36659,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 14.49,
@@ -36587,7 +36683,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -36779,8 +36876,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Gandipet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 19.22,
@@ -36803,7 +36900,8 @@
      "water": "pond"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -36899,8 +36997,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Gandipet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 17.33,
@@ -36923,7 +37021,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -38111,8 +38210,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Medchal–Malkajgiri",
+    "mandal": "Balanagar",
     "village": null,
     "survey_numbers": [],
     "area_acres": 39.31,
@@ -38135,7 +38234,8 @@
      "wikidata": "Q34878401"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -38299,8 +38399,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Abdullapurmet",
     "village": null,
     "survey_numbers": [],
     "area_acres": 62.88,
@@ -38323,7 +38423,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -38739,8 +38840,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 16.38,
@@ -38763,7 +38864,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -38879,8 +38981,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 9.24,
@@ -38902,7 +39004,8 @@
      "natural": "water"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -39254,8 +39357,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 15.54,
@@ -39278,7 +39381,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -39450,8 +39554,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 9.42,
@@ -39474,7 +39578,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   },
   {
@@ -39686,8 +39791,8 @@
     "name_te": null,
     "type": "lake",
     "cohort": "D_UNNOTIFIED",
-    "district": null,
-    "mandal": null,
+    "district": "Ranga Reddy",
+    "mandal": "Serilingampalle",
     "village": null,
     "survey_numbers": [],
     "area_acres": 6.31,
@@ -39710,7 +39815,8 @@
      "water": "lake"
     },
     "matched_case_names": [],
-    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL."
+    "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
    }
   }
  ]

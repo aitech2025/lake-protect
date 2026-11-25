@@ -145,6 +145,31 @@ class DocumentType(StrEnum):
     other = "other"
 
 
+
+class NotificationKind(StrEnum):
+    """What a notification is about (DECISIONS.md D-059)."""
+
+    incident_opened = "incident_opened"  # a new incident in the official's area: needs acknowledgement
+    incident_decided = "incident_decided"  # the admin confirmed or dismissed an incident in the area
+    reminder = "reminder"  # not acknowledged within 24 hours: sent again
+    not_acknowledged = "not_acknowledged"  # to the admin: an official has not acknowledged in 48 hours
+    weekly_digest = "weekly_digest"  # after each weekly screen: the official's area that week
+
+
+class Channel(StrEnum):
+    in_app = "in_app"
+    email = "email"
+    sms = "sms"
+    whatsapp = "whatsapp"
+
+
+class DeliveryStatus(StrEnum):
+    queued = "queued"
+    sent = "sent"
+    held = "held"  # the channel is not set up yet (no gateway agreement or approved template)
+    failed = "failed"
+    skipped = "skipped"  # no address, or demo data that must not leave the machine
+
 class ReadinessStatus(StrEnum):
     yes = "yes"
     no = "no"

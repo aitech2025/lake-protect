@@ -134,6 +134,67 @@ Choices made:
   - the frozen reference image;
   - merging or unlinking assets.
 
+### D-059: Officials are notified by area, and must acknowledge (owner, 25 Nov 2026)
+The owner asked for the downstream layer and chose two parts: notify officials by area (the admin
+sets each official's districts or mandals), and a drill-down dashboard (D-060). Feeds to department
+systems and a weekly report per district were not chosen. Built as M13 (`docs/downstream.md`).
+
+This replaces section 17.5's routing and escalation matrix, which needed the roles D-057 removed:
+- **Who is told.**
+  - A new incident that stays open goes to the officials whose area holds the asset, and to every
+    admin. Each must acknowledge it.
+  - Changes the legal check closes at once, and changes seen again on an open incident, notify no
+    one: they appear in the weekly digest.
+  - A decision tells the area's officials and the incident's reviewers.
+  - An asset with no district reaches the admin, whose message says no official covers it.
+- **Acknowledgement and follow-up** (section 17.5's "acknowledged within 24 hours, then repeated
+  and escalated", with two roles):
+  - a reminder after 24 hours;
+  - every admin told after 48 hours;
+  - a review or an admin's step counts as acknowledging;
+  - the request lapses once the incident is decided, but still counts as late.
+  - The `notifier` service runs this every minute. It replaces the escalation worker D-057
+    removed.
+- **Channels** (section 17.5: in-app, SMS, WhatsApp, email):
+  - In-app always.
+  - Email to a local outbox folder by default, or through the State's relay (`LP_EMAIL_TRANSPORT=smtp`).
+  - SMS and WhatsApp are templates, like the M11 connectors: every message is held until a gateway
+    agreement and a registered DLT template, or an approved WhatsApp template, exist. A held
+    message is never sent later.
+  - Demo data never leaves the machine.
+- **Weekly digest.** After each stored weekly screen: one per person, per week, per dataset.
+- **Seeing is not restricted by area.** Everyone still sees every incident (D-057). Areas decide
+  who is told.
+- **Privacy.**
+  - Messages carry no owner or claimant names (17.10) and no judgement of lawfulness.
+  - Contact details are seen only by the admin. The audit log records that they changed, never
+    their values.
+  - Demo contacts use `.invalid` addresses and numbers no Indian mobile can have.
+
+### D-060: A drill-down overview from State to lake, with OpenStreetMap areas for the real lakes (owner, 25 Nov 2026)
+Section 17.7's dashboard, scaled to two roles:
+- **Levels.** State, district, mandal, village, lake or parcel, then incident. It is the home page
+  for both roles.
+- **Figures at every level.** Assets watched, seen clearly this week, changed this week, new
+  incidents, awaiting review, under review, waiting over 14 days, confirmed, and notifications
+  acknowledged within 24 hours.
+  - "Share of deadlines met" became the acknowledgement figure, as there are no deadlines since
+    D-057.
+  - Citizen reports and per-officer overdue lists are not built.
+- **Every number opens the incidents behind it.** The incident list takes the same area and
+  rule, and a test checks the counts agree.
+- **Skipping levels.** A level no asset in the area records is skipped: real lakes have no
+  village. Assets with no district are grouped as "area not recorded".
+- **Real lakes' areas.** In production, district, mandal and village come with the government
+  record (M11). For the 99 OpenStreetMap lakes, `lp assets-areas` places each lake inside
+  OpenStreetMap's district (admin level 5) and mandal (admin level 6) boundaries, by a point on
+  its surface. Every lake is marked as placed this way, "not the revenue record", and the overview
+  says so. The saved response makes the placement reproducible offline.
+- **Demo areas.** The demo world gains two fictional districts, four mandals and eight villages.
+  Each demo official also covers real districts, so the real lakes' incidents reach someone.
+- **Time in the demo.** Officials' steps in the demo move to 09:00 IST the next day. A seed run
+  before 10:00 IST is dated now instead of 10:00, so nothing in it is dated in the future.
+
 ## Errors and gaps found in CONTEXT.md
 
 ### E-001: `boundaries` is append-only but has `valid_to` (section 7, invariant 12)

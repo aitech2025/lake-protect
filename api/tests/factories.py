@@ -128,9 +128,11 @@ def add_pack_row(db, alert, user):
     db.flush()
 
 
-def make_user(db, role: str, *, name: str | None = None, area: dict | None = None, is_demo: bool = True) -> User:
+def make_user(db, role: str, *, name: str | None = None, area: dict | None = None, is_demo: bool = True,
+              email: str | None = None, phone: str | None = None, channels: list[str] | None = None, language: str = "en") -> User:
     n = next(_seq)
-    user = User(username=f"test-{role}-{n}", name=name or f"Test {role} {n}", role=role, is_demo=is_demo)
+    user = User(username=f"test-{role}-{n}", name=name or f"Test {role} {n}", role=role, is_demo=is_demo, email=email, phone=phone,
+                channels=channels or ["in_app", "email"], language=language)
     if area is not None:
         from geoalchemy2.elements import WKTElement
         from shapely.geometry import MultiPolygon, shape
@@ -157,6 +159,9 @@ def make_asset(
     baseline: dt.date = dt.date(2025, 1, 1),
     valid_from: dt.date = dt.date(2025, 1, 1),
     name: str | None = None,
+    district: str | None = None,
+    mandal: str | None = None,
+    village: str | None = None,
 ) -> Asset:
     """A test asset with a first boundary version whose status matches the cohort."""
     status_by_cohort = {
@@ -176,6 +181,9 @@ def make_asset(
         baseline_date=baseline,
         is_demo=True,
         survey_numbers=[],
+        district=district,
+        mandal=mandal,
+        village=village,
     )
     db.add(asset)
     db.flush()
@@ -189,3 +197,11 @@ def make_asset(
         valid_from=valid_from,
     )
     return asset
+
+
+def cover(db, user, district: str, mandal: str | None = None) -> None:
+    """Give an official an area (what the admin's Officials page does)."""
+    from app.models import OfficialArea
+
+    db.add(OfficialArea(user_id=user.id, district=district, mandal=mandal, added_at=dt.datetime(2025, 1, 1, tzinfo=dt.timezone.utc)))
+    db.flush()

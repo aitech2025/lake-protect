@@ -18,6 +18,10 @@ test("the desk shows real lakes on the Sentinel-2 map, apart from the demo world
 
   await page.getByTestId("dataset-real").click();
   await expect(page.getByTestId("dataset-real")).toHaveAttribute("aria-pressed", "true");
+  // The overview groups the real lakes by district (from OpenStreetMap boundaries, D-060).
+  await expect(page.getByTestId("dash-children")).toContainText("Medchal–Malkajgiri");
+  await expect(page.getByText("not the revenue record")).toBeVisible();
+  await page.getByTestId("nav-alerts").click();
   await expect(page.getByTestId("screening-summary")).toBeVisible();
   // No demo record on screen, so no demo band.
   await expect(page.getByTestId("demo-badge")).toHaveCount(0);

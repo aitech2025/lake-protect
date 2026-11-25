@@ -32,15 +32,27 @@ def list_alerts(
     change_type: str | None = None,
     cohort: str | None = None,
     asset_id: int | None = None,
+    district: str | None = None,
+    mandal: str | None = None,
+    village: str | None = None,
+    waiting: bool = False,
+    week: str | None = None,
     dataset: Literal["demo", "real"] | None = None,
     user: User = Depends(current_user),
     db: Session = Depends(get_db),
 ) -> dict:
-    items = alert_view.list_alerts(db, state=state, change_type=change_type, cohort=cohort, asset_id=asset_id)
+    """Every incident, open first and then by priority. The area filters and `waiting` (open or under review
+    for more than 14 days) and `week` (new incidents of an ISO week) are what the dashboard's numbers
+    open (D-060)."""
+    items = alert_view.list_alerts(db, state=state, change_type=change_type, cohort=cohort, asset_id=asset_id,
+                                   district=district, mandal=mandal, village=village, waiting=waiting,
+                                   new_in_week=week, now=utcnow())
     if dataset is not None:
         items = [i for i in items if i["is_demo"] == (dataset == "demo")]
+    filters = {"state": state, "change_type": change_type, "cohort": cohort, "asset_id": asset_id, "district": district,
+               "mandal": mandal, "village": village, "waiting": waiting, "week": week, "dataset": dataset}
     chain.record(db, actor_id=user.id, action="view.alerts", entity="alert",
-                 details={"filters": {"state": state, "change_type": change_type, "cohort": cohort, "asset_id": asset_id, "dataset": dataset}, "count": len(items)})
+                 details={"filters": {k: v for k, v in filters.items() if v not in (None, False)}, "count": len(items)})
     db.commit()
     return {"items": items, "count": len(items), "has_demo": any(i["is_demo"] for i in items)}
 

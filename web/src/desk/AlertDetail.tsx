@@ -9,6 +9,8 @@ import { DatedBracket } from "../components/DatedBracket";
 import { MapView } from "../components/MapView";
 import { PageState } from "../components/PageState";
 import { useDemoOnScreen } from "../demo";
+import { AckBanner } from "./Inbox";
+import { notifyCountChanged } from "../components/Layout";
 
 const OUTCOMES = ["real_change", "not_real", "needs_site_visit"] as const;
 
@@ -45,8 +47,13 @@ export function AlertDetail() {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const { user } = useAuth();
   const { data: a, error, status, reload } = useAsync(() => api<any>(`/alerts/${id}`), [id]);
   useDemoOnScreen(Boolean(a?.is_demo));
+  // A review or a decision acknowledges this person's notification: refresh the side bar's count.
+  useEffect(() => {
+    if (a) notifyCountChanged();
+  }, [a]);
 
   const boundaries = useMemo(() => ({ type: "FeatureCollection" as const, features: a?.boundary.features ?? [] }), [a]);
   const changes = useMemo(
@@ -88,6 +95,7 @@ export function AlertDetail() {
         <BoundarySeal status={a.boundary.status} version={a.boundary.version} />
       </div>
       <ChangeSummary a={a} />
+      <AckBanner notes={a.my_notifications ?? []} isAdminUser={isAdmin(user)} onDone={reload} />
       <Flags a={a} />
 
       <div className="detail">

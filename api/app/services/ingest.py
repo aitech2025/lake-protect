@@ -9,6 +9,8 @@ Order matters (DECISIONS.md D-057):
    authorised closes it at once, with the reason. A court matter or an unconfirmed boundary keeps
    it open, flagged. A change seen again after an earlier incident was closed or dismissed links
    to that incident.
+5. An incident that stays open notifies the officials of its area and the admin (D-059). Nothing
+   else does: a change closed at once, or seen again on an open incident, goes in the weekly digest.
 """
 from __future__ import annotations
 
@@ -25,6 +27,7 @@ from app.audit import chain
 from app.clock import as_utc
 from app.enums import ChangeType, IncidentState, SensorBasis, Stage
 from app.models import Alert, Asset, Candidate, Observation
+from app.notify import service as notify
 from app.rules import config as rules
 from app.rules import legal_check, priority
 from app.services import boundaries as bsvc
@@ -223,6 +226,7 @@ def ingest(db: Session, body: CandidateIn, *, at: dt.datetime | None = None) -> 
     if verdict in lifecycle.AUTO_CLOSE:
         lifecycle.auto_close(db, alert, verdict, at=at)
         return _out(alert, candidate, check, "closed_by_legal_check")
+    notify.incident_opened(db, alert, at)
     return _out(alert, candidate, check, "created")
 
 

@@ -19,5 +19,17 @@ class Settings(BaseSettings):
     # Stays False until counsel has reviewed the section 63(4) template. Not settable from the UI.
     counsel_reviewed_template: bool = False
 
+    # Notifications (DECISIONS.md D-059). The desk's address, for links in emails and messages.
+    public_url: str = "http://localhost:8180"
+    # Email: "file" writes each email to <storage>/outbox/email (the default: nothing leaves the
+    # machine); "smtp" sends through the State's mail relay; "off" sends none.
+    email_transport: str = "file"
+    email_from: str = "Lake Protect <no-reply@lakeprotect.invalid>"
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_user: str | None = None
+    smtp_password: str | None = None
+    smtp_starttls: bool = True
+
 
 settings = Settings()

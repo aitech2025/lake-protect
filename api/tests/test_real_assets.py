@@ -58,3 +58,29 @@ def test_real_assets_load_once_and_reload_unchanged(db, client, collection):
         assert listed[key]["boundary_status"] == "derived"
         assert listed[key]["boundary_confirmed"] is False
         assert "OpenStreetMap" in listed[key]["boundary_source"]
+
+
+def test_every_real_lake_has_a_district_and_mandal_from_osm(collection):
+    """D-060: placed by OpenStreetMap boundaries, and marked as not the revenue record."""
+    assert "areas" in collection["source"]
+    for f in collection["features"]:
+        p = f["properties"]
+        assert p["district"] and p["mandal"], p["asset_key"]
+        assert "not the revenue record" in p["area_source"]
+
+
+def test_a_changed_area_is_updated_and_logged(db, tmp_path, collection):
+    from app.models import AuditLog
+
+    real_assets.load(db, ASSET_FILE)
+    changed = json.loads(json.dumps(collection))
+    first = changed["features"][0]["properties"]
+    first["mandal"] = "Another mandal"
+    path = tmp_path / "assets.geojson"
+    path.write_text(json.dumps(changed), encoding="utf-8")
+    out = real_assets.load(db, path)
+    assert out["area_changed"] == 1
+    asset = db.scalar(select(Asset).where(Asset.asset_key == first["asset_key"]))
+    assert asset.mandal == "Another mandal"
+    log = db.scalar(select(AuditLog).where(AuditLog.action == "asset.area_changed"))
+    assert log.details["to"]["mandal"] == "Another mandal"

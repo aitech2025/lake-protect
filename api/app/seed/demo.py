@@ -7,6 +7,10 @@ Everything is invented, marked is_demo, and placed in open sea (DECISIONS.md D-0
 are not written directly: each scenario runs through the real ingest, legal check and incident
 lifecycle, in time order, so the demo shows the system's actual behaviour. Then every demo asset
 gets its legal documents and eight weeks of weekly records, each with that week's image.
+
+Notifications come from the same code (D-059): each incident notifies its area's official and the
+admin as it opens, the notifier's follow-up runs every simulated morning (reminders after 24 hours,
+the admin told after 48), and the latest week's digest goes to everyone at the end.
 """
 from __future__ import annotations
 
@@ -23,7 +27,8 @@ from sqlalchemy.orm import Session
 
 from app.audit import chain
 from app.evidence import pack as pack_svc
-from app.models import Alert, Asset, AssetScreen, AuthorisedWork, CourtCase, Permit, ScreenRun, User
+from app.models import Alert, Asset, AssetScreen, AuthorisedWork, CourtCase, OfficialArea, Permit, ScreenRun, User
+from app.notify import service as notify
 from app.seed import demo_docs
 from app.seed import demo_render as render
 from app.seed.demo_world import World
@@ -53,7 +58,12 @@ class Seeder:
     def __init__(self, db: Session, today: dt.date | None = None):
         self.db = db
         self.world = World.load()
-        self.T = dt.datetime.combine(today or dt.date.today(), dt.time(4, 30), tzinfo=dt.timezone.utc)
+        if today is None:
+            # Today at 10:00 IST, or now if that is still ahead: nothing in the demo may be dated in the future.
+            now = dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=1)
+            self.T = min(dt.datetime.combine(now.date(), dt.time(4, 30), tzinfo=dt.timezone.utc), now)
+        else:
+            self.T = dt.datetime.combine(today, dt.time(4, 30), tzinfo=dt.timezone.utc)
         self.users: dict[str, User] = {}
         self.assets: dict[str, Asset] = {}
         self.alerts: dict[str, Alert] = {}
@@ -65,11 +75,19 @@ class Seeder:
 
     # Users, assets and records ------------------------------------------------------------------
     def seed_users(self) -> None:
+        b_day = self.T - dt.timedelta(days=self.world.spec["boundary_days_ago"])
         for spec in self.world.spec["users"]:
-            user = User(username=spec["username"], name=spec["name"], role=spec["role"], language=spec.get("language", "en"), is_demo=True)
+            user = User(username=spec["username"], name=spec["name"], role=spec["role"], language=spec.get("language", "en"), is_demo=True,
+                        email=spec.get("email"), phone=spec.get("phone"), channels=spec.get("channels", ["in_app", "email"]))
             self.db.add(user)
             self.db.flush()
             self.users[spec["username"]] = user
+        admin = next((u for u in self.users.values() if u.role == "admin"), None)
+        for spec in self.world.spec["users"]:
+            for area in spec.get("areas", []):
+                self.db.add(OfficialArea(user_id=self.users[spec["username"]].id, district=area["district"], mandal=area.get("mandal"),
+                                         added_by=admin.id if admin else None, added_at=b_day))
+        self.db.flush()
 
     def seed_assets(self) -> None:
         baseline = (self.T - dt.timedelta(days=self.world.spec["baseline_days_ago"])).date()
@@ -79,7 +97,7 @@ class Seeder:
             asset = Asset(
                 asset_key=spec["key"], name=spec["name"], name_te=spec.get("name_te"),
                 type="lake" if "lake" in spec else "recovered_parcel", cohort=spec["cohort"],
-                district="Demo District", mandal="Demo Mandal", village="Demo Village",
+                district=spec["area"][0], mandal=spec["area"][1], village=spec["area"][2],
                 survey_numbers=spec.get("survey", []), area_acres=round(shape_m.area / ACRE, 2),
                 custodian_agency="Demo Agency", has_cctv=bool(spec.get("cctv")), baseline_date=baseline,
                 is_demo=True, notes="Fictional demo asset. Not a real place.",
@@ -169,7 +187,9 @@ class Seeder:
 
         self._add(self.day(det["day"]), f"{sc['key']}: detect", detect)
         for i, step in enumerate(sc.get("steps", [])):
-            when = self.day(step["day"], minutes=30 + 20 * i)
+            # Officials act from 09:00 IST, an hour before the screen's daily time: a review the next
+            # morning comes within the 24 hours an acknowledgement is asked for (D-059).
+            when = self.day(step["day"], minutes=-60 + 20 * i)
             self._add(when, f"{sc['key']}: {step['do']}", self._step(sc, step, when))
 
     def _step(self, sc: dict, step: dict, when: dt.datetime) -> Callable[[], None]:
@@ -197,6 +217,17 @@ class Seeder:
 
         return run
 
+    def plan_notifier(self) -> None:
+        """The notifier's follow-up and outbox, each simulated morning from the first incident to today."""
+        first = min(sc["detect"]["day"] for sc in self.world.spec["scenarios"])
+        hour = float(self.world.spec.get("notifier_hour_utc", 3.5))
+        start = dt.datetime.combine(self.day(first).date(), dt.time(), tzinfo=dt.timezone.utc) + dt.timedelta(hours=hour)
+        when = start
+        while when <= self.T:
+            self._add(when, "notifier", lambda at=when: notify.tick(self.db, at))
+            when += dt.timedelta(days=1)
+        self._add(self.T, "notifier", lambda: notify.tick(self.db, self.T))
+
     # Weekly records -----------------------------------------------------------------------------
     def _open_on(self, alert_id: int, day: dt.date) -> bool:
         """Was this incident still open (not yet dismissed or closed) at the end of that day?"""
@@ -215,7 +246,7 @@ class Seeder:
         for k in range(WEEKS - 1, -1, -1):
             as_of = (self.T - dt.timedelta(days=7 * k)).date()
             week = weeks_svc.iso_week(as_of)
-            started = dt.datetime.combine(as_of, dt.time(2, 0), tzinfo=dt.timezone.utc)
+            started = min(dt.datetime.combine(as_of, dt.time(2, 0), tzinfo=dt.timezone.utc), self.T - dt.timedelta(minutes=15))
             run = ScreenRun(as_of=as_of, rule_version=DEMO_RULES, rules_sha256=hashlib.sha256(DEMO_RULES.encode()).hexdigest(),
                             collection="demo-synthetic", started_at=started, finished_at=started + dt.timedelta(minutes=12),
                             assets_total=len(self.assets), outcomes={}, is_demo=True)
@@ -267,12 +298,16 @@ class Seeder:
         self.seed_documents()
         for sc in self.world.spec["scenarios"]:
             self.plan_scenario(sc)
+        self.plan_notifier()
         for when, _, label, fn in sorted(self.plan, key=lambda p: (p[0], p[1])):
             try:
                 fn()
             except lifecycle.Refused as exc:
                 raise RuntimeError(f"Demo step refused ({label}): {exc.message}") from exc
         weeks = self.seed_weeks()
+        latest = weeks_svc.iso_week(self.T.date())
+        digests = notify.send_digests(self.db, latest, is_demo=True, at=self.T)
+        notify.tick(self.db, self.T + dt.timedelta(minutes=1))
         self.db.flush()
         return {
             "seed_date": self.T.date().isoformat(),
@@ -280,6 +315,8 @@ class Seeder:
             "assets": len(self.assets),
             "incidents": {k: f"{a.state}{'/' + a.resolution if a.resolution else ''}" for k, a in self.alerts.items()},
             "weekly_records": weeks,
+            "notifications": self.db.scalar(text("SELECT count(*) FROM notifications WHERE is_demo")),
+            "digests": digests["sent"],
         }
 
 

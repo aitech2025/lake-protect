@@ -1,0 +1,46 @@
+# Outside channels for notifications (DECISIONS.md D-059). The in-app inbox needs nothing here.
+#
+# Email is set by environment variables (LP_EMAIL_TRANSPORT and LP_SMTP_*, see .env.example).
+#
+# SMS and WhatsApp are templates, like the government source connectors: they stay "held" until
+# the State signs up a gateway.
+# - SMS to a phone in India needs a sender header and a message template registered on a DLT
+#   platform (TRAI's commercial communication rules). The text must match the template exactly,
+#   with {#var#} where a value goes.
+# - A WhatsApp message that the system starts needs a template approved through a WhatsApp
+#   Business solution provider, or the State's MeeSeva on WhatsApp channel. The State chooses.
+# A held message is never sent later: once a channel is set up, only new messages go out on it.
+
+email:
+  kinds: [incident_opened, incident_decided, reminder, not_acknowledged, weekly_digest]
+
+sms:
+  agreement_ref: null          # the State's gateway agreement
+  base_url: null               # the gateway's send endpoint
+  token_env: LP_SMS_TOKEN      # the gateway credential, in .env
+  dlt_entity_id: null          # the State's DLT principal entity ID
+  sender_id: null              # the registered six-character header
+  kinds: [incident_opened, reminder, not_acknowledged]
+  templates:
+    incident_opened:
+      dlt_template_id: null
+      text: "Lake Protect: new incident {#var#} at {#var#}: {#var#}. Please review and acknowledge: {#var#}"
+      vars: [code, asset, change_label, link]
+    reminder:
+      dlt_template_id: null
+      text: "Lake Protect reminder: incident {#var#} at {#var#} is waiting for you. {#var#}"
+      vars: [code, asset, link]
+    not_acknowledged:
+      dlt_template_id: null
+      text: "Lake Protect: {#var#} has not acknowledged incident {#var#} at {#var#} in 48 hours. {#var#}"
+      vars: [official, code, asset, link]
+
+whatsapp:
+  agreement_ref: null          # the State's provider agreement, or the MeeSeva on WhatsApp order
+  base_url: null
+  token_env: LP_WHATSAPP_TOKEN
+  kinds: [incident_opened, reminder, not_acknowledged]
+  templates:
+    incident_opened: {name: lp_incident_opened_v1, approved: false, params: [code, asset, summary, link]}
+    reminder: {name: lp_incident_reminder_v1, approved: false, params: [code, asset, link]}
+    not_acknowledged: {name: lp_not_acknowledged_v1, approved: false, params: [official, code, asset, link]}

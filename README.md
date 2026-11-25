@@ -27,11 +27,21 @@ docker compose exec -e LP_ALLOW_RESET=true api python -m app.seed.reset   # real
 | Desk | http://localhost:8180 |
 | API | http://localhost:8100/health (also under `/api` on the app's address) |
 | Database | localhost:5544, bound to this machine only |
+| Notifier | Reminders, escalations to the admin and the email outbox, every minute (`docker compose logs notifier`) |
 
 Two roles (DECISIONS.md D-057): **admin**, who runs the application and decides on incidents, and
 **viewer**, the officials, who see everything and record reviews. The demo accounts are
 `demo.admin`, `demo.viewer1` (Telugu) and `demo.viewer2`. How the weekly record, incidents and
 legal documents work: [docs/weekly-processing.md](docs/weekly-processing.md).
+
+The desk opens on the **Overview**, which drills down from State to district, mandal, village and
+lake. Each official is notified about incidents in their own area:
+- in the **Inbox**, where they acknowledge;
+- by email;
+- by SMS and WhatsApp, as templates held until a gateway exists.
+
+The `notifier` service sends reminders after 24 hours and tells the admin after 48. The admin
+manages areas and channels on the **Officials** page. Design: [docs/downstream.md](docs/downstream.md).
 
 The demo script is in [docs/DEMO.md](docs/DEMO.md). After the first build the laptop needs no
 internet: tiles, image pairs, fonts and the app are all local.
@@ -48,6 +58,7 @@ C:\lp-cache\venv\Scripts\lp screen                       # weekly screen: watch 
 C:\lp-cache\venv\Scripts\lp basemap --upload             # offline Sentinel-2 base map for the real-lake maps
 C:\lp-cache\venv\Scripts\lp replay reports\screen\<date>  # after a demo reset: resend a saved screen, no internet
 C:\lp-cache\venv\Scripts\lp detect --asset <asset_key>   # one or more lakes from data/assets.geojson, report only
+C:\lp-cache\venv\Scripts\lp assets-areas                 # district and mandal of each real lake (OpenStreetMap boundaries)
 ```
 
 Government sources (asset creation engine, `docs/asset-engine.md`). No data-sharing agreement exists yet, so they read files:
@@ -64,7 +75,7 @@ Rules are in `pipeline/lake_protect/detect_rules.yaml`; the tuning record is `re
 ## Test
 
 ```powershell
-docker compose exec api pytest                 # API: invariants, incidents, weeks, documents, packs, monthly page
+docker compose exec api pytest                 # API: invariants, incidents, weeks, documents, notifications, overview
 C:\lp-cache\venv\Scripts\python -m pytest pipeline/tests -p no:cacheprovider
 sh scripts/e2e.sh                              # browser tests on a fresh demo (Chromium in Docker)
 ```
@@ -73,7 +84,7 @@ To prove the demo runs with no internet, start the stack on an internal network 
 
 ```powershell
 $env:COMPOSE_PATH_SEPARATOR=":"; $env:COMPOSE_FILE="docker-compose.yml:docker-compose.offline.yml"
-docker compose down; docker compose up -d --wait db api web
+docker compose down; docker compose up -d --wait db api notifier web
 sh scripts/e2e.sh m9-demo
 Remove-Item Env:COMPOSE_FILE; docker compose -f docker-compose.yml -f docker-compose.offline.yml down; docker compose up -d
 ```
