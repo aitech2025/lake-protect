@@ -15,6 +15,7 @@ type Props = {
   theme?: "dark" | "light";
   layerVisibility?: { boundaries?: boolean; ftl?: boolean; changes?: boolean };
   onAssetClick?: (id: number) => void;
+  interactive?: boolean;
 };
 
 const EMPTY: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
@@ -55,7 +56,7 @@ function bboxOf(fcs: GeoJSON.FeatureCollection[]): [number, number, number, numb
   return Number.isFinite(w) ? [w, s, e, n] : null;
 }
 
-export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, height = "100%", testId, theme = "light", layerVisibility = {}, onAssetClick }: Props) {
+export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, height = "100%", testId, theme = "light", layerVisibility = {}, onAssetClick, interactive = true }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const markers = useRef<maplibregl.Marker[]>([]);
@@ -65,7 +66,7 @@ export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, h
 
   useEffect(() => {
     if (!ref.current) return;
-    const m = new maplibregl.Map({ container: ref.current, style: STYLE, center: [81.5, 14.5], zoom: 13, attributionControl: { compact: true }, maxZoom: 18 });
+    const m = new maplibregl.Map({ container: ref.current, style: STYLE, center: [81.5, 14.5], zoom: 13, interactive, attributionControl: { compact: true }, maxZoom: 18 });
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
     m.on("load", () => {
       m.addSource("boundaries", { type: "geojson", data: EMPTY });
