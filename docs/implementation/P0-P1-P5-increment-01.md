@@ -36,13 +36,13 @@ Not yet included: production scheduler, CDSE authenticated Sentinel-1 acquisitio
 
 ### P5 — citizen channel foundations (citizen web retained)
 
-- WhatsApp Cloud webhook signature verification helper using Meta's `X-Hub-Signature-256` HMAC-SHA256 contract.
+- FastAPI WhatsApp Cloud webhook verification endpoint and signed inbound POST using Meta's `X-Hub-Signature-256` HMAC-SHA256 contract.
 - Normalisation of text, location and media-message payloads.
 - Sender reference is hashed before leaving the adapter; raw sender identity is not included in the normalized event.
-- Stable fingerprint for duplicate screening.
+- Stable fingerprint for duplicate screening.\n- Idempotent inbound message persistence as an unverified `signals` record, serialised by provider message ID; no second case-management table.
 - Multilingual keyword hints are explicitly non-authoritative and do not determine legality.
 
-Not yet included: FastAPI webhook route, durable inbound-message table/idempotency constraint, media download and malware scanning, citizen incident persistence, WhatsApp outbound templates, social API connectors, officer registry, notification delivery and SLA escalation. These are deliberately not represented as live integrations in this increment.
+Not yet included: media download and malware scanning, outbound WhatsApp templates, social API connectors, officer registry, notification delivery and SLA escalation. Inbound reports are stored as unverified signals only; they do not automatically create or classify an enforcement case.
 
 ## Safety and evidence constraints
 
