@@ -6,10 +6,10 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.platform import intelligence_router, ingestion_router
 from app.platform import router as platform_router
-from app.routers import alerts, assets, audit, auth, bulletins, candidates, records, tiles, users
+from app.routers import alerts, assets, audit, auth, bulletins, candidates, records, tiles, users, whatsapp
 
 app = FastAPI(title="Lake Protect API", version="0.4.0")
-for module in (auth, assets, candidates, alerts, records, audit, users, tiles, bulletins):
+for module in (auth, assets, candidates, alerts, records, audit, users, tiles, bulletins, whatsapp):
     app.include_router(module.router)
 app.include_router(platform_router.router)
 app.include_router(intelligence_router.router)
