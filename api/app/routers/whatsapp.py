@@ -5,6 +5,7 @@ not a verified incident or legal finding. Media bytes are not downloaded here.
 """
 from __future__ import annotations
 import json
+import hmac
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from fastapi.responses import PlainTextResponse
@@ -22,7 +23,7 @@ def verify_webhook(mode: str | None = Query(default=None, alias="hub.mode"),
                    challenge: str | None = Query(default=None, alias="hub.challenge")):
     if not settings.whatsapp_verify_token:
         raise HTTPException(503,"WhatsApp webhook verification is not configured.")
-    if mode=="subscribe" and token and token==settings.whatsapp_verify_token and challenge is not None:
+    if mode=="subscribe" and token and hmac.compare_digest(token, settings.whatsapp_verify_token) and challenge is not None:
         return PlainTextResponse(challenge)
     raise HTTPException(403,"WhatsApp webhook verification failed.")
 
