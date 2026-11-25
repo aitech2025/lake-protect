@@ -77,6 +77,7 @@ class SceneCreate(BaseModel):
     cloud_cover: float | None = Field(default=None, ge=0, le=100)
     gsd_m: float | None = Field(default=None, gt=0)
     license: str = Field(min_length=1, max_length=300)
+    suitability_status: Literal["PENDING", "SUITABLE", "UNSUITABLE", "PARTIAL"] = "PENDING"
     stac_item: dict[str, Any]
     object_uri: str | None = Field(default=None, max_length=2048)
     checksum_sha256: str | None = Field(default=None, pattern=r"^[0-9a-fA-F]{64}$")
@@ -225,11 +226,11 @@ def register_scene(body: SceneCreate, db: Session = Depends(get_db)):
     row = db.execute(text("""
         INSERT INTO satellite_scenes
           (provider, collection_id, item_id, platform, instrument, acquired_at,
-           footprint, cloud_cover, gsd_m, license, stac_item, object_uri, checksum_sha256)
+           footprint, cloud_cover, gsd_m, license, suitability_status, stac_item, object_uri, checksum_sha256)
         VALUES
           (:provider, :collection_id, :item_id, :platform, :instrument, :acquired_at,
            ST_SetSRID(ST_GeomFromGeoJSON(:footprint),4326), :cloud_cover, :gsd_m,
-           :license, CAST(:stac_item AS jsonb), :object_uri, :checksum_sha256)
+           :license, :suitability_status, CAST(:stac_item AS jsonb), :object_uri, :checksum_sha256)
         ON CONFLICT (provider, collection_id, item_id) DO NOTHING
         RETURNING id, suitability_status, ingested_at
     """), {**body.model_dump(exclude={"footprint", "stac_item"}),
