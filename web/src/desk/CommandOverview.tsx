@@ -117,21 +117,8 @@ export function CommandOverview() {
 
   return (
     <div className={`geo-command theme-${theme}`}>
-      <header className="geo-commandbar">
-        <div className="geo-command-brand">
-          <div className="geo-emblem"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 28 9v14l-12 7L4 23V9z" fill="none" stroke="currentColor" strokeWidth="1.5"/><path d="M7 18c4-7 8 5 13-2s5-1 6-4M8 22c4-4 8 3 15-2" fill="none" stroke="#38bdf8" strokeWidth="2" strokeLinecap="round"/></svg></div>
-          <div><b>GeoGuard</b><span>PUBLIC ASSET COMMAND</span></div>
-        </div>
-        <div className="geo-jurisdiction"><small>JURISDICTION</small><strong>Telangana <span>›</span> Hyderabad <span>›</span> All Zones</strong></div>
-        <form className="geo-search" onSubmit={(e) => { e.preventDefault(); setSearchParams(query ? { q: query } : {}); }}>
-          <span>⌕</span><input aria-label="Search assets and parcels" placeholder="Search survey no., lake ID, asset or coordinates…" value={query} onChange={(e) => setQuery(e.target.value)} /><kbd>↵</kbd>
-        </form>
-        <div className="geo-command-actions">
-          <span className="geo-live"><i /> SYSTEM ONLINE</span>
-          <button className="geo-icon-btn" onClick={() => changeTheme(theme === "dark" ? "light" : "dark")} title="Toggle theme" aria-label="Toggle theme">{theme === "dark" ? "☼" : "◐"}</button>
-          <button className="geo-user" aria-label="Signed in officer"><span>GO</span><b>Geo Officer</b><small>ADMIN</small></button>
-        </div>
-      </header>
+      <div className="geo-command-context"><div><small>COMMAND OVERVIEW</small><h1>Geospatial operations</h1></div><div className="geo-context-date"><span>OBSERVATION WINDOW</span><b>Latest available imagery</b></div></div>
+
 
       <div className="geo-workspace">
         <aside className={`geo-left-panel ${drawerOpen ? "" : "collapsed"}`}>
