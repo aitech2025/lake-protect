@@ -558,3 +558,24 @@ a { color:var(--ftl); }
 .geo-compare-baseline::after,.geo-compare-latest::after { position:absolute; top:52px; padding:6px 8px; border-radius:4px; color:#e0f2fe; background:rgba(8,47,73,.88); font-size:8px; font-weight:800; letter-spacing:.12em; pointer-events:none; }
 .geo-compare-baseline::after { content:"BASELINE · BOUNDARY VIEW"; left:16px; }
 .geo-compare-latest::after { content:"LATEST · DETECTION OVERLAY"; right:16px; background:rgba(127,29,29,.9); }
+
+/* Floating HUD panels keep the map as the full-bleed command surface (80%+ visible canvas). */
+@media (min-width:761px) {
+  .geo-workspace { display:block; position:relative; }
+  .geo-map-stage { position:absolute; inset:0; }
+  .geo-left-panel { position:absolute; z-index:10; top:0; bottom:0; left:0; width:278px; box-shadow:10px 0 30px rgba(0,0,0,.18); }
+  .geo-left-panel.collapsed { width:42px; }
+  .geo-inspector { position:absolute; z-index:10; top:0; bottom:0; right:0; width:350px; box-shadow:-10px 0 30px rgba(0,0,0,.18); }
+}
+@media (min-width:1600px) {
+  .geo-left-panel { width:300px; }.geo-inspector { width:390px; }
+}
+@media (max-width:1450px) and (min-width:761px) {
+  .geo-left-panel { width:252px; }.geo-inspector { width:320px; }
+}
+@media (max-width:760px) {
+  .geo-workspace { display:flex; flex-direction:column; position:relative; }
+  .geo-map-stage { position:relative; inset:auto; }
+  .geo-left-panel { position:relative; display:none; }
+  .geo-inspector { position:relative; inset:auto; width:auto; }
+}
