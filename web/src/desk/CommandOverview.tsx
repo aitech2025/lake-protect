@@ -45,6 +45,7 @@ export function CommandOverview() {
   useEffect(() => { setQuery(searchParams.get("q") ?? ""); }, [searchParams.toString()]);
 
   const [category, setCategory] = useState("all");
+  const [windowDays, setWindowDays] = useState("all");
 
   const assetsState = useAsync(() => api<{ features: any[] }>("/assets"), []);
   const alertsState = useAsync(() => api<{ items: AlertRow[]; has_demo: boolean }>("/alerts"), []);
@@ -67,6 +68,10 @@ export function CommandOverview() {
   }), [assets, category, query]);
 
   const filteredAlerts = useMemo(() => alerts.filter((a) => {
+    if (windowDays !== "all") {
+      const age = Date.now() - new Date(a.first_changed_at).getTime();
+      if (!Number.isFinite(age) || age > Number(windowDays) * 86400000) return false;
+    }
     if (category === "lakes" && !["lake", "tank", "waterbody"].includes(a.asset_type.toLowerCase())) return false;
     if (category === "government" && !a.asset_type.toLowerCase().includes("parcel")) return false;
     if (category === "buildings" && !a.asset_type.toLowerCase().includes("building")) return false;
@@ -169,7 +174,7 @@ export function CommandOverview() {
             <div className="geo-category-pills">
               {[["all","All assets"],["lakes","Lakes & water"],["government","Government land"],["buildings","Public buildings"]].map(([k,v]) => <button key={k} className={category === k ? "active" : ""} onClick={() => setCategory(k)}>{v}</button>)}
             </div>
-            <div className="geo-map-meta"><span>MAP VIEW</span><b>Latest available observations</b><i /> <span>WGS 84</span></div>
+            <div className="geo-map-meta"><span>DETECTION WINDOW</span><select aria-label="Filter detections by date" value={windowDays} onChange={(e) => setWindowDays(e.target.value)}><option value="all">All recorded</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option></select><i /> <span>WGS 84</span></div>
           </div>
           <div className="geo-map-canvas">
             {compare ? <>
@@ -200,7 +205,7 @@ export function CommandOverview() {
               <button title="Reset view" onClick={() => { setSelectedId(null); setSelectedAssetId(null); setInspectorOpen(false); }}>⌖</button>
             </div>
             {compare && <div className="geo-compare-control"><div><b>BASELINE</b><span>Boundary reference</span></div><input aria-label="Before and after comparison divider" type="range" min="5" max="95" value={swipe} onChange={(e) => setSwipe(Number(e.target.value))} /><div><b>LATEST</b><span>Current alert overlay</span></div><p>Swipe preview only. Historical raster pairing is not yet connected.</p></div>}
-            <div className="geo-map-bottomline"><span>Coordinates <b>17.4239° N, 78.4738° E</b></span><span>Scale indicative · not for cadastral measurement</span></div>
+            <div className="geo-map-bottomline"><span>Coordinates <b>{selectedAlert ? `${selectedAlert.lat.toFixed(5)}° N, ${selectedAlert.lon.toFixed(5)}° E` : "—"}</b></span><span>Scale indicative · not for cadastral measurement</span></div>
           </div>
         </main>
 
