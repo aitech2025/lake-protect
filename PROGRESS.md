@@ -27,7 +27,7 @@ data in the app), then M3.
 | M14 GeoGuard: kinds of land, admin adds and stops watching locations | Done | API 334, pipeline 29, browser 5 | 789c555 |
 | M15 Citizen channels: portal, WhatsApp, staff intake, updates back | Done | API 361, pipeline 29, browser 6 | be69e84 |
 | M16 Citizen reports open incidents with a satellite review; no Urdu | Done | API 365, pipeline 32, browser 6 | 6bbcd8c |
-| M17 Officials and the admin work citizens' incidents: acknowledge, notes, looks, legal records, decide, watch | Done | API 375, pipeline 33, browser 7 | M17 commit |
+| M17 Officials and the admin work citizens' incidents: acknowledge, notes, looks, legal records, decide, watch | Done | API 375, pipeline 33, browser 7 | 27fbb13 |
 
 ## M0 Scaffold: done
 
