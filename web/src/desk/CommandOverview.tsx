@@ -74,6 +74,12 @@ export function CommandOverview() {
   }).sort((a,b) => Number(b.overdue) - Number(a.overdue) || (b.priority_score ?? -1) - (a.priority_score ?? -1)), [alerts, category, query]);
 
   const selectedAlert = filteredAlerts.find((a) => a.id === selectedId) ?? alerts.find((a) => a.id === selectedId) ?? null;
+  useEffect(() => {
+    if (selectedId == null && filteredAlerts.length > 0) {
+      setSelectedId(filteredAlerts[0].id);
+      setSelectedAssetId(filteredAlerts[0].asset_id);
+    }
+  }, [filteredAlerts, selectedId]);
   const selectedAsset = assets.find((a) => Number(a.properties?.id ?? a.id) === (selectedAlert?.asset_id ?? selectedAssetId)) ?? null;
 
   const boundaries = useMemo(() => ({
