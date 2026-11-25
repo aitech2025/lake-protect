@@ -34,6 +34,9 @@ export function CommandOverview() {
   const [drawerOpen, setDrawerOpen] = useState(true);
   const [inspectorOpen, setInspectorOpen] = useState(true);
   const [compare, setCompare] = useState(false);
+  const [measure, setMeasure] = useState(false);
+  const [tilt, setTilt] = useState(false);
+  const [measureMetres, setMeasureMetres] = useState(0);
   const [swipe, setSwipe] = useState(52);
   const [searchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
@@ -191,19 +194,24 @@ export function CommandOverview() {
               </div>
             </> : <MapView boundaries={layers.boundaries || layers.ftl ? boundaries : undefined}
               changes={layers.changes ? changes : undefined} pins={layers.pins ? pins : []}
-              fit={focusFit} theme={theme} onAssetClick={selectAssetOnMap}
+              fit={focusFit} theme={theme} onAssetClick={selectAssetOnMap} measure={measure} onMeasureChange={setMeasureMetres}
               layerVisibility={{ boundaries: layers.boundaries, ftl: layers.ftl, changes: layers.changes }} />}
             <div className="geo-map-stamp"><b>HYDERABAD REGION</b><span>Illustrative operational view · source dates vary by asset</span></div>
             <div className="geo-map-legend">
               <span><i className="legend-boundary" /> Official boundary</span><span><i className="legend-ftl" /> FTL / buffer</span><span><i className="legend-change" /> AI screening signal</span><span><i className="legend-pin" /> Open incident</span>
             </div>
             {compare && <div className="geo-compare-divider" style={{ left: `${swipe}%` }}><span>↔</span></div>}
-            <div className="geo-map-controls">
-              <button title="Zoom in" onClick={() => window.dispatchEvent(new CustomEvent("geoguard:zoom", { detail: 1 }))}>＋</button>
-              <button title="Zoom out" onClick={() => window.dispatchEvent(new CustomEvent("geoguard:zoom", { detail: -1 }))}>－</button>
-              <button title="Toggle before and after comparison" className={compare ? "active" : ""} onClick={() => setCompare(!compare)}>⇆</button>
-              <button title="Reset view" onClick={() => { setSelectedId(null); setSelectedAssetId(null); setInspectorOpen(false); }}>⌖</button>
+            <div className="geo-map-control-pill">
+              <button title="Zoom in" aria-label="Zoom in" onClick={() => window.dispatchEvent(new CustomEvent("geoguard:zoom", { detail: 1 }))}>＋</button>
+              <button title="Zoom out" aria-label="Zoom out" onClick={() => window.dispatchEvent(new CustomEvent("geoguard:zoom", { detail: -1 }))}>－</button>
+              <i />
+              <button title="Measure distance on map" aria-pressed={measure} className={measure ? "active" : ""} onClick={() => { setCompare(false); setMeasure(!measure); }}>⌁ <span>Measure</span></button>
+              <button title="Toggle map pitch (terrain elevation is not connected)" aria-pressed={tilt} className={tilt ? "active" : ""} onClick={() => { const next = !tilt; setTilt(next); window.dispatchEvent(new CustomEvent("geoguard:tilt", { detail: next })); }}>◇ <span>2D / 3D</span></button>
+              <i />
+              <button title="Before and after layer comparison" aria-pressed={compare} className={compare ? "active" : ""} onClick={() => { setMeasure(false); setCompare(!compare); }}>⇆ <span>Compare</span></button>
+              <button title="Close inspector" aria-label="Close inspector" onClick={() => { setSelectedId(null); setSelectedAssetId(null); setInspectorOpen(false); }}>⌖</button>
             </div>
+            {measure && !compare && <div className="geo-measure-readout"><b>MAP MEASUREMENT</b><span>{measureMetres >= 1000 ? (measureMetres / 1000).toFixed(3) + " km" : measureMetres.toFixed(1) + " m"}</span><small>Click map to add vertices. Distance is geodesic, not a cadastral survey.</small></div>}
             {compare && <div className="geo-compare-control"><div><b>BASELINE</b><span>Boundary reference</span></div><input aria-label="Before and after comparison divider" type="range" min="5" max="95" value={swipe} onChange={(e) => setSwipe(Number(e.target.value))} /><div><b>LATEST</b><span>Current alert overlay</span></div><p>Swipe preview only. Historical raster pairing is not yet connected.</p></div>}
             <div className="geo-map-bottomline"><span>Coordinates <b>{selectedAlert ? `${selectedAlert.lat.toFixed(5)}° N, ${selectedAlert.lon.toFixed(5)}° E` : "—"}</b></span><span>Scale indicative · not for cadastral measurement</span></div>
           </div>
