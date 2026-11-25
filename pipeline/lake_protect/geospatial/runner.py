@@ -112,27 +112,53 @@ def run_water_screen(*,endpoint: str,collections: list[str],bbox: list[float],
             index_local=Path(result["index_path"])
             mask_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/{safe_id}-water-mask.cog.tif",mask_local)
             index_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/{safe_id}-mndwi.cog.tif",index_local)
-            mask_records.append({"scene_id":item.id,"acquired_at":acquired,"mask_path":mask_local})
+            mask_records.append({"scene_id":item.id,"acquired_at":acquired,"mask_path":mask_local,"geometry":item.geometry})
             outputs.append({"scene_id":item.id,"acquired_at":acquired,
                 "scene_registration":scene_resp.json(),"water_mask":mask_obj,"mndwi":index_obj,
                 "water_area_sq_m":result["water_area_sq_m"],"valid_pixels":result["valid_pixels"],
                 "method":result["method"],"validated":False})
         temporal_change=None
         if len(mask_records) >= 2:
+            from datetime import datetime
+            from shapely.geometry import shape
             from .change import compare_water_masks
-            ordered=sorted(mask_records,key=lambda row:row["acquired_at"])
-            comparison=compare_water_masks(ordered[0]["mask_path"],ordered[-1]["mask_path"],
-                output_dir/f"{run_id}-change")
-            loss_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/water-loss.cog.tif",Path(comparison["water_loss_mask"]))
-            gain_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/water-gain.cog.tif",Path(comparison["water_gain_mask"]))
-            vector_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/water-change.geojson",
-                Path(comparison["vector_path"]),"application/geo+json")
-            temporal_change={"reference_scene":ordered[0]["scene_id"],"current_scene":ordered[-1]["scene_id"],
-                "reference_acquired_at":ordered[0]["acquired_at"],"current_acquired_at":ordered[-1]["acquired_at"],
-                "water_loss_mask":loss_obj,"water_gain_mask":gain_obj,"change_features":vector_obj,
-                "water_loss_area_sq_m":comparison["water_loss_area_sq_m"],
-                "water_gain_area_sq_m":comparison["water_gain_area_sq_m"],
-                "feature_count":comparison["features"],"validated":False,"method":comparison["method"]}
+            comparable=[]
+            for i in range(len(mask_records)):
+                for j in range(i+1,len(mask_records)):
+                    a,b=mask_records[i],mask_records[j]
+                    da=datetime.fromisoformat(str(a["acquired_at"]).replace("Z","+00:00"))
+                    db=datetime.fromisoformat(str(b["acquired_at"]).replace("Z","+00:00"))
+                    if da==db:
+                        continue
+                    earlier,later=(a,b) if da<db else (b,a)
+                    ga,gb=shape(earlier["geometry"]),shape(later["geometry"])
+                    denominator=min(ga.area,gb.area)
+                    overlap=ga.intersection(gb).area/denominator if denominator else 0.0
+                    if overlap >= 0.5:
+                        gap=(datetime.fromisoformat(str(later["acquired_at"]).replace("Z","+00:00"))-
+                             datetime.fromisoformat(str(earlier["acquired_at"]).replace("Z","+00:00"))).total_seconds()
+                        comparable.append((gap,overlap,earlier,later))
+            if comparable:
+                _,footprint_overlap,reference,current=max(comparable,key=lambda row:(row[0],row[1]))
+                comparison=compare_water_masks(reference["mask_path"],current["mask_path"],
+                    output_dir/f"{run_id}-change",minimum_overlap_ratio=0.5)
+                loss_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/water-loss.cog.tif",Path(comparison["water_loss_mask"]))
+                gain_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/water-gain.cog.tif",Path(comparison["water_gain_mask"]))
+                vector_obj=_upload(bucket,s3,f"lake-protect/derived/{run_id}/water-change.geojson",
+                    Path(comparison["vector_path"]),"application/geo+json")
+                temporal_change={"status":"SCREENING_COMPLETE","reference_scene":reference["scene_id"],
+                    "current_scene":current["scene_id"],"reference_acquired_at":reference["acquired_at"],
+                    "current_acquired_at":current["acquired_at"],"footprint_overlap_ratio":round(footprint_overlap,4),
+                    "valid_pixel_overlap_ratio":comparison["overlap_ratio"],
+                    "water_loss_mask":loss_obj,"water_gain_mask":gain_obj,"change_features":vector_obj,
+                    "water_loss_area_sq_m":comparison["water_loss_area_sq_m"],
+                    "water_gain_area_sq_m":comparison["water_gain_area_sq_m"],
+                    "feature_count":comparison["features"],"validated":False,"method":comparison["method"]}
+            else:
+                temporal_change={"status":"NOT_COMPARABLE",
+                    "reason":"No pair of observations had at least 50% footprint overlap and distinct acquisition dates."}
+        elif len(mask_records)==1:
+            temporal_change={"status":"INSUFFICIENT_OBSERVATIONS","reason":"Only one suitable observation was processed."}
         final_status="SUCCEEDED" if outputs and not rejected else ("PARTIAL" if outputs else "FAILED")
         output_manifest={"scene_count":registered,"processed_count":len(outputs),
             "rejected_count":len(rejected),"outputs":outputs,"rejected":rejected,"temporal_change":temporal_change,
