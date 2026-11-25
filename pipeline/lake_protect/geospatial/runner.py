@@ -43,11 +43,14 @@ def _s3_client():
 
 
 def _upload(bucket,client,key: str,path: Path,content_type: str = "image/tiff") -> dict:
-    data=path.read_bytes()
-    digest=hashlib.sha256(data).hexdigest()
-    client.put_object(Bucket=bucket,Key=key,Body=data,ContentType=content_type,
-                      Metadata={"sha256":digest})
-    return {"uri":f"s3://{bucket}/{key}","sha256":digest,"bytes":len(data)}
+    digest=hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    checksum=digest.hexdigest()
+    client.upload_file(str(path),bucket,key,ExtraArgs={
+        "ContentType":content_type,"Metadata":{"sha256":checksum}})
+    return {"uri":f"s3://{bucket}/{key}","sha256":checksum,"bytes":path.stat().st_size}
 
 
 def run_water_screen(*,endpoint: str,collections: list[str],bbox: list[float],
