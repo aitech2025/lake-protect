@@ -32,5 +32,7 @@ class Settings(BaseSettings):
     data_dir: Path = Path("/srv/data")
     repo_dir: Path = Path("/srv/repo")
     counsel_reviewed_template: bool = False
+    whatsapp_verify_token: str | None = None
+    whatsapp_app_secret: str | None = None
 
 settings = Settings()
