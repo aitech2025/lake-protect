@@ -243,6 +243,12 @@ def register_scene(body: SceneCreate, db: Session = Depends(get_db)):
         if existing["checksum_sha256"] != body.checksum_sha256:
             db.rollback()
             raise HTTPException(409, "STAC scene identity already exists with a different checksum.")
+        if existing["suitability_status"] == "PENDING" and body.suitability_status != "PENDING":
+            db.execute(text("""
+                UPDATE satellite_scenes SET suitability_status=:status WHERE id=:id
+            """), {"status": body.suitability_status, "id": existing["id"]})
+            existing = dict(existing)
+            existing["suitability_status"] = body.suitability_status
         db.commit()
         return {"duplicate": True, "scene": {k: existing[k] for k in ("id", "suitability_status", "ingested_at")}}
     db.commit()
