@@ -76,6 +76,7 @@ def test_pipeline_ingestion_is_idempotent_and_processing_run_has_state_machine(c
         "cloud_cover": 4.5,
         "gsd_m": 10,
         "license": "Copernicus",
+        "suitability_status": "SUITABLE",
         "stac_item": {"id": "scene-0001", "type": "Feature", "assets": {}},
         "object_uri": "scenes/scene-0001.json",
         "checksum_sha256": "d" * 64,
@@ -83,6 +84,7 @@ def test_pipeline_ingestion_is_idempotent_and_processing_run_has_state_machine(c
     scene = client.post("/api/v1/ingestion/scenes", headers=_pipeline_headers(), json=scene_payload)
     assert scene.status_code == 201, scene.text
     assert scene.json()["duplicate"] is False
+    assert scene.json()["scene"]["suitability_status"] == "SUITABLE"
     scene_duplicate = client.post("/api/v1/ingestion/scenes",
                                   headers=_pipeline_headers(), json=scene_payload)
     assert scene_duplicate.status_code == 201
