@@ -71,3 +71,19 @@ jobs:
       - name: Run pipeline tests
         working-directory: pipeline
         run: pytest -q
+
+  web-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+      - name: Type-check and build web application
+        working-directory: web
+        run: npm run build
