@@ -101,7 +101,7 @@ def run_water_screen(*,endpoint: str,collections: list[str],bbox: list[float],
                 "instrument":item.properties.get("instruments",[None])[0] if item.properties.get("instruments") else None,
                 "acquired_at":acquired,"footprint":item.geometry,
                 "cloud_cover":item.properties.get("eo:cloud_cover"),"gsd_m":item.properties.get("gsd"),
-                "license":license_label,"stac_item":item_dict,
+                "license":license_label,"suitability_status":"SUITABLE","stac_item":item_dict,
                 "object_uri":f"s3://{bucket}/{item_key}","checksum_sha256":item_digest}
             scene_resp=api.post("/api/v1/ingestion/scenes",json=scene_payload)
             scene_resp.raise_for_status()
