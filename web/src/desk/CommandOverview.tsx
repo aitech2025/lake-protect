@@ -35,7 +35,7 @@ export function CommandOverview() {
   const [inspectorOpen, setInspectorOpen] = useState(true);
   const [compare, setCompare] = useState(false);
   const [swipe, setSwipe] = useState(52);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
   useEffect(() => {
     const syncTheme = (event: Event) => setTheme((event as CustomEvent<Theme>).detail);
