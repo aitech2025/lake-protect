@@ -25,12 +25,12 @@ Example environment (inject credentials through the runtime secret manager, not 
 
 ```bash
 export LP_API_BASE_URL=https://lake-protect-api.example.gov
-export LP_PIPELINE_TOKEN=<pipeline-service-token>
-export LP_GEO_S3_BUCKET=<approved-derived-imagery-bucket>
-export LP_GEO_S3_ENDPOINT_URL=<optional-s3-compatible-endpoint>
+export LP_PIPELINE_TOKEN='replace-with-pipeline-service-token'
+export LP_GEO_S3_BUCKET='approved-derived-imagery-bucket'
+export LP_GEO_S3_ENDPOINT_URL='https://s3-compatible-endpoint.example' # omit if using AWS S3
 export LP_GEO_S3_REGION=ap-south-1
-export LP_GEO_S3_ACCESS_KEY_ID=<runtime-secret>
-export LP_GEO_S3_SECRET_ACCESS_KEY=<runtime-secret>
+export LP_GEO_S3_ACCESS_KEY_ID='inject-at-runtime'
+export LP_GEO_S3_SECRET_ACCESS_KEY='inject-at-runtime'
 
 cd pipeline
 pip install -e '.[geo,dev]'
