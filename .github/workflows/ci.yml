@@ -67,7 +67,7 @@ jobs:
           cache-dependency-path: pipeline/pyproject.toml
       - name: Install pipeline test dependencies
         working-directory: pipeline
-        run: pip install -e ".[dev,osm,ml]"
+        run: pip install -e ".[dev,osm,ml,geo]"
       - name: Run pipeline tests
         working-directory: pipeline
         run: pytest -q
