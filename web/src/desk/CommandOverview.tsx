@@ -78,7 +78,7 @@ export function CommandOverview() {
     if (!query.trim()) return true;
     const q = query.toLowerCase();
     return [a.asset_name, a.code, a.asset_id, a.change_type, a.zone].some((v) => String(v ?? "").toLowerCase().includes(q));
-  }).sort((a,b) => Number(b.overdue) - Number(a.overdue) || (b.priority_score ?? -1) - (a.priority_score ?? -1)), [alerts, category, query]);
+  }).sort((a,b) => Number(b.overdue) - Number(a.overdue) || (b.priority_score ?? -1) - (a.priority_score ?? -1)), [alerts, category, query, windowDays]);
 
   const selectedAlert = filteredAlerts.find((a) => a.id === selectedId) ?? alerts.find((a) => a.id === selectedId) ?? null;
   useEffect(() => {
