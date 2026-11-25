@@ -38,7 +38,13 @@ def compare_water_masks(reference_path: str | Path, current_path: str | Path,
             resampling=Resampling.nearest,src_nodata=cur.nodata,dst_nodata=np.nan)
     valid=np.isfinite(reference)&np.isfinite(current)
     if ref_nodata is not None: valid &= reference != ref_nodata
-    reference_valid=np.isfinite(reference)\n    if ref_nodata is not None: reference_valid &= reference != ref_nodata\n    overlap_ratio=float(valid.sum()/max(1,reference_valid.sum()))\n    if valid.sum()==0 or overlap_ratio < minimum_overlap_ratio:\n        raise ValueError(f"Insufficient scene overlap for temporal comparison: {overlap_ratio:.3f}")\n    ref_water=(reference==1)&valid\n    cur_water=(current==1)&valid
+    reference_valid=np.isfinite(reference)
+    if ref_nodata is not None: reference_valid &= reference != ref_nodata
+    overlap_ratio=float(valid.sum()/max(1,reference_valid.sum()))
+    if valid.sum()==0 or overlap_ratio < minimum_overlap_ratio:
+        raise ValueError(f"Insufficient scene overlap for temporal comparison: {overlap_ratio:.3f}")
+    ref_water=(reference==1)&valid
+    cur_water=(current==1)&valid
     loss=np.where(valid,(ref_water&~cur_water).astype("float32"),np.nan)
     gain=np.where(valid,(~ref_water&cur_water).astype("float32"),np.nan)
     loss_path=_write_cog(loss,profile,output_dir/"water-loss.cog.tif")
