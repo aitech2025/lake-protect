@@ -12,6 +12,8 @@ type Props = {
   fit?: [number, number, number, number] | null;
   height?: string;
   testId?: string;
+  theme?: "dark" | "light";
+  layerVisibility?: { boundaries?: boolean; ftl?: boolean; changes?: boolean };
 };
 
 const EMPTY: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
@@ -52,7 +54,7 @@ function bboxOf(fcs: GeoJSON.FeatureCollection[]): [number, number, number, numb
   return Number.isFinite(w) ? [w, s, e, n] : null;
 }
 
-export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, height = "100%", testId }: Props) {
+export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, height = "100%", testId, theme = "light", layerVisibility = {} }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const markers = useRef<maplibregl.Marker[]>([]);
@@ -102,6 +104,44 @@ export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, h
     if (loaded.current) apply();
     else m.once("lp:data", apply);
   }, [boundaries, changes, fit, pins]);
+
+
+  useEffect(() => {
+    const m = map.current;
+    if (!m) return;
+    const apply = () => {
+      const visible = (name: string, on: boolean) => {
+        if (m.getLayer(name)) m.setLayoutProperty(name, "visibility", on ? "visible" : "none");
+      };
+      visible("primary-fill", layerVisibility.boundaries ?? true);
+      visible("primary-confirmed", layerVisibility.boundaries ?? true);
+      visible("primary-preliminary", layerVisibility.boundaries ?? true);
+      visible("primary-estimated", layerVisibility.boundaries ?? true);
+      visible("ring", layerVisibility.boundaries ?? true);
+      visible("buffer", layerVisibility.ftl ?? true);
+      visible("change-fill", layerVisibility.changes ?? true);
+      visible("change-line", layerVisibility.changes ?? true);
+      m.setPaintProperty("bg", "background-color", theme === "dark" ? "#090e17" : "#f8fafc");
+      if (m.getLayer("base")) {
+        m.setPaintProperty("base", "raster-brightness-min", theme === "dark" ? 0.03 : 0);
+        m.setPaintProperty("base", "raster-brightness-max", theme === "dark" ? 0.42 : 1);
+        m.setPaintProperty("base", "raster-saturation", theme === "dark" ? -0.55 : 0);
+      }
+    };
+    if (loaded.current) apply();
+    else m.once("lp:data", apply);
+  }, [theme, layerVisibility.boundaries, layerVisibility.ftl, layerVisibility.changes]);
+
+  useEffect(() => {
+    const m = map.current;
+    if (!m) return;
+    const zoom = (event: Event) => {
+      const amount = Number((event as CustomEvent<number>).detail ?? 0);
+      m.zoomTo(m.getZoom() + amount, { duration: 220 });
+    };
+    window.addEventListener("geoguard:zoom", zoom);
+    return () => window.removeEventListener("geoguard:zoom", zoom);
+  }, []);
 
   useEffect(() => {
     const m = map.current;
