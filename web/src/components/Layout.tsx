@@ -35,6 +35,7 @@ export function Layout() {
   const toggle = () => void i18n.changeLanguage(i18n.language === "te" ? "en" : "te");
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
+    window.dispatchEvent(new CustomEvent("geoguard:theme", { detail: theme }));
     try { localStorage.setItem("lp.theme", theme); } catch { /* optional preference */ }
   }, [theme]);
   useEffect(() => {
