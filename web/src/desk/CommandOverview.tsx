@@ -58,6 +58,7 @@ export function CommandOverview() {
     const p = a.properties ?? {};
     if (category === "lakes" && !["lake", "waterbody", "tank"].includes(String(p.asset_type ?? p.kind ?? "").toLowerCase())) return false;
     if (category === "government" && !String(p.asset_type ?? p.kind ?? "").toLowerCase().includes("parcel")) return false;
+    if (category === "buildings" && !String(p.asset_type ?? p.kind ?? "").toLowerCase().includes("building")) return false;
     if (query.trim()) {
       const q = query.toLowerCase();
       return [p.name, p.name_te, p.asset_code, p.survey_no, p.id].some((v) => String(v ?? "").toLowerCase().includes(q));
@@ -68,6 +69,7 @@ export function CommandOverview() {
   const filteredAlerts = useMemo(() => alerts.filter((a) => {
     if (category === "lakes" && !["lake", "tank", "waterbody"].includes(a.asset_type.toLowerCase())) return false;
     if (category === "government" && !a.asset_type.toLowerCase().includes("parcel")) return false;
+    if (category === "buildings" && !a.asset_type.toLowerCase().includes("building")) return false;
     if (!query.trim()) return true;
     const q = query.toLowerCase();
     return [a.asset_name, a.code, a.asset_id, a.change_type, a.zone].some((v) => String(v ?? "").toLowerCase().includes(q));
@@ -165,7 +167,7 @@ export function CommandOverview() {
         <main className="geo-map-stage">
           <div className="geo-map-toolbar">
             <div className="geo-category-pills">
-              {[["all","All assets"],["lakes","Lakes & water"],["government","Government land"]].map(([k,v]) => <button key={k} className={category === k ? "active" : ""} onClick={() => setCategory(k)}>{v}</button>)}
+              {[["all","All assets"],["lakes","Lakes & water"],["government","Government land"],["buildings","Public buildings"]].map(([k,v]) => <button key={k} className={category === k ? "active" : ""} onClick={() => setCategory(k)}>{v}</button>)}
             </div>
             <div className="geo-map-meta"><span>MAP VIEW</span><b>Latest available observations</b><i /> <span>WGS 84</span></div>
           </div>
