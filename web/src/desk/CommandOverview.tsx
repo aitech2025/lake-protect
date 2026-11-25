@@ -170,17 +170,26 @@ export function CommandOverview() {
             <div className="geo-map-meta"><span>MAP VIEW</span><b>Latest available observations</b><i /> <span>WGS 84</span></div>
           </div>
           <div className="geo-map-canvas">
-            <MapView boundaries={layers.boundaries || layers.ftl ? boundaries : undefined}
+            {compare ? <>
+              <div className="geo-compare-map geo-compare-baseline">
+                <MapView boundaries={layers.boundaries || layers.ftl ? boundaries : undefined}
+                  fit={focusFit} theme={theme} interactive={false}
+                  layerVisibility={{ boundaries: layers.boundaries, ftl: layers.ftl, changes: false }} />
+              </div>
+              <div className="geo-compare-map geo-compare-latest" style={{ clipPath: `inset(0 0 0 ${swipe}%)` }}>
+                <MapView boundaries={layers.boundaries || layers.ftl ? boundaries : undefined}
+                  changes={layers.changes ? changes : undefined} pins={layers.pins ? pins : []}
+                  fit={focusFit} theme={theme} interactive={false}
+                  layerVisibility={{ boundaries: layers.boundaries, ftl: layers.ftl, changes: layers.changes }} />
+              </div>
+            </> : <MapView boundaries={layers.boundaries || layers.ftl ? boundaries : undefined}
               changes={layers.changes ? changes : undefined} pins={layers.pins ? pins : []}
               fit={focusFit} theme={theme} onAssetClick={selectAssetOnMap}
-              layerVisibility={{ boundaries: layers.boundaries, ftl: layers.ftl, changes: layers.changes }} />
+              layerVisibility={{ boundaries: layers.boundaries, ftl: layers.ftl, changes: layers.changes }} />}
             <div className="geo-map-stamp"><b>HYDERABAD REGION</b><span>Illustrative operational view · source dates vary by asset</span></div>
             <div className="geo-map-legend">
               <span><i className="legend-boundary" /> Official boundary</span><span><i className="legend-ftl" /> FTL / buffer</span><span><i className="legend-change" /> AI screening signal</span><span><i className="legend-pin" /> Open incident</span>
             </div>
-            {compare && <div className="geo-compare-overlay" style={{ clipPath: `inset(0 ${100-swipe}% 0 0)` }}>
-              <div className="geo-compare-watermark">BASELINE / BOUNDARY VIEW</div>
-            </div>}
             {compare && <div className="geo-compare-divider" style={{ left: `${swipe}%` }}><span>↔</span></div>}
             <div className="geo-map-controls">
               <button title="Zoom in" onClick={() => window.dispatchEvent(new CustomEvent("geoguard:zoom", { detail: 1 }))}>＋</button>
