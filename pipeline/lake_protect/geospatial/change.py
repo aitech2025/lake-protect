@@ -12,7 +12,10 @@ import numpy as np
 
 
 def compare_water_masks(reference_path: str | Path, current_path: str | Path,
-                        output_dir: str | Path, *, minimum_area_sq_m: float = 400.0, minimum_overlap_ratio: float = 0.5,\n                        reference_scene_id: str | None = None, current_scene_id: str | None = None,\n                        reference_acquired_at: str | None = None, current_acquired_at: str | None = None,\n                        processing_run_id: str | None = None) -> dict[str, Any]:
+                        output_dir: str | Path, *, minimum_area_sq_m: float = 400.0, minimum_overlap_ratio: float = 0.5,
+                        reference_scene_id: str | None = None, current_scene_id: str | None = None,
+                        reference_acquired_at: str | None = None, current_acquired_at: str | None = None,
+                        processing_run_id: str | None = None) -> dict[str, Any]:
     import rasterio
     from rasterio.enums import Resampling
     from rasterio.features import shapes
@@ -64,7 +67,9 @@ def compare_water_masks(reference_path: str | Path, current_path: str | Path,
             features.append({"type":"Feature","geometry":mapping(geom_wgs84),
                 "properties":{"change_type":change_type,"area_sq_m":round(area,2),
                     "minimum_area_sq_m":minimum_area_sq_m,"evidence_class":"SCREENING",
-                    "validated":False,"reference_scene_id":reference_scene_id,\n                    "current_scene_id":current_scene_id,"reference_acquired_at":reference_acquired_at,\n                    "current_acquired_at":current_acquired_at,"processing_run_id":processing_run_id}})
+                    "validated":False,"reference_scene_id":reference_scene_id,
+                    "current_scene_id":current_scene_id,"reference_acquired_at":reference_acquired_at,
+                    "current_acquired_at":current_acquired_at,"processing_run_id":processing_run_id}})
     geojson={"type":"FeatureCollection","name":"sentinel_water_spread_change","features":features}
     vector_path=output_dir/"water-change.geojson"
     vector_path.write_text(json.dumps(geojson,ensure_ascii=False),encoding="utf-8")
