@@ -48,8 +48,8 @@ async def receive_webhook(request: Request, db: Session = Depends(get_db)):
         db.execute(text("SELECT pg_advisory_xact_lock(hashtextextended(:key,0))"),
                    {"key":"whatsapp:"+report.provider_message_id})
         existing=db.execute(text("""SELECT id FROM signals WHERE kind='citizen_whatsapp'
-            AND ref::jsonb ->> 'provider_message_id'=:message_id LIMIT 1"""),
-            {"message_id":report.provider_message_id}).scalar_one_or_none()
+            AND ref LIKE :needle LIMIT 1"""),
+            {"needle":'%"provider_message_id": "'+report.provider_message_id+'"%'}).scalar_one_or_none()
         if existing is not None:
             duplicates+=1
             continue
