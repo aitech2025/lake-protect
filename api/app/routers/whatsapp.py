@@ -6,7 +6,7 @@ not a verified incident or legal finding. Media bytes are not downloaded here.
 from __future__ import annotations
 import json
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from fastapi.responses import PlainTextResponse
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -17,7 +17,9 @@ from lake_protect.integrations.citizen import verify_meta_signature, normalize_m
 router=APIRouter(tags=["citizen-whatsapp"])
 
 @router.get("/webhooks/whatsapp")
-def verify_webhook(mode: str | None = None, token: str | None = None, challenge: str | None = None):
+def verify_webhook(mode: str | None = Query(default=None, alias="hub.mode"),
+                   token: str | None = Query(default=None, alias="hub.verify_token"),
+                   challenge: str | None = Query(default=None, alias="hub.challenge")):
     if not settings.whatsapp_verify_token:
         raise HTTPException(503,"WhatsApp webhook verification is not configured.")
     if mode=="subscribe" and token and token==settings.whatsapp_verify_token and challenge is not None:

@@ -33,8 +33,11 @@ def assess_item(item: Any, *, max_cloud_pct: float = 35.0, max_age_days: int | N
         if (current - stamp).days > max_age_days: reasons.append("observation_too_old")
     hrefs = {key: asset.href for key, asset in item.assets.items() if getattr(asset, "href", None)}
     if not hrefs: reasons.append("no_accessible_assets")
-    if collection.lower().startswith("sentinel-2") and not any(k in hrefs for k in ("B03", "green")):
-        reasons.append("missing_green_band")
+    if collection.lower().startswith("sentinel-2"):
+        if cloud is None: reasons.append("missing_cloud_cover_metadata")
+        if gsd is None: reasons.append("missing_ground_sample_distance")
+        if not any(k in hrefs for k in ("B03", "green")): reasons.append("missing_green_band")
+        if not any(k in hrefs for k in ("B11", "swir16")): reasons.append("missing_swir_band")
     return SceneDecision(item_id=item.id, collection=collection, acquired_at=str(acquired) if acquired else None,
         sensor=sensor, cloud_cover=float(cloud) if cloud is not None else None,
         gsd_m=float(gsd) if gsd is not None else None, suitable=not reasons, reasons=tuple(reasons), assets=hrefs)

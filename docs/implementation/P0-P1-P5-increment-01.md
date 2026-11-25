@@ -2,56 +2,85 @@
 
 Branch: `feat/p0-p1-p5-geospatial-integrations`
 
-This increment is additive. It preserves the current FastAPI/PostGIS case-management plane and the citizen web app.
+This is an additive increment. It preserves the existing FastAPI/PostGIS case-management plane, the citizen web application, and existing ingestion/processing-run APIs.
 
-## Added in this increment
+## P0 — detection and backtest foundations
 
-### P0 — detection and backtest foundations
+- STAC scene discovery and suitability decisions for Sentinel collections.
+- Sentinel-2 MNDWI spectral baseline and COG water masks.
+- Sentinel-1 VV threshold screening accepts calibrated, terrain-corrected dB inputs only; it does not run orbit correction or SNAP preprocessing.
+- Temporal comparison of two MNDWI masks produces water-loss and water-gain COGs plus GeoJSON polygons, with geodesic area filtering.
+- GeoJSON case/detection scorer reports one-to-one spatial matches, precision, recall and F1. Ground-truth cases must include `area_acres`, `event_date` and an explicit `public_action_date` key (use null if no action date is known). Detections must include `detected_at`.
+- The scorer is a first evaluation utility, not yet a statistically governed blind-test harness. It does not prove model accuracy or satisfy a 30-case acceptance gate.
 
-- STAC search for Sentinel collections with acquisition date, cloud-cover, asset-availability and age suitability checks.
-- Sentinel-2 MNDWI spectral baseline and binary water mask output.
-- Sentinel-1 VV backscatter threshold screen. Inputs must already be calibrated, terrain-corrected dB products; this is not a SNAP preprocessing workflow.
-- GeoJSON case/detection evaluator with area eligibility, temporal constraints before public action, one-to-one spatial matching, precision, recall and F1.
-- CLI entry point: `lp-geo` with `search`, `mndwi`, `sar-water`, and `backtest` commands.
+## P1 — executable Sentinel-2 water workflow
 
-Example:
+- Dedicated geospatial dependencies and worker image remain separate from the transactional API.
+- `lp-geo run-water` searches STAC, evaluates suitability, registers scene metadata through `/api/v1/ingestion/scenes`, creates and updates a processing run through `/api/v1/ingestion/processing-runs`, calculates MNDWI masks, selects a temporally distinct pair with at least 50% footprint overlap, compares water masks, and writes derived artefacts to S3-compatible object storage.
+- Scene and run metadata use the existing ingestion schema; no duplicate scene or processing-run database was introduced.
+- COG layout is checked; outputs are SHA-256 hashed and uploaded with hash metadata.
+- The processing-run output manifest records scene IDs, acquisition dates, S3 object URIs, checksums, areas and method disclaimers.
+
+Example environment (inject credentials through the runtime secret manager, not source control):
 
 ```bash
+export LP_API_BASE_URL=https://lake-protect-api.example.gov
+export LP_PIPELINE_TOKEN='replace-with-pipeline-service-token'
+export LP_GEO_S3_BUCKET='approved-derived-imagery-bucket'
+export LP_GEO_S3_ENDPOINT_URL='https://s3-compatible-endpoint.example' # omit if using AWS S3
+export LP_GEO_S3_REGION=ap-south-1
+export LP_GEO_S3_ACCESS_KEY_ID='inject-at-runtime'
+export LP_GEO_S3_SECRET_ACCESS_KEY='inject-at-runtime'
+
 cd pipeline
 pip install -e '.[geo,dev]'
-lp-geo search --collections sentinel-2-l2a --bbox 78.2,17.2,78.7,17.6 --start 2025-01-01 --end 2025-02-01
-lp-geo backtest data/ground-truth/cases.geojson data/outputs/detections.geojson --output reports/backtest.json
+lp-geo run-water \
+  --collections sentinel-2-l2a \
+  --bbox 78.2,17.2,78.7,17.6 \
+  --start 2025-01-01 --end 2025-03-01 \
+  --max-cloud-pct 35 \
+  --license-label 'confirm-provider-licence-before-use'
 ```
 
-Ground-truth GeoJSON must use EPSG:4326 coordinates. Each case should include `area_acres`, `event_date`, and `public_action_date`; detections should include `detected_at`. This is an initial scoring utility, not yet a statistically governed blind-backtest runner. It does not establish the required 30-case gate or model accuracy.
+The example bbox and licence label are placeholders. Use an approved AOI, verify the provider/product licence, and confirm that the API service token and bucket policy are provisioned. The runner currently uses the STAC provider's accessible asset URLs; it does not implement CDSE account-based acquisition or provider tasking.
 
-### P1 — geospatial processing foundation
+### P1 remaining
 
-- Optional geospatial dependencies remain isolated from the transactional API.
-- Dedicated `pipeline/Dockerfile.geo` image for raster workers.
-- STAC scene suitability decisions are serialisable for later registration through the existing `/api/v1/ingestion/scenes` endpoint.
-- COG output is verified via GDAL IMAGE_STRUCTURE metadata; a normal GeoTIFF is not silently accepted as a COG.
+- Sentinel-1 ingestion and SNAP processing workflow.
+- Persistent scheduling, backfill controls, rate limiting and resumable downloads.
+- Production STAC API/pgSTAC and tile serving.
+- Per-asset boundary clipping, lake-specific baseline selection and season-aware change rules.
+- Integration against the target government's object store, API and IAM environment.
 
-Not yet included: production scheduler, CDSE authenticated Sentinel-1 acquisition, object-store download/cache manager, scene tiling, STAC API server/pgSTAC deployment, TiTiler, end-to-end run registration, and retryable distributed processing. These need environment/provider decisions and integration tests against the current DB schema.
+## P5 — WhatsApp inbound foundations (citizen web retained)
 
-### P5 — citizen channel foundations (citizen web retained)
+- Meta WhatsApp Cloud webhook GET verification uses the documented `hub.mode`, `hub.verify_token` and `hub.challenge` query parameter names.
+- Signed POST payloads are verified using `X-Hub-Signature-256` HMAC-SHA256 before database writes.
+- Text, location and media references are normalised; sender references are hashed.
+- Inbound messages are persisted idempotently as unverified `signals` records using the existing table and transaction advisory locks.
+- Keyword category hints are non-authoritative. Reports do not automatically create enforcement cases or legal findings.
+- API tests cover Meta verification, invalid signatures and duplicate message handling.
 
-- FastAPI WhatsApp Cloud webhook verification endpoint and signed inbound POST using Meta's `X-Hub-Signature-256` HMAC-SHA256 contract.
-- Normalisation of text, location and media-message payloads.
-- Sender reference is hashed before leaving the adapter; raw sender identity is not included in the normalized event.
-- Stable fingerprint for duplicate screening.\n- Idempotent inbound message persistence as an unverified `signals` record, serialised by provider message ID; no second case-management table.
-- Multilingual keyword hints are explicitly non-authoritative and do not determine legality.
+Configure `LP_WHATSAPP_VERIFY_TOKEN` and `LP_WHATSAPP_APP_SECRET` in the runtime secret manager. Configure the Meta webhook subscription for the deployed HTTPS endpoint.
 
-Not yet included: media download and malware scanning, outbound WhatsApp templates, social API connectors, officer registry, notification delivery and SLA escalation. Inbound reports are stored as unverified signals only; they do not automatically create or classify an enforcement case.
+### P5 remaining
 
-## Safety and evidence constraints
+- Authenticated media download, content-type/size validation, malware scanning and immutable original storage.
+- Outbound WhatsApp template messages.
+- Social listening through authorised APIs/licensed providers and source-specific terms.
+- Officer contact registry, departmental/jurisdiction routing, delivery receipts, retries and SLA escalation.
+- Privacy notices, consent/retention rules and operational governance for each channel.
 
-- Water masks and SAR threshold masks are screening layers only. Thresholds need local seasonal calibration and independent field reference.
-- Sentinel-1 VV thresholding is not a substitute for radiometric calibration, terrain correction, speckle treatment or orbit processing.
-- Spectral MNDWI is not a building or soil-fill detector. High-resolution building/fill detection remains a separate model/data work package.
-- Backtest metrics are meaningful only after case labels, geometry CRS, dates and blind-test independence are reviewed.
-- No automated legal conclusion, enforcement recommendation or owner identification is produced.
+## Evidence and model guardrails
+
+- MNDWI/SAR outputs and temporal water polygons are screening products. They are not proof of FTL encroachment, ownership or illegality.
+- Water spread is not equivalent to the legally notified FTL polygon. Seasonal hydrology, image quality and acquisition timing matter.
+- A two-date mask comparison is meaningful only when scenes are seasonally and spatially comparable. The pair selector uses acquisition-time gap and footprint overlap; it is an initial baseline, not a lake-specific seasonal reference policy. Comparisons are withheld when sufficient overlap is unavailable.
+- Sentinel-1 thresholding is not a substitute for calibration, terrain correction, speckle filtering or orbit processing.
+- MNDWI does not detect buildings or soil filling. High-resolution construction/fill models remain separate work.
+- Backtest metrics require independently adjudicated cases, consistent geometry CRS, reliable event/action dates and a held-out blind cohort.
+- All operational decisions remain with authorised officers; model outputs are review signals only.
 
 ## Verification status
 
-The new tests are added to the existing pipeline test suite and CI installs the `geo` extra. This change has not been executed in a local Docker/GDAL environment in this session. CI must pass before merging; inspect COG driver availability and Sentinel asset naming against real STAC items before operational use.
+Unit tests have been added for scene suitability, temporal water comparison, backtest timing, Meta signature verification and inbound idempotency. CI is configured to install the geospatial extra. The repository CI and target Docker/GDAL/S3 environment have not been executed in this session. Do not merge until PR checks pass and a controlled integration test is run with approved imagery and storage.
