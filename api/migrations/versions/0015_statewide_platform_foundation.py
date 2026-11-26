@@ -36,7 +36,7 @@ def upgrade():
     );
     CREATE INDEX ix_public_assets_category ON public_assets(category_code,lifecycle_status);
     CREATE INDEX ix_public_assets_footprint ON public_assets USING GIST(footprint);
-    CREATE TABLE land_parcels (
+    CREATE TABLE platform_land_parcels (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(), state_code text NOT NULL DEFAULT 'TS',
       district_code text, mandal_code text, village_code text, survey_number text NOT NULL,
       subdivision_number text, land_classification text,
@@ -45,10 +45,10 @@ def upgrade():
       source_record_ref text, valid_from date NOT NULL, valid_to date, recorded_at timestamptz NOT NULL DEFAULT now(),
       footprint geometry(MultiPolygon,4326), CHECK (valid_to IS NULL OR valid_to > valid_from)
     );
-    CREATE INDEX ix_land_parcels_survey ON land_parcels(district_code,mandal_code,village_code,survey_number,subdivision_number);
-    CREATE INDEX ix_land_parcels_geom ON land_parcels USING GIST(footprint);
+    CREATE INDEX ix_platform_land_parcels_survey ON platform_land_parcels(district_code,mandal_code,village_code,survey_number,subdivision_number);
+    CREATE INDEX ix_platform_land_parcels_geom ON platform_land_parcels USING GIST(footprint);
     CREATE TABLE asset_parcels (
-      asset_id uuid NOT NULL REFERENCES public_assets(id), parcel_id uuid NOT NULL REFERENCES land_parcels(id),
+      asset_id uuid NOT NULL REFERENCES public_assets(id), parcel_id uuid NOT NULL REFERENCES platform_land_parcels(id),
       overlap_area_sq_m numeric(16,2), relation_type text NOT NULL DEFAULT 'INTERSECTS',
       valid_from date NOT NULL, valid_to date, PRIMARY KEY(asset_id,parcel_id,valid_from),
       CHECK (valid_to IS NULL OR valid_to > valid_from)
@@ -115,7 +115,7 @@ def upgrade():
     CREATE INDEX ix_processing_runs_scope ON processing_runs USING GIST(geographic_scope);
     CREATE TABLE candidate_asset_links (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(), legacy_candidate_id bigint REFERENCES candidates(id),
-      platform_asset_id uuid NOT NULL REFERENCES public_assets(id), parcel_id uuid REFERENCES land_parcels(id),
+      platform_asset_id uuid NOT NULL REFERENCES public_assets(id), parcel_id uuid REFERENCES platform_land_parcels(id),
       boundary_id bigint REFERENCES boundaries(id), processing_run_id uuid REFERENCES processing_runs(id),
       spatial_relation text NOT NULL, overlap_area_sq_m numeric(16,2), matched_at timestamptz NOT NULL DEFAULT now(),
       UNIQUE(legacy_candidate_id,platform_asset_id,parcel_id,boundary_id)
@@ -155,5 +155,5 @@ def downgrade():
     op.execute("""
     DROP TABLE IF EXISTS outbox_events,ml_evaluations,ml_model_versions,candidate_asset_links,
       processing_runs,satellite_scenes,source_records,ingestion_batches,asset_responsibilities,
-      asset_admin_links,asset_parcels,land_parcels,public_assets,administrative_units,departments CASCADE;
+      asset_admin_links,asset_parcels,platform_land_parcels,public_assets,administrative_units,departments CASCADE;
     """)
