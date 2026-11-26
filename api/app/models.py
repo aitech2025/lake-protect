@@ -62,6 +62,8 @@ class Asset(Base):
     __tablename__ = "assets"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     asset_key: Mapped[str] = mapped_column(Text, unique=True)
+    # Canonical statewide UUID; legacy bigint id remains for operational compatibility.
+    platform_asset_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
     name: Mapped[str] = mapped_column(Text)
     name_te: Mapped[str | None] = mapped_column(Text)
     type: Mapped[str] = mapped_column(ASSET_TYPE)
