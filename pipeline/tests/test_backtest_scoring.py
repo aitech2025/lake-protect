@@ -124,3 +124,23 @@ def test_precision_is_not_estimable_when_no_detections_exist():
     result = evaluate([case()], [])
     assert result["precision"] is None
     assert result["precision_status"] == "not_estimable"
+
+def test_retrospective_first_changed_at_cannot_substitute_for_detected_at():
+    item = detection()
+    item["properties"] = {"first_changed_at": "2024-06-15"}
+    try:
+        evaluate([case()], [item])
+    except ValueError as exc:
+        assert "detected_at" in str(exc)
+        assert "retrospective" in str(exc)
+    else:
+        raise AssertionError("A retrospective change date must not be accepted as a detection date")
+
+
+def test_duplicate_detection_ids_are_rejected():
+    try:
+        evaluate([case()], [detection("same"), detection("same", detected_at="2024-07-10")])
+    except ValueError as exc:
+        assert "Duplicate detection id" in str(exc)
+    else:
+        raise AssertionError("Duplicate replay detection IDs must be rejected")
