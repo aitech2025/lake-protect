@@ -22,7 +22,7 @@ from sqlalchemy.exc import DBAPIError
 from app.citizen import sender, service, whatsapp
 from app.clock import utcnow
 from app.config import settings
-from app.models import Alert, Asset, Candidate, CitizenMessage, CitizenReport, ImageryRequest, Notification, SatelliteReview, Signal
+from app.models import Alert, Asset, Candidate, CandidateAsset, CitizenMessage, CitizenReport, ImageryRequest, Notification, SatelliteReview, Signal
 from app.notify import service as notify
 from app.notify.channels import Result
 from tests.factories import PNG_B64, TEST_LAT, TEST_LON, TG_LAT, TG_LON, auth, cover, decide, ingest, make_asset, make_user, offset, square
@@ -125,6 +125,20 @@ def test_outside_every_location_the_report_makes_a_reported_place_and_the_screen
     place = db.get(Asset, db.get(Candidate, alert.candidate_id).asset_id)
     assert (place.type, place.monitored, place.cohort) == ("reported_place", False, "D_UNNOTIFIED")
     assert place.name == f"Reported place {view['ref']}"
+    candidate_asset = db.get(CandidateAsset, report.candidate_asset_id)
+    assert candidate_asset is not None
+    assert candidate_asset.candidate_code == f"GGC-{view['ref']}"
+    assert candidate_asset.status == "PENDING_VERIFICATION"
+    assert candidate_asset.support_asset_id == place.id
+    assert candidate_asset.detection_candidate_id == alert.candidate_id
+    assert candidate_asset.incident_id == alert.id
+    assert candidate_asset.provenance["verification"] == "unverified"
+    # Internal support geometry must not leak into either registered-asset catalogue.
+    assert place.id not in {f["id"] for f in client.get("/assets", headers=auth(w.admin)).json()["features"]}
+    registry = client.get("/api/v1/platform/assets", headers=auth(w.admin)).json()["items"]
+    assert all(row["category_code"] != "reported_place" for row in registry)
+    candidate_rows = client.get("/api/v1/platform/candidate-assets", headers=auth(w.admin)).json()["items"]
+    assert any(row["id"] == str(candidate_asset.id) and row["source_report_ref"] == view["ref"] for row in candidate_rows)
     # A reported place is not on the weekly watch.
     assert place.id not in {a["id"] for a in client.get("/pipeline/watchlist", headers=TOKEN).json()["assets"]}
     rid = review_of(db, alert.id).id
