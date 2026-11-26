@@ -2,7 +2,7 @@
 
 **Branch:** `feature/consolidated`  
 **Plan owner:** Product owner / implementation agent  
-**Baseline commit:** `45aae37c3e6da294f05a922c2618ea95b1603612` (after PRs #31–#35)  
+**Baseline commit:** `99b56e06a0eb6395280797a8b154b16af8924a41` (after PRs #31–#36)  
 **Plan created:** 26 November 2026  
 **Status:** Active — Phase 1 started  
 **Source of truth:** `CONTEXT.md`, latest applicable owner decisions in `DECISIONS.md`, current code, and focused design documents.
@@ -175,7 +175,7 @@ Phase 2 UI work can proceed in parallel with M3 data verification, but it must n
 | Task | Status | Latest evidence / next action |
 |---|---|---|
 | P0 baseline and CI | Complete | API/PostGIS, pipeline and web CI were restored in PR #21; latest canonical runs after PRs #31–#34 are green. |
-| M2 detect-v2 diagnostics | Implemented; review pending | PR #25 exports sub-threshold levelling diagnostics separately from alert candidates. PR #31 adds run4/run5 polygon comparison CLI. The actual artifact comparison and human disposition of 11 disappeared run4 candidates remain outstanding. |
+| M2 detect-v2 diagnostics | Implemented; review pending | PR #25 exports sub-threshold levelling diagnostics separately from alert candidates. PR #31 adds run4/run5 polygon comparison CLI. The run4/run5 comparison has completed: 14 run4 candidates vs 3 run5 candidates; 2 spatial matches, 12 unmatched run4 footprints and 1 unmatched run5 footprint. All remain human-review leads, not accuracy labels. |
 | M3.1–M3.5 case evidence | Blocked on external evidence | 27 discovery leads are recorded; none is independently verified. Exact event dates, public-action dates, affected areas and verified event polygons are still required. |
 | M3.6–M3.7 rule review/freeze | Blocked | Five-lake non-scored tuning exists, but run4/run5 footprint review is incomplete. No immutable detect-v2 tag exists. |
 | M3.8–M3.10 replay | Implemented | Weekly resumable replay and no-look-ahead controls exist; replay detections now explicitly carry EPSG:4326 CRS metadata. |
