@@ -20,6 +20,7 @@ const NAV: { to: string; key: string; roles: string[] }[] = [
   { to: "/audit", key: "nav.audit", roles: BOTH },
   { to: "/officials", key: "nav.officials", roles: ["admin"] },
   { to: "/whatsapp-test", key: "nav.whatsapp_test", roles: ["admin"] },
+  { to: "/citizen-operations", key: "nav.citizen_ops", roles: ["admin"] },
 ];
 
 const COUNT_EVENT = "lp:notify-count";
