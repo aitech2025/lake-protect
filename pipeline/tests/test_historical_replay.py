@@ -88,6 +88,7 @@ def test_replay_deduplicates_candidates_and_keeps_first_detection_date(tmp_path)
     assert len(data["features"]) == 1
     feature = data["features"][0]
     assert feature["properties"]["detected_at"] == "2024-01-01"
+    assert feature["properties"]["geometry_crs"] == "EPSG:4326"
     assert feature["properties"]["first_changed_at"] == "2024-01-03"
     assert feature["properties"]["replay_as_of"] == "2024-01-01"
 
