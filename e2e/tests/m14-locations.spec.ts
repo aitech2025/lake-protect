@@ -11,6 +11,27 @@ test("the admin adds, refuses a duplicate of, and stops watching a location", as
   await login(page, "demo.admin");
   await page.goto("/assets");
 
+  // The statewide registry supports district → mandal drill-down without losing map context.
+  const districtFilter = page.getByTestId("filter-district");
+  const mandalFilter = page.getByTestId("filter-mandal");
+  await expect(districtFilter).toBeVisible();
+  expect(await districtFilter.locator("option").count()).toBeGreaterThan(1);
+  let selectedDistrict = "";
+  for (let i = 1; i < await districtFilter.locator("option").count(); i++) {
+    await districtFilter.selectOption({ index: i });
+    if (await mandalFilter.locator("option").count() > 1) {
+      selectedDistrict = await districtFilter.inputValue();
+      break;
+    }
+  }
+  expect(selectedDistrict).not.toBe("");
+  await mandalFilter.selectOption({ index: 1 });
+  const selectedMandal = await mandalFilter.inputValue();
+  const filteredRows = await page.locator(".list .row").allTextContents();
+  expect(filteredRows.length).toBeGreaterThan(0);
+  expect(filteredRows.every((row) => row.includes(selectedDistrict) && row.includes(selectedMandal))).toBeTruthy();
+  await page.getByTestId("clear-area-filters").click();
+
   // What GeoGuard watches now, and what is planned.
   await expect(page.getByTestId("kind-card-water_body")).toContainText("99 watched");
   await expect(page.getByTestId("kind-card-endowment_land")).toContainText("Planned");

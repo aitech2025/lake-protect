@@ -304,7 +304,14 @@
       "inside": "Inside the boundary",
       "buffer": "Buffer",
       "watch_ring": "Watch ring"
-    }
+    },
+    "registry_filters": "Filter the statewide registry by administrative area",
+    "filter_district": "District",
+    "all_districts": "All districts",
+    "filter_mandal": "Mandal",
+    "all_mandals": "All mandals",
+    "clear_area_filters": "Clear area filters",
+    "boundary_source": "Boundary source"
   },
   "records": {
     "title": "Records",

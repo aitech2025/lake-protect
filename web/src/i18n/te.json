@@ -305,7 +305,14 @@
       "inside": "సరిహద్దు లోపల",
       "buffer": "బఫర్",
       "watch_ring": "పర్యవేక్షణ వలయం"
-    }
+    },
+    "registry_filters": "పరిపాలనా ప్రాంతం ఆధారంగా రాష్ట్రవ్యాప్త రిజిస్ట్రీని వడపోసండి",
+    "filter_district": "జిల్లా",
+    "all_districts": "అన్ని జిల్లాలు",
+    "filter_mandal": "మండలం",
+    "all_mandals": "అన్ని మండలాలు",
+    "clear_area_filters": "ప్రాంత ఫిల్టర్లను తొలగించండి",
+    "boundary_source": "హద్దు మూలం"
   },
   "records": {
     "title": "రికార్డులు",
