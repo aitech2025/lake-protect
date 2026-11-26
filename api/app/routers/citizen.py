@@ -26,6 +26,7 @@ from app.clock import utcnow
 from app.db import get_db
 from app.enums import Role
 from app.models import CitizenChat, CitizenReport, User
+from app.notify import channels
 from app.security import require_roles
 
 router = APIRouter(prefix="/citizen", tags=["citizen"])
@@ -64,6 +65,72 @@ def config(db: Session = Depends(get_db)) -> dict:
         "stats": service.stats(db),
         "limits": {"photos": service.MAX_PHOTOS, "photo_mb": service.MAX_PHOTO_BYTES // (1024 * 1024), "description": 1000},
         "helpline": "1070",
+    }
+
+
+@router.get("/operations", dependencies=[Depends(require_roles(Role.admin))])
+def operations(db: Session = Depends(get_db)) -> dict:
+    """Admin-only operational view of citizen satellite reviews and outbound retry queues.
+
+    This is health/queue metadata only: it never returns citizen names, phone numbers, message
+    bodies, exact report coordinates or photo data.
+    """
+    from app.citizen import incident
+    from app.models import Alert
+
+    pending = incident.pending(db, limit=100)
+    review_items = []
+    for review in pending:
+        alert = db.get(Alert, review.alert_id)
+        report = db.get(CitizenReport, alert.report_id) if alert and alert.report_id else None
+        review_items.append({
+            "id": review.id,
+            "alert_id": review.alert_id,
+            "alert_code": alert.code if alert else None,
+            "report_ref": report.ref if report else None,
+            "kind": review.kind,
+            "requested_at": review.requested_at.isoformat() if review.requested_at else None,
+            "attempts": review.attempts,
+            "max_attempts": incident.MAX_ATTEMPTS,
+            "look_date": review.look_date.isoformat() if review.look_date else None,
+            "detail": review.detail,
+        })
+
+    message_rows = db.execute(text(
+        """
+        SELECT channel, status, count(*)::int AS count, max(at) AS last_at
+        FROM citizen_messages
+        WHERE direction = 'out' AND is_demo = false
+        GROUP BY channel, status
+        ORDER BY channel, status
+        """
+    )).mappings().all()
+    retry = db.execute(text(
+        """
+        SELECT
+          count(*) FILTER (WHERE status IN ('queued', 'failed') AND attempt < 3)::int AS retry_pending,
+          count(*) FILTER (WHERE status = 'failed' AND attempt >= 3)::int AS retry_exhausted
+        FROM citizen_messages
+        WHERE direction = 'out' AND is_demo = false
+        """
+    )).mappings().one()
+
+    inbound_ready = bool(os.environ.get("LP_WHATSAPP_VERIFY_TOKEN") and os.environ.get("LP_WHATSAPP_APP_SECRET"))
+    return {
+        "satellite_reviews": {"pending": len(review_items), "items": review_items, "max_items": 100},
+        "outbound_messages": {
+            "by_channel_status": [dict(row) for row in message_rows],
+            "retry_pending": retry["retry_pending"],
+            "retry_exhausted": retry["retry_exhausted"],
+        },
+        "outbound_channels": channels.status(),
+        "citizen_updates": sender.status(),
+        "whatsapp_inbound": {
+            "ready": inbound_ready,
+            "mode": "configured" if inbound_ready else "disabled",
+            "detail": "Webhook verification and signature credentials are configured" if inbound_ready
+                else "Disabled until the State's WhatsApp Business agreement and webhook credentials are configured",
+        },
     }
 
 

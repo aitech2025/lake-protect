@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { homeFor, useAuth } from "./auth";
 import { Layout } from "./components/Layout";
 import { AlertDetail } from "./desk/AlertDetail";
+import { CitizenOperations } from "./desk/CitizenOperations";
 import { Assets } from "./desk/Assets";
 import { Audit } from "./desk/Audit";
 import { Dashboard } from "./desk/Dashboard";
@@ -52,6 +53,7 @@ export function App() {
         <Route path="/satellites" element={<Satellites />} />
         <Route path="/monthly" element={<Monthly />} />
         <Route path="/whatsapp-test" element={<WhatsAppTest />} />
+        <Route path="/citizen-operations" element={<CitizenOperations />} />
       </Route>
       <Route path="*" element={<Home />} />
     </Routes>
