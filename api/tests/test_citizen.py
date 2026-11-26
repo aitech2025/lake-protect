@@ -96,6 +96,23 @@ def test_a_report_opens_a_citizen_incident_waiting_for_its_satellite_review_and_
     assert (alert.origin, alert.report_id, alert.state, report.placed_by) == ("citizen", report.id, "OPEN", "pin")
     cand = db.get(Candidate, alert.candidate_id)
     assert (cand.asset_id, cand.sensor_basis, cand.change_type) == (w.lake.id, "citizen_report", "soil_fill")
+    canonical = db.execute(text("""
+      SELECT pa.id AS canonical_id, pa.asset_code, a.platform_asset_id AS asset_platform_asset_id,
+             c.platform_asset_id AS candidate_platform_asset_id,
+             b.platform_asset_id AS boundary_platform_asset_id, al.platform_asset_id AS incident_platform_asset_id
+      FROM assets a
+      JOIN public_assets pa ON pa.id=a.platform_asset_id
+      JOIN candidates c ON c.id=:candidate_id
+      JOIN boundaries b ON b.id=c.boundary_id
+      JOIN alerts al ON al.id=:alert_id
+      WHERE a.id=:asset_id
+    """), {"asset_id": w.lake.id, "candidate_id": cand.id, "alert_id": alert.id}).mappings().one()
+    assert canonical["asset_code"]  # preserve a pre-existing permanent code when one already exists
+    expected_id = str(canonical["canonical_id"])
+    assert str(canonical["asset_platform_asset_id"]) == expected_id
+    assert str(canonical["candidate_platform_asset_id"]) == expected_id
+    assert str(canonical["boundary_platform_asset_id"]) == expected_id
+    assert str(canonical["incident_platform_asset_id"]) == expected_id
     assert 2500 < float(cand.area_sq_m) < 3000  # the reported spot: a 30 m circle
     rv = review_of(db, alert.id)
     assert (rv.status, rv.source) == ("pending", "sentinel-2")  # the screener answers it; there is no demo sensor
@@ -124,6 +141,7 @@ def test_outside_every_location_the_report_makes_a_reported_place_and_the_screen
     alert = db.get(Alert, report.alert_id)
     place = db.get(Asset, db.get(Candidate, alert.candidate_id).asset_id)
     assert (place.type, place.monitored, place.cohort) == ("reported_place", False, "D_UNNOTIFIED")
+    assert place.platform_asset_id is None  # candidate support rows never enter the registered asset identity space
     assert place.name == f"Reported place {view['ref']}"
     candidate_asset = db.get(CandidateAsset, report.candidate_asset_id)
     assert candidate_asset is not None
