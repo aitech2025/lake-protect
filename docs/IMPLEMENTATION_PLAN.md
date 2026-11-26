@@ -403,3 +403,13 @@ A new owner-requested Civic Slate & Water-Ledger refresh is in progress on `feat
 - [ ] Refine page-specific overview, queue, Asset 360, records, inbox and admin interactions based on QA.
 
 **Governance:** this is a frontend-only redesign. It preserves the current `admin` / `viewer` roles, server-authorized actions and D-057 incident lifecycle. It does not restore retired field-officer workflows, dual sign-off, officer routing or SLA timers. ACTION / VERIFY / WATCH will not be inferred from boundary data until the backend exposes an authoritative operating-mode contract. No API, ML, data, database, PWA or government-integration contract has been changed.
+
+
+## 10. Canonical asset identity integration — 26 November 2026
+
+- Implementation branch: `feat/canonical-asset-identity-db`, `feat/canonical-asset-identity-api`, and `feat/canonical-asset-identity-docs` (fan-out from `consolidated`).
+- Adds a database-backed bridge from legacy operational bigint IDs to permanent UUID registry identity, and propagates the UUID through boundary, candidate, incident, monitoring and signal records.
+- Existing operational APIs retain their bigint IDs and add the canonical UUID/GeoGuard Asset Code. The platform API exposes the optional legacy compatibility ID.
+- `reported_place` remains explicitly excluded from canonical registry mapping; candidate asset and incident remain separate from registered assets.
+- See [canonical asset identity integration](implementation/CANONICAL-ASSET-IDENTITY-INTEGRATION.md) for the migration, invariants and acceptance checklist.
+- Status: **implementation prepared; migration execution, API/PostGIS tests and CI validation pending**. Do not mark complete until the validation gates pass.
