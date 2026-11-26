@@ -97,6 +97,7 @@ export function AlertDetail() {
         </div>
         <BoundarySeal status={a.boundary.status} version={a.boundary.version} />
       </div>
+      <p className="banner disclaimer" role="note">{t("statement.imagery")}</p>
       <ChangeSummary a={a} />
       <AckBanner notes={a.my_notifications ?? []} isAdminUser={isAdmin(user)} onDone={reload} />
       <Flags a={a} />
@@ -420,6 +421,7 @@ function EvidencePanel({ alert, onChange }: { alert: any; onChange: () => void }
   return (
     <div className="panel" data-testid="evidence-panel">
       <h2 className="title-s">{t("pack.title")}</h2>
+      <p className="disclaimer" role="note">{t("statement.imagery")}</p>
       {latest ? (
         <>
           <p className="small" style={{ marginTop: "0.5rem" }}>
