@@ -37,7 +37,7 @@ The implementation plan and status document contain references to `feature/conso
 | Application foundation | Implemented (prototype) | FastAPI modular backend, React/TypeScript UI, PostgreSQL/PostGIS, migrations and container services documented |
 | Identity and access | Partially implemented | Authentication/role checks exist; current D-057 roles admin/viewer. SSO/MFA and end-to-end production authorization not complete |
 | Asset registry | Partially implemented | Lake asset catalogue, asset IDs, source records, ingestion foundations; complete authoritative statewide registry not established |
-| Permanent asset identity | Needs decision / partial | Existing asset IDs exist; immutable UUID + permanent GeoGuard Asset Code requirements need explicit schema/API/UI implementation evidence |
+| Permanent asset identity | Partially implemented | `public_assets` has UUID primary key and unique permanent `asset_code`; legacy lake engine still uses integer IDs and complete cross-surface identity mapping is not verified |
 | Boundaries and provenance | Partially implemented | Versioned/append-only boundaries, source metadata and Asset 360 provenance; certified departmental boundaries and separate legal approval not complete |
 | Government data onboarding | Partially implemented | File/import/source foundations; full submission package, approval workflow and authoritative data agreements incomplete |
 | Legal document repository | Partially implemented | Asset documents/evidence references and legal checks exist; comprehensive document lifecycle, OCR verification and legal sign-off not complete |
@@ -50,7 +50,7 @@ The implementation plan and status document contain references to `feature/conso
 | Detection quality | Not verified | No validated precision/recall/F1 or false-alert rate; tuning comparison is not accuracy validation |
 | Detection/incident workflow | Implemented for current prototype | Candidate ingestion, alert/incident lifecycle, review/decision, legal references and audit foundations |
 | Case entity separation | Not verified / needs implementation | New PRD requires separate Detection, Lead, Incident, Case and Inspection; full distinct model and relationships need code audit/implementation |
-| Citizen web reporting | Partially implemented | Portal and incident association exist; end-to-end journey, privacy, candidate-asset semantics and operational queue acceptance need verification |
+| Citizen web reporting | Partially implemented | Portal and incident association exist; unknown locations now create a distinct `candidate_assets` record linked to report, detection candidate and incident. Internal `reported_place` support rows are hidden from both registered-asset catalogues; candidate promotion and end-to-end acceptance remain outstanding |
 | WhatsApp | Partially implemented | Webhook verification and inbound normalization/readiness state documented; live outbound provider integration incomplete |
 | Social intelligence | Partially implemented foundation / not complete | Social signal payload foundations referenced; permitted-source connectors, lead triage, legal basis and full workflow not complete |
 | Field operations | Intentionally deferred / needs decision | Older field app and officer roles were retired under D-057; future inspection support is gated on expanded RBAC approval |
@@ -67,7 +67,13 @@ The implementation plan and status document contain references to `feature/conso
 | UI redesign | Partially implemented | PR #38 Civic Slate refresh was partial; many legacy screens remain |
 | Production readiness | Not achieved | Governance, validation, security, operations, provider agreements and deployment approvals outstanding |
 
-## 4. Specific detection tuning evidence
+## 4. BRD/PRD implementation update — candidate asset separation
+
+A focused implementation increment adds migration `0016_candidate_assets.py`, the `CandidateAsset` ORM model, citizen-report linkage, an admin/viewer read endpoint at `/api/v1/platform/candidate-assets`, and catalogue filters that prevent internal `reported_place` support rows from appearing as registered government assets. The internal support row remains temporarily because the existing legal-check and incident pipeline requires an `Asset`/boundary foreign key; it is explicitly marked internal and is not exposed in registered-asset lists. This is a transitional adapter, not a claim that the legacy asset model has been fully normalized. Automatic promotion to the authoritative registry is not implemented.
+
+**Validation status:** regression assertions were added to `api/tests/test_citizen.py`; execution is pending CI. No test pass is claimed.
+
+## 5. Specific detection tuning evidence
 
 The module status reports the M2 run4/run5 spatial comparison:
 - run4: 14 candidates;
@@ -84,7 +90,7 @@ This is comparative tuning/review evidence only. It is not a scored accuracy res
 5. run the blind replay/scorer once against the frozen rules;
 6. report precision, recall, F1, false flags per lake-year, lead time, class/season breakdown and limitations.
 
-## 5. Key documentation inconsistencies to resolve
+## 6. Key documentation inconsistencies to resolve
 
 1. `docs/MODULE_IMPLEMENTATION_STATUS.md` points to product/RTM paths that are absent from `consolidated`.
 2. `docs/IMPLEMENTATION_PLAN.md` and status metadata still refer to `feature/consolidated` or a status branch, while the requested working branch is `consolidated`.
@@ -93,7 +99,7 @@ This is comparative tuning/review evidence only. It is not a scored accuracy res
 5. D-063 pseudo-asset language must be aligned with candidate-asset semantics.
 6. Current lake-focused implementation and statewide multi-category product vision must be labelled separately in roadmap and dashboard.
 
-## 6. Recommended implementation sequence
+## 7. Recommended implementation sequence
 
 | Phase | Priority | Work | Exit evidence |
 |---|---|---|---|
@@ -111,7 +117,7 @@ This is comparative tuning/review evidence only. It is not a scored accuracy res
 | P11 | Critical before production | Security, privacy, hosting, DR, VAPT and operations | Formal sign-off, restore drill, SLO and incident runbooks |
 | P12 | Approval-gated | Government integrations | Agreements, test environment, contract tests and authorized credentials |
 
-## 7. Release blockers
+## 8. Release blockers
 
 Do not claim production readiness until all applicable items pass:
 - approved business/product baseline and departmental operating model;
@@ -125,6 +131,6 @@ Do not claim production readiness until all applicable items pass:
 - provider contracts/licences and imagery cost controls;
 - user acceptance and operational support runbooks.
 
-## 8. Audit disclaimer
+## 9. Audit disclaimer
 
 This status is a point-in-time assessment of repository evidence on 26 November 2026. It does not certify that every listed feature was exercised end-to-end. Historical test counts are quoted only where repository documents record them; no fresh test execution is claimed.
