@@ -7,7 +7,7 @@ app=typer.Typer(help="Lake Protect geospatial intelligence commands",no_args_is_
 
 @app.command("run-water")
 def run_water(endpoint:str=typer.Option("https://earth-search.aws.element84.com/v1"),
-              collections:str=typer.Option("sentinel-2-l2a"),
+              collections:str=typer.Option("sentinel-2-c1-l2a"),
               bbox:str=typer.Option(...,help="west,south,east,north EPSG:4326"),
               start:str=typer.Option(...),end:str=typer.Option(...),
               max_cloud_pct:float=typer.Option(35.0,min=0,max=100),
@@ -21,7 +21,7 @@ def run_water(endpoint:str=typer.Option("https://earth-search.aws.element84.com/
     typer.echo("processing_run="+result["run_id"]+" status="+result["status"]+" processed="+str(result["processed_count"]))
 
 @app.command("search")
-def search(endpoint:str=typer.Option("https://earth-search.aws.element84.com/v1"),collections:str=typer.Option("sentinel-2-l2a"),
+def search(endpoint:str=typer.Option("https://earth-search.aws.element84.com/v1"),collections:str=typer.Option("sentinel-2-c1-l2a"),
            bbox:str=typer.Option(...,help="west,south,east,north EPSG:4326"),start:str=typer.Option(...),end:str=typer.Option(...),
            max_cloud_pct:float=typer.Option(35.0,min=0,max=100),limit:int=typer.Option(100,min=1,max=1000),
            out:Path=typer.Option(Path("data/imagery/scenes.json"))):

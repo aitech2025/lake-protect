@@ -56,12 +56,14 @@ def compare_water_masks(reference_path: str | Path, current_path: str | Path,
     geod=Geod(ellps="WGS84")
     features=[]
     counts={"water_loss_pixels":int(np.nansum(loss==1)),"water_gain_pixels":int(np.nansum(gain==1))}
+    area_totals={"water_loss":0.0,"water_gain":0.0}
     for change_type,array in (("water_loss",loss),("water_gain",gain)):
         mask=np.isfinite(array)&(array==1)
         for geom_json,value in shapes(array.astype("uint8"),mask=mask,transform=ref_transform):
             geom=shape(geom_json)
             geom_wgs84=transform_geometry(transformer.transform,geom)
             area=abs(geod.geometry_area_perimeter(geom_wgs84)[0])
+            area_totals[change_type]+=area
             if area < minimum_area_sq_m:
                 continue
             features.append({"type":"Feature","geometry":mapping(geom_wgs84),
@@ -73,10 +75,9 @@ def compare_water_masks(reference_path: str | Path, current_path: str | Path,
     geojson={"type":"FeatureCollection","name":"sentinel_water_spread_change","features":features}
     vector_path=output_dir/"water-change.geojson"
     vector_path.write_text(json.dumps(geojson,ensure_ascii=False),encoding="utf-8")
-    pixel_area=abs(profile["transform"].a*profile["transform"].e)
     return {"water_loss_mask":str(loss_path),"water_gain_mask":str(gain_path),
         "vector_path":str(vector_path),"features":len(features),**counts,
-        "water_loss_area_sq_m":round(counts["water_loss_pixels"]*pixel_area,2),
-        "water_gain_area_sq_m":round(counts["water_gain_pixels"]*pixel_area,2),
+        "water_loss_area_sq_m":round(area_totals["water_loss"],2),
+        "water_gain_area_sq_m":round(area_totals["water_gain"],2),
         "method":"temporal binary MNDWI mask difference","validated":False,
         "warning":"Use seasonally comparable images and field/reference validation; changes are screening signals only."}
