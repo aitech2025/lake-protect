@@ -75,7 +75,7 @@ def operations(db: Session = Depends(get_db)) -> dict:
     bodies, exact report coordinates or photo data.
     """
     from app.citizen import incident
-    from app.models import Alert, CitizenMessage
+    from app.models import Alert
 
     pending = incident.pending(db, limit=100)
     review_items = []
@@ -122,7 +122,8 @@ def operations(db: Session = Depends(get_db)) -> dict:
             "retry_pending": retry["retry_pending"],
             "retry_exhausted": retry["retry_exhausted"],
         },
-        "outbound_channels": sender.status(),
+        "outbound_channels": channels.status(),
+        "citizen_updates": sender.status(),
         "whatsapp_inbound": {
             "ready": inbound_ready,
             "mode": "configured" if inbound_ready else "disabled",
