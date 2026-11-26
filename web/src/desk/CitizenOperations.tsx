@@ -12,7 +12,8 @@ type Review = {
 type Operations = {
   satellite_reviews: { pending: number; items: Review[]; max_items: number };
   outbound_messages: { by_channel_status: { channel: string; status: string; count: number; last_at: string | null }[]; retry_pending: number; retry_exhausted: number };
-  outbound_channels: { sms_updates?: boolean; whatsapp?: boolean } | { channel: string; ready: boolean; mode: string; detail: string }[];
+  outbound_channels: { channel: string; ready: boolean; mode: string; detail: string }[];
+  citizen_updates: { sms_updates: boolean; whatsapp: boolean };
   whatsapp_inbound: { ready: boolean; mode: string; detail: string };
 };
 
@@ -26,7 +27,7 @@ export function CitizenOperations() {
     return <div className="page"><h1>{t("citizen_ops.title")}</h1><p className="banner warn">{t("citizen_ops.admin_only")}</p></div>;
   }
 
-  const channels = Array.isArray(data?.outbound_channels) ? data.outbound_channels : [];
+  const channels = data?.outbound_channels ?? [];
   return (
     <div className="page" data-testid="citizen-operations">
       <div className="page-head">
@@ -40,6 +41,8 @@ export function CitizenOperations() {
             <div className="kind-card"><b>{t("citizen_ops.pending_reviews")}</b><span className="small muted" data-testid="pending-review-count">{data.satellite_reviews.pending}</span></div>
             <div className="kind-card"><b>{t("citizen_ops.retry_pending")}</b><span className="small muted">{data.outbound_messages.retry_pending}</span></div>
             <div className="kind-card"><b>{t("citizen_ops.retry_exhausted")}</b><span className="small muted">{data.outbound_messages.retry_exhausted}</span></div>
+            <div className="kind-card"><b>{t("citizen_ops.sms_updates")}</b><span className={data.citizen_updates.sms_updates ? "ok" : "flag"}>{t(data.citizen_updates.sms_updates ? "citizen_ops.configured" : "citizen_ops.disabled")}</span></div>
+            <div className="kind-card"><b>{t("citizen_ops.whatsapp_updates")}</b><span className={data.citizen_updates.whatsapp ? "ok" : "flag"}>{t(data.citizen_updates.whatsapp ? "citizen_ops.configured" : "citizen_ops.disabled")}</span></div>
             <div className="kind-card"><b>{t("citizen_ops.whatsapp_inbound")}</b><span className={data.whatsapp_inbound.ready ? "ok" : "flag"}>{t(data.whatsapp_inbound.ready ? "citizen_ops.configured" : "citizen_ops.disabled")}</span><span className="small muted">{data.whatsapp_inbound.detail}</span></div>
           </section>
           <section className="section" data-testid="citizen-review-queue">
