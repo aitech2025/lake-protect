@@ -155,14 +155,14 @@ def _boundary_provenance(row: dict | None) -> dict | None:
         "final_notification", "preliminary_notification"
     ):
         source_class = "official_record"
-    elif connector:
-        source_class = "imported_file" if transport == "file_drop" else "provider_api" if transport == "api" else "imported_source"
     elif "openstreetmap" in source_name or "osm" in source_name:
         source_class = "osm_derived"
     elif "user-drawn" in source_name or "user drawn" in source_name:
         source_class = "user_drawn"
     elif status == "derived":
         source_class = "derived_unverified"
+    elif connector:
+        source_class = "imported_file" if transport == "file_drop" else "provider_api" if transport == "api" else "imported_source"
     else:
         source_class = "unclassified"
     return {
