@@ -12,12 +12,30 @@ from app.security import current_user, require_roles
 
 router = APIRouter(prefix="/api/v1/platform", tags=["platform-registry"])
 
+@router.get("/candidate-assets")
+def list_candidate_assets(limit: int = Query(100, ge=1, le=500), offset: int = Query(0, ge=0),
+                         actor: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Unverified reported locations, separate from the registered government asset registry."""
+    rows = db.execute(text("""
+      SELECT ca.id, ca.candidate_code, ca.display_name, ca.category_hint, ca.district, ca.mandal, ca.village,
+             ca.status, ca.created_at, r.ref AS source_report_ref, ca.detection_candidate_id, ca.incident_id,
+             ST_AsGeoJSON(ca.footprint)::json AS footprint
+      FROM candidate_assets ca JOIN citizen_reports r ON r.id=ca.source_report_id
+      ORDER BY ca.created_at DESC, ca.id LIMIT :limit OFFSET :offset
+    """), {"limit": limit, "offset": offset}).mappings().all()
+    chain.record(db, actor_id=actor.id, action="view.candidate_assets", entity="candidate_asset",
+                 details={"count": len(rows), "limit": limit, "offset": offset})
+    db.commit()
+    return {"items": [dict(row) for row in rows], "limit": limit, "offset": offset,
+            "notice": "Candidate locations are unverified intelligence, not registered government assets."}
+
 @router.get("/assets")
 def list_assets(category: str | None = None, limit: int = Query(100, ge=1, le=500),
                 offset: int = Query(0, ge=0), _: User = Depends(current_user), db: Session = Depends(get_db)):
     rows = db.execute(text("""
       SELECT id,asset_code,display_name,category_code,lifecycle_status,baseline_date,source_authority
-      FROM public_assets WHERE (:category IS NULL OR category_code=:category)
+      FROM public_assets WHERE category_code <> 'reported_place'
+        AND (:category IS NULL OR category_code=:category)
       ORDER BY asset_code LIMIT :limit OFFSET :offset
     """), {"category":category,"limit":limit,"offset":offset}).mappings()
     return {"items":[dict(row) for row in rows],"limit":limit,"offset":offset}
@@ -44,7 +62,7 @@ def get_asset(asset_id: UUID, _: User = Depends(current_user), db: Session = Dep
     row = db.execute(text("""
       SELECT id,asset_code,display_name,category_code,lifecycle_status,baseline_date,source_authority,
              source_record_ref,ST_AsGeoJSON(footprint)::json AS footprint
-      FROM public_assets WHERE id=:asset_id
+      FROM public_assets WHERE id=:asset_id AND category_code <> 'reported_place'
     """),{"asset_id":str(asset_id)}).mappings().first()
     if row is None:
         raise HTTPException(status_code=404,detail="Asset not found")
