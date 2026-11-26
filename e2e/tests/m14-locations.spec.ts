@@ -32,6 +32,12 @@ test("the admin adds, refuses a duplicate of, and stops watching a location", as
   expect(filteredRows.every((row) => row.includes(selectedDistrict) && row.includes(selectedMandal))).toBeTruthy();
   await page.getByTestId("clear-area-filters").click();
 
+  // Asset 360 must expose source class and avoid implying authority for unverified outlines.
+  await page.locator(".list .row", { hasText: "Kapra lake" }).first().click();
+  await expect(page.getByTestId("asset-register")).toBeVisible();
+  await expect(page.getByTestId("boundary-provenance")).toBeVisible();
+  await expect(page.getByTestId("boundary-provenance")).toContainText(/unverified|unclassified|OpenStreetMap/i);
+
   // What GeoGuard watches now, and what is planned.
   await expect(page.getByTestId("kind-card-water_body")).toContainText("99 watched");
   await expect(page.getByTestId("kind-card-endowment_land")).toContainText("Planned");

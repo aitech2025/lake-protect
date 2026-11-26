@@ -110,7 +110,9 @@ _LINKS_SQL = text(
 _PRIMARY_SOURCE_SQL = text(
     """
     SELECT b.id AS boundary_id, b.version, b.kind::text AS kind, b.status::text AS status, b.source_name,
-           b.positional_accuracy_m, s.connector, s.agency, s.file_name, s.sha256, s.source_date, s.reference
+           b.source_url, b.source_date AS boundary_source_date, b.notification_ref, b.certified_by,
+           b.positional_accuracy_m, s.id AS source_snapshot_id, s.connector, s.agency, s.file_name,
+           s.sha256, s.source_date, s.reference, s.transport, s.is_sample
     FROM boundaries b LEFT JOIN source_snapshots s ON s.id = b.source_snapshot_id
     WHERE b.asset_id = :a AND b.kind IN ('ftl', 'parcel') ORDER BY b.version DESC LIMIT 1
     """
@@ -136,6 +138,51 @@ _PARCELS_SQL = text(
     ORDER BY p.village, p.survey_no, p.sub_division
     """
 )
+
+
+
+def _boundary_provenance(row: dict | None) -> dict | None:
+    """Return a conservative, explicit provenance classification; never infer authority from a name."""
+    if row is None:
+        return None
+    status = row.get("status")
+    connector = row.get("connector")
+    transport = row.get("transport")
+    source_name = (row.get("source_name") or "").lower()
+    if row.get("is_sample"):
+        source_class = "demo_sample"
+    elif status == "derived":
+        source_class = "derived_unverified"
+    elif connector == "hmda_lpc" and row.get("notification_ref") and status in (
+        "final_notification", "preliminary_notification"
+    ):
+        source_class = "official_record"
+    elif connector:
+        source_class = "imported_file" if transport == "file_drop" else "provider_api" if transport == "api" else "imported_source"
+    elif "openstreetmap" in source_name or "osm" in source_name:
+        source_class = "osm_derived"
+    elif "user-drawn" in source_name or "user drawn" in source_name:
+        source_class = "user_drawn"
+    else:
+        source_class = "unclassified"
+    return {
+        "source_class": source_class,
+        "source_name": row.get("source_name"),
+        "source_url": row.get("source_url"),
+        "source_date": row.get("boundary_source_date") or row.get("source_date"),
+        "notification_ref": row.get("notification_ref"),
+        "certified_by": row.get("certified_by"),
+        "source_snapshot_id": row.get("source_snapshot_id"),
+        "source_agency": row.get("agency"),
+        "source_transport": transport,
+        "source_sha256": row.get("sha256"),
+        "provenance_complete": bool(
+            row.get("source_name") and (
+                row.get("source_url") or row.get("notification_ref") or row.get("source_snapshot_id")
+            )
+        ),
+        "authority_confirmed": source_class == "official_record",
+    }
 
 
 @router.get("/assets/{asset_id}/register")
@@ -169,7 +216,7 @@ def asset_register(asset_id: int, user: User = Depends(require_roles(*REGISTER_R
         "asset_id": asset_id,
         "asset_key": asset.asset_key,
         "is_demo": asset.is_demo,
-        "boundary_source": dict(primary) if primary else None,
+        "boundary_source": (dict(primary) | {"provenance": _boundary_provenance(dict(primary))}) if primary else None,
         "links": links,
         "parcels": parcels,
         "parcel_categories": categories,
