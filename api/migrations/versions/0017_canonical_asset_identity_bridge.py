@@ -21,6 +21,14 @@ def upgrade():
     CREATE UNIQUE INDEX IF NOT EXISTS ux_public_assets_legacy_asset_id
       ON public_assets(legacy_asset_id);
 
+    DO $
+    BEGIN
+      IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname='fk_public_assets_legacy_asset') THEN
+        ALTER TABLE public_assets ADD CONSTRAINT fk_public_assets_legacy_asset
+          FOREIGN KEY (legacy_asset_id) REFERENCES assets(id) ON DELETE RESTRICT;
+      END IF;
+    END $;
+
     ALTER TABLE assets ADD COLUMN IF NOT EXISTS platform_asset_id uuid;
     CREATE UNIQUE INDEX IF NOT EXISTS ux_assets_platform_asset_id
       ON assets(platform_asset_id) WHERE platform_asset_id IS NOT NULL;
@@ -196,6 +204,7 @@ def downgrade():
     DROP FUNCTION IF EXISTS geoguard_sync_child_asset_identity();
     DROP FUNCTION IF EXISTS geoguard_sync_asset_identity();
     ALTER TABLE assets DROP CONSTRAINT IF EXISTS ck_assets_have_platform_identity;
+    ALTER TABLE public_assets DROP CONSTRAINT IF EXISTS fk_public_assets_legacy_asset;
     ALTER TABLE assets DROP CONSTRAINT IF EXISTS fk_assets_platform_asset;
     ALTER TABLE boundaries DROP CONSTRAINT IF EXISTS fk_boundaries_platform_asset;
     ALTER TABLE candidates DROP CONSTRAINT IF EXISTS fk_candidates_platform_asset;
