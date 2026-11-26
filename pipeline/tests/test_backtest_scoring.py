@@ -28,7 +28,7 @@ def case(case_id="case-1", **overrides):
 
 
 def detection(detection_id="det-1", detected_at="2024-07-01", **overrides):
-    properties = {"detected_at": detected_at}
+    properties = {"detected_at": detected_at, "geometry_crs": "EPSG:4326", "sensor_basis": "optical_and_radar"}
     properties.update(overrides)
     return {
         "type": "Feature",
@@ -127,7 +127,7 @@ def test_precision_is_not_estimable_when_no_detections_exist():
 
 def test_retrospective_first_changed_at_cannot_substitute_for_detected_at():
     item = detection()
-    item["properties"] = {"first_changed_at": "2024-06-15"}
+    item["properties"] = {"first_changed_at": "2024-06-15", "geometry_crs": "EPSG:4326"}
     try:
         evaluate([case()], [item])
     except ValueError as exc:
@@ -144,3 +144,34 @@ def test_duplicate_detection_ids_are_rejected():
         assert "Duplicate detection id" in str(exc)
     else:
         raise AssertionError("Duplicate replay detection IDs must be rejected")
+
+
+def test_detection_must_declare_geojson_crs():
+    item = detection()
+    item["properties"].pop("geometry_crs")
+    try:
+        evaluate([case()], [item])
+    except ValueError as exc:
+        assert "geometry_crs=EPSG:4326" in str(exc)
+    else:
+        raise AssertionError("Detection CRS must be explicit")
+
+
+def test_detection_with_projected_crs_is_rejected():
+    item = detection()
+    item["properties"]["geometry_crs"] = "EPSG:32644"
+    try:
+        evaluate([case()], [item])
+    except ValueError as exc:
+        assert "reproject source geometry" in str(exc)
+    else:
+        raise AssertionError("Projected coordinates must not be treated as GeoJSON longitude/latitude")
+
+
+def test_report_includes_median_lead_time_and_sensor_season_breakdowns():
+    result = evaluate([case()], [detection()])
+    assert result["median_lead_time_days"] == 62
+    assert result["matched_by_sensor"] == {"optical_and_radar": 1}
+    assert result["matched_by_season"] == {"southwest_monsoon": 1}
+    assert result["matched_by_event_type"] == {"soil_fill": 1}
+    assert result["iou_crs"] == "EPSG:32644"

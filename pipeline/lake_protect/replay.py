@@ -83,6 +83,7 @@ def _load_week_features(path: Path, as_of: dt.date) -> list[dict]:
         properties = dict(feature.get("properties") or {})
         if not isinstance(feature.get("geometry"), dict):
             raise ReplayError(f"Weekly candidate in {path} has no GeoJSON geometry")
+        properties["geometry_crs"] = "EPSG:4326"
         properties["detected_at"] = as_of.isoformat()
         properties["replay_as_of"] = as_of.isoformat()
         properties["replay_detection_id"] = _candidate_key({**properties, "geometry": feature["geometry"]})
