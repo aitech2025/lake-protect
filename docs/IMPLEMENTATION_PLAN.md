@@ -175,12 +175,12 @@ Phase 2 UI work can proceed in parallel with M3 data verification, but it must n
 | Task | Status | Latest evidence / next action |
 |---|---|---|
 | P0.1 canonical branch baseline | Done | `feature/consolidated`, baseline `65ce4c4` |
-| P0.2 CI status review | Done | Run `45749001507`: pipeline and web passed; API job failed |
+| P0.2 CI status review | Done | Earlier PR #20 run `45757478902`: pipeline 66 passed, web build passed; API 347 passed / 40 failed (same 40 baseline failures). Latest scorer/test/evidence-request changes are awaiting CI run `45765718947`; web build passed, pipeline/API jobs still running |
 | P0.3–P0.6 CI triage | Not started | Classify 40 known API failures and establish a reproducible baseline |
-| M3.1–M3.5 case evidence | Not started | Inventory the 30 PRD cases; verify geometry, dates, area and source |
-| M3.6–M3.7 freeze rules | Not started | `detect-v2`; no tag exists at baseline |
+| M3.1–M3.5 case evidence | In progress | 27 discovery leads classified in `data/case-register.csv` into primary candidates, historical-only, restoration controls, boundary controls and unresolved identities. None are independently verified; manifest remains empty |
+| M3.6–M3.7 freeze rules | Not started | `detect-v2`; no tag exists. Freeze only after confirming the rules and case protocol |
 | M3.8–M3.11 weekly replay | Not started | Existing scoring utility only; replay orchestration remains to build |
-| M3.12–M3.17 scoring/report | Partial | `geospatial/backtest.py` is a basic scorer; complete validation and report outputs remain |
+| M3.12–M3.17 scoring/report | In progress | Hardened scorer now enforces validated primary eligibility, event/action temporal order, strict >0.25-acre threshold and auditable false-positive review; focused tests added, CI pending |
 | P2 geospatial UI | Not started | Registry APIs merged by PR #19; UI wiring remains |
 | P3 incident/citizen hardening | Partial | Core M12–M17 flows exist; provider-dependent channels and operational hardening remain |
 | P4 intelligence | Not started | ML utilities/registry foundation exist; no approved production model or RAG copilot |
@@ -190,11 +190,71 @@ Phase 2 UI work can proceed in parallel with M3 data verification, but it must n
 
 **First active work item:** M3.1–M3.5 — blind-backtest case evidence inventory and validation.
 
-The first increment will:
-1. inspect the existing PRD case list and any supplied evidence;
-2. distinguish name-search hints from verified ground-truth events;
-3. define a machine-readable case manifest with source, geometry, event date, public-action date, area and eligibility reason;
-4. add validation and tests so incomplete or ambiguous cases cannot silently enter the score;
-5. document blockers where source evidence or hand-traced boundaries are required.
+The first increment has started on `feature/m3-case-validation`:
+1. Inspected the PRD's section 13 starter list and `data/case_lake_search.yml`; name matches are discovery hints, not ground truth.
+2. Added `data/case-register.csv` with 27 leads and explicit source-review status, event-date precision, public-action-date precision, case role and scoring lane. Reporting/action dates are not misrepresented as the date the underlying change began.
+3. Classified 2014–2023 cases as historical detection-only, restoration actions as controls, Khajaguda boundary disputes as boundary controls, Durgam Cheruvu as exposed under D-042, and ambiguous Pedda Cheruvu identity as unresolved.
+4. Added the empty GeoJSON manifest, evidence register documentation, strict validator and `lp-geo validate-cases` command.
+5. Hardened `geospatial/backtest.py`: only validator-eligible cases can score; detections must occur on/after event and strictly before public action; exactly 0.25 acre is excluded; unknown public-action dates cannot be counted as early-warning hits; unmatched detections are not false positives until reviewed with reviewer identity, review date and evidence.
+6. Added focused scorer tests in `pipeline/tests/test_backtest_scoring.py` and updated legacy backtest fixtures to satisfy the evidence contract.
+7. Added `docs/m3-government-evidence-request.md`, a structured request checklist for TGRAC, HYDRAA, HMDA, Irrigation and Revenue records.
 
-No scored backtest will run until the rules are frozen and the case set is independently verified.
+**Still blocked:** none of the 27 leads has a verified event footprint and complete event/action evidence. The scoring manifest remains empty. The scored backtest will not run until source evidence is independently verified and detector rules are frozen.
+
+
+## 8. Execution log
+
+### 26 November 2026 — M3 case-evidence validation started
+
+- Created this plan on `feature/consolidated` at commit `e7321a7`.
+- Created implementation branch `feature/m3-case-validation` from that plan commit.
+- Added a machine-readable empty GeoJSON case manifest, case-register documentation, validation module, CLI command and focused tests.
+- The validator requires explicit event/action dates, independent area source, verified event-footprint provenance and EPSG:4326 geometry. It excludes cases with unknown action dates, non-exact event dates, unverified geometry, pre-2018 events or area at/below 0.25 acre from the primary gate.
+- No actual case was admitted or scored. Source verification and geometry tracing remain human evidence tasks.
+- Next: run the focused pipeline suite in CI, fix any failures, then build the evidence inventory from the PRD starter cases without guessing missing values.
+
+
+### 26 November 2026 — PR #20 CI result
+
+- PR: https://github.com/aitech2025/lake-protect/pull/20
+- CI run: https://github.com/aitech2025/lake-protect/actions/runs/45757478902
+- Pipeline tests: **66 passed** (including the new case-validation tests).
+- Web type-check/build: **passed**.
+- API/PostGIS: **347 passed, 40 failed**. The failure count and failure set match the previously recorded baseline; this increment changes no API code. The full API suite is therefore not green, but the new pipeline validation suite is green.
+- PR remains open for review; it has not been merged into `feature/consolidated` yet.
+
+
+### 26 November 2026 — PRD case leads inventoried
+
+- Added `data/case-register.csv` with 21 leads from CONTEXT.md section 13.
+- The register preserves the PRD's approximate date anchors and reported area notes as text. It does not convert month/year ranges into exact event dates or infer affected polygons.
+- All 21 rows remain `unverified` and `needs_verification`, except the Bhagirathamma/Tautanikunta boundary-uncertainty cases explicitly marked `exclude_pending_boundary`.
+- The GeoJSON scoring manifest remains empty until exact dates, public-action dates, independently supported areas, source evidence and verified event footprints are available.
+- PR #20 has been updated with the inventory; the latest commit will receive a fresh CI run.
+
+
+### 26 November 2026 — Recommended next increment executed
+
+- Expanded the discovery inventory from 21 to **27 named leads** using the PRD list and additional cases described in the SANDRP Hyderabad lakes review and other cited reporting.
+- Reworked the register so it distinguishes event-date precision from public-action-date precision and separates primary candidates from historical-only cases, authorized-restoration controls, boundary-uncertainty controls and unresolved identities.
+- Identified a scoring integrity defect in the previous backtest: a case with unknown public-action date could be matched and labelled `before_public_action=true`; the scorer also treated exactly 0.25 acre as eligible despite the PRD requiring over 0.25 acre, and counted every unmatched detection as a false positive without human review.
+- Reworked the scorer to use the case validator's primary eligibility set, enforce event-date/public-action-date ordering, apply the strict area threshold and require documented human review before counting false positives. Unmatched detections now keep precision pending rather than silently inflating/deflating it.
+- Added focused temporal and adjudication tests. CI is pending on run `45765555468`.
+- No cases have been promoted to verified ground truth; no detection metrics have been generated. This is intentional until official records, imagery dates and event footprints are verified.
+
+### Evidence sources consulted
+
+- SANDRP, *Hyderabad Lakes 2025: Degradation Continues Amid HYDRAA Efforts*: https://sandrp.in/2026/02/17/hyderabad-lakes-2025-degradation-continues-amid-hydraa-efforts/
+- The News Minute, *Telangana: 171 natural water tanks encroached in past 10 years, says govt report*: https://www.thenewsminute.com/telangana/telangana-171-natural-water-tanks-encroached-in-past-10-years-says-govt-report
+- The News Minute, Khajaguda boundary/procedure case: https://www.thenewsminute.com/telangana/telangana-hc-raps-hydraa-again-for-hasty-evictions-questions-proof-of-violations
+- Deccan Chronicle, *HYDRAA Protects Muskin Cheruvu From Encroachers*: https://www.deccanchronicle.com/southern-states/telangana/hydraa-protects-muskin-cheruvu-from-encroachers-1960200
+
+These articles are discovery references only. They are not substitutes for certified boundaries, official event records or independently traced event polygons.
+
+
+### 26 November 2026 — Government evidence request prepared
+
+- Added `docs/m3-government-evidence-request.md` with the exact spatial, temporal, legal-status and provenance fields needed from TGRAC, HYDRAA, HMDA, Irrigation and Revenue departments.
+- Requested the original 171-tank report and spatial annexures, exact comparison dates, dated enforcement records, official boundary versions, event footprints and five non-scored tuning lakes.
+- The document explicitly asks departments to distinguish physical event date from first public/official action date, and total FTL area from the actual event footprint.
+- Latest CI run `45765718947` is in progress; web build has passed, pipeline and API jobs are still running at the time of this update.

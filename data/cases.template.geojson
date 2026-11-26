@@ -1,0 +1,13 @@
+{
+  "type": "FeatureCollection",
+  "name": "GeoGuard M3 verified historical event cases",
+  "metadata": {
+    "status": "empty_template",
+    "purpose": "Ground-truth event footprints for the blind historical backtest",
+    "coordinate_reference": "EPSG:4326",
+    "minimum_scoring_area_acres": 0.25,
+    "scoring_period_start": "2018-01-01",
+    "warning": "Do not add a case until its source, exact event date, public-action date, area and event geometry have been independently verified."
+  },
+  "features": []
+}
