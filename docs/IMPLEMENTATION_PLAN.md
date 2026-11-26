@@ -397,6 +397,7 @@ A new owner-requested Civic Slate & Water-Ledger refresh is in progress on `feat
 - [x] Responsive workspace shell with grouped navigation and account/language controls.
 - [x] Shared styling refresh for page surfaces, panels, forms, tables, maps, badges and evidence.
 - [x] Mandatory evidentiary disclaimer surfaced on Alert Detail and Evidence Pack preview.
+- [x] Move the dated observation bracket ahead of review actions; keep language and sign-out controls reachable on mobile.
 - [ ] Validate the full route set, existing E2E selectors and English/Telugu responsive layouts.
 - [ ] Refine page-specific overview, queue, Asset 360, records, inbox and admin interactions based on QA.
 
