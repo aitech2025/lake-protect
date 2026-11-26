@@ -23,10 +23,10 @@ const NAV: { to: string; key: string; roles: string[]; icon: string }[] = [
 ];
 
 const GROUPS = [
-  { label: "Workspace", items: ["/dashboard", "/inbox"] },
-  { label: "Review & records", items: ["/alerts", "/reports", "/assets", "/records"] },
-  { label: "Data & oversight", items: ["/sources", "/satellites", "/monthly", "/audit"] },
-  { label: "Administration", items: ["/officials", "/whatsapp-test", "/citizen-operations"] },
+  { label: "Workspace", labelTe: "పని ప్రదేశం", items: ["/dashboard", "/inbox"] },
+  { label: "Review & records", labelTe: "సమీక్ష & రికార్డులు", items: ["/alerts", "/reports", "/assets", "/records"] },
+  { label: "Data & oversight", labelTe: "డేటా & పర్యవేక్షణ", items: ["/sources", "/satellites", "/monthly", "/audit"] },
+  { label: "Administration", labelTe: "నిర్వహణ", items: ["/officials", "/whatsapp-test", "/citizen-operations"] },
 ];
 
 const ICON_PATH: Record<string, string> = {
@@ -151,14 +151,14 @@ export function Layout() {
             <span className="small">{t("app.tagline")}</span>
           </span>
         </NavLink>
-        <div className="rail-caption">GOVERNANCE WORKSPACE</div>
+        <div className="rail-caption">{i18n.language === "te" ? "పరిపాలనా కార్యస్థలం" : "GOVERNANCE WORKSPACE"}</div>
         <nav className="nav-links" aria-label={t("nav.label")}>
           {GROUPS.map((group) => {
             const items = visible.filter((n) => group.items.includes(n.to));
             if (!items.length) return null;
             return (
-              <section className="nav-group" key={group.label} aria-label={group.label}>
-                <p className="nav-group-label">{group.label}</p>
+              <section className="nav-group" key={group.label} aria-label={i18n.language === "te" ? group.labelTe : group.label}>
+                <p className="nav-group-label">{i18n.language === "te" ? group.labelTe : group.label}</p>
                 {items.map((n) => (
                   <NavLink key={n.to} to={n.to} data-testid={`nav-${n.to.slice(1)}`} className={({ isActive }) => `nav-item${isActive ? " active" : ""}`}>
                     <NavIcon name={n.icon} />
