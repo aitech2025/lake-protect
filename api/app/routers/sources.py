@@ -151,8 +151,6 @@ def _boundary_provenance(row: dict | None) -> dict | None:
     source_name = (row.get("source_name") or "").lower()
     if row.get("is_sample"):
         source_class = "demo_sample"
-    elif status == "derived":
-        source_class = "derived_unverified"
     elif connector == "hmda_lpc" and row.get("notification_ref") and status in (
         "final_notification", "preliminary_notification"
     ):
@@ -163,6 +161,8 @@ def _boundary_provenance(row: dict | None) -> dict | None:
         source_class = "osm_derived"
     elif "user-drawn" in source_name or "user drawn" in source_name:
         source_class = "user_drawn"
+    elif status == "derived":
+        source_class = "derived_unverified"
     else:
         source_class = "unclassified"
     return {
