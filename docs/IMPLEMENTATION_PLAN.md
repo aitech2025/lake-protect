@@ -2,7 +2,7 @@
 
 **Branch:** `feature/consolidated`  
 **Plan owner:** Product owner / implementation agent  
-**Baseline commit:** `0588ab28b70acac2f649916bdfb969f361266c8a` (after PR #27)  
+**Baseline commit:** `45aae37c3e6da294f05a922c2618ea95b1603612` (after PRs #31–#35)  
 **Plan created:** 26 November 2026  
 **Status:** Active — Phase 1 started  
 **Source of truth:** `CONTEXT.md`, latest applicable owner decisions in `DECISIONS.md`, current code, and focused design documents.
@@ -78,7 +78,7 @@
 
 #### 1C. Score, inspect and report
 
-- [ ] M3.12 Complete scorer validation. Case-manifest eligibility is validated; PR #26 now rejects missing replay timestamps, duplicate detection IDs and invalid/out-of-range detection geometry. Remaining: full case/detection CRS contract and complete report breakdowns.
+- [x] M3.12 Complete scorer validation. PR #32 requires explicit EPSG:4326 detection CRS, validates Polygon/MultiPolygon bounds and computes IoU in EPSG:32644; adds median lead time and sensor/season/event-type breakdowns. Full false-flags-per-lake-year and signed report remain in M3.14–M3.17.
 - [ ] M3.13 Match a detection only when it intersects the event geometry and its alert date precedes the public-action date.
 - [ ] M3.14 Report true/false positives, misses, precision, recall, F1, median lead time, false flags per lake-year, sensor/season breakdown and ineligible cases.
 - [ ] M3.15 Generate before/after chips for every scored case, including misses, with acquisition dates and sensor labels.
@@ -96,7 +96,7 @@
 - [ ] P2.1 Map the new registry/ingestion APIs to current UI navigation and data contracts.
 - [ ] P2.2 Complete the statewide registry hierarchy. Existing asset map/list and dashboard drill-down are present; PR #27 adds district → mandal filters. Department/source hierarchy and authoritative master-code mapping remain.
 - [ ] P2.3 Complete Asset 360 integration. Existing page links boundaries/versions, registry links, survey parcels, weekly screens and documents; incident/evidence cross-linking and full source completeness remain.
-- [ ] P2.4 Standardise provenance labels. PR #27 surfaces the boundary source name; normalised source classes (official/imported/OSM/user-drawn/demo) remain.
+- [x] P2.4 Add conservative boundary provenance classes in Asset 360. PR #33 adds source classes, source metadata and authority state; PR #35 fixes OSM-vs-generic-derived classification. Both are merged and CI passed.
 - [ ] P2.5 Add imagery freshness and coverage states, including no usable look and failed processing.
 - [ ] P2.6 Show geospatial screening candidates as review leads; never present MNDWI/radar output as a legal finding.
 - [ ] P2.7 Provide clear provider configuration states: not configured, demo/sample, configured, connected, failed. Do not imply live provider connectivity when credentials are absent.
@@ -170,24 +170,23 @@ Phase 2 UI work can proceed in parallel with M3 data verification, but it must n
 - Keep large imagery, cache files, secrets and personal data out of git.
 - Update this plan in the same PR/commit as each completed task or meaningful blocker.
 
-## 6. Status ledger
+## 6. Current status ledger — 26 November 2026
 
 | Task | Status | Latest evidence / next action |
 |---|---|---|
-| P0.1 canonical branch baseline | Done | `feature/consolidated`, baseline `65ce4c4` |
-| P0.2 CI status review | Done | Latest canonical-branch run #269 (`45766083814`, commit `d17fce6`) completed 26 Nov 2026: pipeline 77 passed; web type-check/build passed; API/PostGIS 347 passed / 40 failed. Overall workflow is **failed** only because the API/PostGIS job failed; see [run #269](https://github.com/aitech2025/lake-protect/actions/runs/45766083814) |
-| P0.3 CI failure classification | In progress | 40 failures are identical in runs `45765808663` and `45766083814`. Triage: 38 failures trace to ordinary test fixtures marked `is_demo=True` despite D-057/D-065 isolation; 1 source test expected demo imports in the real-asset API; 1 confirmed WhatsApp `is_demo` NameError. Details: [CI triage](ci-baseline-triage.md). Fixes are on `feature/p0-ci-triage`; await CI before closing. |
-| P0.4 reproducible test commands | Done | CI commands, Python 3.13 / Node 22 / PostGIS 16-3.4 and safe test DB environment recorded in [CI triage](ci-baseline-triage.md). |
-| P0.5 fix backtest/core-demo blockers | In progress | Corrected test fixture defaults, explicit demo isolation coverage, source-sample visibility assertion and WhatsApp demo-flag propagation on `feature/p0-ci-triage`; validation pending. |
-| P0.6 CI failure summaries | Not started | After P0.5 validation, improve CI failure summaries without hiding or waiving failures. |
-| M3.1–M3.5 case evidence | In progress | 27 discovery leads classified in `data/case-register.csv` into primary candidates, historical-only, restoration controls, boundary controls and unresolved identities. None are independently verified; manifest remains empty |
-| M3.6–M3.7 freeze rules | In progress / blocked | Run5 exercises D-058, but 11 run4 candidate footprints disappeared and 72 levelling pixels lack diagnostic chips. Do not tag until these are reviewed. |
-| M3.8–M3.10 replay | Implemented and CI-validated | PR #22 added weekly replay, no-look-ahead guards and resumable window-cache checkpoints. M3.11 scored run remains blocked by rule freeze and official case evidence. |
-| M3.12–M3.17 scoring/report | In progress | Hardened scorer now enforces validated primary eligibility, event/action temporal order, strict >0.25-acre threshold and auditable false-positive review; focused tests added; pipeline CI 77 passed |
-| P2 geospatial UI | Not started | Registry APIs merged by PR #19; UI wiring remains |
-| P3 incident/citizen hardening | Partial | Core M12–M17 flows exist; provider-dependent channels and operational hardening remain |
-| P4 intelligence | Not started | ML utilities/registry foundation exist; no approved production model or RAG copilot |
-| P5 production readiness | Not started | Government integration placeholders only; department RLS and security/ops gates remain |
+| P0 baseline and CI | Complete | API/PostGIS, pipeline and web CI were restored in PR #21; latest canonical runs after PRs #31–#34 are green. |
+| M2 detect-v2 diagnostics | Implemented; review pending | PR #25 exports sub-threshold levelling diagnostics separately from alert candidates. PR #31 adds run4/run5 polygon comparison CLI. The actual artifact comparison and human disposition of 11 disappeared run4 candidates remain outstanding. |
+| M3.1–M3.5 case evidence | Blocked on external evidence | 27 discovery leads are recorded; none is independently verified. Exact event dates, public-action dates, affected areas and verified event polygons are still required. |
+| M3.6–M3.7 rule review/freeze | Blocked | Five-lake non-scored tuning exists, but run4/run5 footprint review is incomplete. No immutable detect-v2 tag exists. |
+| M3.8–M3.10 replay | Implemented | Weekly resumable replay and no-look-ahead controls exist; replay detections now explicitly carry EPSG:4326 CRS metadata. |
+| M3.11 scored replay | Blocked | Do not run until the eligible case manifest is independently verified and detector rules are frozen. |
+| M3.12 scorer validation | Complete in code | PR #32 enforces explicit detection CRS, geometry contract, metric IoU and auditable scoring breakdowns. |
+| M3.13–M3.17 scoring/report | Partial / blocked | Temporal matching and review-gated precision exist. Scored run, complete false-flag rates, case chips, independent adjudication and signed report remain. |
+| P2 registry / Asset 360 | Improved; partial | PR #27 adds district/mandal filters; PR #33 adds boundary provenance classes and display. Official department hierarchy, coverage/freshness states and consolidated acceptance suite remain. |
+| P3 citizen workflow | Partial | PR #28 adds admin review/retry operations visibility. Real non-demo queue/retry journey validation and provider authorization remain. |
+| P4 intelligence | Not started as a product capability | ML foundations exist; no approved production model or source-grounded RAG copilot. |
+| P5 readiness diagnostics | Implemented as diagnostics only | PR #34 adds admin-only `GET /readiness`. It always reports production certification as not performed and lists RLS, SSO/MFA, government authorization, HA/DR and security review as unverified. |
+| P5 production gates | Not complete | Government agreements, RLS, SSO/MFA, India-region hosting, VAPT, backup restore, HA/DR and load/resilience tests remain. |
 
 ## 7. Current execution checkpoint
 
@@ -347,3 +346,33 @@ The following implementation increments were delivered in parallel on short-live
 5. Complete the remaining P2 source hierarchy/coverage acceptance suite and the P5 security/production gates.
 
 No scored detection accuracy claim is authorized by these implementation increments.
+
+
+## 9. Next fan-out execution checkpoint — 26 November 2026
+
+| PR | Workstream | Result | CI |
+|---|---|---|---|
+| #31 | M2 run4/run5 spatial candidate comparison CLI and tests | Merged | Passed |
+| #32 | M3 scorer CRS contract, metric IoU and scoring breakdowns; replay CRS stamping | Merged | Passed |
+| #33 | P2 Asset 360 boundary provenance API/UI and tests | Merged | Passed |
+| #34 | P5 admin-only readiness diagnostics and tests | Merged | Passed |
+| #35 | P2 OSM provenance class correction | Merged | Passed |
+
+### What is now implemented
+
+- `lp-geo compare-tuning` compares two non-scored candidate exports by asset, change type and projected polygon IoU, producing matched/disappeared/added review leads. It does not determine truth or enforcement status.
+- Historical replay output now stamps `geometry_crs=EPSG:4326`; the scorer rejects missing or projected detection coordinates and computes spatial IoU in EPSG:32644.
+- Backtest output now includes median lead time and matched/unmatched breakdowns by sensor, season and event type. Precision remains unavailable while any unmatched candidate lacks complete human review.
+- Asset 360 now displays conservative boundary provenance, including source class, source date/reference, agency, provenance completeness and whether the specific HMDA LPC notification-reference criteria were met.
+- `GET /readiness` is an admin-only configuration diagnostic. It does not certify production readiness and intentionally reports all security/authorization/HA-DR sign-offs as unverified.
+
+### Immediate next actions
+
+1. PR #35 is merged; verify the updated source classes in the Asset 360 demo journey.
+2. Download the existing run5 tuning artifact and run `lp-geo compare-tuning` against the committed run4 candidates; inspect every disappeared/added footprint and diagnostic chip.
+3. Record human review dispositions with reviewer, date and evidence; only then decide whether detect-v2 can be frozen.
+4. Continue the government evidence request for independently verified M3 cases. No scored replay until the manifest and frozen rules are approved.
+5. Complete P2 coverage/freshness and official hierarchy; complete P3 non-demo queue validation.
+6. Treat the readiness endpoint as an operator checklist only; complete actual P5 controls before any production deployment.
+
+No detection accuracy or production-readiness claim is authorized by this fan-out.
