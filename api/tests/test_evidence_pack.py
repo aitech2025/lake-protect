@@ -28,7 +28,7 @@ def at(days: float) -> dt.datetime:
 @pytest.fixture()
 def confirmed(db):
     team = Team(db)
-    asset = make_asset(db, cohort="A_RECOVERED")
+    asset = make_asset(db, cohort="A_RECOVERED", is_demo=True)
     _, alert = ingest(db, asset, at=T0, first_changed=dt.date(2025, 9, 25), last_clear=dt.date(2025, 9, 15))
     review(db, alert, team.viewer, "real_change", "Fresh soil on both images", at=at(1))
     decide(db, alert, team.admin, "CONFIRMED", "Real change", at=at(2))

@@ -53,7 +53,7 @@ def test_watchlist_needs_the_pipeline_token(client):
 
 def test_watchlist_lists_real_assets_only_with_boundary_set(client, db):
     real = _real(db, baseline=dt.date(2024, 7, 19))
-    demo = make_asset(db)
+    demo = make_asset(db, is_demo=True)
     body = client.get("/pipeline/watchlist", headers=TOKEN).json()
     keys = {a["asset_key"] for a in body["assets"]}
     assert real.asset_key in keys and demo.asset_key not in keys
@@ -88,7 +88,7 @@ def test_run_refuses_a_look_after_as_of(client, db):
 
 
 def test_run_refuses_demo_or_unknown_assets(client, db):
-    demo = make_asset(db)
+    demo = make_asset(db, is_demo=True)
     assert client.post("/pipeline/runs", json=_run([demo.id]), headers=TOKEN).status_code == 422
     assert client.post("/pipeline/runs", json=_run([987654321]), headers=TOKEN).status_code == 422
 

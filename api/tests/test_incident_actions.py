@@ -151,7 +151,7 @@ def test_a_sharper_image_an_official_asks_for_waits_for_the_admin(client, db, w)
 def test_legal_records_and_documents_are_attached_to_the_incident(client, db, w):
     alert = report(client, db)
     db.add(CourtCase(court="Test High Court", case_no="WP 1/2026", status="pending", asset_id=w.lake.id, survey_numbers=[],
-                     next_hearing=dt.date(2026, 12, 10), is_demo=True))
+                     next_hearing=dt.date(2026, 12, 10), is_demo=False))
     db.flush()
     doc = client.post(f"/alerts/{alert.id}/documents", data={"doc_type": "government_order", "title": "Test stop-work notice",
                                                             "reference": "TEST/SWN/2026/7", "issued_on": "2026-11-20"},
