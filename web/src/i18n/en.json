@@ -311,7 +311,24 @@
     "filter_mandal": "Mandal",
     "all_mandals": "All mandals",
     "clear_area_filters": "Clear area filters",
-    "boundary_source": "Boundary source"
+    "boundary_source": "Boundary source",
+    "provenance": "Boundary provenance",
+    "provenance_date": "Source date: {{date}}",
+    "provenance_reference": "Reference: {{ref}}",
+    "authority_confirmed": "Authority reference recorded",
+    "authority_unconfirmed": "Authority not verified",
+    "provenance_incomplete": "Source provenance is incomplete; treat this boundary as unverified.",
+    "provenance_class": {
+      "official_record": "Department notification record",
+      "imported_file": "Imported file",
+      "provider_api": "Provider API",
+      "imported_source": "Imported source",
+      "osm_derived": "OpenStreetMap-derived",
+      "user_drawn": "User-drawn",
+      "derived_unverified": "Derived / unverified",
+      "demo_sample": "Demo sample",
+      "unclassified": "Unclassified source"
+    }
   },
   "records": {
     "title": "Records",
