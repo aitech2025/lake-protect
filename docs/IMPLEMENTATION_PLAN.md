@@ -108,6 +108,7 @@
 
 **Goal:** complete the latest approved product workflow, not the superseded multi-role workflow.
 
+- [x] P3.1a Separate unknown citizen-reported locations from the registered asset catalogues. Migration `0016_candidate_assets.py` creates a distinct candidate-asset record linked to the report, detection candidate and incident; internal `reported_place` support rows are excluded from both asset catalogue APIs. Regression assertions added; CI execution pending.
 - [ ] P3.1 Validate the complete citizen journey: web report → location resolution → incident association/creation → satellite review → official notification → review/decision → citizen-safe status update.
 - [ ] P3.2 Add operational health/queue visibility for citizen satellite review jobs and retries. Implemented and merged in PR #28; full CI passed.
 - [ ] P3.3 Expose provider-ready WhatsApp inbound configuration and disabled state. Readiness and disabled state are visible in merged PR #28; actual webhook remains disabled until State credentials/authorization are supplied.
