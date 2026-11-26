@@ -31,3 +31,4 @@ NFR-DATA-001,Data integrity,Immutable IDs provenance and evidence lineage,Mutati
 NFR-RES-001,Resilience,Retry and recovery,Idempotent jobs queue recovery backup restore tested,Partially implemented,Pipeline and retry foundations,Production restore and DR validation,R11
 NFR-OPS-001,Observability,Operational monitoring,Jobs providers queues data freshness and security metrics visible,Partially implemented,Existing operations status surfaces,Complete SLOs and alerting,R11
 NFR-COMP-001,Compliance,Hosting and regulatory approvals,Hosting residency retention and legal sign-offs recorded,Needs decision,No approved production decision,Government/security/legal approvals,R11
+ASSET-IDENTITY-001,Asset Registry,Canonical UUID identity propagated to operational assets boundaries detections incidents monitoring history and signals,Migration 0017 plus ORM and API identity fields,Pending migration and CI validation,High
