@@ -136,8 +136,15 @@ def evaluate(
             and item["review_disposition"] in {"false_positive", "valid_unscored_change"}
             and isinstance(item["reviewed_by"], str) and bool(item["reviewed_by"].strip())
             and isinstance(item["review_evidence"], str) and bool(item["review_evidence"].strip())
-            and bool(_iso_date(item["reviewed_at"], "reviewed_at"))
+            and _valid_review_date(item["reviewed_at"])
         )
+
+    def _valid_review_date(value: Any) -> bool:
+        try:
+            _iso_date(value, "reviewed_at")
+            return True
+        except ValueError:
+            return False
 
     adjudicated_false_positive = sum(
         1 for item in unmatched
@@ -151,7 +158,7 @@ def evaluate(
     precision = (
         true_positive / (true_positive + adjudicated_false_positive)
         if unreviewed == 0 and true_positive + adjudicated_false_positive > 0
-        else (0.0 if unreviewed == 0 else None)
+        else None
     )
     recall = true_positive / len(eligible) if eligible else None
     f1 = (
