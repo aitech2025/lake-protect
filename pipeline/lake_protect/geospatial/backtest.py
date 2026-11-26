@@ -6,6 +6,7 @@ review disposition. An unmatched candidate is not automatically a false alarm.
 from __future__ import annotations
 
 import json
+from datetime import date
 from math import isfinite
 from pathlib import Path
 from typing import Any
@@ -107,8 +108,8 @@ def evaluate(
                 "detected_at": detected,
                 "public_action_date": props["public_action_date"],
                 "lead_time_days": (
-                    __import__("datetime").date.fromisoformat(props["public_action_date"])
-                    - __import__("datetime").date.fromisoformat(detected[:10])
+                    date.fromisoformat(props["public_action_date"])
+                    - date.fromisoformat(detected[:10])
                 ).days,
                 "before_public_action": True,
             })
@@ -120,14 +121,33 @@ def evaluate(
             "detection_id": detections[idx].get("id"),
             "detected_at": (detections[idx].get("properties") or {}).get("detected_at")
                 or (detections[idx].get("properties") or {}).get("first_changed_at"),
+            "review_status": (detections[idx].get("properties") or {}).get("review_status"),
             "review_disposition": (detections[idx].get("properties") or {}).get("review_disposition"),
+            "reviewed_by": (detections[idx].get("properties") or {}).get("reviewed_by"),
+            "reviewed_at": (detections[idx].get("properties") or {}).get("reviewed_at"),
+            "review_evidence": (detections[idx].get("properties") or {}).get("review_evidence"),
         }
         for idx in sorted(remaining)
     ]
+
+    def has_complete_review(item: dict[str, Any]) -> bool:
+        return (
+            item["review_status"] == "reviewed"
+            and item["review_disposition"] in {"false_positive", "valid_unscored_change"}
+            and isinstance(item["reviewed_by"], str) and bool(item["reviewed_by"].strip())
+            and isinstance(item["review_evidence"], str) and bool(item["review_evidence"].strip())
+            and bool(_iso_date(item["reviewed_at"], "reviewed_at"))
+        )
+
     adjudicated_false_positive = sum(
-        1 for item in unmatched if item["review_disposition"] == "false_positive"
+        1 for item in unmatched
+        if has_complete_review(item) and item["review_disposition"] == "false_positive"
     )
-    unreviewed = len(unmatched) - adjudicated_false_positive
+    reviewed_valid_unscored = sum(
+        1 for item in unmatched
+        if has_complete_review(item) and item["review_disposition"] == "valid_unscored_change"
+    )
+    unreviewed = len(unmatched) - adjudicated_false_positive - reviewed_valid_unscored
     precision = (
         true_positive / (true_positive + adjudicated_false_positive)
         if unreviewed == 0 and true_positive + adjudicated_false_positive > 0
@@ -149,6 +169,7 @@ def evaluate(
         "false_negative": false_negative,
         "false_positive": adjudicated_false_positive,
         "unmatched_detections": len(unmatched),
+        "reviewed_valid_unscored_detections": reviewed_valid_unscored,
         "unreviewed_detections": unreviewed,
         "unmatched_detection_details": unmatched,
         "precision": round(precision, 4) if precision is not None else None,
@@ -160,7 +181,7 @@ def evaluate(
         "matches": matches,
         "warning": (
             "Screening metrics only. Precision remains unavailable until every unmatched "
-            "candidate has a documented human review disposition. Verify blind-test "
+            "candidate has a documented human review disposition, reviewer and evidence. Verified changes outside the scored event set are reported separately, not as false positives. Verify blind-test "
             "independence and imagery provenance before reporting."
         ),
     }
