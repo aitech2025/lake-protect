@@ -70,6 +70,35 @@ def evaluate(
         if props.get("case_id") in eligible_ids:
             eligible.append((feature, shape(feature["geometry"])))
 
+    # Validate the complete replay detection contract before matching any case.
+    # Replay IDs are stable across weeks; duplicate IDs would otherwise be silently collapsed
+    # or double-counted depending on input order.
+    seen_detection_ids: set[str] = set()
+    for idx, detection in enumerate(detections):
+        if not isinstance(detection, dict) or not isinstance(detection.get("geometry"), dict):
+            raise ValueError(f"Detection at index {idx} must contain GeoJSON geometry")
+        detection_id = detection.get("id") or (detection.get("properties") or {}).get("detection_id")
+        if not isinstance(detection_id, str) or not detection_id.strip():
+            raise ValueError(f"Detection at index {idx} must have a stable string id")
+        if detection_id in seen_detection_ids:
+            raise ValueError(f"Duplicate detection id: {detection_id}")
+        seen_detection_ids.add(detection_id)
+        detection_props = detection.get("properties") or {}
+        if not isinstance(detection_props, dict):
+            raise ValueError(f"Detection at index {idx} properties must be an object")
+        if not detection_props.get("detected_at"):
+            raise ValueError(
+                f"Detection {detection_id} is missing detected_at; "
+                "first_changed_at is retrospective and cannot be scored"
+            )
+        _iso_date(detection_props["detected_at"], f"detection[{idx}].detected_at")
+        detection_geom = shape(detection["geometry"])
+        if detection_geom.is_empty or not detection_geom.is_valid:
+            raise ValueError(f"Detection {detection_id} has invalid geometry")
+        minx, miny, maxx, maxy = detection_geom.bounds
+        if minx < -180 or maxx > 180 or miny < -90 or maxy > 90:
+            raise ValueError(f"Detection {detection_id} coordinates are outside EPSG:4326 bounds")
+
     remaining = set(range(len(detections)))
     matches: list[dict[str, Any]] = []
     for case, case_geom in eligible:
@@ -82,9 +111,12 @@ def evaluate(
             if not isinstance(detection, dict) or not isinstance(detection.get("geometry"), dict):
                 raise ValueError(f"Detection at index {idx} must contain GeoJSON geometry")
             det_props = detection.get("properties") or {}
-            detected = det_props.get("detected_at") or det_props.get("first_changed_at")
+            detected = det_props.get("detected_at")
             if not detected:
-                continue
+                raise ValueError(
+                    f"Detection at index {idx} is missing detected_at; "
+                    "first_changed_at is retrospective and must never be used for lead-time scoring"
+                )
             detected_date = _iso_date(detected, f"detection[{idx}].detected_at")
             # A valid lead-time hit must occur on/after the observed event and
             # strictly before the first public action.
@@ -118,8 +150,7 @@ def evaluate(
     unmatched = [
         {
             "detection_id": detections[idx].get("id"),
-            "detected_at": (detections[idx].get("properties") or {}).get("detected_at")
-                or (detections[idx].get("properties") or {}).get("first_changed_at"),
+            "detected_at": (detections[idx].get("properties") or {}).get("detected_at"),
             "review_status": (detections[idx].get("properties") or {}).get("review_status"),
             "review_disposition": (detections[idx].get("properties") or {}).get("review_disposition"),
             "reviewed_by": (detections[idx].get("properties") or {}).get("reviewed_by"),
