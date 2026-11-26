@@ -58,8 +58,8 @@ The example bbox and licence label are placeholders. Use an approved AOI, verify
 - Signed POST payloads are verified using `X-Hub-Signature-256` HMAC-SHA256 before database writes.
 - Text, location and media references are normalised; sender references are hashed.
 - Inbound messages are persisted idempotently as unverified `signals` records using the existing table and transaction advisory locks.
-- Keyword category hints are non-authoritative. Reports do not automatically create enforcement cases or legal findings.
-- API tests cover Meta verification, invalid signatures and duplicate message handling.
+- An authenticated `/api/v1/ingestion/social-signals` endpoint accepts batches from authorised X, Instagram, Facebook, YouTube or news-RSS connectors. It normalises timestamps, hashes author IDs, stores provider-supplied coordinates only, deduplicates by provider/post ID and records unverified signals.\n- Keyword category hints are non-authoritative. Reports do not automatically create enforcement cases or legal findings.
+- API tests cover Meta verification, invalid signatures, duplicate WhatsApp message handling and social signal ingestion/idempotency.
 
 Configure `LP_WHATSAPP_VERIFY_TOKEN` and `LP_WHATSAPP_APP_SECRET` in the runtime secret manager. Configure the Meta webhook subscription for the deployed HTTPS endpoint.
 
@@ -67,7 +67,7 @@ Configure `LP_WHATSAPP_VERIFY_TOKEN` and `LP_WHATSAPP_APP_SECRET` in the runtime
 
 - Authenticated media download, content-type/size validation, malware scanning and immutable original storage.
 - Outbound WhatsApp template messages.
-- Social listening through authorised APIs/licensed providers and source-specific terms.
+- Provider-specific API clients, credentials, quota handling, licensed listening subscriptions and scheduled collection (the ingestion adapter is present; live source connectors are not).
 - Officer contact registry, departmental/jurisdiction routing, delivery receipts, retries and SLA escalation.
 - Privacy notices, consent/retention rules and operational governance for each channel.
 

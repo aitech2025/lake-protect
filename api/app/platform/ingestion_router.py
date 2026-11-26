@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.db import get_db
+from lake_protect.integrations.social import normalize_post
 
 router = APIRouter(prefix="/api/v1/ingestion", tags=["ingestion"])
 
@@ -99,6 +100,66 @@ class ProcessingRunUpdate(BaseModel):
     output_manifest: dict[str, Any] = Field(default_factory=dict)
     error_code: str | None = Field(default=None, max_length=100)
     error_detail: str | None = Field(default=None, max_length=2000)
+
+
+
+class SocialPostIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    provider: Literal["x", "instagram", "facebook", "youtube", "news_rss"]
+    post_id: str = Field(min_length=1, max_length=500)
+    created_at: datetime
+    text: str = Field(default="", max_length=10000)
+    author_id: str | None = Field(default=None, max_length=500)
+    url: str | None = Field(default=None, max_length=2048)
+    latitude: float | None = Field(default=None, ge=-90, le=90)
+    longitude: float | None = Field(default=None, ge=-180, le=180)
+
+
+class SocialBatchIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    items: list[SocialPostIn] = Field(min_length=1, max_length=100)
+
+
+@router.post("/social-signals", status_code=202, dependencies=[Depends(pipeline_credential)])
+def ingest_social_signals(body: SocialBatchIn, db: Session = Depends(get_db)):
+    """Accept posts fetched through authorised provider APIs; never scrape or infer coordinates."""
+    _pipeline_context(db)
+    stored = duplicates = 0
+    for item in body.items:
+        if (item.latitude is None) != (item.longitude is None):
+            raise HTTPException(422, "Provider latitude and longitude must be supplied together.")
+        try:
+            signal = normalize_post(item.provider, {
+                "id": item.post_id, "created_at": item.created_at.isoformat(),
+                "text": item.text, "author_id": item.author_id, "url": item.url,
+                "latitude": item.latitude, "longitude": item.longitude,
+            })
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        lock_key = f"social:{signal['provider']}:{signal['provider_post_id']}"
+        db.execute(text("SELECT pg_advisory_xact_lock(hashtextextended(:key,0))"), {"key": lock_key})
+        needle = '%"provider_post_id": "' + signal["provider_post_id"] + '"%'
+        existing = db.execute(text("""
+            SELECT id FROM signals WHERE kind=:kind AND CAST(ref AS jsonb) ->> 'provider_post_id' = :post_id LIMIT 1
+        """), {"kind": "social_" + signal["provider"], "post_id": signal["provider_post_id"]}).scalar_one_or_none()
+        if existing is not None:
+            duplicates += 1
+            continue
+        geometry = (json.dumps({"type": "Point", "coordinates": [signal["longitude"], signal["latitude"]]})
+                    if signal["latitude"] is not None else None)
+        db.execute(text("""
+            INSERT INTO signals(kind,geom,received_at,ref,is_demo)
+            VALUES (:kind,
+              CASE WHEN CAST(:geometry AS text) IS NULL THEN NULL
+                   ELSE ST_SetSRID(ST_GeomFromGeoJSON(CAST(:geometry AS text)),4326) END,
+              now(),:ref,false)
+        """), {"kind": "social_" + signal["provider"], "geometry": geometry,
+               "ref": json.dumps(signal, ensure_ascii=False)})
+        stored += 1
+    db.commit()
+    return {"status": "accepted", "received": len(body.items), "stored": stored,
+            "duplicates": duplicates,
+            "note": "Only authorised source data is accepted; social posts remain unverified signals."}
 
 
 @router.post("/batches", status_code=201, dependencies=[Depends(pipeline_credential)])
