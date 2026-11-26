@@ -133,18 +133,31 @@ export function Assets() {
   const { data, error, status, loading, reload } = useAsync(() => api<{ features: any[] }>("/assets"), []);
   const cats = useAsync(() => api<Categories>("/categories"), []);
   const [kind, setKind] = useState("all");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedMandal, setSelectedMandal] = useState("");
   const [showStopped, setShowStopped] = useState(false);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState<string | null>(null);
   const all = useMemo(() => data?.features ?? [], [data]);
+  const districts = useMemo(
+    () => Array.from(new Set(all.map((f) => f.properties.district).filter(Boolean))).sort(),
+    [all],
+  );
+  const mandals = useMemo(
+    () => Array.from(new Set(all.filter((f) => !selectedDistrict || f.properties.district === selectedDistrict)
+      .map((f) => f.properties.mandal).filter(Boolean))).sort(),
+    [all, selectedDistrict],
+  );
   const stopped = all.filter((f) => !f.properties.monitored).length;
   const features = useMemo(
     // Places made from citizens' reports are not watched until an official adds them (D-063, D-064),
     // so choosing their kind shows them all.
     () => all.filter((f) => (kind === "all" || f.properties.category === kind)
+      && (!selectedDistrict || f.properties.district === selectedDistrict)
+      && (!selectedMandal || f.properties.mandal === selectedMandal)
       && (showStopped || f.properties.monitored || f.id === selected || kind === "citizen_reported")
       && (!linked || f.id === selected)),
-    [all, kind, showStopped, selected, linked],
+    [all, kind, selectedDistrict, selectedMandal, showStopped, selected, linked],
   );
   const labelOf = (category: string) => {
     const c = cats.data?.items.find((x) => x.name === category);
@@ -200,6 +213,27 @@ export function Assets() {
         />
       )}
       {cats.data && <KindsStrip cats={cats.data} kind={kind} setKind={setKind} />}
+      <section className="section asset-registry-filters" data-testid="registry-filters" aria-label={t("assets.registry_filters")}>
+        <label className="field">
+          {t("assets.filter_district")}
+          <select value={selectedDistrict} onChange={(e) => { setSelectedDistrict(e.target.value); setSelectedMandal(""); }} data-testid="filter-district">
+            <option value="">{t("assets.all_districts")}</option>
+            {districts.map((district) => <option key={district} value={district}>{district}</option>)}
+          </select>
+        </label>
+        <label className="field">
+          {t("assets.filter_mandal")}
+          <select value={selectedMandal} onChange={(e) => setSelectedMandal(e.target.value)} data-testid="filter-mandal" disabled={mandals.length === 0}>
+            <option value="">{t("assets.all_mandals")}</option>
+            {mandals.map((mandal) => <option key={mandal} value={mandal}>{mandal}</option>)}
+          </select>
+        </label>
+        {(selectedDistrict || selectedMandal) && (
+          <button type="button" className="btn quiet" onClick={() => { setSelectedDistrict(""); setSelectedMandal(""); }} data-testid="clear-area-filters">
+            {t("assets.clear_area_filters")}
+          </button>
+        )}
+      </section>
       {stopped > 0 && (
         <label className="small toggle-line">
           <input type="checkbox" checked={showStopped} onChange={(e) => setShowStopped(e.target.checked)} data-testid="show-stopped" /> {t("locations.show_stopped", { n: stopped })}
@@ -226,7 +260,9 @@ export function Assets() {
                     <span>{t(`mode.${p.mode}`)}</span>
                     {p.area_acres !== null && <span>{t("assets.acres", { acres: p.area_acres })}</span>}
                     <span>{t("assets.baseline", { date: fmtDate(p.baseline_date, lang) })}</span>
+                    {p.district && <span>{p.district}{p.mandal ? " · " + p.mandal : ""}</span>}
                   </span>
+                  {p.boundary_source && <span className="small muted" data-testid="boundary-provenance">{t("assets.boundary_source")}: {p.boundary_source}</span>}
                   <CoverageLine p={p} />
                 </span>
                 <span><BoundarySeal status={p.boundary_status} version={p.boundary_version} /></span>
