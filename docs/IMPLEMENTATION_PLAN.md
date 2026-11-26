@@ -2,7 +2,7 @@
 
 **Branch:** `feature/consolidated`  
 **Plan owner:** Product owner / implementation agent  
-**Baseline commit:** `65ce4c4bcf4f1d938987c92c1d2012c49642870f`  
+**Baseline commit:** `0588ab28b70acac2f649916bdfb969f361266c8a` (after PR #27)  
 **Plan created:** 26 November 2026  
 **Status:** Active — Phase 1 started  
 **Source of truth:** `CONTEXT.md`, latest applicable owner decisions in `DECISIONS.md`, current code, and focused design documents.
@@ -26,17 +26,17 @@
 
 | Area | Baseline at plan creation | Evidence / note |
 |---|---|---|
-| Canonical development branch | `feature/consolidated` at `65ce4c4` | PR #19 merged |
+| Canonical development branch | `feature/consolidated` at `0588ab2` | PRs #19, #21–#23, #25–#27 merged |
 | M0–M19 | Recorded as complete in `PROGRESS.md` | Milestone history; verify current code before extending |
 | M3 scored blind backtest | Not started / not scored | `PROGRESS.md`; M2 tuning is explicitly not an accuracy result |
-| Backtest code | Partial | `geospatial/backtest.py` scores supplied GeoJSON; it does not perform historical weekly imagery replay |
+| Backtest code | Partial, materially hardened | Weekly replay is implemented; scorer now requires replay `detected_at`, stable unique detection IDs and valid EPSG:4326 geometry. Verified cases and a scored run remain blocked |
 | Ground-truth case set | Not ready | `data/case_lake_search.yml` contains name patterns, not verified event labels/boundaries |
 | Rule freeze | Not done | `detect_rules.yaml` is `detect-v2`; no git tag exists at baseline |
 | Historical disclosure | Required | Durgam Cheruvu was seen once before tuning (D-042); disclose in M3 report |
 | Tuning evidence | Available | Five non-scored tuning lakes; see `reports/m2-tuning/README.md` |
-| Geospatial engine | Backend integrated | PR #19; registry APIs not yet fully surfaced in the desk |
+| Geospatial engine | Backend integrated; UI drill-down advanced | Existing Asset 360 plus PR #27 district/mandal filters and boundary-source provenance; full official registry hierarchy remains open |
 | Government sources | Templates/file imports | No live government integration without agreement |
-| API CI | Green after P0 repair | PR #21 run #275: API/PostGIS 387 passed, pipeline 77 passed, web build passed. JUnit artifacts and job summaries are now published. |
+| API CI | Green on merged increments | PR #21 baseline repair; PRs #25–#27 passed their CI workflows. PR #28 CI is in progress. |
 | Department data isolation | Not production-ready | Department-level RLS deliberately deferred in PR #19 |
 | AI copilot/RAG | Not implemented | Separate future phase; must cite source records and avoid legal conclusions |
 
@@ -78,7 +78,7 @@
 
 #### 1C. Score, inspect and report
 
-- [ ] M3.12 Improve scoring to validate CRS, dates, IDs, geometries and eligibility before metrics are calculated.
+- [ ] M3.12 Complete scorer validation. Case-manifest eligibility is validated; PR #26 now rejects missing replay timestamps, duplicate detection IDs and invalid/out-of-range detection geometry. Remaining: full case/detection CRS contract and complete report breakdowns.
 - [ ] M3.13 Match a detection only when it intersects the event geometry and its alert date precedes the public-action date.
 - [ ] M3.14 Report true/false positives, misses, precision, recall, F1, median lead time, false flags per lake-year, sensor/season breakdown and ineligible cases.
 - [ ] M3.15 Generate before/after chips for every scored case, including misses, with acquisition dates and sensor labels.
@@ -94,13 +94,13 @@
 **Goal:** make the newly integrated statewide registry and processing services usable from the existing GeoGuard desk without replacing the current working screens.
 
 - [ ] P2.1 Map the new registry/ingestion APIs to current UI navigation and data contracts.
-- [ ] P2.2 Add a statewide registry view with department, administrative unit, asset and parcel hierarchy.
-- [ ] P2.3 Add asset 360 linking boundaries and versions, source records, survey references, weekly screens, incidents, documents and evidence.
-- [ ] P2.4 Add source/provenance labels: official record, imported file, OSM-derived, user-drawn, demo/sample.
+- [ ] P2.2 Complete the statewide registry hierarchy. Existing asset map/list and dashboard drill-down are present; PR #27 adds district → mandal filters. Department/source hierarchy and authoritative master-code mapping remain.
+- [ ] P2.3 Complete Asset 360 integration. Existing page links boundaries/versions, registry links, survey parcels, weekly screens and documents; incident/evidence cross-linking and full source completeness remain.
+- [ ] P2.4 Standardise provenance labels. PR #27 surfaces the boundary source name; normalised source classes (official/imported/OSM/user-drawn/demo) remain.
 - [ ] P2.5 Add imagery freshness and coverage states, including no usable look and failed processing.
 - [ ] P2.6 Show geospatial screening candidates as review leads; never present MNDWI/radar output as a legal finding.
 - [ ] P2.7 Provide clear provider configuration states: not configured, demo/sample, configured, connected, failed. Do not imply live provider connectivity when credentials are absent.
-- [ ] P2.8 Add API/UI integration tests for registry search, asset detail, boundary provenance and processing-run visibility.
+- [ ] P2.8 Complete API/UI integration tests. PR #27 adds district/mandal filter E2E coverage; registry search, asset detail, boundary provenance and processing-run coverage still need a consolidated acceptance suite.
 
 **Exit criteria:** a senior official can navigate from State/district to asset, inspect authoritative status/provenance and see the latest screening state without using raw APIs.
 
@@ -109,9 +109,9 @@
 **Goal:** complete the latest approved product workflow, not the superseded multi-role workflow.
 
 - [ ] P3.1 Validate the complete citizen journey: web report → location resolution → incident association/creation → satellite review → official notification → review/decision → citizen-safe status update.
-- [ ] P3.2 Add operational health/queue visibility for citizen satellite review jobs and retries.
-- [ ] P3.3 Complete provider-ready WhatsApp inbound configuration and clearly expose the disabled/unconfigured state.
-- [ ] P3.4 Complete approved SMS/WhatsApp outbound templates only after the relevant gateway, DLT/WhatsApp approvals and owner authorization.
+- [ ] P3.2 Add operational health/queue visibility for citizen satellite review jobs and retries. Implemented in open PR #28; awaiting full CI and merge.
+- [ ] P3.3 Expose provider-ready WhatsApp inbound configuration and disabled state. Implemented in open PR #28; actual webhook remains disabled until State credentials/authorization are supplied.
+- [ ] P3.4 Keep SMS/WhatsApp outbound templates held until the relevant gateway, DLT/WhatsApp approvals and owner authorization; no live provider activation in this demo.
 - [ ] P3.5 Validate acknowledgement reminders, 48-hour admin follow-up and weekly digests with idempotency tests.
 - [ ] P3.6 Complete admin boundary/source conflict resolution tools; never auto-downgrade a boundary.
 - [ ] P3.7 Improve the asset legal register for source-linked survey numbers, land category, Section 22A and court status as data becomes lawfully available.
@@ -316,3 +316,34 @@ These articles are discovery references only. They are not substitutes for certi
 - This differs materially from detect-v1 run4 (14 clearing candidates / 20.19 acres). The 11 candidate footprints that no longer appear need before/after review; no accuracy or improvement claim is made.
 - Workflow artifact: https://github.com/aitech2025/lake-protect/actions/runs/45780430533 (artifact ID `15098336015`). The artifact contains the three candidate chips, per-lake weekly imagery, GeoJSON and summary.
 - M3.6 remains in progress; M3.7 remains blocked. Next implementation: diagnostic geometry/chips for levelling components that survive controls but fail final candidate extraction, then compare run4/run5 footprints. Do not freeze or score yet.
+
+
+## 8. Fan-out execution checkpoint — 26 November 2026
+
+The following implementation increments were delivered in parallel on short-lived branches and merged into `feature/consolidated`:
+
+| PR | Workstream | Result | CI |
+|---|---|---|---|
+| #23 | M2 detect-v2 tuning and workflow correction | Merged | Passed |
+| #25 | M2 sub-threshold levelling diagnostics and before/after review chips | Merged | Passed |
+| #26 | M3 scorer guardrails: replay-time `detected_at`, unique IDs and geometry validation | Merged | Passed |
+| #27 | P2 statewide registry district/mandal drill-down and boundary-source label | Merged | Passed |
+| #28 | P3 citizen operations queue, retry visibility and provider-readiness dashboard | Open; awaiting final CI | In progress |
+
+### Current implementation facts
+
+- M2 diagnostic components are now kept separately from alert candidates. Sub-threshold levelling patches can be inspected through `diagnostics.geojson` and `chips/diagnostics/*`; they do not lower the candidate area threshold or enter alert workflows.
+- M3 scoring no longer accepts retrospective `first_changed_at` as the detection timestamp. A scored detection must have a valid replay `detected_at`, a unique stable ID and valid EPSG:4326 geometry.
+- P2 registry filters operate on the existing authoritative `/assets` response, keeping map and list in sync. The selected district constrains mandal options.
+- P3 operations visibility is implemented in PR #28. It excludes demo messages and exposes no reporter phone numbers, names, message bodies, exact coordinates or photos.
+- PR #24 was closed because its documentation branch conflicted with merged tuning changes. This checkpoint supersedes that stale documentation branch.
+
+### Remaining critical gates
+
+1. Complete the run4/run5 spatial comparison for the 11 disappeared detect-v1 candidate footprints and review all diagnostic chips.
+2. Independently verify exact event dates, public-action dates, event polygons and affected areas for the scoring case manifest.
+3. Freeze detect-v2 only after human review; then run the scored replay once and publish full metrics and limitations.
+4. Finish PR #28 CI and merge; then validate the end-to-end citizen operations page against a real (non-demo) queued review and retry scenario.
+5. Complete the remaining P2 source hierarchy/coverage acceptance suite and the P5 security/production gates.
+
+No scored detection accuracy claim is authorized by these implementation increments.
