@@ -180,7 +180,7 @@ export function Layout() {
       <header className="topbar">
         <div className="topbar-context">
           <span className="topbar-kicker">GEOGUARD <span aria-hidden="true">/</span> TELANGANA</span>
-          <h1>{active ? t(active.key) : t("app.name")}</h1>
+          <p className="topbar-page-title">{active ? t(active.key) : t("app.name")}</p>
         </div>
         <div className="topbar-tools">
           <span className="role-indicator"><span className="role-dot" />{user && t(`role.${user.role}`)}</span>
