@@ -36,7 +36,7 @@ def list_assets(category: str | None = None, limit: int = Query(100, ge=1, le=50
     rows = db.execute(text("""
       SELECT id,asset_code,display_name,category_code,lifecycle_status,baseline_date,source_authority
       FROM public_assets WHERE category_code <> 'reported_place'
-        AND (:category IS NULL OR category_code=:category)
+        AND (CAST(:category AS text) IS NULL OR category_code=CAST(:category AS text))
       ORDER BY asset_code LIMIT :limit OFFSET :offset
     """), {"category":category,"limit":limit,"offset":offset}).mappings()
     return {"items":[dict(row) for row in rows],"limit":limit,"offset":offset}
