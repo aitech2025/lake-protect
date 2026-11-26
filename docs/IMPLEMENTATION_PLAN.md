@@ -36,7 +36,7 @@
 | Tuning evidence | Available | Five non-scored tuning lakes; see `reports/m2-tuning/README.md` |
 | Geospatial engine | Backend integrated | PR #19; registry APIs not yet fully surfaced in the desk |
 | Government sources | Templates/file imports | No live government integration without agreement |
-| API CI | Known baseline failures | Latest recorded run: API job failed; pipeline and web jobs passed. Earlier baseline and integrated runs both had 40 API failures (see PR #19/run history). |
+| API CI | Green after P0 repair | PR #21 run #275: API/PostGIS 387 passed, pipeline 77 passed, web build passed. JUnit artifacts and job summaries are now published. |
 | Department data isolation | Not production-ready | Department-level RLS deliberately deferred in PR #19 |
 | AI copilot/RAG | Not implemented | Separate future phase; must cite source records and avoid legal conclusions |
 
@@ -48,10 +48,10 @@
 
 - [x] P0.1 Confirm canonical branch and baseline commit.
 - [x] P0.2 Review CI status after PR #19.
-- [ ] P0.3 Classify the 40 known API/PostGIS failures into product regressions, environment/test-fixture issues and pre-existing defects.
-- [ ] P0.4 Establish a reproducible local test command set and record baseline results.
-- [ ] P0.5 Resolve only failures that block the backtest or core demo; track unrelated failures separately.
-- [ ] P0.6 Ensure CI uploads useful failure summaries and runs pipeline, API/PostGIS and web checks on every PR.
+- [x] P0.3 Classify all 40 API/PostGIS failures into test-fixture/product-contract mismatches, an obsolete source-test expectation and one WhatsApp product defect.
+- [x] P0.4 Establish reproducible API/PostGIS, pipeline and web test commands; record environment and baseline results in `docs/ci-baseline-triage.md`.
+- [x] P0.5 Repair the 40-failure API baseline without weakening demo isolation or database invariants; full API/PostGIS suite now passes.
+- [x] P0.6 Add JUnit XML reports, always-run job summaries and artifact uploads for API/PostGIS and pipeline jobs; all three checks run on PRs.
 
 **Exit criteria:** known failures have owners/root causes; test commands and expected baseline are documented; no new regression is hidden by a baseline waiver.
 
@@ -283,11 +283,15 @@ These articles are discovery references only. They are not substitutes for certi
 - This confirms the M3 pipeline changes and web build remain green on the canonical branch. It does **not** make the complete CI pipeline green. The 40 API/PostGIS failures still need root-cause classification and remediation; do not describe them as fixed.
 - No change to backtest evidence status: 27 discovery leads remain unverified, the scoring manifest is empty and no detection metrics have been generated.
 
-### 26 November 2026 — P0.3 CI triage and first repair increment
+### 26 November 2026 — P0.3–P0.6 CI baseline restored
 
 - Compared API/PostGIS logs from runs `45765808663` and `45766083814`; all 40 failing test names and signatures are identical. Both runs report 347 passed / 40 failed.
 - Inspected the failing tests, test factories, API filtering and current D-057/D-065 behavior. Classified 38 failures as ordinary test fixtures incorrectly marked demo, one source test as an obsolete expectation that demo connector samples should appear in the real-asset API, and one as a genuine WhatsApp handler `NameError`.
 - Added `docs/ci-baseline-triage.md` with evidence, classifications, CI commands/environment and repair acceptance criteria.
 - On `feature/p0-ci-triage`, changed ordinary API test factory defaults to non-demo while allowing explicit demo fixtures; updated the demo SMTP isolation test to create an explicit demo notification; updated the source sample test to assert demo records remain hidden; passed the existing WhatsApp `is_demo` argument into `_step()` to remove the runtime NameError.
-- P0.3 remains **in progress** until the full API/PostGIS suite runs. No failure is waived and no claim of a green API build is made yet.
-- Next: run CI on this branch, inspect all remaining failures, then close P0.3/P0.5 only when the tests and demo-isolation controls pass.
+- The first repair CI run reduced the 40 failures to 7. The next run exposed two remaining test assumptions after the demo-default correction; both were fixed by explicitly marking the fixtures as demo, not by weakening production filters.
+- Fixed a genuine evidence-pack defect: the demo watermark was positioned outside the printable page and therefore absent from extracted PDF text. It now appears in normal page flow.
+- Added `scripts/ci_junit_summary.py` and workflow steps that write totals/failing test names to GitHub job summaries and upload API/PostGIS and pipeline JUnit reports even when tests fail.
+- Final PR #21 CI run #275: API/PostGIS **387 passed, 0 failed**; pipeline **77 passed**; web type-check/build **passed**. All jobs succeeded: https://github.com/aitech2025/lake-protect/actions/runs/45776369043
+- P0.3–P0.6 are complete on this feature branch. No tests were skipped, xfailed or waived. PR #21 is ready for merge; the canonical branch is unchanged until merge.
+- Next plan gate: M3.1–M3.5 still require independently verifiable case records, exact event/action dates and event polygons. The government evidence request remains the next external dependency; do not invent ground truth or score unverified cases.
