@@ -151,6 +151,7 @@ def write_report(results: list[AssetResult], meta: dict, out_dir: Path) -> Path:
     """One folder per run: summary.json, candidates.geojson, and the chips as PNG files."""
     out_dir.mkdir(parents=True, exist_ok=True)
     features = []
+    diagnostic_features = []
     for r in results:
         for n, c in enumerate(r.candidates, 1):
             props = {k: v for k, v in c.items() if k not in ("geometry", "before_chip_png_b64", "after_chip_png_b64")}
@@ -163,17 +164,30 @@ def write_report(results: list[AssetResult], meta: dict, out_dir: Path) -> Path:
                     (out_dir / name).write_bytes(base64.b64decode(b64))
                     props[f"{which}_chip"] = name
             features.append({"type": "Feature", "geometry": c["geometry"], "properties": props})
+        for n, c in enumerate(r.diagnostics, 1):
+            props = {k: v for k, v in c.items() if k not in ("geometry", "before_chip_png_b64", "after_chip_png_b64")}
+            props["asset_name"] = r.aoi.name
+            for which in ("before", "after"):
+                b64 = c.get(f"{which}_chip_png_b64")
+                if b64:
+                    name = f"chips/diagnostics/{r.aoi.asset_key}_{n}_{which}.png"
+                    (out_dir / "chips" / "diagnostics").mkdir(parents=True, exist_ok=True)
+                    (out_dir / name).write_bytes(base64.b64decode(b64))
+                    props[f"{which}_chip"] = name
+            diagnostic_features.append({"type": "Feature", "geometry": c["geometry"], "properties": props})
     (out_dir / "candidates.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": features}, indent=1), encoding="utf-8")
+    (out_dir / "diagnostics.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": diagnostic_features}, indent=1), encoding="utf-8")
     assets = []
     for r in results:
         row = asset_summary(r)
+        row["diagnostic_components"] = len(r.diagnostics)
         if r.week_image_png:
             (out_dir / "weeks").mkdir(exist_ok=True)
             name = f"weeks/{r.aoi.asset_key}.png"
             (out_dir / name).write_bytes(r.week_image_png)
             row["image_file"] = name
         assets.append(row)
-    summary = {**meta, "assets": assets, "candidates": len(features)}
+    summary = {**meta, "assets": assets, "candidates": len(features), "diagnostic_components": len(diagnostic_features)}
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=1, default=str), encoding="utf-8")
     # Full API payloads, chips included, keyed by asset_key so `lp replay` can resend them after a
     # demo reset with no internet. Not committed (see .gitignore): it is large and rebuildable.
