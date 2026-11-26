@@ -36,7 +36,7 @@
 | Tuning evidence | Available | Five non-scored tuning lakes; see `reports/m2-tuning/README.md` |
 | Geospatial engine | Backend integrated; UI drill-down advanced | Existing Asset 360 plus PR #27 district/mandal filters and boundary-source provenance; full official registry hierarchy remains open |
 | Government sources | Templates/file imports | No live government integration without agreement |
-| API CI | Green on merged increments | PR #21 baseline repair; PRs #25–#27 passed their CI workflows. PR #28 CI is in progress. |
+| API CI | Green on merged increments | PR #21 baseline repair; PRs #25–#27 passed their CI workflows. PR #28 merged after API/PostGIS, pipeline, web and E2E CI passed. |
 | Department data isolation | Not production-ready | Department-level RLS deliberately deferred in PR #19 |
 | AI copilot/RAG | Not implemented | Separate future phase; must cite source records and avoid legal conclusions |
 
@@ -109,8 +109,8 @@
 **Goal:** complete the latest approved product workflow, not the superseded multi-role workflow.
 
 - [ ] P3.1 Validate the complete citizen journey: web report → location resolution → incident association/creation → satellite review → official notification → review/decision → citizen-safe status update.
-- [ ] P3.2 Add operational health/queue visibility for citizen satellite review jobs and retries. Implemented in open PR #28; awaiting full CI and merge.
-- [ ] P3.3 Expose provider-ready WhatsApp inbound configuration and disabled state. Implemented in open PR #28; actual webhook remains disabled until State credentials/authorization are supplied.
+- [ ] P3.2 Add operational health/queue visibility for citizen satellite review jobs and retries. Implemented and merged in PR #28; full CI passed.
+- [ ] P3.3 Expose provider-ready WhatsApp inbound configuration and disabled state. Readiness and disabled state are visible in merged PR #28; actual webhook remains disabled until State credentials/authorization are supplied.
 - [ ] P3.4 Keep SMS/WhatsApp outbound templates held until the relevant gateway, DLT/WhatsApp approvals and owner authorization; no live provider activation in this demo.
 - [ ] P3.5 Validate acknowledgement reminders, 48-hour admin follow-up and weekly digests with idempotency tests.
 - [ ] P3.6 Complete admin boundary/source conflict resolution tools; never auto-downgrade a boundary.
@@ -328,7 +328,7 @@ The following implementation increments were delivered in parallel on short-live
 | #25 | M2 sub-threshold levelling diagnostics and before/after review chips | Merged | Passed |
 | #26 | M3 scorer guardrails: replay-time `detected_at`, unique IDs and geometry validation | Merged | Passed |
 | #27 | P2 statewide registry district/mandal drill-down and boundary-source label | Merged | Passed |
-| #28 | P3 citizen operations queue, retry visibility and provider-readiness dashboard | Open; awaiting final CI | In progress |
+| #28 | P3 citizen operations queue, retry visibility and provider-readiness dashboard | Merged | Passed |
 
 ### Current implementation facts
 
