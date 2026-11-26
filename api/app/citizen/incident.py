@@ -65,7 +65,7 @@ def reported_place(db: Session, report: CitizenReport, lon: float, lat: float, a
         type="reported_place", cohort=rules.cohort_for_status("derived").value, district=area.get("district"),
         mandal=area.get("mandal"), village=area.get("village"), survey_numbers=[], baseline_date=rules.policy_cutoff_date(),
         is_demo=report.is_demo, added_at=at,
-        notes=f"Made from citizen report {report.ref}." + (f" District and mandal: {area['source']}." if area.get("source") else ""),
+        notes=f"INTERNAL SUPPORT RECORD — NOT A REGISTERED GOVERNMENT ASSET. Candidate location from citizen report {report.ref}." + (f" District and mandal: {area['source']}." if area.get("source") else ""),
     )
     db.add(asset)
     db.flush()
@@ -106,9 +106,31 @@ def create(db: Session, report: CitizenReport, lon: float, lat: float, matched: 
     if report.is_demo:
         alert.code = f"TEST-{at.year}-{alert.id:04d}"
     db.flush()
+    candidate_asset_id = None
+    if matched is None:
+        candidate_asset_id = db.execute(text("""
+            INSERT INTO candidate_assets
+              (candidate_code, source_report_id, support_asset_id, detection_candidate_id, incident_id,
+               display_name, category_hint, district, mandal, village, footprint, provenance, created_at, updated_at)
+            SELECT :candidate_code, :report_id, :support_asset_id, :detection_candidate_id, :incident_id,
+                   :display_name, :category_hint, :district, :mandal, :village, b.geom,
+                   CAST(:provenance AS jsonb), :created_at, :updated_at
+            FROM boundaries b WHERE b.id = :boundary_id
+            RETURNING id
+        """), {
+            "candidate_code": f"GGC-{report.ref}", "report_id": report.id, "support_asset_id": asset.id,
+            "detection_candidate_id": candidate.id, "incident_id": alert.id,
+            "display_name": f"Reported location {report.ref}", "category_hint": report.what,
+            "district": asset.district, "mandal": asset.mandal, "village": asset.village,
+            "provenance": json.dumps({"source": "citizen_report", "report_ref": report.ref,
+                                      "verification": "unverified", "support_record": "internal_only"}),
+            "created_at": at, "updated_at": at, "boundary_id": primary["id"],
+        }).scalar_one()
+        report.candidate_asset_id = candidate_asset_id
     chain.record(db, actor_id=None, action="citizen.incident_opened", entity="alert", entity_id=alert.id, at=at,
-                 details={"code": alert.code, "ref": report.ref, "asset_id": asset.id, "reported_place": matched is None,
-                          "legal_check": decision.result.value})
+                 details={"code": alert.code, "ref": report.ref, "asset_id": asset.id,
+                          "candidate_asset_id": str(candidate_asset_id) if candidate_asset_id else None,
+                          "reported_place": matched is None, "legal_check": decision.result.value})
     return alert
 
 
