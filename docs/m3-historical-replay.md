@@ -1,6 +1,6 @@
 # M3 weekly historical replay
 
-**Status:** implementation in progress on `feature/m3-historical-replay`.  
+**Status:** implementation validated on PR #22 CI; no historical production replay has been executed yet.  
 **Purpose:** replay the production Sentinel detector at historical weekly as-of dates without look-ahead. This is an engineering runner, not evidence that any case is true ground truth and not an accuracy result.
 
 ## Command
