@@ -1,7 +1,5 @@
 from copy import deepcopy
 
-import pytest
-
 from lake_protect.geospatial.backtest import evaluate
 
 POLYGON = {
@@ -85,7 +83,15 @@ def test_unmatched_detection_is_not_automatically_called_false_positive():
 
 def test_human_adjudicated_false_positive_is_counted():
     result = evaluate([case()], [
-        detection("false-1", detected_at="2024-09-02", review_disposition="false_positive")
+        detection(
+            "false-1",
+            detected_at="2024-09-02",
+            review_status="reviewed",
+            review_disposition="false_positive",
+            reviewed_by="independent-reviewer",
+            reviewed_at="2024-09-03",
+            review_evidence="manual comparison against dated high-resolution history",
+        )
     ])
     assert result["false_positive"] == 1
     assert result["unreviewed_detections"] == 0
@@ -103,3 +109,12 @@ def test_pre_2018_case_is_excluded_from_scoring():
     result = evaluate([case(event_date="2017-12-31")], [detection()])
     assert result["eligible_cases"] == 0
     assert "event_before_2018-01-01" in result["excluded_cases"][0]["reasons"]
+
+
+def test_incomplete_false_positive_review_does_not_count_as_adjudicated():
+    result = evaluate([case()], [
+        detection("false-1", detected_at="2024-09-02", review_disposition="false_positive")
+    ])
+    assert result["false_positive"] == 0
+    assert result["unreviewed_detections"] == 1
+    assert result["precision"] is None
