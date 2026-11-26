@@ -869,7 +869,7 @@ table.grid tr.clickable:hover td { background: #f8fafc; }
   .topbar-tools { gap: 6px; }
   .role-indicator, .topbar-divider, .user-name { display: none; }
   .utility-button { min-height: 32px; padding: 5px 8px; font-size: 11px; }
-  .civic-main { order: 3; flex: 1; min-height: 0; }
+  .civic-main { order: 2; flex: 1; min-height: 0; }
   .page { padding: 18px 14px 28px; }
   .page-head h1, .page > h1 { font-size: 23px; }
   .queue { grid-template-columns: minmax(0, 1fr); }
