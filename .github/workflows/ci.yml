@@ -2,9 +2,9 @@ name: Lake Protect CI
 
 on:
   push:
-    branches: ["feature/initial", "feature/consolidated", "feature/geospatial-integration", "feat/**"]
+    branches: ["consolidated", "feature/initial", "feature/consolidated", "feature/geospatial-integration", "feat/**"]
   pull_request:
-    branches: ["feature/consolidated"]
+    branches: ["consolidated", "feature/consolidated"]
   workflow_dispatch:
 
 permissions:
