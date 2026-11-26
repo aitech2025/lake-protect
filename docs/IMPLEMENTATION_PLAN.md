@@ -1,11 +1,11 @@
 # GeoGuard implementation plan
 
-**Branch:** `feature/consolidated`  
+**Branch:** `consolidated` (working branch per product-owner direction)  
 **Plan owner:** Product owner / implementation agent  
 **Baseline commit:** `99b56e06a0eb6395280797a8b154b16af8924a41` (after PRs #31–#36)  
 **Plan created:** 26 November 2026  
 **Status:** Active — Phase 1 started  
-**Source of truth:** `CONTEXT.md`, latest applicable owner decisions in `DECISIONS.md`, current code, and focused design documents.
+**Source of truth:** latest applicable owner decisions in `DECISIONS.md`, the review baseline in `docs/requirements/` and `docs/architecture/`, current code, and focused implementation documents. Historical conflicts are tracked in `docs/architecture/GEOGUARD-ADR-REGISTER.md`.
 
 > This is a living plan. Update the status, evidence, commit/PR and test result for each task as work progresses. Do not mark a task done merely because code exists; its acceptance criteria must be demonstrated.
 
