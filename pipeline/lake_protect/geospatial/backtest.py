@@ -1,51 +1,186 @@
-"""Spatial and temporal backtest scoring for independently verified cases."""
+"""Spatial and temporal scoring for independently verified M3 cases.
+
+Precision is deliberately withheld until every unmatched detection has a human
+review disposition. An unmatched candidate is not automatically a false alarm.
+"""
 from __future__ import annotations
+
 import json
+from math import isfinite
 from pathlib import Path
 from typing import Any
+
 from shapely.geometry import shape
-ACRE_SQ_M=4046.8564224
 
-def load_features(path: str | Path) -> list[dict[str,Any]]:
-    data=json.loads(Path(path).read_text(encoding="utf-8"))
-    if data.get("type")!="FeatureCollection": raise ValueError("Input must be a GeoJSON FeatureCollection")
-    return data.get("features",[])
+from .cases import validate_case_collection
 
-def evaluate(cases: list[dict[str,Any]], detections: list[dict[str,Any]], *, minimum_area_acres: float=0.25, match_iou: float=0.10) -> dict[str,Any]:
-    eligible=[]
+
+def load_features(path: str | Path) -> list[dict[str, Any]]:
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(data, dict) or data.get("type") != "FeatureCollection":
+        raise ValueError("Input must be a GeoJSON FeatureCollection")
+    features = data.get("features")
+    if not isinstance(features, list):
+        raise ValueError("FeatureCollection.features must be an array")
+    return features
+
+
+def _iso_date(value: Any, label: str) -> str:
+    if not isinstance(value, str) or len(value) < 10:
+        raise ValueError(f"{label} must be an ISO date or timestamp")
+    try:
+        from datetime import date
+        parsed = date.fromisoformat(value[:10])
+    except ValueError as exc:
+        raise ValueError(f"{label} must begin with YYYY-MM-DD") from exc
+    if parsed.isoformat() != value[:10]:
+        raise ValueError(f"{label} must begin with YYYY-MM-DD")
+    return parsed.isoformat()
+
+
+def evaluate(
+    cases: list[dict[str, Any]],
+    detections: list[dict[str, Any]],
+    *,
+    minimum_area_acres: float = 0.25,
+    match_iou: float = 0.10,
+) -> dict[str, Any]:
+    """Score only eligible cases and only detections strictly before public action.
+
+    Primary eligibility requires the M3 case validator to pass: exact event date,
+    known public-action date, verified geometry, supported area > threshold and
+    complete provenance. Unknown-action cases remain visible as exclusions.
+    """
+    if isinstance(minimum_area_acres, bool) or not isfinite(minimum_area_acres) or minimum_area_acres < 0:
+        raise ValueError("minimum_area_acres must be a finite non-negative number")
+    if isinstance(match_iou, bool) or not isfinite(match_iou) or not 0 <= match_iou <= 1:
+        raise ValueError("match_iou must be between 0 and 1")
+
+    validation = validate_case_collection(
+        {"type": "FeatureCollection", "features": cases},
+        minimum_area_acres=minimum_area_acres,
+    )
+    if not validation["valid"]:
+        raise ValueError("Invalid case manifest: " + "; ".join(validation["errors"]))
+
+    eligible_ids = set(validation["eligible_case_ids"])
+    eligible: list[tuple[dict[str, Any], Any]] = []
     for feature in cases:
-        geom=shape(feature["geometry"]); props=feature.get("properties",{})
-        if not props.get("event_date"):
-            raise ValueError("Every ground-truth case must provide event_date for temporal backtesting")
-        if "public_action_date" not in props:
-            raise ValueError("Every ground-truth case must include public_action_date; use null when no action date is known")
-        if props.get("area_acres") is None:
-            raise ValueError(f"Case {props.get('case_id', feature.get('id'))} must provide area_acres; degree-based area estimates are not accepted")
-        area=float(props["area_acres"])
-        if area>=minimum_area_acres: eligible.append((feature,geom))
-    remaining=set(range(len(detections))); matches=[]
-    for case,case_geom in eligible:
-        props=case.get("properties",{}); action=props.get("public_action_date"); event=props.get("event_date"); choices=[]
-        for idx in remaining:
-            det=detections[idx]; dp=det.get("properties",{}); detected=dp.get("detected_at") or dp.get("first_changed_at")
-            if not detected or (action and detected[:10]>=action[:10]) or (event and detected[:10]<event[:10]): continue
-            geom=shape(det["geometry"]); union=case_geom.union(geom).area
-            iou=case_geom.intersection(geom).area/union if union else 0.0
-            if iou>=match_iou: choices.append((iou,idx,detected))
-        if choices:
-            iou,idx,detected=max(choices); remaining.remove(idx)
-            matches.append({"case_id":props.get("case_id",case.get("id")),"detection_id":detections[idx].get("id"),
-                "iou":round(iou,4),"detected_at":detected,"before_public_action":True})
-    tp=len(matches); fn=len(eligible)-tp; fp=len(remaining)
-    precision=tp/(tp+fp) if tp+fp else 0.0; recall=tp/(tp+fn) if tp+fn else 0.0
-    f1=2*precision*recall/(precision+recall) if precision+recall else 0.0
-    return {"eligible_cases":len(eligible),"excluded_below_minimum_area":len(cases)-len(eligible),
-        "detections":len(detections),"true_positive":tp,"false_positive":fp,"false_negative":fn,
-        "precision":round(precision,4),"recall":round(recall,4),"f1":round(f1,4),
-        "minimum_area_acres":minimum_area_acres,"match_iou":match_iou,"matches":matches,
-        "warning":"Screening metrics only; verify labels, dates, CRS and blind-test independence before reporting."}
+        props = feature.get("properties", {})
+        if props.get("case_id") in eligible_ids:
+            eligible.append((feature, shape(feature["geometry"])))
 
-def evaluate_files(cases_path: str|Path,detections_path: str|Path,output_path: str|Path,*,minimum_area_acres:float=0.25,match_iou:float=0.10):
-    result=evaluate(load_features(cases_path),load_features(detections_path),minimum_area_acres=minimum_area_acres,match_iou=match_iou)
-    Path(output_path).parent.mkdir(parents=True,exist_ok=True); Path(output_path).write_text(json.dumps(result,indent=2),encoding="utf-8")
+    remaining = set(range(len(detections)))
+    matches: list[dict[str, Any]] = []
+    for case, case_geom in eligible:
+        props = case["properties"]
+        event_date = _iso_date(props["event_date"], f"{props['case_id']}.event_date")
+        action_date = _iso_date(props["public_action_date"], f"{props['case_id']}.public_action_date")
+        choices: list[tuple[float, int, str]] = []
+        for idx in remaining:
+            detection = detections[idx]
+            if not isinstance(detection, dict) or not isinstance(detection.get("geometry"), dict):
+                raise ValueError(f"Detection at index {idx} must contain GeoJSON geometry")
+            det_props = detection.get("properties") or {}
+            detected = det_props.get("detected_at") or det_props.get("first_changed_at")
+            if not detected:
+                continue
+            detected_date = _iso_date(detected, f"detection[{idx}].detected_at")
+            # A valid lead-time hit must occur on/after the observed event and
+            # strictly before the first public action.
+            if detected_date < event_date or detected_date >= action_date:
+                continue
+            geom = shape(detection["geometry"])
+            if geom.is_empty or not geom.is_valid:
+                raise ValueError(f"Detection at index {idx} has invalid geometry")
+            union_area = case_geom.union(geom).area
+            iou = case_geom.intersection(geom).area / union_area if union_area else 0.0
+            if iou >= match_iou:
+                choices.append((iou, idx, detected))
+        if choices:
+            iou, idx, detected = max(choices)
+            remaining.remove(idx)
+            matches.append({
+                "case_id": props["case_id"],
+                "detection_id": detections[idx].get("id"),
+                "iou": round(iou, 4),
+                "detected_at": detected,
+                "public_action_date": props["public_action_date"],
+                "lead_time_days": (
+                    __import__("datetime").date.fromisoformat(props["public_action_date"])
+                    - __import__("datetime").date.fromisoformat(detected[:10])
+                ).days,
+                "before_public_action": True,
+            })
+
+    true_positive = len(matches)
+    false_negative = len(eligible) - true_positive
+    unmatched = [
+        {
+            "detection_id": detections[idx].get("id"),
+            "detected_at": (detections[idx].get("properties") or {}).get("detected_at")
+                or (detections[idx].get("properties") or {}).get("first_changed_at"),
+            "review_disposition": (detections[idx].get("properties") or {}).get("review_disposition"),
+        }
+        for idx in sorted(remaining)
+    ]
+    adjudicated_false_positive = sum(
+        1 for item in unmatched if item["review_disposition"] == "false_positive"
+    )
+    unreviewed = len(unmatched) - adjudicated_false_positive
+    precision = (
+        true_positive / (true_positive + adjudicated_false_positive)
+        if unreviewed == 0 and true_positive + adjudicated_false_positive > 0
+        else (0.0 if unreviewed == 0 else None)
+    )
+    recall = true_positive / len(eligible) if eligible else None
+    f1 = (
+        2 * precision * recall / (precision + recall)
+        if precision is not None and recall is not None and precision + recall > 0
+        else (0.0 if precision == 0 and recall == 0 else None)
+    )
+
+    return {
+        "eligible_cases": len(eligible),
+        "eligible_case_ids": [feature["properties"]["case_id"] for feature, _ in eligible],
+        "excluded_cases": validation["excluded_cases"],
+        "detections": len(detections),
+        "true_positive": true_positive,
+        "false_negative": false_negative,
+        "false_positive": adjudicated_false_positive,
+        "unmatched_detections": len(unmatched),
+        "unreviewed_detections": unreviewed,
+        "unmatched_detection_details": unmatched,
+        "precision": round(precision, 4) if precision is not None else None,
+        "recall": round(recall, 4) if recall is not None else None,
+        "f1": round(f1, 4) if f1 is not None else None,
+        "precision_status": "complete" if unreviewed == 0 else "pending_manual_review",
+        "minimum_area_acres_exclusive": minimum_area_acres,
+        "match_iou": match_iou,
+        "matches": matches,
+        "warning": (
+            "Screening metrics only. Precision remains unavailable until every unmatched "
+            "candidate has a documented human review disposition. Verify blind-test "
+            "independence and imagery provenance before reporting."
+        ),
+    }
+
+
+def evaluate_files(
+    cases_path: str | Path,
+    detections_path: str | Path,
+    output_path: str | Path,
+    *,
+    minimum_area_acres: float = 0.25,
+    match_iou: float = 0.10,
+) -> dict[str, Any]:
+    result = evaluate(
+        load_features(cases_path),
+        load_features(detections_path),
+        minimum_area_acres=minimum_area_acres,
+        match_iou=match_iou,
+    )
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(result, indent=2), encoding="utf-8")
     return result
