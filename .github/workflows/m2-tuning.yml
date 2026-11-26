@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     env:
-      LP_CACHE_DIR: ${{ runner.temp }}/lp-cache
+      LP_CACHE_DIR: ${{ github.workspace }}/.lp-cache
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -24,7 +24,7 @@ jobs:
       - name: Restore imagery window cache
         uses: actions/cache@v4
         with:
-          path: ${{ runner.temp }}/lp-cache
+          path: .lp-cache
           key: m2-detect-v2-${{ runner.os }}-${{ hashFiles('pipeline/lake_protect/detect_rules.yaml') }}
           restore-keys: |
             m2-detect-v2-${{ runner.os }}-
