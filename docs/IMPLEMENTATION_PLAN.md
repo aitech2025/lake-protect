@@ -175,7 +175,7 @@ Phase 2 UI work can proceed in parallel with M3 data verification, but it must n
 | Task | Status | Latest evidence / next action |
 |---|---|---|
 | P0.1 canonical branch baseline | Done | `feature/consolidated`, baseline `65ce4c4` |
-| P0.2 CI status review | Done | Earlier PR #20 run `45757478902`: pipeline 66 passed, web build passed; API 347 passed / 40 failed (same 40 baseline failures). Latest scorer/test/evidence-request changes are awaiting CI run `45765718947`; web build passed, pipeline/API jobs still running |
+| P0.2 CI status review | Done | PR #20 merged as `cb3b8d7913b922b3e6075e4bb2e3a8583dcb9206`. Validation run `45765808663`: pipeline 77 passed, web build passed; API 347 passed / 40 failed (same baseline failures) |
 | P0.3–P0.6 CI triage | Not started | Classify 40 known API failures and establish a reproducible baseline |
 | M3.1–M3.5 case evidence | In progress | 27 discovery leads classified in `data/case-register.csv` into primary candidates, historical-only, restoration controls, boundary controls and unresolved identities. None are independently verified; manifest remains empty |
 | M3.6–M3.7 freeze rules | Not started | `detect-v2`; no tag exists. Freeze only after confirming the rules and case protocol |
@@ -221,7 +221,7 @@ The first increment has started on `feature/m3-case-validation`:
 - Pipeline tests: **66 passed** (including the new case-validation tests).
 - Web type-check/build: **passed**.
 - API/PostGIS: **347 passed, 40 failed**. The failure count and failure set match the previously recorded baseline; this increment changes no API code. The full API suite is therefore not green, but the new pipeline validation suite is green.
-- PR remains open for review; it has not been merged into `feature/consolidated` yet.
+- This checkpoint was written before merge; PR #20 was subsequently merged to `feature/consolidated` as `cb3b8d7913b922b3e6075e4bb2e3a8583dcb9206` (see the merge log below).
 
 
 ### 26 November 2026 — PRD case leads inventoried
