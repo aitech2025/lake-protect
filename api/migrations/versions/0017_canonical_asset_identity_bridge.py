@@ -21,13 +21,13 @@ def upgrade():
     CREATE UNIQUE INDEX IF NOT EXISTS ux_public_assets_legacy_asset_id
       ON public_assets(legacy_asset_id);
 
-    DO $
+    DO $$
     BEGIN
       IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname='fk_public_assets_legacy_asset') THEN
         ALTER TABLE public_assets ADD CONSTRAINT fk_public_assets_legacy_asset
           FOREIGN KEY (legacy_asset_id) REFERENCES assets(id) ON DELETE RESTRICT;
       END IF;
-    END $;
+    END $$;
 
     ALTER TABLE assets ADD COLUMN IF NOT EXISTS platform_asset_id uuid;
     CREATE UNIQUE INDEX IF NOT EXISTS ux_assets_platform_asset_id
@@ -146,7 +146,7 @@ def upgrade():
       END IF;
       UPDATE assets SET platform_asset_id = canonical_id WHERE id = NEW.id;
       RETURN NEW;
-    END $;
+    END $$;
 
     CREATE OR REPLACE FUNCTION geoguard_sync_child_asset_identity()
     RETURNS trigger LANGUAGE plpgsql AS $$
