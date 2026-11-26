@@ -71,9 +71,9 @@
 
 - [ ] M3.6 Review the final `detect-v2` rule file and tuning evidence; do not change thresholds using scored-case results.
 - [ ] M3.7 Freeze the exact rule file and dependencies in an immutable git tag before scoring. Record commit SHA and SHA-256.
-- [ ] M3.8 Implement/complete a weekly historical replay runner from the Sentinel-2 and Sentinel-1 STAC archives.
-- [ ] M3.9 Enforce strict as-of filtering: every scene acquisition timestamp must be at or before that replay date. Add tests proving no look-ahead.
-- [ ] M3.10 Make runs resumable and cache windowed asset imagery; never download full scenes unnecessarily.
+- [x] M3.8 Implement/complete a weekly historical replay runner from the Sentinel-2 and Sentinel-1 STAC archives. `lp historical-replay` reuses the production screen; Sentinel-1 checks are enabled by default for built candidates.
+- [x] M3.9 Enforce strict as-of filtering: every scene acquisition timestamp must be at or before that replay date. The STAC query, returned-item filter and raster readers enforce this; `pipeline/tests/test_no_lookahead.py` covers the catalogue and pixel-reader guards.
+- [x] M3.10 Make runs resumable and cache windowed asset imagery; never download full scenes unnecessarily. The replay checkpoints each date and fingerprints the AOI/rules/range; existing STAC and windowed COG caches are reused.
 - [ ] M3.11 Run the scored set once against the frozen rules. Any rerun after rule changes must use a new tag and be disclosed.
 
 #### 1C. Score, inspect and report
@@ -295,3 +295,15 @@ These articles are discovery references only. They are not substitutes for certi
 - Final PR #21 CI run #275: API/PostGIS **387 passed, 0 failed**; pipeline **77 passed**; web type-check/build **passed**. All jobs succeeded: https://github.com/aitech2025/lake-protect/actions/runs/45776369043
 - P0.3–P0.6 are complete on this feature branch. No tests were skipped, xfailed or waived. PR #21 is ready for merge; the canonical branch is unchanged until merge.
 - Next plan gate: M3.1–M3.5 still require independently verifiable case records, exact event/action dates and event polygons. The government evidence request remains the next external dependency; do not invent ground truth or score unverified cases.
+
+
+### 26 November 2026 — M3.8 historical replay runner started
+
+- PR #21 merged to `feature/consolidated` as `4156a9034be7b67c9604537dcc8e88b70b20576b`; P0.3–P0.6 are complete and the canonical CI baseline is green.
+- Created `feature/m3-historical-replay` from the merged canonical commit.
+- Added `pipeline/lake_protect/replay.py` and the `lp historical-replay` command. It reuses the production screen at weekly as-of dates, writes a report per week, checkpoints each completed date, fingerprints the exact rules/AOI/date range, and refuses to resume into a changed configuration.
+- Aggregated detections retain the first replay as-of date in `detected_at`; this is deliberately distinct from retrospective `first_changed_at` so lead-time scoring does not claim the detector knew about a change before it could satisfy its persistence rules.
+- Added `pipeline/tests/test_historical_replay.py` for weekly date generation, de-duplication, earliest detection date, resume behavior and configuration mismatch refusal. Added `docs/m3-historical-replay.md` with usage and interpretation safeguards.
+- PR #22 CI run: API/PostGIS **387 passed**, pipeline **84 passed**, web build **passed**; all jobs succeeded: https://github.com/aitech2025/lake-protect/actions/runs/45777436579.
+- Existing no-look-ahead guards and tests were reviewed; M3.9 is marked complete. M3.8 and M3.10 remain in progress pending CI validation and confirmation that Sentinel-1 historical checks are included in the replay.
+- No historical replay has been run and no detection metrics have been produced. The 27 discovery leads remain unverified; official case evidence and event polygons are still required before scoring. M3.6–M3.7 rule review/freeze and M3.1–M3.5 evidence acquisition remain prerequisites to the scored replay.

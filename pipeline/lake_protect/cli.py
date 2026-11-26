@@ -341,5 +341,42 @@ def basemap(
         typer.echo(f"Upload: {resp.status_code} {resp.text[:200]}")
 
 
+@app.command("historical-replay")
+def historical_replay(
+    start: str = typer.Option(..., help="First replay as-of date (YYYY-MM-DD)."),
+    end: str = typer.Option(..., help="Last replay as-of date (YYYY-MM-DD)."),
+    assets: str = typer.Option("data/assets.geojson", help="Fixed asset/boundary snapshot used for every replay date."),
+    asset: list[str] = typer.Option(None, "--asset", help="Limit to these asset_keys. Repeat for several."),
+    out: str = typer.Option("reports/m3/historical-replay", help="Replay output directory; checkpoints and reports are retained here."),
+    step_days: int = typer.Option(7, min=1, help="Days between replay as-of dates; default weekly."),
+    workers: int = typer.Option(16, min=1, help="Parallel raster reads."),
+    chips: bool = typer.Option(True, help="Render dated before/after evidence chips for candidates."),
+    use_radar: bool = typer.Option(True, help="Apply the configured Sentinel-1 built-up check."),
+    resume: bool = typer.Option(True, help="Resume completed dates from verified checkpoints."),
+) -> None:
+    """Replay the frozen detector at weekly historical dates without look-ahead.
+
+    The detector rules hash and fixed AOI snapshot are bound to the output directory. If either
+    changes, start a new output directory and disclose the new run rather than mixing results.
+    """
+    from pathlib import Path
+
+    from lake_protect.replay import run_replay
+    from lake_protect.screen import aois_from_file
+
+    first, last = _date(start), _date(end)
+    if first is None or last is None:
+        raise typer.BadParameter("start and end must be YYYY-MM-DD dates")
+    aois = aois_from_file(Path(assets), asset or None, None)
+    result = run_replay(
+        aois, start=first, end=last, out_dir=Path(out), step_days=step_days,
+        workers=workers, with_chips=chips, use_radar=use_radar, resume=resume, log=typer.echo,
+    )
+    typer.echo(
+        f"Replay {result['status']}: {len(result['completed_dates'])} dates, "
+        f"{result['detections']} unique detections; manifest={Path(out) / 'replay-manifest.json'}"
+    )
+
+
 if __name__ == "__main__":
     app()
