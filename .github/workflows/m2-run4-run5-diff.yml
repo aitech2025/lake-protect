@@ -1,0 +1,49 @@
+name: M2 run4/run5 spatial review diff
+
+on:
+  workflow_dispatch:
+    inputs:
+      run5_run_id:
+        description: GitHub Actions run ID containing the run5 tuning artifact
+        required: true
+        default: "45780430533"
+        type: string
+  push:
+    branches:
+      - feature/consolidated
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install geospatial CLI
+        run: python -m pip install -e "pipeline[geo]"
+      - name: Download run5 tuning artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: m2-detect-v2-tuning-2026-11-20
+          run-id: ${{ github.event.inputs.run5_run_id || '45780430533' }}
+          github-token: ${{ github.token }}
+          path: run5
+      - name: Compare committed run4 and run5 candidate footprints
+        run: |
+          lp-geo compare-tuning \
+            reports/m2-tuning/run4/candidates.geojson \
+            run5/candidates.geojson \
+            --iou-threshold 0.10 \
+            --output reports/m2-tuning/run4-run5-diff.json
+      - name: Upload human-review report
+        uses: actions/upload-artifact@v4
+        with:
+          name: m2-run4-run5-spatial-diff
+          path: reports/m2-tuning/run4-run5-diff.json
+          if-no-files-found: error
+          retention-days: 90
