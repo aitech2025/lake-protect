@@ -137,6 +137,8 @@ def test_outside_every_location_the_report_makes_a_reported_place_and_the_screen
     assert place.id not in {f["id"] for f in client.get("/assets", headers=auth(w.admin)).json()["features"]}
     registry = client.get("/api/v1/platform/assets", headers=auth(w.admin)).json()["items"]
     assert all(row["category_code"] != "reported_place" for row in registry)
+    refused = client.post("/api/v1/platform/assets", json={"asset_code": "TEST-REPORTED-PLACE", "display_name": "Reported place", "category_code": "reported_place"}, headers=auth(w.admin))
+    assert refused.status_code == 422
     candidate_rows = client.get("/api/v1/platform/candidate-assets", headers=auth(w.admin)).json()["items"]
     assert any(row["id"] == str(candidate_asset.id) and row["source_report_ref"] == view["ref"] for row in candidate_rows)
     # A reported place is not on the weekly watch.
