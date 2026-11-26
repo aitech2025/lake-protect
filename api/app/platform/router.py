@@ -21,6 +21,7 @@ def list_candidate_assets(limit: int = Query(100, ge=1, le=500), offset: int = Q
              ca.status, ca.created_at, r.ref AS source_report_ref, ca.detection_candidate_id, ca.incident_id,
              ST_AsGeoJSON(ca.footprint)::json AS footprint
       FROM candidate_assets ca JOIN citizen_reports r ON r.id=ca.source_report_id
+      WHERE NOT ca.is_demo
       ORDER BY ca.created_at DESC, ca.id LIMIT :limit OFFSET :offset
     """), {"limit": limit, "offset": offset}).mappings().all()
     chain.record(db, actor_id=actor.id, action="view.candidate_assets", entity="candidate_asset",
