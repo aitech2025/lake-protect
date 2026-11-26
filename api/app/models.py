@@ -633,6 +633,7 @@ class CandidateAsset(Base):
     footprint = mapped_column(Geometry("MULTIPOLYGON", srid=4326), nullable=False)
     status: Mapped[str] = mapped_column(Text, default="PENDING_VERIFICATION")
     provenance: Mapped[dict] = mapped_column(JSONB, default=dict)
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[dt.datetime] = mapped_column(TZ)
     updated_at: Mapped[dt.datetime] = mapped_column(TZ)
 
