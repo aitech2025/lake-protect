@@ -117,3 +117,8 @@ Important limitations:
 - Artifact: [m2-run4-run5-spatial-diff](https://github.com/aitech2025/lake-protect/actions/runs/45819230496/artifacts/15117485673)
 - Comparison: 14 run4 candidates vs 3 run5 candidates; 2 partial spatial matches, 12 unmatched run4 footprints, 1 unmatched run5 footprint.
 - The result is documented in [run4/run5 spatial review](../reports/m2-tuning/run4-run5-spatial-review.md). All unmatched and partial matches remain unadjudicated review leads.
+
+
+## UI layer — Civic Slate refresh (26 November 2026)
+
+**In progress** on `feat/geoguard-civic-ui-refresh`. Shared shell, design tokens, common visual primitives and mandatory evidence disclaimer have been implemented. Full page-by-page visual and functional QA remains pending. No backend, ML, data or API contract changes are included. See [UI redesign specification](UI_REDESIGN.md).
