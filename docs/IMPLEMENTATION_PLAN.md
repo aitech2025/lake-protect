@@ -175,7 +175,7 @@ Phase 2 UI work can proceed in parallel with M3 data verification, but it must n
 | Task | Status | Latest evidence / next action |
 |---|---|---|
 | P0.1 canonical branch baseline | Done | `feature/consolidated`, baseline `65ce4c4` |
-| P0.2 CI status review | Done | Earlier PR #20 run `45757478902`: pipeline 66 passed, web build passed; API 347 passed / 40 failed (same 40 baseline failures). Latest scoring/register changes are awaiting CI run `45765555468` |
+| P0.2 CI status review | Done | Earlier PR #20 run `45757478902`: pipeline 66 passed, web build passed; API 347 passed / 40 failed (same 40 baseline failures). Latest scorer/test/evidence-request changes are awaiting CI run `45765718947`; web build passed, pipeline/API jobs still running |
 | P0.3–P0.6 CI triage | Not started | Classify 40 known API failures and establish a reproducible baseline |
 | M3.1–M3.5 case evidence | In progress | 27 discovery leads classified in `data/case-register.csv` into primary candidates, historical-only, restoration controls, boundary controls and unresolved identities. None are independently verified; manifest remains empty |
 | M3.6–M3.7 freeze rules | Not started | `detect-v2`; no tag exists. Freeze only after confirming the rules and case protocol |
@@ -196,7 +196,8 @@ The first increment has started on `feature/m3-case-validation`:
 3. Classified 2014–2023 cases as historical detection-only, restoration actions as controls, Khajaguda boundary disputes as boundary controls, Durgam Cheruvu as exposed under D-042, and ambiguous Pedda Cheruvu identity as unresolved.
 4. Added the empty GeoJSON manifest, evidence register documentation, strict validator and `lp-geo validate-cases` command.
 5. Hardened `geospatial/backtest.py`: only validator-eligible cases can score; detections must occur on/after event and strictly before public action; exactly 0.25 acre is excluded; unknown public-action dates cannot be counted as early-warning hits; unmatched detections are not false positives until reviewed with reviewer identity, review date and evidence.
-6. Added focused scorer tests in `pipeline/tests/test_backtest_scoring.py`.
+6. Added focused scorer tests in `pipeline/tests/test_backtest_scoring.py` and updated legacy backtest fixtures to satisfy the evidence contract.
+7. Added `docs/m3-government-evidence-request.md`, a structured request checklist for TGRAC, HYDRAA, HMDA, Irrigation and Revenue records.
 
 **Still blocked:** none of the 27 leads has a verified event footprint and complete event/action evidence. The scoring manifest remains empty. The scored backtest will not run until source evidence is independently verified and detector rules are frozen.
 
@@ -249,3 +250,11 @@ The first increment has started on `feature/m3-case-validation`:
 - Deccan Chronicle, *HYDRAA Protects Muskin Cheruvu From Encroachers*: https://www.deccanchronicle.com/southern-states/telangana/hydraa-protects-muskin-cheruvu-from-encroachers-1960200
 
 These articles are discovery references only. They are not substitutes for certified boundaries, official event records or independently traced event polygons.
+
+
+### 26 November 2026 — Government evidence request prepared
+
+- Added `docs/m3-government-evidence-request.md` with the exact spatial, temporal, legal-status and provenance fields needed from TGRAC, HYDRAA, HMDA, Irrigation and Revenue departments.
+- Requested the original 171-tank report and spatial annexures, exact comparison dates, dated enforcement records, official boundary versions, event footprints and five non-scored tuning lakes.
+- The document explicitly asks departments to distinguish physical event date from first public/official action date, and total FTL area from the actual event footprint.
+- Latest CI run `45765718947` is in progress; web build has passed, pipeline and API jobs are still running at the time of this update.
