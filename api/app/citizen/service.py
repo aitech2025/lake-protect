@@ -50,7 +50,7 @@ from sqlalchemy.orm import Session
 from app.audit import chain
 from app.citizen import locate, sender, texts
 from app.config import settings
-from app.models import Alert, Asset, CitizenMessage, CitizenReport, CitizenReportEvent, Signal, User
+from app.models import Alert, Asset, CandidateAsset, CitizenMessage, CitizenReport, CitizenReportEvent, Signal, User
 from app.sources import engine
 from app.storage import store
 
@@ -539,12 +539,16 @@ def desk_row(db: Session, r: CitizenReport) -> dict:
     lonlat = db.execute(text("SELECT ST_X(geom), ST_Y(geom) FROM citizen_reports WHERE id = :i"), {"i": r.id}).one() if r.geom is not None else (None, None)
     asset = db.get(Asset, r.asset_id) if r.asset_id else None
     alert = db.get(Alert, r.alert_id) if r.alert_id else None
+    candidate_asset = db.get(CandidateAsset, r.candidate_asset_id) if r.candidate_asset_id else None
     dups = db.scalar(select(func.count()).select_from(CitizenReport).where(CitizenReport.duplicate_of == r.id)) or 0
     root = db.get(CitizenReport, r.duplicate_of) if r.duplicate_of else None
     return {
         "id": r.id, "ref": r.ref, "channel": r.channel, "language": r.language, "what": r.what, "description": r.description,
         "lon": lonlat[0], "lat": lonlat[1], "location_text": r.location_text, "photos": len(r.photos or []),
         "asset_id": r.asset_id, "asset_name": asset.name if asset else None, "asset_name_te": asset.name_te if asset else None,
+        "asset_class": "candidate_asset" if candidate_asset else ("registered_asset" if asset and asset.type != "reported_place" else None),
+        "candidate_asset_id": str(candidate_asset.id) if candidate_asset else None,
+        "candidate_asset_code": candidate_asset.candidate_code if candidate_asset else None,
         "district": asset.district if asset else None, "mandal": asset.mandal if asset else None, "zone": r.zone,
         "alert_id": r.alert_id, "alert_code": alert.code if alert else None, "alert_state": alert.state if alert else None,
         "duplicate_of": r.duplicate_of, "duplicate_of_ref": root.ref if root else None, "duplicates": int(dups),
