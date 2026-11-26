@@ -163,7 +163,7 @@ def test_email_goes_to_the_outbox_and_sms_and_whatsapp_are_held_without_a_gatewa
     assert latest["whatsapp"]["status"] == "held"
     assert latest["sms"]["to_masked"] == "+91******0011"
     eml = isolated_storage.get_object(channels.outbox_key(n, w.north)).decode()
-    assert "Subject: [DEMO] New incident" in eml and "fictional" in eml
+    assert "Subject: New incident" in eml and "fictional" not in eml
     assert counts["sent"] >= 1 and counts["held"] == 2
     # The admin has no phone and only email; the second official has no email address.
     _, b = ingest(db, w.a_south_b)
@@ -175,8 +175,11 @@ def test_demo_data_never_leaves_the_machine_on_smtp(db, monkeypatch):
     monkeypatch.setattr(settings, "email_transport", "smtp")
     monkeypatch.setattr(settings, "smtp_host", "relay.invalid")
     demo_user = make_user(db, "viewer", is_demo=True, email="demo@geoguard.invalid")
-    n = Notification(user_id=demo_user.id, kind="incident_opened", subject="Demo incident", body="Fictional test data",
-                     payload={}, needs_ack=True, created_at=T0, is_demo=True)
+    demo_asset = make_asset(db, is_demo=True)
+    _, demo_alert = ingest(db, demo_asset)
+    n = Notification(user_id=demo_user.id, kind="incident_opened", alert_id=demo_alert.id,
+                     subject="Demo incident", body="Fictional test data", payload={}, needs_ack=True,
+                     created_at=T0, is_demo=True)
     db.add(n)
     db.flush()
     db.add(NotificationDelivery(notification_id=n.id, channel="email", status="queued", attempt=0, at=T0))
@@ -225,7 +228,9 @@ def test_a_set_up_sms_gateway_gets_the_registered_template(db, w, monkeypatch):
     assert sent["json"]["template_id"] == "T-reminder" and sent["json"]["sender"] == "LKPRTC"
     assert sent["json"]["text"].startswith(f"GeoGuard reminder: incident {a.code} at ")
     assert sent["headers"]["Authorization"] == "Bearer secret"
-    assert channels.send("sms", notes_for(db, a.id)[w.north.id], w.north).detail == channels.DEMO_STAYS
+    gateway_result = channels.send("sms", notes_for(db, a.id)[w.north.id], w.north)
+    assert gateway_result.status == "sent"
+    assert gateway_result.detail == "Accepted by the SMS gateway"
 
 
 def test_dlt_templates_are_filled_slot_by_slot():
