@@ -149,9 +149,11 @@ def test_hydraa_upgrades_a_preliminary_lake_and_adds_recovered_land(db, client, 
     assert parcel.survey_numbers == ["41", "42"]
 
     analyst = make_user(db, "viewer")
-    listed = {f["properties"]["asset_key"]: f["properties"] for f in client.get("/assets", headers=auth(analyst)).json()["features"]}
-    assert listed["sample-hydraa-hyd-rec-s-01"]["mode"] == "ACTION"
-    assert listed["sample-lpc-s-002"]["boundary_status"] == "final_notification"
+    # Imported connector samples are explicitly demo records (D-056/D-065). They remain
+    # inspectable in the import report and database, but must not leak into the real-asset API.
+    listed = {f["properties"]["asset_key"] for f in client.get("/assets", headers=auth(analyst)).json()["features"]}
+    assert "sample-hydraa-hyd-rec-s-01" not in listed
+    assert "sample-lpc-s-002" not in listed
 
 
 def test_land_records_load_without_owner_names_and_fill_survey_numbers(db, client, isolated_storage):
