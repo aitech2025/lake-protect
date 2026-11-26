@@ -79,9 +79,8 @@ def upgrade():
       END IF;
     END $$;
 
-    ALTER TABLE assets ADD CONSTRAINT ck_assets_have_platform_identity
-      CHECK (type::text = 'reported_place' OR platform_asset_id IS NOT NULL) NOT VALID;
-    ALTER TABLE assets VALIDATE CONSTRAINT ck_assets_have_platform_identity;
+    -- The AFTER INSERT trigger below fills the UUID after the legacy row exists; a CHECK
+    -- constraint would run before that AFTER trigger. The trigger raises if reconciliation fails.
 
     -- Propagate the UUID to operational records while retaining bigint FKs and API compatibility.
     ALTER TABLE boundaries ADD COLUMN IF NOT EXISTS platform_asset_id uuid;
@@ -128,7 +127,7 @@ def upgrade():
     DECLARE canonical_id uuid;
     BEGIN
       IF NEW.type::text = 'reported_place' THEN
-        NEW.platform_asset_id := NULL;
+        UPDATE assets SET platform_asset_id = NULL WHERE id = NEW.id;
         RETURN NEW;
       END IF;
 
@@ -203,7 +202,6 @@ def downgrade():
     DROP TRIGGER IF EXISTS trg_geoguard_asset_identity ON assets;
     DROP FUNCTION IF EXISTS geoguard_sync_child_asset_identity();
     DROP FUNCTION IF EXISTS geoguard_sync_asset_identity();
-    ALTER TABLE assets DROP CONSTRAINT IF EXISTS ck_assets_have_platform_identity;
     ALTER TABLE public_assets DROP CONSTRAINT IF EXISTS fk_public_assets_legacy_asset;
     ALTER TABLE assets DROP CONSTRAINT IF EXISTS fk_assets_platform_asset;
     ALTER TABLE boundaries DROP CONSTRAINT IF EXISTS fk_boundaries_platform_asset;
