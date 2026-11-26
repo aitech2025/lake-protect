@@ -174,7 +174,7 @@ export function Layout() {
         </nav>
         <div className="rail-foot">
           <span className="rail-foot-mark" aria-hidden="true">●</span>
-          <span>Evidence-led public administration</span>
+          <span>{i18n.language === "te" ? "సాక్ష్యాధారిత ప్రజా పరిపాలన" : "Evidence-led public administration"}</span>
         </div>
       </aside>
       <header className="topbar">
