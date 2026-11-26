@@ -97,7 +97,8 @@ def test_a_report_opens_a_citizen_incident_waiting_for_its_satellite_review_and_
     cand = db.get(Candidate, alert.candidate_id)
     assert (cand.asset_id, cand.sensor_basis, cand.change_type) == (w.lake.id, "citizen_report", "soil_fill")
     canonical = db.execute(text("""
-      SELECT pa.id, pa.asset_code, a.platform_asset_id, c.platform_asset_id,
+      SELECT pa.id AS canonical_id, pa.asset_code, a.platform_asset_id AS asset_platform_asset_id,
+             c.platform_asset_id AS candidate_platform_asset_id,
              b.platform_asset_id AS boundary_platform_asset_id, al.platform_asset_id AS incident_platform_asset_id
       FROM assets a
       JOIN public_assets pa ON pa.id=a.platform_asset_id
@@ -107,10 +108,11 @@ def test_a_report_opens_a_citizen_incident_waiting_for_its_satellite_review_and_
       WHERE a.id=:asset_id
     """), {"asset_id": w.lake.id, "candidate_id": cand.id, "alert_id": alert.id}).mappings().one()
     assert canonical["asset_code"].startswith("TG-LEGACY-")
-    assert str(canonical["id"]) == str(canonical["platform_asset_id"])
-    assert str(canonical["id"]) == str(canonical["platform_asset_id_1"] if "platform_asset_id_1" in canonical else canonical["platform_asset_id"])
-    assert str(canonical["id"]) == str(canonical["boundary_platform_asset_id"])
-    assert str(canonical["id"]) == str(canonical["incident_platform_asset_id"])
+    expected_id = str(canonical["canonical_id"])
+    assert str(canonical["asset_platform_asset_id"]) == expected_id
+    assert str(canonical["candidate_platform_asset_id"]) == expected_id
+    assert str(canonical["boundary_platform_asset_id"]) == expected_id
+    assert str(canonical["incident_platform_asset_id"]) == expected_id
     assert 2500 < float(cand.area_sq_m) < 3000  # the reported spot: a 30 m circle
     rv = review_of(db, alert.id)
     assert (rv.status, rv.source) == ("pending", "sentinel-2")  # the screener answers it; there is no demo sensor
