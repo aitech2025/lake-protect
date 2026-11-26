@@ -165,3 +165,15 @@ def test_levelling_rule_reports_raw_and_kept_transition_pixels():
     assert res.candidates[0].change_type == "levelling"
     assert res.counts["px_levelling_raw"] == 20
     assert res.counts["px_levelling_kept"] == 20
+
+def test_sub_threshold_levelling_patch_is_exported_as_review_diagnostic():
+    """A 900 m² patch survives temporal controls but must not become an alert."""
+    dates = looks(dt.date(2024, 9, 1), 40)
+    small = (slice(10, 13), slice(12, 15))  # 9 pixels at 10 m = 900 m²
+    pattern = [OTHER] * 30 + [BARE] * 10
+    res = run(dates, stack(dates, None, block=small, pattern=pattern))
+    assert res.candidates == []
+    assert len(res.diagnostics) == 1
+    assert res.diagnostics[0].change_type == "levelling"
+    assert res.diagnostics[0].area_sq_m == 900
+    assert res.counts["diagnostic_levelling_components"] == 1
