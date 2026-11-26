@@ -177,7 +177,7 @@ Phase 2 UI work can proceed in parallel with M3 data verification, but it must n
 | P0.1 canonical branch baseline | Done | `feature/consolidated`, baseline `65ce4c4` |
 | P0.2 CI status review | Done | PR #20 run `45757478902`: pipeline 66 passed, web build passed; API 347 passed / 40 failed (same 40 baseline failures) |
 | P0.3–P0.6 CI triage | Not started | Classify 40 known API failures and establish a reproducible baseline |
-| M3.1–M3.5 case evidence | In progress | Validator/template/docs implemented; pipeline CI passed (66 tests); actual case evidence is still unverified and manifest remains empty |
+| M3.1–M3.5 case evidence | In progress | 21 PRD starter leads inventoried in `data/case-register.csv`; validator/template/docs implemented; actual event evidence remains unverified and manifest remains empty |
 | M3.6–M3.7 freeze rules | Not started | `detect-v2`; no tag exists. Freeze only after confirming the rules and case protocol |
 | M3.8–M3.11 weekly replay | Not started | Existing scoring utility only; replay orchestration remains to build |
 | M3.12–M3.17 scoring/report | Partial | `geospatial/backtest.py` is a basic scorer; complete validation and report outputs remain |
@@ -220,3 +220,12 @@ The first increment has started on `feature/m3-case-validation`:
 - Web type-check/build: **passed**.
 - API/PostGIS: **347 passed, 40 failed**. The failure count and failure set match the previously recorded baseline; this increment changes no API code. The full API suite is therefore not green, but the new pipeline validation suite is green.
 - PR remains open for review; it has not been merged into `feature/consolidated` yet.
+
+
+### 26 November 2026 — PRD case leads inventoried
+
+- Added `data/case-register.csv` with 21 leads from CONTEXT.md section 13.
+- The register preserves the PRD's approximate date anchors and reported area notes as text. It does not convert month/year ranges into exact event dates or infer affected polygons.
+- All 21 rows remain `unverified` and `needs_verification`, except the Bhagirathamma/Tautanikunta boundary-uncertainty cases explicitly marked `exclude_pending_boundary`.
+- The GeoJSON scoring manifest remains empty until exact dates, public-action dates, independently supported areas, source evidence and verified event footprints are available.
+- PR #20 has been updated with the inventory; the latest commit will receive a fresh CI run.
