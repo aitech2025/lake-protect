@@ -62,6 +62,8 @@ class Asset(Base):
     __tablename__ = "assets"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     asset_key: Mapped[str] = mapped_column(Text, unique=True)
+    # Canonical statewide UUID; legacy bigint id remains for operational compatibility.
+    platform_asset_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
     name: Mapped[str] = mapped_column(Text)
     name_te: Mapped[str | None] = mapped_column(Text)
     type: Mapped[str] = mapped_column(ASSET_TYPE)
@@ -89,6 +91,7 @@ class MonitoringChange(Base):
     __tablename__ = "monitoring_changes"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     asset_id: Mapped[int] = mapped_column(ForeignKey("assets.id"))
+    platform_asset_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
     monitored: Mapped[bool] = mapped_column(Boolean)
     reason: Mapped[str] = mapped_column(Text)
     actor_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
@@ -101,6 +104,7 @@ class Boundary(Base):
     __tablename__ = "boundaries"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     asset_id: Mapped[int] = mapped_column(ForeignKey("assets.id"))
+    platform_asset_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
     version: Mapped[int] = mapped_column(Integer)
     kind: Mapped[str] = mapped_column(BOUNDARY_KIND)
     status: Mapped[str] = mapped_column(BOUNDARY_STATUS)
@@ -141,6 +145,7 @@ class Candidate(Base):
     __tablename__ = "candidates"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     asset_id: Mapped[int] = mapped_column(ForeignKey("assets.id"))
+    platform_asset_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
     boundary_id: Mapped[int] = mapped_column(ForeignKey("boundaries.id"))
     geom = mapped_column(MULTIPOLYGON)
     area_sq_m: Mapped[Decimal] = mapped_column(Numeric(14, 2))
@@ -226,6 +231,7 @@ class Alert(Base):
     origin: Mapped[str] = mapped_column(Text, server_default="satellite")
     report_id: Mapped[int | None] = mapped_column(ForeignKey("citizen_reports.id"))
     candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id"), unique=True)
+    platform_asset_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
     state: Mapped[str] = mapped_column(INCIDENT_STATE)
     resolution: Mapped[str | None] = mapped_column(Text)
     closed_at: Mapped[dt.datetime | None] = mapped_column(TZ)
@@ -352,6 +358,7 @@ class Signal(Base):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     kind: Mapped[str] = mapped_column(Text)
     asset_id: Mapped[int | None] = mapped_column(ForeignKey("assets.id"))
+    platform_asset_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
     geom = mapped_column(Geometry("GEOMETRY", srid=4326, spatial_index=False), nullable=True)
     received_at: Mapped[dt.datetime] = mapped_column(TZ)
     ref: Mapped[str | None] = mapped_column(Text)
