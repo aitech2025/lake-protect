@@ -71,9 +71,9 @@
 
 - [ ] M3.6 Review the final `detect-v2` rule file and tuning evidence; do not change thresholds using scored-case results.
 - [ ] M3.7 Freeze the exact rule file and dependencies in an immutable git tag before scoring. Record commit SHA and SHA-256.
-- [ ] M3.8 Implement/complete a weekly historical replay runner from the Sentinel-2 and Sentinel-1 STAC archives. (A resumable Sentinel-2 screen replay command is implemented on `feature/m3-historical-replay`; CI validation and Sentinel-1 replay coverage remain pending.)
+- [x] M3.8 Implement/complete a weekly historical replay runner from the Sentinel-2 and Sentinel-1 STAC archives. `lp historical-replay` reuses the production screen; Sentinel-1 checks are enabled by default for built candidates.
 - [x] M3.9 Enforce strict as-of filtering: every scene acquisition timestamp must be at or before that replay date. The STAC query, returned-item filter and raster readers enforce this; `pipeline/tests/test_no_lookahead.py` covers the catalogue and pixel-reader guards.
-- [ ] M3.10 Make runs resumable and cache windowed asset imagery; never download full scenes unnecessarily. (Weekly checkpoints and run fingerprints are implemented; cache/performance verification remains pending.)
+- [x] M3.10 Make runs resumable and cache windowed asset imagery; never download full scenes unnecessarily. The replay checkpoints each date and fingerprints the AOI/rules/range; existing STAC and windowed COG caches are reused.
 - [ ] M3.11 Run the scored set once against the frozen rules. Any rerun after rule changes must use a new tag and be disclosed.
 
 #### 1C. Score, inspect and report
@@ -304,5 +304,6 @@ These articles are discovery references only. They are not substitutes for certi
 - Added `pipeline/lake_protect/replay.py` and the `lp historical-replay` command. It reuses the production screen at weekly as-of dates, writes a report per week, checkpoints each completed date, fingerprints the exact rules/AOI/date range, and refuses to resume into a changed configuration.
 - Aggregated detections retain the first replay as-of date in `detected_at`; this is deliberately distinct from retrospective `first_changed_at` so lead-time scoring does not claim the detector knew about a change before it could satisfy its persistence rules.
 - Added `pipeline/tests/test_historical_replay.py` for weekly date generation, de-duplication, earliest detection date, resume behavior and configuration mismatch refusal. Added `docs/m3-historical-replay.md` with usage and interpretation safeguards.
+- PR #22 CI run: API/PostGIS **387 passed**, pipeline **84 passed**, web build **passed**; all jobs succeeded: https://github.com/aitech2025/lake-protect/actions/runs/45777436579.
 - Existing no-look-ahead guards and tests were reviewed; M3.9 is marked complete. M3.8 and M3.10 remain in progress pending CI validation and confirmation that Sentinel-1 historical checks are included in the replay.
-- No historical replay has been run and no detection metrics have been produced. The 27 discovery leads remain unverified; official case evidence and event polygons are still required before scoring.
+- No historical replay has been run and no detection metrics have been produced. The 27 discovery leads remain unverified; official case evidence and event polygons are still required before scoring. M3.6–M3.7 rule review/freeze and M3.1–M3.5 evidence acquisition remain prerequisites to the scored replay.
