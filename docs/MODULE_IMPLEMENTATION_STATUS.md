@@ -1,3 +1,5 @@
+> **Requirements baseline update (26 November 2026):** The consolidated review baseline is now maintained in [BRD](requirements/01-GEOGUARD-BRD.md), [PRD](requirements/02-GEOGUARD-PRD.md), [solution architecture](architecture/GEOGUARD-SOLUTION-ARCHITECTURE.md), [ADR register](architecture/GEOGUARD-ADR-REGISTER.md), [audited implementation status](implementation/GEOGUARD-IMPLEMENTATION-STATUS.md), [traceability matrix](requirements/GEOGUARD-TRACEABILITY.csv) and [government data exchange specification](integration/GOVERNMENT-DATA-EXCHANGE.md). This newer review baseline supersedes the stale product/RTM paths referenced in the historical header below. The current working branch is `consolidated`; this document's earlier branch metadata is historical and must not be used to infer the active branch.
+
 # GeoGuard module implementation status
 
 **Assessment date:** 26 November 2026  
