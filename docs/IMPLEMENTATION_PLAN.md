@@ -180,7 +180,7 @@ Phase 2 UI work can proceed in parallel with M3 data verification, but it must n
 | M3.1–M3.5 case evidence | In progress | 27 discovery leads classified in `data/case-register.csv` into primary candidates, historical-only, restoration controls, boundary controls and unresolved identities. None are independently verified; manifest remains empty |
 | M3.6–M3.7 freeze rules | Not started | `detect-v2`; no tag exists. Freeze only after confirming the rules and case protocol |
 | M3.8–M3.11 weekly replay | Not started | Existing scoring utility only; replay orchestration remains to build |
-| M3.12–M3.17 scoring/report | In progress | Hardened scorer now enforces validated primary eligibility, event/action temporal order, strict >0.25-acre threshold and auditable false-positive review; focused tests added, CI pending |
+| M3.12–M3.17 scoring/report | In progress | Hardened scorer now enforces validated primary eligibility, event/action temporal order, strict >0.25-acre threshold and auditable false-positive review; focused tests added; pipeline CI 77 passed |
 | P2 geospatial UI | Not started | Registry APIs merged by PR #19; UI wiring remains |
 | P3 incident/citizen hardening | Partial | Core M12–M17 flows exist; provider-dependent channels and operational hardening remain |
 | P4 intelligence | Not started | ML utilities/registry foundation exist; no approved production model or RAG copilot |
@@ -239,7 +239,8 @@ The first increment has started on `feature/m3-case-validation`:
 - Reworked the register so it distinguishes event-date precision from public-action-date precision and separates primary candidates from historical-only cases, authorized-restoration controls, boundary-uncertainty controls and unresolved identities.
 - Identified a scoring integrity defect in the previous backtest: a case with unknown public-action date could be matched and labelled `before_public_action=true`; the scorer also treated exactly 0.25 acre as eligible despite the PRD requiring over 0.25 acre, and counted every unmatched detection as a false positive without human review.
 - Reworked the scorer to use the case validator's primary eligibility set, enforce event-date/public-action-date ordering, apply the strict area threshold and require documented human review before counting false positives. Unmatched detections now keep precision pending rather than silently inflating/deflating it.
-- Added focused temporal and adjudication tests. CI is pending on run `45765555468`.
+- Added focused temporal and adjudication tests. CI run `45765808663`: pipeline **77 passed**, web build passed; API/PostGIS **347 passed / 40 failed**, matching the pre-existing baseline.
+- Merged PR #20 into `feature/consolidated` as `cb3b8d7913b922b3e6075e4bb2e3a8583dcb9206`.
 - No cases have been promoted to verified ground truth; no detection metrics have been generated. This is intentional until official records, imagery dates and event footprints are verified.
 
 ### Evidence sources consulted
@@ -257,4 +258,13 @@ These articles are discovery references only. They are not substitutes for certi
 - Added `docs/m3-government-evidence-request.md` with the exact spatial, temporal, legal-status and provenance fields needed from TGRAC, HYDRAA, HMDA, Irrigation and Revenue departments.
 - Requested the original 171-tank report and spatial annexures, exact comparison dates, dated enforcement records, official boundary versions, event footprints and five non-scored tuning lakes.
 - The document explicitly asks departments to distinguish physical event date from first public/official action date, and total FTL area from the actual event footprint.
-- Latest CI run `45765718947` is in progress; web build has passed, pipeline and API jobs are still running at the time of this update.
+- Latest CI run `45765808663` completed: pipeline **77 passed**, web build passed, API/PostGIS **347 passed / 40 failed** (same baseline failure count).
+
+
+### 26 November 2026 — PR #20 merged
+
+- PR #20 merged to `feature/consolidated`: https://github.com/aitech2025/lake-protect/pull/20
+- Merge commit: `cb3b8d7913b922b3e6075e4bb2e3a8583dcb9206`.
+- Validation run: https://github.com/aitech2025/lake-protect/actions/runs/45765808663
+- Pipeline: **77 passed**. Web build: **passed**. API/PostGIS: **347 passed, 40 failed**, same 40 pre-existing baseline failures.
+- The case register, strict validator, hardened scorer, tests and government evidence request are now part of the canonical branch.
