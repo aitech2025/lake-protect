@@ -118,3 +118,9 @@ def test_incomplete_false_positive_review_does_not_count_as_adjudicated():
     assert result["false_positive"] == 0
     assert result["unreviewed_detections"] == 1
     assert result["precision"] is None
+
+
+def test_precision_is_not_estimable_when_no_detections_exist():
+    result = evaluate([case()], [])
+    assert result["precision"] is None
+    assert result["precision_status"] == "not_estimable"
