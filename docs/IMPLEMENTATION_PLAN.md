@@ -5,7 +5,7 @@
 **Baseline commit:** `65ce4c4bcf4f1d938987c92c1d2012c49642870f`  
 **Plan created:** 26 November 2026  
 **Status:** Active — Phase 1 started  
-**Source of truth:** `CONTEXT.md`, latest applicable owner decisions in `DECISIONS.md`, current code, and focused design documents.
+**Source of truth:** `CONTEXT.md`, latest applicable owner decisions in `DECISIONS.md`, current code, and focused design documents.  \n**Module inventory:** [Module implementation status](MODULE_IMPLEMENTATION_STATUS.md).
 
 > This is a living plan. Update the status, evidence, commit/PR and test result for each task as work progresses. Do not mark a task done merely because code exists; its acceptance criteria must be demonstrated.
 
@@ -29,14 +29,14 @@
 | Canonical development branch | `feature/consolidated` at `65ce4c4` | PR #19 merged |
 | M0–M19 | Recorded as complete in `PROGRESS.md` | Milestone history; verify current code before extending |
 | M3 scored blind backtest | Not started / not scored | `PROGRESS.md`; M2 tuning is explicitly not an accuracy result |
-| Backtest code | Partial | `geospatial/backtest.py` scores supplied GeoJSON; it does not perform historical weekly imagery replay |
+| Backtest code | Partial | PR #20 adds strict case validation/scoring; merged PR #22 adds weekly resumable replay. Scored run remains blocked by rule freeze and verified cases |
 | Ground-truth case set | Not ready | `data/case_lake_search.yml` contains name patterns, not verified event labels/boundaries |
 | Rule freeze | Not done | `detect_rules.yaml` is `detect-v2`; no git tag exists at baseline |
 | Historical disclosure | Required | Durgam Cheruvu was seen once before tuning (D-042); disclose in M3 report |
 | Tuning evidence | Available | Five non-scored tuning lakes; see `reports/m2-tuning/README.md` |
 | Geospatial engine | Backend integrated | PR #19; registry APIs not yet fully surfaced in the desk |
 | Government sources | Templates/file imports | No live government integration without agreement |
-| API CI | Green after P0 repair | PR #21 run #275: API/PostGIS 387 passed, pipeline 77 passed, web build passed. JUnit artifacts and job summaries are now published. |
+| API CI | Green on canonical branch | PR #21 run #275: API/PostGIS 387 passed, pipeline 77 passed, web build passed. PR #23's standard CI is being revalidated after one pipeline fixture-length failure; see module status. |
 | Department data isolation | Not production-ready | Department-level RLS deliberately deferred in PR #19 |
 | AI copilot/RAG | Not implemented | Separate future phase; must cite source records and avoid legal conclusions |
 
@@ -174,36 +174,34 @@ Phase 2 UI work can proceed in parallel with M3 data verification, but it must n
 
 | Task | Status | Latest evidence / next action |
 |---|---|---|
-| P0.1 canonical branch baseline | Done | `feature/consolidated`, baseline `65ce4c4` |
-| P0.2 CI status review | Done | Latest canonical-branch run #269 (`45766083814`, commit `d17fce6`) completed 26 Nov 2026: pipeline 77 passed; web type-check/build passed; API/PostGIS 347 passed / 40 failed. Overall workflow is **failed** only because the API/PostGIS job failed; see [run #269](https://github.com/aitech2025/lake-protect/actions/runs/45766083814) |
-| P0.3 CI failure classification | In progress | 40 failures are identical in runs `45765808663` and `45766083814`. Triage: 38 failures trace to ordinary test fixtures marked `is_demo=True` despite D-057/D-065 isolation; 1 source test expected demo imports in the real-asset API; 1 confirmed WhatsApp `is_demo` NameError. Details: [CI triage](ci-baseline-triage.md). Fixes are on `feature/p0-ci-triage`; await CI before closing. |
-| P0.4 reproducible test commands | Done | CI commands, Python 3.13 / Node 22 / PostGIS 16-3.4 and safe test DB environment recorded in [CI triage](ci-baseline-triage.md). |
-| P0.5 fix backtest/core-demo blockers | In progress | Corrected test fixture defaults, explicit demo isolation coverage, source-sample visibility assertion and WhatsApp demo-flag propagation on `feature/p0-ci-triage`; validation pending. |
-| P0.6 CI failure summaries | Not started | After P0.5 validation, improve CI failure summaries without hiding or waiving failures. |
-| M3.1–M3.5 case evidence | In progress | 27 discovery leads classified in `data/case-register.csv` into primary candidates, historical-only, restoration controls, boundary controls and unresolved identities. None are independently verified; manifest remains empty |
-| M3.6–M3.7 freeze rules | Not started | `detect-v2`; no tag exists. Freeze only after confirming the rules and case protocol |
-| M3.8–M3.11 weekly replay | Not started | Existing scoring utility only; replay orchestration remains to build |
-| M3.12–M3.17 scoring/report | In progress | Hardened scorer now enforces validated primary eligibility, event/action temporal order, strict >0.25-acre threshold and auditable false-positive review; focused tests added; pipeline CI 77 passed |
-| P2 geospatial UI | Not started | Registry APIs merged by PR #19; UI wiring remains |
-| P3 incident/citizen hardening | Partial | Core M12–M17 flows exist; provider-dependent channels and operational hardening remain |
-| P4 intelligence | Not started | ML utilities/registry foundation exist; no approved production model or RAG copilot |
-| P5 production readiness | Not started | Government integration placeholders only; department RLS and security/ops gates remain |
+| P0.1–P0.6 engineering baseline | **Done** | PR #21 merged; API/PostGIS 387 passed, pipeline 77 passed, web build passed. JUnit summaries/artifacts are enabled. |
+| M3.1–M3.5 case evidence | **Blocked on independent evidence** | 27 discovery leads are catalogued; none are verified scoring cases. The GeoJSON scoring manifest remains empty pending exact event/action dates, area evidence and event polygons. |
+| M3.6 rule review | **Reviewed; freeze blocked** | detect-v2 run5 completed on five non-scored lakes. Three clearing candidates / 5.78 acres; 72 levelling pixels survived controls but no final levelling candidate. Eleven detect-v1 candidate footprints disappeared and need diagnostic comparison. |
+| M3.7 immutable rule freeze | **Blocked** | Do not tag until diagnostic chips/geometries and human review resolve the run4/run5 differences. |
+| M3.8 weekly historical replay | **Implemented and merged** | PR #22 merged; `lp historical-replay` is available. No scored replay has been run. |
+| M3.9 no-look-ahead | **Implemented and tested** | Catalogue, returned-item and raster-reader as-of guards plus tests. |
+| M3.10 resumability/cache | **Implemented and CI-validated** | Weekly checkpoints and AOI/rule/date-range fingerprints; configuration mismatch refuses resume. |
+| M3.11 scored run | **Blocked** | Requires verified eligible case set and immutable rule tag. |
+| M3.12–M3.17 metrics and report | **Partially implemented; blocked on inputs** | Strict eligibility/scoring and false-positive adjudication foundations exist; metrics, chips and signed report require a valid scored run. |
+| P2 statewide registry and Asset 360 UI | **Not started / backend available** | Registry/ingestion APIs merged in PR #19; wire them into current desk, drill-down and asset detail. |
+| P3 citizen/incident hardening | **Partial** | Citizen web and core incident lifecycle exist; provider-dependent channels and end-to-end operations need validation. |
+| P4 advanced intelligence | **Partial foundations** | Social ingestion and ML registry utilities exist; no approved production model or Copilot/RAG. |
+| P5 government integration and production readiness | **Not started** | Demo adapters/placeholders only; requires government authorization, security, RLS, SSO and operations gates. |
+| PR #23 detect-v2 tuning increment | **Open; validation in progress** | Tuning workflow succeeded and artifact reviewed. Standard CI run #284 had API/web success and one pipeline fixture failure; failed pipeline job was re-run. Confirm rerun before merge. |
 
 ## 7. Current execution checkpoint
 
-**First active work item:** M3.1–M3.5 — blind-backtest case evidence inventory and validation.
+**Active implementation sequence:**
 
-The first increment has started on `feature/m3-case-validation`:
-1. Inspected the PRD's section 13 starter list and `data/case_lake_search.yml`; name matches are discovery hints, not ground truth.
-2. Added `data/case-register.csv` with 27 leads and explicit source-review status, event-date precision, public-action-date precision, case role and scoring lane. Reporting/action dates are not misrepresented as the date the underlying change began.
-3. Classified 2014–2023 cases as historical detection-only, restoration actions as controls, Khajaguda boundary disputes as boundary controls, Durgam Cheruvu as exposed under D-042, and ambiguous Pedda Cheruvu identity as unresolved.
-4. Added the empty GeoJSON manifest, evidence register documentation, strict validator and `lp-geo validate-cases` command.
-5. Hardened `geospatial/backtest.py`: only validator-eligible cases can score; detections must occur on/after event and strictly before public action; exactly 0.25 acre is excluded; unknown public-action dates cannot be counted as early-warning hits; unmatched detections are not false positives until reviewed with reviewer identity, review date and evidence.
-6. Added focused scorer tests in `pipeline/tests/test_backtest_scoring.py` and updated legacy backtest fixtures to satisfy the evidence contract.
-7. Added `docs/m3-government-evidence-request.md`, a structured request checklist for TGRAC, HYDRAA, HMDA, Irrigation and Revenue records.
+1. Complete PR #23 CI revalidation and merge the tuning workflow/correction only when all required checks pass. This does not freeze detect-v2.
+2. Implement diagnostic exports for levelling components that survive temporal controls but fail final candidate extraction, including geometry and dated before/after chips.
+3. Implement a spatial comparison of detect-v1 run4 and detect-v2 run5 for the 11 candidate footprints that disappeared.
+4. Record human review outcomes with reviewer, date, disposition and evidence; then decide whether detect-v2 is ready for an immutable tag.
+5. Continue independent evidence acquisition for the 27 case leads. Do not infer event dates, legal boundaries or affected polygons.
+6. After rule freeze and verified case eligibility, run the scored historical replay once and publish full metrics, misses, false flags, lead times, chips and limitations.
+7. In parallel, start P2 UI wiring for statewide registry, provenance, Asset 360 and imagery coverage.
 
-**Still blocked:** none of the 27 leads has a verified event footprint and complete event/action evidence. The scoring manifest remains empty. The scored backtest will not run until source evidence is independently verified and detector rules are frozen.
-
+**Hard blockers:** no verified scored ground-truth set; detect-v2 rule freeze is withheld; no scored historical replay or detection accuracy metrics exist. Government integrations remain placeholders until explicitly authorized.
 
 ## 8. Execution log
 
