@@ -67,6 +67,24 @@ for name, count in sorted(by_flag.items()):
     lines.append(f"- {name}: {count}")
 if not by_flag:
     lines.append("- None")
+lines += ["", "### Transition pixels before and after controls"]
+for name in ("soil_fill", "clearing", "building", "levelling"):
+    raw = sum(int((asset.get("counts") or {}).get(f"px_{name}_raw", 0)) for asset in summary.get("assets", []))
+    kept = sum(int((asset.get("counts") or {}).get(f"px_{name}_kept", 0)) for asset in summary.get("assets", []))
+    lines.append(f"- {name}: {raw} raw transition pixels; {kept} pixels survive controls and baseline")
+lines += ["", "### Radar details for building candidates"]
+radar_rows = []
+for feature in features:
+    p = feature.get("properties") or {}
+    if p.get("change_type") != "building":
+        continue
+    radar = p.get("radar") or {}
+    radar_rows.append(
+        f"- {p.get('asset_key')}: {radar.get('status', 'not_run')}; "
+        f"looks before/after/season={radar.get('looks_before')}/{radar.get('looks_after')}/{radar.get('looks_season')}; "
+        f"rise={radar.get('rise_db')} dB; seasonal rise={radar.get('rise_vs_last_year_db')} dB"
+    )
+lines.extend(radar_rows or ["- No building candidates"])
 lines += [
     "",
     "### Interpretation",

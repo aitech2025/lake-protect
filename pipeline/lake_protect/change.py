@@ -198,7 +198,15 @@ def detect(
         "px_dropped_not_new": int((base & alerting & stable & persistent & fresh & ~seasonal & ~novel).sum()),
         "px_dropped_not_established": int((base & alerting & stable & persistent & fresh & ~seasonal & novel & ~established).sum()),
     }
+    # Per-transition counts make new rule classes (notably D-058 levelling) observable during
+    # tuning even when their pixels are later removed by persistence, seasonality or area gates.
+    for code in ALERTING:
+        name = CHANGE_NAMES[code]
+        counts[f"px_{name}_raw"] = int((base & (ctype == code)).sum())
     keep = base & alerting & stable & persistent & fresh & ~seasonal & novel & established
+    for code in ALERTING:
+        name = CHANGE_NAMES[code]
+        counts[f"px_{name}_kept"] = int((keep & after_baseline & (ctype == code)).sum())
     counts["px_before_baseline"] = int((keep & ~after_baseline).sum())
     counts["px_kept"] = int((keep & after_baseline).sum())
 
