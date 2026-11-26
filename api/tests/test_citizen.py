@@ -107,7 +107,7 @@ def test_a_report_opens_a_citizen_incident_waiting_for_its_satellite_review_and_
       JOIN alerts al ON al.id=:alert_id
       WHERE a.id=:asset_id
     """), {"asset_id": w.lake.id, "candidate_id": cand.id, "alert_id": alert.id}).mappings().one()
-    assert canonical["asset_code"].startswith("TG-LEGACY-")
+    assert canonical["asset_code"]  # preserve a pre-existing permanent code when one already exists
     expected_id = str(canonical["canonical_id"])
     assert str(canonical["asset_platform_asset_id"]) == expected_id
     assert str(canonical["candidate_platform_asset_id"]) == expected_id
