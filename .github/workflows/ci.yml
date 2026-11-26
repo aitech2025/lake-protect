@@ -54,7 +54,18 @@ jobs:
           pip install -e pipeline
       - name: Run API and PostGIS integration tests
         working-directory: api
-        run: pytest -q
+        run: pytest -q --junitxml=api-junit.xml
+      - name: Write API test summary
+        if: always()
+        working-directory: api
+        run: python ../scripts/ci_junit_summary.py api-junit.xml "API/PostGIS"
+      - name: Upload API test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-postgis-junit
+          path: api/api-junit.xml
+          if-no-files-found: warn
 
   pipeline-tests:
     runs-on: ubuntu-latest
@@ -70,7 +81,18 @@ jobs:
         run: pip install -e ".[dev,osm,ml,geo]"
       - name: Run pipeline tests
         working-directory: pipeline
-        run: pytest -q
+        run: pytest -q --junitxml=pipeline-junit.xml
+      - name: Write pipeline test summary
+        if: always()
+        working-directory: pipeline
+        run: python ../scripts/ci_junit_summary.py pipeline-junit.xml "Pipeline"
+      - name: Upload pipeline test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-junit
+          path: pipeline/pipeline-junit.xml
+          if-no-files-found: warn
 
   web-build:
     runs-on: ubuntu-latest
