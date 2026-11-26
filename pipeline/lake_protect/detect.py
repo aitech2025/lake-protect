@@ -40,6 +40,7 @@ class AssetResult:
     last_look: dt.date | None
     counts: dict
     candidates: list[dict] = field(default_factory=list)
+    diagnostics: list[dict] = field(default_factory=list)
     legacy: list[dict] = field(default_factory=list)
     water: list[tuple[dt.date, float]] = field(default_factory=list)
     # The week's image: the latest clear look, boundary drawn, this run's changes outlined (D-057).
@@ -159,6 +160,12 @@ def detect_asset(
         out.counts["candidates_dropped_radar"] = len(dropped)
         pairs = [(c, p) for c, p in pairs if p not in dropped]
     out.candidates = [p for _, p in pairs]
+    out.diagnostics = []
+    for diagnostic in res.diagnostics:
+        payload = _payload(diagnostic, looks, aoi, with_chips)
+        payload["diagnostic"] = True
+        payload["diagnostic_reason"] = "below_minimum_component_area"
+        out.diagnostics.append(payload)
     out.legacy = [_payload(c, looks, aoi, False) for c in res.legacy]
     if with_chips and looks.scenes:
         _week_image(out, looks, aoi, [c for c, p in pairs])
