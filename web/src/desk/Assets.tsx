@@ -308,6 +308,21 @@ export function Assets() {
       {register && (
         <section className="section" data-testid="asset-register">
           <h2>{t("assets.register")}</h2>
+          {register.boundary_source?.provenance && (
+            <div className="note" data-testid="boundary-provenance">
+              <b>{t("assets.provenance")}</b>: {t(`assets.provenance_class.${register.boundary_source.provenance.source_class}`)}
+              <div className="small muted">{register.boundary_source.provenance.source_name}</div>
+              <div className="small muted">
+                {register.boundary_source.provenance.source_date && <>{t("assets.provenance_date", { date: fmtDate(register.boundary_source.provenance.source_date, lang) })} · </>}
+                {register.boundary_source.provenance.notification_ref && <>{t("assets.provenance_reference", { ref: register.boundary_source.provenance.notification_ref })} · </>}
+                {register.boundary_source.provenance.source_agency ?? ""}
+              </div>
+              <span className={register.boundary_source.provenance.authority_confirmed ? "pill ok" : "pill closed"}>
+                {t(register.boundary_source.provenance.authority_confirmed ? "assets.authority_confirmed" : "assets.authority_unconfirmed")}
+              </span>
+              {!register.boundary_source.provenance.provenance_complete && <p className="small flag">{t("assets.provenance_incomplete")}</p>}
+            </div>
+          )}
           {register.links.length === 0 ? (
             <p className="muted">{t("assets.no_links")}</p>
           ) : (
