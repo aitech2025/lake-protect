@@ -387,3 +387,17 @@ No detection accuracy or production-readiness claim is authorized by this fan-ou
 - The two matched pairs changed materially in area: 12.0340→4.6209 acres and 1.7792→0.5683 acres. These are partial spatial correspondences, not stable/equivalent footprints.
 - Added `reports/m2-tuning/run4-run5-spatial-review.md` with results, identifiers, caveats and the human-review checklist.
 - No unmatched footprint is classified as a false positive or true positive. Human inspection of all 15 review leads plus PR #25 levelling diagnostics remains a prerequisite to rule freeze.
+
+
+## UI redesign checkpoint — 26 November 2026
+
+A new owner-requested Civic Slate & Water-Ledger refresh is in progress on `feat/geoguard-civic-ui-refresh`. See [UI redesign specification](UI_REDESIGN.md).
+
+- [x] Shared civic theme tokens, semantic status palette and shadcn-inspired controls.
+- [x] Responsive workspace shell with grouped navigation and account/language controls.
+- [x] Shared styling refresh for page surfaces, panels, forms, tables, maps, badges and evidence.
+- [x] Mandatory evidentiary disclaimer surfaced on Alert Detail and Evidence Pack preview.
+- [ ] Validate the full route set, existing E2E selectors and English/Telugu responsive layouts.
+- [ ] Refine page-specific overview, queue, Asset 360, records, inbox and admin interactions based on QA.
+
+**Governance:** this is a frontend-only redesign. It preserves the current `admin` / `viewer` roles, server-authorized actions and D-057 incident lifecycle. It does not restore retired field-officer workflows, dual sign-off, officer routing or SLA timers. ACTION / VERIFY / WATCH will not be inferred from boundary data until the backend exposes an authoritative operating-mode contract. No API, ML, data, database, PWA or government-integration contract has been changed.
