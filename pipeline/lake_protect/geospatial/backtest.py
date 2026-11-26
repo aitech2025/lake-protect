@@ -9,11 +9,32 @@ import json
 from datetime import date
 from math import isfinite
 from pathlib import Path
+from statistics import median
 from typing import Any
 
+from pyproj import Transformer
 from shapely.geometry import shape
+from shapely.ops import transform
 
 from .cases import validate_case_collection
+
+# The scored cases are Telangana events; compare area/IoU in a metric CRS, not degrees.
+_TO_TELANGANA_METRES = Transformer.from_crs("EPSG:4326", "EPSG:32644", always_xy=True).transform
+
+
+def _season(value: str) -> str:
+    month = date.fromisoformat(value[:10]).month
+    if month in (12, 1, 2):
+        return "winter"
+    if month in (3, 4, 5):
+        return "pre_monsoon"
+    if month in (6, 7, 8, 9):
+        return "southwest_monsoon"
+    return "post_monsoon"
+
+
+def _label(value: Any) -> str:
+    return str(value).strip() if value is not None and str(value).strip() else "unknown"
 
 
 def load_features(path: str | Path) -> list[dict[str, Any]]:
@@ -74,6 +95,7 @@ def evaluate(
     # Replay IDs are stable across weeks; duplicate IDs would otherwise be silently collapsed
     # or double-counted depending on input order.
     seen_detection_ids: set[str] = set()
+    projected_detections: dict[int, Any] = {}
     for idx, detection in enumerate(detections):
         if not isinstance(detection, dict) or not isinstance(detection.get("geometry"), dict):
             raise ValueError(f"Detection at index {idx} must contain GeoJSON geometry")
@@ -86,6 +108,11 @@ def evaluate(
         detection_props = detection.get("properties") or {}
         if not isinstance(detection_props, dict):
             raise ValueError(f"Detection at index {idx} properties must be an object")
+        if detection_props.get("geometry_crs") != "EPSG:4326":
+            raise ValueError(
+                f"Detection {detection_id} must declare geometry_crs=EPSG:4326; "
+                "reproject source geometry before scoring"
+            )
         if not detection_props.get("detected_at"):
             raise ValueError(
                 f"Detection {detection_id} is missing detected_at; "
@@ -93,16 +120,18 @@ def evaluate(
             )
         _iso_date(detection_props["detected_at"], f"detection[{idx}].detected_at")
         detection_geom = shape(detection["geometry"])
-        if detection_geom.is_empty or not detection_geom.is_valid:
-            raise ValueError(f"Detection {detection_id} has invalid geometry")
+        if detection_geom.is_empty or not detection_geom.is_valid or detection_geom.geom_type not in ("Polygon", "MultiPolygon"):
+            raise ValueError(f"Detection {detection_id} must have valid Polygon/MultiPolygon geometry")
         minx, miny, maxx, maxy = detection_geom.bounds
         if minx < -180 or maxx > 180 or miny < -90 or maxy > 90:
             raise ValueError(f"Detection {detection_id} coordinates are outside EPSG:4326 bounds")
+        projected_detections[idx] = transform(_TO_TELANGANA_METRES, detection_geom)
 
     remaining = set(range(len(detections)))
     matches: list[dict[str, Any]] = []
     for case, case_geom in eligible:
         props = case["properties"]
+        projected_case_geom = transform(_TO_TELANGANA_METRES, case_geom)
         event_date = _iso_date(props["event_date"], f"{props['case_id']}.event_date")
         action_date = _iso_date(props["public_action_date"], f"{props['case_id']}.public_action_date")
         choices: list[tuple[float, int, str]] = []
@@ -122,11 +151,9 @@ def evaluate(
             # strictly before the first public action.
             if detected_date < event_date or detected_date >= action_date:
                 continue
-            geom = shape(detection["geometry"])
-            if geom.is_empty or not geom.is_valid:
-                raise ValueError(f"Detection at index {idx} has invalid geometry")
-            union_area = case_geom.union(geom).area
-            iou = case_geom.intersection(geom).area / union_area if union_area else 0.0
+            geom = projected_detections[idx]
+            union_area = projected_case_geom.union(geom).area
+            iou = projected_case_geom.intersection(geom).area / union_area if union_area else 0.0
             if iou >= match_iou:
                 choices.append((iou, idx, detected))
         if choices:
@@ -134,7 +161,10 @@ def evaluate(
             remaining.remove(idx)
             matches.append({
                 "case_id": props["case_id"],
-                "detection_id": detections[idx].get("id"),
+                "detection_id": detections[idx].get("id") or (detections[idx].get("properties") or {}).get("detection_id"),
+                "sensor": _label((detections[idx].get("properties") or {}).get("sensor_basis") or (detections[idx].get("properties") or {}).get("sensor")),
+                "event_type": _label(props.get("event_type")),
+                "season": _season(detected),
                 "iou": round(iou, 4),
                 "detected_at": detected,
                 "public_action_date": props["public_action_date"],
@@ -149,7 +179,8 @@ def evaluate(
     false_negative = len(eligible) - true_positive
     unmatched = [
         {
-            "detection_id": detections[idx].get("id"),
+            "detection_id": detections[idx].get("id") or (detections[idx].get("properties") or {}).get("detection_id"),
+            "sensor": _label((detections[idx].get("properties") or {}).get("sensor_basis") or (detections[idx].get("properties") or {}).get("sensor")),
             "detected_at": (detections[idx].get("properties") or {}).get("detected_at"),
             "review_status": (detections[idx].get("properties") or {}).get("review_status"),
             "review_disposition": (detections[idx].get("properties") or {}).get("review_disposition"),
@@ -197,6 +228,18 @@ def evaluate(
         else (0.0 if precision == 0 and recall == 0 else None)
     )
 
+    lead_times = [item["lead_time_days"] for item in matches]
+    matched_by_sensor: dict[str, int] = {}
+    matched_by_season: dict[str, int] = {}
+    matched_by_event_type: dict[str, int] = {}
+    unmatched_by_sensor: dict[str, int] = {}
+    for item in matches:
+        matched_by_sensor[item["sensor"]] = matched_by_sensor.get(item["sensor"], 0) + 1
+        matched_by_season[item["season"]] = matched_by_season.get(item["season"], 0) + 1
+        matched_by_event_type[item["event_type"]] = matched_by_event_type.get(item["event_type"], 0) + 1
+    for item in unmatched:
+        unmatched_by_sensor[item["sensor"]] = unmatched_by_sensor.get(item["sensor"], 0) + 1
+
     return {
         "eligible_cases": len(eligible),
         "eligible_case_ids": [feature["properties"]["case_id"] for feature, _ in eligible],
@@ -212,6 +255,13 @@ def evaluate(
         "precision": round(precision, 4) if precision is not None else None,
         "recall": round(recall, 4) if recall is not None else None,
         "f1": round(f1, 4) if f1 is not None else None,
+        "median_lead_time_days": median(lead_times) if lead_times else None,
+        "lead_time_days": {"min": min(lead_times), "max": max(lead_times), "median": median(lead_times)} if lead_times else None,
+        "matched_by_sensor": dict(sorted(matched_by_sensor.items())),
+        "unmatched_by_sensor": dict(sorted(unmatched_by_sensor.items())),
+        "matched_by_season": dict(sorted(matched_by_season.items())),
+        "matched_by_event_type": dict(sorted(matched_by_event_type.items())),
+        "iou_crs": "EPSG:32644",
         "precision_status": (
             "pending_manual_review" if unreviewed else
             "complete" if true_positive + adjudicated_false_positive > 0 else
