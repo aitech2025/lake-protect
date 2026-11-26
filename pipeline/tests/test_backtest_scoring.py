@@ -127,7 +127,7 @@ def test_precision_is_not_estimable_when_no_detections_exist():
 
 def test_retrospective_first_changed_at_cannot_substitute_for_detected_at():
     item = detection()
-    item["properties"] = {"first_changed_at": "2024-06-15"}
+    item["properties"] = {"first_changed_at": "2024-06-15", "geometry_crs": "EPSG:4326"}
     try:
         evaluate([case()], [item])
     except ValueError as exc:
