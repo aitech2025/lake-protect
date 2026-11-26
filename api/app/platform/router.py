@@ -34,7 +34,7 @@ def list_candidate_assets(limit: int = Query(100, ge=1, le=500), offset: int = Q
 def list_assets(category: str | None = None, limit: int = Query(100, ge=1, le=500),
                 offset: int = Query(0, ge=0), _: User = Depends(current_user), db: Session = Depends(get_db)):
     rows = db.execute(text("""
-      SELECT id,asset_code,display_name,category_code,lifecycle_status,baseline_date,source_authority
+      SELECT id,asset_code,display_name,category_code,lifecycle_status,baseline_date,source_authority,legacy_asset_id
       FROM public_assets WHERE category_code <> 'reported_place'
         AND (CAST(:category AS text) IS NULL OR category_code=CAST(:category AS text))
       ORDER BY asset_code LIMIT :limit OFFSET :offset
@@ -47,7 +47,7 @@ def create_asset(payload: AssetCreate, actor: User = Depends(require_roles("admi
         row = db.execute(text("""
           INSERT INTO public_assets(asset_code,display_name,category_code,baseline_date,source_authority,source_record_ref)
           VALUES (:asset_code,:display_name,:category_code,:baseline_date,:source_authority,:source_record_ref)
-          RETURNING id,asset_code,display_name,category_code,lifecycle_status,baseline_date,source_authority
+          RETURNING id,asset_code,display_name,category_code,lifecycle_status,baseline_date,source_authority,legacy_asset_id
         """),payload.model_dump()).mappings().one()
         chain.record(db, actor_id=actor.id, action="public_asset.created", entity="public_asset",
                      entity_id=row["id"], details={"asset_code":payload.asset_code,"category_code":payload.category_code,
@@ -62,7 +62,7 @@ def create_asset(payload: AssetCreate, actor: User = Depends(require_roles("admi
 def get_asset(asset_id: UUID, _: User = Depends(current_user), db: Session = Depends(get_db)):
     row = db.execute(text("""
       SELECT id,asset_code,display_name,category_code,lifecycle_status,baseline_date,source_authority,
-             source_record_ref,ST_AsGeoJSON(footprint)::json AS footprint
+             legacy_asset_id,source_record_ref,ST_AsGeoJSON(footprint)::json AS footprint
       FROM public_assets WHERE id=:asset_id AND category_code <> 'reported_place'
     """),{"asset_id":str(asset_id)}).mappings().first()
     if row is None:
