@@ -99,6 +99,10 @@ export function AlertDetail() {
       </div>
       <p className="banner disclaimer" role="note">{t("statement.imagery")}</p>
       <ChangeSummary a={a} />
+      <section className="section panel observation-summary" aria-labelledby="observation-window-title">
+        <h2 id="observation-window-title" className="title-s">{t("detail.bracket_title")}</h2>
+        <DatedBracket baseline={a.asset.baseline_date} cutoff={a.policy_cutoff_date} lastClear={cand.last_clear_at} firstChanged={cand.first_changed_at} detected={a.created_at} />
+      </section>
       <AckBanner notes={a.my_notifications ?? []} isAdminUser={isAdmin(user)} onDone={reload} />
       <Flags a={a} />
       {a.citizen && <CitizenOrigin a={a} />}
@@ -141,11 +145,6 @@ export function AlertDetail() {
           ) : null}
 
           {a.officer && <CitizenMain a={a} onDone={reload} />}
-
-          <section className="section panel">
-            <h2 className="title-s">{t("detail.bracket_title")}</h2>
-            <DatedBracket baseline={a.asset.baseline_date} cutoff={a.policy_cutoff_date} lastClear={cand.last_clear_at} firstChanged={cand.first_changed_at} detected={a.created_at} />
-          </section>
 
           <section className="section">
             <h2 className="title-s">{t("detail.map_title")}</h2>
