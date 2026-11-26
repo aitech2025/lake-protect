@@ -4,7 +4,7 @@ Input: looks in time order (all acquired on or before `as_of`), one class per pi
 For every pixel:
 
 1. The current class Y is the class of the newest informative look (water, vegetation, bare,
-   built; masked and mixed looks carry no information).
+   built or other; only masked looks carry no information. OTHER is required for D-058 levelling).
 2. Walking back from the newest look, the run of looks still showing Y ends at the first look
    that shows anything else. That look is the old state X, and its date is the last clear date.
    A run that reaches the start of the window has no known start, so it never alerts.
@@ -100,7 +100,8 @@ def detect(
     assert all(d <= as_of for d in dates), "a look after as_of reached change detection"
     assert list(dates) == sorted(dates), "looks must be in time order"
     day = _days(list(dates))
-    informative = (cls != MASKED) & (cls != OTHER)
+    # OTHER is an informative land state: D-058's levelling transition is OTHER > BARE.
+    informative = cls != MASKED
 
     # Step 1 and 2: newest class, run of looks back to the first that differs.
     Y = np.zeros((H, W), np.uint8)
