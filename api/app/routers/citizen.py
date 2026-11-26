@@ -26,6 +26,7 @@ from app.clock import utcnow
 from app.db import get_db
 from app.enums import Role
 from app.models import CitizenChat, CitizenReport, User
+from app.notify import channels
 from app.security import require_roles
 
 router = APIRouter(prefix="/citizen", tags=["citizen"])
