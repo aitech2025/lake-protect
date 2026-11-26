@@ -176,7 +176,10 @@ Phase 2 UI work can proceed in parallel with M3 data verification, but it must n
 |---|---|---|
 | P0.1 canonical branch baseline | Done | `feature/consolidated`, baseline `65ce4c4` |
 | P0.2 CI status review | Done | Latest canonical-branch run #269 (`45766083814`, commit `d17fce6`) completed 26 Nov 2026: pipeline 77 passed; web type-check/build passed; API/PostGIS 347 passed / 40 failed. Overall workflow is **failed** only because the API/PostGIS job failed; see [run #269](https://github.com/aitech2025/lake-protect/actions/runs/45766083814) |
-| P0.3–P0.6 CI triage | Not started | Classify 40 known API failures and establish a reproducible baseline |
+| P0.3 CI failure classification | In progress | 40 failures are identical in runs `45765808663` and `45766083814`. Triage: 38 failures trace to ordinary test fixtures marked `is_demo=True` despite D-057/D-065 isolation; 1 source test expected demo imports in the real-asset API; 1 confirmed WhatsApp `is_demo` NameError. Details: [CI triage](ci-baseline-triage.md). Fixes are on `feature/p0-ci-triage`; await CI before closing. |
+| P0.4 reproducible test commands | Done | CI commands, Python 3.13 / Node 22 / PostGIS 16-3.4 and safe test DB environment recorded in [CI triage](ci-baseline-triage.md). |
+| P0.5 fix backtest/core-demo blockers | In progress | Corrected test fixture defaults, explicit demo isolation coverage, source-sample visibility assertion and WhatsApp demo-flag propagation on `feature/p0-ci-triage`; validation pending. |
+| P0.6 CI failure summaries | Not started | After P0.5 validation, improve CI failure summaries without hiding or waiving failures. |
 | M3.1–M3.5 case evidence | In progress | 27 discovery leads classified in `data/case-register.csv` into primary candidates, historical-only, restoration controls, boundary controls and unresolved identities. None are independently verified; manifest remains empty |
 | M3.6–M3.7 freeze rules | Not started | `detect-v2`; no tag exists. Freeze only after confirming the rules and case protocol |
 | M3.8–M3.11 weekly replay | Not started | Existing scoring utility only; replay orchestration remains to build |
@@ -279,3 +282,12 @@ These articles are discovery references only. They are not substitutes for certi
 - API/PostGIS integration tests: **347 passed, 40 failed** (job failed; 1 warning). The API failure set remains the outstanding CI blocker; the run log records failures across boundaries, citizen reports, dashboard, lifecycle, locations, monthly reports, notifications, rules mode and source fixtures.
 - This confirms the M3 pipeline changes and web build remain green on the canonical branch. It does **not** make the complete CI pipeline green. The 40 API/PostGIS failures still need root-cause classification and remediation; do not describe them as fixed.
 - No change to backtest evidence status: 27 discovery leads remain unverified, the scoring manifest is empty and no detection metrics have been generated.
+
+### 26 November 2026 — P0.3 CI triage and first repair increment
+
+- Compared API/PostGIS logs from runs `45765808663` and `45766083814`; all 40 failing test names and signatures are identical. Both runs report 347 passed / 40 failed.
+- Inspected the failing tests, test factories, API filtering and current D-057/D-065 behavior. Classified 38 failures as ordinary test fixtures incorrectly marked demo, one source test as an obsolete expectation that demo connector samples should appear in the real-asset API, and one as a genuine WhatsApp handler `NameError`.
+- Added `docs/ci-baseline-triage.md` with evidence, classifications, CI commands/environment and repair acceptance criteria.
+- On `feature/p0-ci-triage`, changed ordinary API test factory defaults to non-demo while allowing explicit demo fixtures; updated the demo SMTP isolation test to create an explicit demo notification; updated the source sample test to assert demo records remain hidden; passed the existing WhatsApp `is_demo` argument into `_step()` to remove the runtime NameError.
+- P0.3 remains **in progress** until the full API/PostGIS suite runs. No failure is waived and no claim of a green API build is made yet.
+- Next: run CI on this branch, inspect all remaining failures, then close P0.3/P0.5 only when the tests and demo-isolation controls pass.
