@@ -16,7 +16,7 @@ def test_derived_boundary_is_never_authority_confirmed():
         "is_sample": False,
         "sha256": "a" * 64,
     })
-    assert result["source_class"] == "derived_unverified"
+    assert result["source_class"] == "osm_derived"
     assert result["authority_confirmed"] is False
 
 
