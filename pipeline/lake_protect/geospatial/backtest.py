@@ -30,7 +30,6 @@ def _iso_date(value: Any, label: str) -> str:
     if not isinstance(value, str) or len(value) < 10:
         raise ValueError(f"{label} must be an ISO date or timestamp")
     try:
-        from datetime import date
         parsed = date.fromisoformat(value[:10])
     except ValueError as exc:
         raise ValueError(f"{label} must begin with YYYY-MM-DD") from exc
@@ -182,7 +181,11 @@ def evaluate(
         "precision": round(precision, 4) if precision is not None else None,
         "recall": round(recall, 4) if recall is not None else None,
         "f1": round(f1, 4) if f1 is not None else None,
-        "precision_status": "complete" if unreviewed == 0 else "pending_manual_review",
+        "precision_status": (
+            "pending_manual_review" if unreviewed else
+            "complete" if true_positive + adjudicated_false_positive > 0 else
+            "not_estimable"
+        ),
         "minimum_area_acres_exclusive": minimum_area_acres,
         "match_iou": match_iou,
         "matches": matches,
