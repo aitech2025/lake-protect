@@ -171,11 +171,16 @@ def test_email_goes_to_the_outbox_and_sms_and_whatsapp_are_held_without_a_gatewa
     assert [(d["channel"], d["status"]) for d in next(iter(south.values()))] == [("email", "skipped")]
 
 
-def test_demo_data_never_leaves_the_machine_on_smtp(db, w, monkeypatch):
+def test_demo_data_never_leaves_the_machine_on_smtp(db, monkeypatch):
     monkeypatch.setattr(settings, "email_transport", "smtp")
     monkeypatch.setattr(settings, "smtp_host", "relay.invalid")
-    _, a = ingest(db, w.a_north)
-    n = notes_for(db, a.id)[w.north.id]
+    demo_user = make_user(db, "viewer", is_demo=True, email="demo@geoguard.invalid")
+    n = Notification(user_id=demo_user.id, kind="incident_opened", subject="Demo incident", body="Fictional test data",
+                     payload={}, needs_ack=True, created_at=T0, is_demo=True)
+    db.add(n)
+    db.flush()
+    db.add(NotificationDelivery(notification_id=n.id, channel="email", status="queued", attempt=0, at=T0))
+    db.flush()
     service.send_pending(db, T0 + H)
     email = next(d for d in service.deliveries_for(db, [n.id])[n.id] if d["channel"] == "email")
     assert email["status"] == "skipped" and email["detail"] == channels.DEMO_STAYS
