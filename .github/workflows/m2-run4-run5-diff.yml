@@ -10,6 +10,7 @@ on:
         type: string
   push:
     branches:
+      - consolidated
       - feature/consolidated
 
 permissions:
