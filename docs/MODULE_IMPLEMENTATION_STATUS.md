@@ -71,7 +71,7 @@ The 27 entries in `data/case-register.csv` are discovery leads, not verified gro
 - PR #22 merged: weekly resumable historical replay. Its recorded validation was API/PostGIS 387 passed, pipeline 84 passed and web build passed.
 - PR #23 is open: detect-v2 levelling tuning/correction and reproducible five-lake workflow.
 - PR #23's tuning workflow succeeded and produced the artifact above.
-- The standard CI run for PR #23 (run `45780437198`) initially reported API and web success but one pipeline test failure: `test_masked_looks_do_not_break_the_run` had a fixture-length mismatch. The current branch file has an additional final masked look; the failed pipeline job was re-run to validate the current head. Do not call the full PR check green until that rerun completes.
+- The standard CI run for PR #23 (run `45780437198`, head `a2503c5`) reported API and web success but one pipeline test failure: `test_masked_looks_do_not_break_the_run` had a fixture-length mismatch. A subsequent commit on the PR branch adds the missing fixture item; the recorded run is still failed because it tested the earlier commit. The follow-up commit's CI result must be confirmed before merge.
 - Canonical development branch remains `feature/consolidated`. Do not merge feature work directly to `main` without a separate release decision.
 
 ## Recommended next implementation sequence
