@@ -1,6 +1,6 @@
-"""Statewide platform modules.
+"""Statewide platform API package.
 
-Import ORM mappings so the canonical tables share the existing declarative
-metadata registry. Alembic migrations remain the only DDL authority.
+The additive schema is managed by Alembic and accessed through explicit SQL. Do not
+register duplicate ORM mappings here: the legacy application already maps some
+geospatial tables such as land_parcels.
 """
-from app.platform import models as models  # noqa: F401
