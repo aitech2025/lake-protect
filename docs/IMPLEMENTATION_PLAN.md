@@ -177,8 +177,8 @@ Phase 2 UI work can proceed in parallel with M3 data verification, but it must n
 | P0.1 canonical branch baseline | Done | `feature/consolidated`, baseline `65ce4c4` |
 | P0.2 CI status review | Done | Run `45749001507`: pipeline and web passed; API job failed |
 | P0.3–P0.6 CI triage | Not started | Classify 40 known API failures and establish a reproducible baseline |
-| M3.1–M3.5 case evidence | Not started | Inventory the 30 PRD cases; verify geometry, dates, area and source |
-| M3.6–M3.7 freeze rules | Not started | `detect-v2`; no tag exists at baseline |
+| M3.1–M3.5 case evidence | In progress | Added strict GeoJSON case validator, empty manifest template and case-register rules; actual case evidence is still unverified and the manifest remains empty |
+| M3.6–M3.7 freeze rules | Not started | `detect-v2`; no tag exists. Freeze only after confirming the rules and case protocol |
 | M3.8–M3.11 weekly replay | Not started | Existing scoring utility only; replay orchestration remains to build |
 | M3.12–M3.17 scoring/report | Partial | `geospatial/backtest.py` is a basic scorer; complete validation and report outputs remain |
 | P2 geospatial UI | Not started | Registry APIs merged by PR #19; UI wiring remains |
@@ -190,11 +190,23 @@ Phase 2 UI work can proceed in parallel with M3 data verification, but it must n
 
 **First active work item:** M3.1–M3.5 — blind-backtest case evidence inventory and validation.
 
-The first increment will:
-1. inspect the existing PRD case list and any supplied evidence;
-2. distinguish name-search hints from verified ground-truth events;
-3. define a machine-readable case manifest with source, geometry, event date, public-action date, area and eligibility reason;
-4. add validation and tests so incomplete or ambiguous cases cannot silently enter the score;
-5. document blockers where source evidence or hand-traced boundaries are required.
+The first increment has started on `feature/m3-case-validation`:
+1. Inspected the PRD's section 13 starter list and `data/case_lake_search.yml`; they are discovery hints, not verified ground truth.
+2. Added `data/cases.template.geojson` as an intentionally empty case manifest. No event labels or geometries were invented.
+3. Added `docs/backtest-case-register.md` with required evidence, eligibility and privacy rules.
+4. Added `pipeline/lake_protect/geospatial/cases.py` and `lp-geo validate-cases` to validate source, dates, area, geometry provenance, CRS, duplicate IDs and personal-data exclusions.
+5. Added focused tests in `pipeline/tests/test_backtest_cases.py`. CI/test execution is pending the PR.
 
-No scored backtest will run until the rules are frozen and the case set is independently verified.
+**Still blocked:** no independently verified case polygons and event/action dates are present in the repository. The case manifest remains empty. The scored backtest will not run until evidence is verified and the detector rules are frozen.
+
+
+## 8. Execution log
+
+### 26 November 2026 — M3 case-evidence validation started
+
+- Created this plan on `feature/consolidated` at commit `e7321a7`.
+- Created implementation branch `feature/m3-case-validation` from that plan commit.
+- Added a machine-readable empty GeoJSON case manifest, case-register documentation, validation module, CLI command and focused tests.
+- The validator requires explicit event/action dates, independent area source, verified event-footprint provenance and EPSG:4326 geometry. It excludes cases with unknown action dates, non-exact event dates, unverified geometry, pre-2018 events or area at/below 0.25 acre from the primary gate.
+- No actual case was admitted or scored. Source verification and geometry tracing remain human evidence tasks.
+- Next: run the focused pipeline suite in CI, fix any failures, then build the evidence inventory from the PRD starter cases without guessing missing values.
