@@ -41,6 +41,20 @@ def sar_water(item_json:Path=typer.Argument(...),output:Path=typer.Option(Path("
     from .raster import sentinel1_vv_screen
     typer.echo(json.dumps(sentinel1_vv_screen(json.loads(item_json.read_text(encoding="utf-8")),output,threshold_db=threshold_db),indent=2))
 
+@app.command("validate-cases")
+def validate_cases(manifest:Path=typer.Argument(...,exists=True,dir_okay=False,readable=True),
+                   output:Path=typer.Option(Path("reports/m3/case-validation.json"))):
+    """Validate M3 ground-truth case evidence before scoring."""
+    from .cases import validate_case_collection
+    collection=json.loads(manifest.read_text(encoding="utf-8"))
+    result=validate_case_collection(collection)
+    output.parent.mkdir(parents=True,exist_ok=True)
+    output.write_text(json.dumps(result,indent=2),encoding="utf-8")
+    typer.echo(json.dumps(result,indent=2))
+    typer.echo(f"report={output}")
+    if not result["valid"]:
+        raise typer.Exit(code=1)
+
 @app.command("backtest")
 def backtest(cases:Path=typer.Argument(...),detections:Path=typer.Argument(...),output:Path=typer.Option(Path("reports/backtest.json")),
              minimum_area_acres:float=typer.Option(0.25,min=0),match_iou:float=typer.Option(0.10,min=0,max=1)):
