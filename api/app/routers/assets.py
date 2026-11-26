@@ -33,7 +33,8 @@ router = APIRouter(tags=["assets"])
 
 _LIST_SQL = text(
     """
-    SELECT a.id, a.asset_key, a.name, a.name_te, a.type::text AS type, a.cohort::text AS cohort,
+    SELECT a.id, a.platform_asset_id, pa.asset_code AS geoguard_asset_code,
+           a.asset_key, a.name, a.name_te, a.type::text AS type, a.cohort::text AS cohort,
            a.district, a.mandal, a.village, a.survey_numbers, a.area_acres, a.custodian_agency,
            a.has_cctv, a.baseline_date, a.is_demo, a.notes, a.monitored, a.added_at,
            (SELECT u.name FROM users u WHERE u.id = a.added_by) AS added_by,
@@ -46,6 +47,7 @@ _LIST_SQL = text(
            sc.last_look AS screen_last_look, sc.candidates AS screen_candidates, sc.as_of AS screened_as_of,
            sc.rule_version AS screen_rule_version
     FROM assets a
+    LEFT JOIN public_assets pa ON pa.id = a.platform_asset_id
     LEFT JOIN LATERAL (
         SELECT bv.* FROM boundary_versions bv
         WHERE bv.asset_id = a.id AND bv.kind IN ('ftl', 'parcel')
