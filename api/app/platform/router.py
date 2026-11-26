@@ -1,4 +1,4 @@
-"""Versioned platform APIs with database-enforced department row security."""
+"""Versioned statewide registry APIs. Department-level RLS is a follow-on hardening step."""
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import text
@@ -52,7 +52,7 @@ def get_asset(asset_id: UUID, _: User = Depends(current_user), db: Session = Dep
 
 @router.post("/assets/{asset_id}/responsibilities",status_code=status.HTTP_201_CREATED)
 def add_responsibility(asset_id: UUID,payload: ResponsibilityCreate,
-                       actor: User = Depends(require_roles("admin","nodal_officer")),db: Session = Depends(get_db)):
+                       actor: User = Depends(require_roles("admin")),db: Session = Depends(get_db)):
     try:
         row=db.execute(text("""
           INSERT INTO asset_responsibilities(asset_id,department_id,relationship_type,valid_from,valid_to,source_authority,source_record_ref)
