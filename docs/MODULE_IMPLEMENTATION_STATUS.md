@@ -103,7 +103,7 @@ The 27 entries in `data/case-register.csv` are discovery leads, not verified gro
 | #32 | M3 scorer CRS, metric IoU and scoring breakdowns | Merged | Passed |
 | #33 | P2 Asset 360 boundary provenance | Merged | Passed |
 | #34 | P5 admin-only readiness diagnostics | Merged | Passed |
-| #35 | P2 OSM provenance classification correction | Open; awaiting CI | In progress |
+| #35 | P2 OSM provenance classification correction | Merged | Passed |
 
 Important limitations:
 - The run4/run5 comparison code is merged, but the actual run5 artifact comparison and human review have not been executed.
