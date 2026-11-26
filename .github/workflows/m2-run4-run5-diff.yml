@@ -1,0 +1,56 @@
+name: M2 run4/run5 spatial diff
+
+on:
+  workflow_dispatch:
+    inputs:
+      run5_run_id:
+        description: GitHub Actions run ID containing the run5 tuning artifact
+        required: true
+        default: "45781173252"
+        type: string
+      artifact_name:
+        description: Name of the run5 tuning artifact
+        required: true
+        default: "m2-detect-v2-tuning-2026-11-20"
+        type: string
+      iou_threshold:
+        description: Minimum polygon IoU for a spatial match
+        required: true
+        default: "0.10"
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install geospatial CLI
+        run: python -m pip install -e "pipeline[geo]"
+      - name: Download run5 tuning artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          run-id: ${{ inputs.run5_run_id }}
+          github-token: ${{ github.token }}
+          path: run5
+      - name: Compare run4 and run5 candidate footprints
+        run: |
+          lp-geo compare-tuning \
+            reports/m2-tuning/run4/candidates.geojson \
+            run5/candidates.geojson \
+            --iou-threshold ${{ inputs.iou_threshold }} \
+            --output reports/m2-tuning/run4-run5-diff.json
+      - name: Upload spatial review report
+        uses: actions/upload-artifact@v4
+        with:
+          name: m2-run4-run5-spatial-diff
+          path: reports/m2-tuning/run4-run5-diff.json
+          if-no-files-found: error
+          retention-days: 90
