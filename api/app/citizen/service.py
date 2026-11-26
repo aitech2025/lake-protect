@@ -341,6 +341,7 @@ def place(db: Session, report: CitizenReport, lon: float, lat: float, placed_by:
     root = duplicate_root(db, lon, lat, at, is_demo=report.is_demo)
     if root is not None and root.id != report.id and root.alert_id:
         report.duplicate_of, report.asset_id, report.zone, report.alert_id = root.id, root.asset_id, root.zone, root.alert_id
+        report.candidate_asset_id = root.candidate_asset_id
         add_event(db, report, "duplicate", status=root.status, note=texts.note("duplicate"), at=at, internal=f"Same place as {root.ref}",
                   mirror=False, send=send, actor=actor)
     else:
