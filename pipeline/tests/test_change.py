@@ -77,7 +77,7 @@ def test_a_reversal_breaks_the_run():
 
 def test_masked_looks_do_not_break_the_run():
     dates = looks(dt.date(2024, 9, 1), 40)
-    pattern = [WATER] * 30 + [BARE, MASKED, BARE, BARE, MASKED, BARE, BARE, MASKED, BARE]
+    pattern = [WATER] * 30 + [BARE, MASKED, BARE, BARE, MASKED, BARE, BARE, MASKED, BARE, MASKED]
     res = run(dates, stack(dates, None, pattern=pattern))
     assert len(res.candidates) == 1
 

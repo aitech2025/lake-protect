@@ -181,8 +181,8 @@ Phase 2 UI work can proceed in parallel with M3 data verification, but it must n
 | P0.5 fix backtest/core-demo blockers | In progress | Corrected test fixture defaults, explicit demo isolation coverage, source-sample visibility assertion and WhatsApp demo-flag propagation on `feature/p0-ci-triage`; validation pending. |
 | P0.6 CI failure summaries | Not started | After P0.5 validation, improve CI failure summaries without hiding or waiving failures. |
 | M3.1–M3.5 case evidence | In progress | 27 discovery leads classified in `data/case-register.csv` into primary candidates, historical-only, restoration controls, boundary controls and unresolved identities. None are independently verified; manifest remains empty |
-| M3.6–M3.7 freeze rules | Not started | `detect-v2`; no tag exists. Freeze only after confirming the rules and case protocol |
-| M3.8–M3.11 weekly replay | Not started | Existing scoring utility only; replay orchestration remains to build |
+| M3.6–M3.7 freeze rules | In progress / blocked | Run5 exercises D-058, but 11 run4 candidate footprints disappeared and 72 levelling pixels lack diagnostic chips. Do not tag until these are reviewed. |
+| M3.8–M3.10 replay | Implemented and CI-validated | PR #22 added weekly replay, no-look-ahead guards and resumable window-cache checkpoints. M3.11 scored run remains blocked by rule freeze and official case evidence. |
 | M3.12–M3.17 scoring/report | In progress | Hardened scorer now enforces validated primary eligibility, event/action temporal order, strict >0.25-acre threshold and auditable false-positive review; focused tests added; pipeline CI 77 passed |
 | P2 geospatial UI | Not started | Registry APIs merged by PR #19; UI wiring remains |
 | P3 incident/citizen hardening | Partial | Core M12–M17 flows exist; provider-dependent channels and operational hardening remain |
@@ -307,3 +307,12 @@ These articles are discovery references only. They are not substitutes for certi
 - PR #22 CI run: API/PostGIS **387 passed**, pipeline **84 passed**, web build **passed**; all jobs succeeded: https://github.com/aitech2025/lake-protect/actions/runs/45777436579.
 - Existing no-look-ahead guards and tests were reviewed; M3.9 is marked complete. M3.8 and M3.10 remain in progress pending CI validation and confirmation that Sentinel-1 historical checks are included in the replay.
 - No historical replay has been run and no detection metrics have been produced. The 27 discovery leads remain unverified; official case evidence and event polygons are still required before scoring. M3.6–M3.7 rule review/freeze and M3.1–M3.5 evidence acquisition remain prerequisites to the scored replay.
+
+
+### 26 November 2026 — M3.6 detect-v2 review and D-058 correction
+
+- The first detect-v2 tuning run revealed that `change.detect()` excluded `OTHER` from informative observations, making the configured `other>bare: levelling` transition unreachable. Corrected the temporal stack so only `MASKED` looks are uninformative; added a synthetic levelling regression test and per-transition raw/kept pixel counters.
+- Corrected five-lake run5 (detect-v2, as-of 2026-11-20, rules SHA-256 `7e3ae2398bab87c1133a7a6ecefafe5b4407c8a7a428fdc0b7999cb998fa2a36`) emitted 3 clearing candidates totalling 5.78 acres. It observed 2,068 raw levelling pixels and 72 pixels after temporal controls, but no final levelling candidate.
+- This differs materially from detect-v1 run4 (14 clearing candidates / 20.19 acres). The 11 candidate footprints that no longer appear need before/after review; no accuracy or improvement claim is made.
+- Workflow artifact: https://github.com/aitech2025/lake-protect/actions/runs/45780430533 (artifact ID `15098336015`). The artifact contains the three candidate chips, per-lake weekly imagery, GeoJSON and summary.
+- M3.6 remains in progress; M3.7 remains blocked. Next implementation: diagnostic geometry/chips for levelling components that survive controls but fail final candidate extraction, then compare run4/run5 footprints. Do not freeze or score yet.

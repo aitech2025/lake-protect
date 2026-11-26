@@ -85,6 +85,12 @@ for feature in features:
         f"rise={radar.get('rise_db')} dB; seasonal rise={radar.get('rise_vs_last_year_db')} dB"
     )
 lines.extend(radar_rows or ["- No building candidates"])
+lines += ["", "### Levelling transition pixels by tuning lake"]
+for asset in summary.get("assets", []):
+    counts = asset.get("counts") or {}
+    raw = int(counts.get("px_levelling_raw", 0))
+    kept = int(counts.get("px_levelling_kept", 0))
+    lines.append(f"- {asset.get('name')}: {raw} raw; {kept} survive controls; {asset.get('candidates', 0)} total candidates")
 lines += [
     "",
     "### Interpretation",
