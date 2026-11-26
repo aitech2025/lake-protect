@@ -28,6 +28,7 @@ def upgrade():
       footprint geometry(MultiPolygon,4326) NOT NULL,
       status text NOT NULL DEFAULT 'PENDING_VERIFICATION',
       provenance jsonb NOT NULL DEFAULT '{}'::jsonb,
+      is_demo boolean NOT NULL DEFAULT false,
       created_at timestamptz NOT NULL DEFAULT now(),
       updated_at timestamptz NOT NULL DEFAULT now()
     );
