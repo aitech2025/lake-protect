@@ -609,8 +609,30 @@ class CitizenReport(Base):
     flags: Mapped[list[str]] = mapped_column(ARRAY(Text), default=list)
     source_hash: Mapped[str] = mapped_column(Text)
     placed_by: Mapped[str | None] = mapped_column(Text)  # migration 0010: pin, description or official
+    candidate_asset_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("candidate_assets.id"))
     contact_purged_at: Mapped[dt.datetime | None] = mapped_column(TZ)
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[dt.datetime] = mapped_column(TZ)
+    updated_at: Mapped[dt.datetime] = mapped_column(TZ)
+
+
+class CandidateAsset(Base):
+    """An unverified location from citizen intelligence, separate from registered Assets."""
+    __tablename__ = "candidate_assets"
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
+    candidate_code: Mapped[str] = mapped_column(Text, unique=True)
+    source_report_id: Mapped[int] = mapped_column(ForeignKey("citizen_reports.id"), unique=True)
+    support_asset_id: Mapped[int] = mapped_column(ForeignKey("assets.id"), unique=True)
+    detection_candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id"), unique=True)
+    incident_id: Mapped[int] = mapped_column(ForeignKey("alerts.id"), unique=True)
+    display_name: Mapped[str] = mapped_column(Text)
+    category_hint: Mapped[str] = mapped_column(Text)
+    district: Mapped[str | None] = mapped_column(Text)
+    mandal: Mapped[str | None] = mapped_column(Text)
+    village: Mapped[str | None] = mapped_column(Text)
+    footprint = mapped_column(Geometry("MULTIPOLYGON", srid=4326), nullable=False)
+    status: Mapped[str] = mapped_column(Text, default="PENDING_VERIFICATION")
+    provenance: Mapped[dict] = mapped_column(JSONB, default=dict)
     created_at: Mapped[dt.datetime] = mapped_column(TZ)
     updated_at: Mapped[dt.datetime] = mapped_column(TZ)
 
