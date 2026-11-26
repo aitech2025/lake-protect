@@ -5,7 +5,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 LP_CACHE_DIR=/var/lp/cache
 WORKDIR /srv/pipeline
 COPY pipeline/pyproject.toml ./
 COPY pipeline/lake_protect ./lake_protect
-RUN pip install --no-cache-dir ".[geo,osm]" "planetary-computer>=1.0,<2"
+RUN pip install --no-cache-dir ".[geo,osm,ml,integrations]" "planetary-computer>=1.0,<2"
 # Chips are labelled with the same Noto Sans the desk and evidence packs use.
 COPY api/app/assets/fonts /srv/api/app/assets/fonts
 WORKDIR /srv/repo

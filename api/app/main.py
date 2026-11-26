@@ -4,6 +4,8 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.db import get_db
+from app.platform import intelligence_router, ingestion_router
+from app.platform import router as platform_router
 from app.routers import (
     alerts,
     assets,
@@ -28,6 +30,9 @@ app = FastAPI(title="GeoGuard API", version="0.1.0")
 for module in (auth, assets, candidates, pipeline, alerts, records, sources, documents, audit, users, tiles, bulletins, notifications, dashboard,
                citizen, reports, satellites):
     app.include_router(module.router)
+app.include_router(platform_router.router)
+app.include_router(intelligence_router.router)
+app.include_router(ingestion_router.router)
 
 
 @app.get("/health")
