@@ -75,9 +75,9 @@ def test_a_reversal_breaks_the_run():
     assert res.candidates == []
 
 
-def test_masked_and_mixed_looks_do_not_break_the_run():
+def test_masked_looks_do_not_break_the_run():
     dates = looks(dt.date(2024, 9, 1), 40)
-    pattern = [WATER] * 30 + [BARE, MASKED, BARE, OTHER, BARE, MASKED, BARE, BARE, MASKED, BARE]
+    pattern = [WATER] * 30 + [BARE, MASKED, BARE, BARE, MASKED, BARE, BARE, MASKED, BARE, MASKED]
     res = run(dates, stack(dates, None, pattern=pattern))
     assert len(res.candidates) == 1
 
@@ -154,3 +154,14 @@ def test_patches_close_together_are_one_change():
         specks[30:, r0:r0 + 2, 12:14] = BARE  # 4 px each, 2 px apart: none reaches 1,000 sq m alone
     res = run(dates, specks)
     assert res.candidates == []
+
+
+def test_levelling_rule_reports_raw_and_kept_transition_pixels():
+    """D-058: other-to-bare pixels are counted separately for tuning."""
+    dates = looks(dt.date(2024, 9, 1), 40)
+    pattern = [OTHER] * 30 + [BARE] * 10
+    res = run(dates, stack(dates, None, pattern=pattern))
+    assert len(res.candidates) == 1
+    assert res.candidates[0].change_type == "levelling"
+    assert res.counts["px_levelling_raw"] == 20
+    assert res.counts["px_levelling_kept"] == 20

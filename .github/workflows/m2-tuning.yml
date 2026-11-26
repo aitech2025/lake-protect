@@ -1,0 +1,70 @@
+name: M2 detect-v2 tuning run
+
+on:
+  push:
+    branches: ["feature/m2-tuning-detect-v2"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      LP_CACHE_DIR: ${{ github.workspace }}/.lp-cache
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pipeline/pyproject.toml
+      - name: Restore imagery window cache
+        uses: actions/cache@v4
+        with:
+          path: .lp-cache
+          key: m2-detect-v2-${{ runner.os }}-${{ hashFiles('pipeline/lake_protect/detect_rules.yaml') }}
+          restore-keys: |
+            m2-detect-v2-${{ runner.os }}-
+      - name: Install geospatial pipeline
+        working-directory: pipeline
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,osm,ml,geo]"
+      - name: Verify tuning configuration
+        run: |
+          python - <<'PY'
+          import yaml
+          from pathlib import Path
+          rules = yaml.safe_load(Path("pipeline/lake_protect/detect_rules.yaml").read_text())
+          if rules.get("rule_version") != "detect-v2":
+              raise SystemExit(f"Expected detect-v2, found {rules.get('rule_version')!r}")
+          print("Tuning assets: five non-scored lakes from reports/m2-tuning/README.md")
+          print("As-of: 2026-11-20 (same cutoff as run4)")
+          PY
+      - name: Run detect-v2 on the five non-scored tuning lakes
+        working-directory: pipeline
+        run: |
+          lp detect \
+            --assets ../data/assets.geojson \
+            --asset osm-way-27934981 \
+            --asset osm-way-265159686 \
+            --asset osm-way-158331211 \
+            --asset osm-way-28847688 \
+            --asset osm-way-263825342 \
+            --as-of 2026-11-20 \
+            --workers 8 \
+            --out ../reports/m2-tuning/run5-detect-v2
+      - name: Summarize tuning candidates
+        if: always()
+        run: python scripts/summarize_m2_tuning.py reports/m2-tuning/run5-detect-v2
+      - name: Upload tuning report and evidence chips
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m2-detect-v2-tuning-2026-11-20
+          path: reports/m2-tuning/run5-detect-v2/
+          if-no-files-found: warn
+          retention-days: 30
