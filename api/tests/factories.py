@@ -131,7 +131,7 @@ def add_pack_row(db, alert, user):
     db.flush()
 
 
-def make_user(db, role: str, *, name: str | None = None, area: dict | None = None, is_demo: bool = True,
+def make_user(db, role: str, *, name: str | None = None, area: dict | None = None, is_demo: bool = False,
               email: str | None = None, phone: str | None = None, channels: list[str] | None = None, language: str = "en") -> User:
     n = next(_seq)
     user = User(username=f"test-{role}-{n}", name=name or f"Test {role} {n}", role=role, is_demo=is_demo, email=email, phone=phone,
@@ -165,6 +165,7 @@ def make_asset(
     district: str | None = None,
     mandal: str | None = None,
     village: str | None = None,
+    is_demo: bool = False,
 ) -> Asset:
     """A test asset with a first boundary version whose status matches the cohort."""
     status_by_cohort = {
@@ -182,7 +183,7 @@ def make_asset(
         type=type,
         cohort=cohort,
         baseline_date=baseline,
-        is_demo=True,
+        is_demo=is_demo,
         survey_numbers=[],
         district=district,
         mandal=mandal,
