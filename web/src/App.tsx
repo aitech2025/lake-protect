@@ -15,6 +15,7 @@ import { ReportDetail, Reports } from "./desk/Reports";
 import { Satellites } from "./desk/Satellites";
 import { Sources } from "./desk/Sources";
 import { Monthly } from "./bulletin/Monthly";
+import { WhatsAppTest } from "./desk/WhatsAppTest";
 import { ReportPage, TrackPage } from "./portal/Portal";
 
 function RequireUser({ children }: { children: ReactNode }) {
@@ -50,6 +51,7 @@ export function App() {
         <Route path="/audit" element={<Audit />} />
         <Route path="/satellites" element={<Satellites />} />
         <Route path="/monthly" element={<Monthly />} />
+        <Route path="/whatsapp-test" element={<WhatsAppTest />} />
       </Route>
       <Route path="*" element={<Home />} />
     </Routes>

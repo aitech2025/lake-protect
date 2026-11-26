@@ -102,6 +102,9 @@ def create(db: Session, report: CitizenReport, lon: float, lat: float, matched: 
     check, decision = legal_check.run(db, candidate, asset, at)
     alert = ingest._new_alert(db, candidate, asset, at)
     alert.origin, alert.report_id = "citizen", report.id
+    alert.is_demo = report.is_demo
+    if report.is_demo:
+        alert.code = f"TEST-{at.year}-{alert.id:04d}"
     db.flush()
     chain.record(db, actor_id=None, action="citizen.incident_opened", entity="alert", entity_id=alert.id, at=at,
                  details={"code": alert.code, "ref": report.ref, "asset_id": asset.id, "reported_place": matched is None,

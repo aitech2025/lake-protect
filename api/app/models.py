@@ -659,6 +659,7 @@ class CitizenMessage(Base):
     attempt: Mapped[int] = mapped_column(Integer, default=0)
     retry_of: Mapped[int | None] = mapped_column(ForeignKey("citizen_messages.id"))
     detail: Mapped[str | None] = mapped_column(Text)
+    provider_message_id: Mapped[str | None] = mapped_column(Text)
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
     at: Mapped[dt.datetime] = mapped_column(TZ)
 

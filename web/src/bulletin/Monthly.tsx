@@ -76,7 +76,12 @@ export function Monthly() {
           <div className="monthly-grid">
             <figure className="monthly-map">
               <div dangerouslySetInnerHTML={{ __html: data.map_svg }} />
-              <figcaption className="small muted">{t("monthly.map_legend", { days: data.wait_days })}</figcaption>
+              <figcaption className="monthly-legend" aria-label={t("monthly.map_legend_label")}>
+                <span><i className="legend-swatch lake" />{t("monthly.legend_water")}</span>
+                <span><i className="legend-swatch land" />{t("monthly.legend_land")}</span>
+                <span><i className="legend-swatch incident" />{t("monthly.legend_new")}</span>
+                <span><i className="legend-swatch waiting" />{t("monthly.legend_waiting", { days: data.wait_days })}</span>
+              </figcaption>
             </figure>
             <div>
               <h2>{t("monthly.what_changed")}</h2>

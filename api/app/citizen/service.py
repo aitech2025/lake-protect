@@ -166,12 +166,12 @@ def match(db: Session, lon: float, lat: float) -> dict | None:
     return {**dict(row), "zone": ZONE[row["kind"]]} if row else None
 
 
-def near_incident(db: Session, asset_id: int, lon: float | None, lat: float | None) -> int | None:
+def near_incident(db: Session, asset_id: int, lon: float | None, lat: float | None, *, is_demo: bool = False) -> int | None:
     """An open, under-review or confirmed incident on the location, within 150 m of the pin."""
     return db.scalar(text(
         """
         SELECT al.id FROM alerts al JOIN candidates c ON c.id = al.candidate_id
-        WHERE c.asset_id = :a AND al.state::text = ANY(:states)
+        WHERE c.asset_id = :a AND al.state::text = ANY(:states) AND al.is_demo = :is_demo
           AND (CAST(:lon AS float8) IS NULL OR ST_DWithin(c.geom::geography,
                ST_SetSRID(ST_MakePoint(CAST(:lon AS float8), CAST(:lat AS float8)), 4326)::geography, :m))
         ORDER BY CASE WHEN CAST(:lon AS float8) IS NULL THEN 0
@@ -179,18 +179,18 @@ def near_incident(db: Session, asset_id: int, lon: float | None, lat: float | No
                  al.id DESC
         LIMIT 1
         """
-    ), {"a": asset_id, "lon": lon, "lat": lat, "m": INCIDENT_M, "states": list(OPEN_INCIDENT)})
+    ), {"a": asset_id, "lon": lon, "lat": lat, "m": INCIDENT_M, "states": list(OPEN_INCIDENT), "is_demo": is_demo})
 
 
-def duplicate_root(db: Session, lon: float, lat: float, at: dt.datetime) -> CitizenReport | None:
+def duplicate_root(db: Session, lon: float, lat: float, at: dt.datetime, *, is_demo: bool = False) -> CitizenReport | None:
     rid = db.scalar(text(
         """
         SELECT coalesce(r.duplicate_of, r.id) FROM citizen_reports r
-        WHERE r.status <> 'CLOSED' AND r.geom IS NOT NULL AND r.created_at >= :since
+        WHERE r.status <> 'CLOSED' AND r.geom IS NOT NULL AND r.created_at >= :since AND r.is_demo = :is_demo
           AND ST_DWithin(r.geom::geography, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, :m)
         ORDER BY r.created_at, r.id LIMIT 1
         """
-    ), {"lon": lon, "lat": lat, "m": DUPLICATE_M, "since": at - dt.timedelta(days=DUPLICATE_DAYS)})
+    ), {"lon": lon, "lat": lat, "m": DUPLICATE_M, "since": at - dt.timedelta(days=DUPLICATE_DAYS), "is_demo": is_demo})
     return db.get(CitizenReport, rid) if rid else None
 
 
@@ -253,6 +253,7 @@ def submit(
     phone: str | None = None,
     phone_verified_via: str | None = None,
     wants_updates: bool = False,
+    is_demo: bool = False,
     source_ref: str | None = None,
     entered_by: User | None = None,
 ) -> CitizenReport:
@@ -276,7 +277,7 @@ def submit(
         raise CitizenError("The place must be in Telangana")
     if len(photos or []) + len(stored_photos or []) > MAX_PHOTOS:
         raise CitizenError(f"At most {MAX_PHOTOS} photos")
-    if channel not in STAFF_CHANNELS:
+    if channel not in STAFF_CHANNELS and not is_demo:
         _rate_limit(db, source, at)
     if phone is not None and not (wants_updates and phone_verified_via):
         phone = None  # kept only to send updates, and only once verified
@@ -294,7 +295,7 @@ def submit(
         photos=kept, reporter_name=((reporter_name or "").strip()[:120] or None) if phone else None,
         reporter_phone=phone, phone_verified_via=phone_verified_via if phone else None, wants_updates=bool(phone),
         source_ref=(source_ref or "").strip() or None, entered_by=entered_by.id if entered_by else None,
-        status="RECEIVED", flags=flags, source_hash=source, is_demo=False, created_at=at, updated_at=at,
+        status="RECEIVED", flags=flags, source_hash=source, is_demo=is_demo, created_at=at, updated_at=at,
     )
     db.add(report)
     db.flush()
@@ -315,7 +316,8 @@ def submit(
         db.flush()
         from app.notify import service as notify
 
-        notify.citizen_report(db, report, at)  # the admin places it
+        if not report.is_demo:
+            notify.citizen_report(db, report, at)  # the admin places it
     else:
         place(db, report, lon, lat, placed_by, at, send=send)
     chain.record(db, actor_id=entered_by.id if entered_by else None, action="citizen.report_received", entity="citizen_report",
@@ -336,7 +338,7 @@ def place(db: Session, report: CitizenReport, lon: float, lat: float, placed_by:
     report.geom = WKTElement(f"POINT({lon} {lat})", srid=4326)
     report.placed_by = placed_by
     db.flush()
-    root = duplicate_root(db, lon, lat, at)
+    root = duplicate_root(db, lon, lat, at, is_demo=report.is_demo)
     if root is not None and root.id != report.id and root.alert_id:
         report.duplicate_of, report.asset_id, report.zone, report.alert_id = root.id, root.asset_id, root.zone, root.alert_id
         add_event(db, report, "duplicate", status=root.status, note=texts.note("duplicate"), at=at, internal=f"Same place as {root.ref}",
@@ -345,12 +347,13 @@ def place(db: Session, report: CitizenReport, lon: float, lat: float, placed_by:
         m = match(db, lon, lat)
         if m:
             report.asset_id, report.zone = m["id"], m["zone"]
-        existing = near_incident(db, m["id"], lon, lat) if m else None
+        existing = near_incident(db, m["id"], lon, lat, is_demo=report.is_demo) if m else None
         if existing:
             report.alert_id = existing
             add_event(db, report, "linked_incident", status="CHECKING", note=texts.note("linked_incident", place=place_name(db, report)),
                       at=at, send=send, actor=actor)
-            notify.citizen_report(db, report, at)  # for information: the incident already has its officials
+            if not report.is_demo:
+                notify.citizen_report(db, report, at)  # for information: the incident already has its officials
             alert = db.get(Alert, existing)
             if alert.state == "CONFIRMED":
                 add_event(db, report, "closed_incident_confirmed", status="CLOSED", note=texts.note("incident_confirmed"), at=at,
@@ -364,7 +367,8 @@ def place(db: Session, report: CitizenReport, lon: float, lat: float, placed_by:
             add_event(db, report, "case_opened", status="CHECKING", note=texts.note("case_opened"), at=at, actor=actor,
                       internal=f"Incident {alert.code} opened", send=send)
             incident.request(db, alert, report, lon, lat, at, send=send)
-            notify.incident_opened(db, alert, at)
+            if not report.is_demo:
+                notify.incident_opened(db, alert, at)
     db.add(Signal(kind="citizen_report", asset_id=report.asset_id, geom=report.geom, received_at=at, ref=report.ref,
                   linked_alert_id=report.alert_id, is_demo=report.is_demo))
     db.flush()
@@ -525,7 +529,7 @@ def stats(db: Session, days: int = 30, now: dt.datetime | None = None) -> dict:
                count(*) FILTER (WHERE status = 'CHECKING') AS checking,
                count(*) FILTER (WHERE status = 'CLOSED') AS closed,
                count(*) FILTER (WHERE alert_id IS NOT NULL) AS with_incident
-        FROM citizen_reports WHERE created_at >= :since
+        FROM citizen_reports WHERE created_at >= :since AND is_demo = false
         """
     ), {"since": now - dt.timedelta(days=days)}).mappings().one()
     return {"days": days, **{k: int(v) for k, v in row.items()}}

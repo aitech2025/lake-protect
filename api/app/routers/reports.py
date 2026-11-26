@@ -45,7 +45,7 @@ def _fail(exc: service.CitizenError) -> HTTPException:
 def list_reports(status: str | None = None, channel: str | None = None,
                  asset_id: int | None = None, alert_id: int | None = None, limit: int = Query(200, ge=1, le=500),
                  user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    q = select(CitizenReport)
+    q = select(CitizenReport).where(CitizenReport.is_demo.is_(False))
     if status == "open":
         q = q.where(CitizenReport.status != "CLOSED")
     elif status:

@@ -19,6 +19,7 @@ const NAV: { to: string; key: string; roles: string[] }[] = [
   { to: "/monthly", key: "nav.monthly", roles: BOTH },
   { to: "/audit", key: "nav.audit", roles: BOTH },
   { to: "/officials", key: "nav.officials", roles: ["admin"] },
+  { to: "/whatsapp-test", key: "nav.whatsapp_test", roles: ["admin"] },
 ];
 
 const COUNT_EVENT = "lp:notify-count";
@@ -56,6 +57,23 @@ function useUnacknowledged(): number {
   return n;
 }
 
+function useWhatsAppSimulatorEnabled(): boolean {
+  const { user } = useAuth();
+  const [enabled, setEnabled] = useState(false);
+  useEffect(() => {
+    if (!user || user.role !== "admin") {
+      setEnabled(false);
+      return;
+    }
+    let live = true;
+    api<{ whatsapp_simulator: boolean }>("/citizen/config")
+      .then((r) => live && setEnabled(r.whatsapp_simulator))
+      .catch(() => live && setEnabled(false));
+    return () => { live = false; };
+  }, [user]);
+  return enabled;
+}
+
 export function Mark() {
   // Lake outline with a solid boundary and a dashed buffer: the product's own line language.
   return (
@@ -71,6 +89,7 @@ export function Layout() {
   const { user, logout } = useAuth();
   const { pathname } = useLocation();
   const unacknowledged = useUnacknowledged();
+  const simulatorEnabled = useWhatsAppSimulatorEnabled();
   const mainRef = useRef<HTMLElement>(null);
   const firstRender = useRef(true);
   const toggle = () => void i18n.changeLanguage(i18n.language === "te" ? "en" : "te");
@@ -102,7 +121,7 @@ export function Layout() {
           <b>{t("app.name")}</b>
           <span className="small">{t("app.tagline")}</span>
         </div>
-        {NAV.filter((n) => user && n.roles.includes(user.role)).map((n) => (
+        {NAV.filter((n) => user && n.roles.includes(user.role) && (n.to !== "/whatsapp-test" || simulatorEnabled)).map((n) => (
           <NavLink key={n.to} to={n.to} data-testid={`nav-${n.to.slice(1)}`}>
             {t(n.key)}
             {n.to === "/inbox" && unacknowledged > 0 && (

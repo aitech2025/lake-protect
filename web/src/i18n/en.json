@@ -19,7 +19,8 @@
     "inbox": "Inbox",
     "officials": "Officials",
     "reports": "Citizen reports",
-    "satellites": "Satellites"
+    "satellites": "Satellites",
+    "whatsapp_test": "WhatsApp test"
   },
   "login": {
     "title": "Sign in with a demo account",
@@ -444,7 +445,12 @@
     "waiting": "waiting over {{days}} days",
     "what_changed": "What changed this month",
     "no_new": "No new incidents.",
-    "days_waiting": "{{n}} days"
+    "days_waiting": "{{n}} days",
+    "map_legend_label": "Map legend",
+    "legend_water": "Lakes and water bodies",
+    "legend_land": "Government land",
+    "legend_new": "New incident this month",
+    "legend_waiting": "Waiting over {{days}} days for a decision"
   },
   "officer": {
     "title": "Officer record",
@@ -733,7 +739,9 @@
     },
     "by_category": "Watched, by kind of land",
     "planned": "planned",
-    "not_watched": "no longer watched"
+    "not_watched": "no longer watched",
+    "back_district": "Back to {{district}} district",
+    "back_overview": "Back to state overview"
   },
   "inbox": {
     "title": "Inbox",
@@ -881,7 +889,8 @@
     "started": "Watching started",
     "stopped": "Watching stopped",
     "not_watched": "Not watched",
-    "from_reports": "Made from citizens' reports; not watched"
+    "from_reports": "Made from citizens' reports; not watched",
+    "back_all": "Back to all locations"
   },
   "citizen": {
     "tagline": "Weekly satellite watch over Telangana's lakes and government land",
@@ -1228,5 +1237,49 @@
       "deleted": "Deleted",
       "switched_off": "Turned off"
     }
+  },
+  "whatsapp_test": {
+    "title": "WhatsApp intake test",
+    "eyebrow": "Local test tool",
+    "intro": "Run the WhatsApp reporting conversation here, with a fake sender and no phone or provider account.",
+    "sender": "Fake sender ID",
+    "sender_help": "The simulator only accepts fake IDs beginning with 1555.",
+    "test_only": "Test records only.",
+    "isolation": "They are marked as test data, kept out of the live incident lists, and do not notify officials.",
+    "conversation": "WhatsApp test conversation",
+    "simulated_chat": "Local simulation",
+    "restart": "Restart chat",
+    "ready_title": "Start a test conversation",
+    "ready_text": "The first message opens the same guided flow used by WhatsApp intake.",
+    "start": "Send ?Hi?",
+    "quick_replies": "Suggested replies",
+    "message_placeholder": "Type a reply",
+    "sending": "Sending?",
+    "send": "Send",
+    "pin_sent": "Shared a location pin",
+    "location_step": "Location message",
+    "pin_title": "Choose a map pin",
+    "sample_pin": "Use sample point",
+    "pin_help": "Click the map to place the exact point, then send it as a WhatsApp location message.",
+    "no_pin": "No point selected",
+    "send_pin": "Send location",
+    "result": "Created test report",
+    "result_waiting": "Complete the conversation to create an isolated test report and incident.",
+    "created": "Report {{ref}}",
+    "location_words": "Location provided as text",
+    "open_report": "Open report",
+    "open_incident": "Open incident",
+    "flow_title": "What this tests",
+    "flow_language": "Language selection",
+    "flow_place": "Location pin or landmark",
+    "flow_what": "Incident type",
+    "flow_detail": "Photo skip and written details",
+    "flow_created": "Report and incident creation",
+    "no_photo_download": "Photo upload is not simulated here; WhatsApp media download still needs provider configuration.",
+    "english": "1 ? English",
+    "telugu": "2 ? Telugu",
+    "skip": "Skip",
+    "yes": "Yes",
+    "no": "No"
   }
 }

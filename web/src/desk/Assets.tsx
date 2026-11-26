@@ -124,11 +124,12 @@ export function Assets() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const { user } = useAuth();
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const linked = params.get("asset");
   const [selected, setSelected] = useState<number | null>(linked ? Number(linked) : null);
   useEffect(() => {
-  }, []);
+    setSelected(linked ? Number(linked) : null);
+  }, [linked]);
   const { data, error, status, loading, reload } = useAsync(() => api<{ features: any[] }>("/assets"), []);
   const cats = useAsync(() => api<Categories>("/categories"), []);
   const [kind, setKind] = useState("all");
@@ -141,8 +142,9 @@ export function Assets() {
     // Places made from citizens' reports are not watched until an official adds them (D-063, D-064),
     // so choosing their kind shows them all.
     () => all.filter((f) => (kind === "all" || f.properties.category === kind)
-      && (showStopped || f.properties.monitored || f.id === selected || kind === "citizen_reported")),
-    [all, kind, showStopped, selected],
+      && (showStopped || f.properties.monitored || f.id === selected || kind === "citizen_reported")
+      && (!linked || f.id === selected)),
+    [all, kind, showStopped, selected, linked],
   );
   const labelOf = (category: string) => {
     const c = cats.data?.items.find((x) => x.name === category);
@@ -179,6 +181,7 @@ export function Assets() {
         </div>
         {isAdmin(user) && !adding && <button type="button" className="btn" onClick={startAdding} data-testid="add-location-open">{t("locations.add")}</button>}
       </div>
+      {linked && selected && <p><button className="btn quiet" onClick={() => { setSelected(null); setParams({}); }}>{t("locations.back_all")}</button></p>}
       {added && <p className="banner info" role="status" data-testid="added-message">{t("locations.added", { name: added })}</p>}
       {adding && cats.data && (
         <AddLocation

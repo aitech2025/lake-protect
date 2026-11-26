@@ -17,11 +17,16 @@ from typing import Literal
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Request, UploadFile
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.citizen import otp, sender, service, texts, whatsapp
 from app.clock import utcnow
 from app.db import get_db
+from app.enums import Role
+from app.models import CitizenChat, CitizenReport, User
+from app.security import require_roles
 
 router = APIRouter(prefix="/citizen", tags=["citizen"])
 
@@ -55,6 +60,7 @@ def config(db: Session = Depends(get_db)) -> dict:
         "languages": list(texts.LANGS),
         "whats": [{"key": k, "label": texts.WHAT[k]} for k in texts.WHAT_ORDER],
         "updates": sender.status(),
+        "whatsapp_simulator": settings.enable_whatsapp_simulator,
         "stats": service.stats(db),
         "limits": {"photos": service.MAX_PHOTOS, "photo_mb": service.MAX_PHOTO_BYTES // (1024 * 1024), "description": 1000},
         "helpline": "1070",
@@ -165,3 +171,41 @@ async def whatsapp_incoming(request: Request, db: Session = Depends(get_db)) -> 
         handled += 1
     db.commit()
     return {"handled": handled}
+
+
+class WhatsAppSimulatorIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    sender: str = Field(default="15550000000", pattern=r"^1555[0-9]{7,9}$")
+    type: Literal["text", "location"]
+    text: str | None = Field(default=None, max_length=1000)
+    longitude: float | None = Field(default=None, ge=-180, le=180)
+    latitude: float | None = Field(default=None, ge=-90, le=90)
+
+
+@router.post("/whatsapp/simulator")
+def whatsapp_simulator(body: WhatsAppSimulatorIn, user: User = Depends(require_roles(Role.admin)),
+                       db: Session = Depends(get_db)) -> dict:
+    """Local-only WhatsApp test UI. Records are isolated with is_demo and never notify officials."""
+    if not settings.enable_whatsapp_simulator:
+        raise HTTPException(404, "The WhatsApp simulator is disabled")
+    if body.type == "text":
+        if body.text is None:
+            raise HTTPException(422, "Enter a text message")
+        message = {"type": "text", "text": body.text}
+    else:
+        if body.latitude is None or body.longitude is None:
+            raise HTTPException(422, "Choose a location on the map")
+        message = {"type": "location", "latitude": body.latitude, "longitude": body.longitude}
+    replies = whatsapp.handle(db, body.sender, message, at=utcnow(), is_demo=True)
+    chat = db.scalar(select(CitizenChat).where(
+        CitizenChat.wa_hash == whatsapp.wa_hash(body.sender), CitizenChat.is_demo.is_(True)))
+    report_out = None
+    if chat and chat.report_id:
+        report = db.get(CitizenReport, chat.report_id)
+        if report:
+            coords = db.execute(text("SELECT ST_X(geom), ST_Y(geom) FROM citizen_reports WHERE id = :id"), {"id": report.id}).one()
+            report_out = {"id": report.id, "ref": report.ref, "alert_id": report.alert_id,
+                          "longitude": coords[0], "latitude": coords[1], "what": report.what,
+                          "description": report.description, "location_text": report.location_text}
+    db.commit()
+    return {"replies": replies, "state": chat.state if chat else "new", "report": report_out}

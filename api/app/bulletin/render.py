@@ -29,6 +29,7 @@ def map_svg(db: Session, stats: dict, *, width: int = 640, height: int = 400) ->
         FROM assets a
         JOIN LATERAL (SELECT geom FROM boundary_versions bv WHERE bv.asset_id = a.id AND bv.kind IN ('ftl','parcel')
                       ORDER BY bv.version DESC LIMIT 1) b ON true
+        WHERE a.is_demo = false
         """)).mappings().all()
     pts = [c for r in rows for poly in (r["g"]["coordinates"] if r["g"]["type"] == "MultiPolygon" else [r["g"]["coordinates"]]) for c in poly[0]]
     if not pts:

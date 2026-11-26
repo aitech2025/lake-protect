@@ -48,6 +48,7 @@ def _incidents(db: Session) -> list[dict]:
                c.change_type::text AS change_type,
                ST_X(ST_PointOnSurface(c.geom)) AS lon, ST_Y(ST_PointOnSurface(c.geom)) AS lat
         FROM alerts al JOIN candidates c ON c.id = al.candidate_id JOIN assets a ON a.id = c.asset_id
+        WHERE al.is_demo = false
         """)).mappings().all()
     return [dict(r) for r in rows]
 

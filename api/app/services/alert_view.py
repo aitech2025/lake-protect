@@ -75,6 +75,7 @@ LEFT JOIN satellite_reviews sr ON sr.alert_id = al.id AND sr.kind = 'automatic'
 LEFT JOIN LATERAL (SELECT * FROM legal_checks l WHERE l.candidate_id = c.id ORDER BY l.id DESC LIMIT 1) lc ON true
 WHERE (CAST(:alert_id AS bigint) IS NULL OR al.id = CAST(:alert_id AS bigint))
   AND (CAST(:asset_id AS bigint) IS NULL OR a.id = CAST(:asset_id AS bigint))
+  AND (CAST(:include_demo AS boolean) OR NOT al.is_demo)
 ORDER BY CASE al.state WHEN 'OPEN' THEN 0 WHEN 'UNDER_REVIEW' THEN 1 WHEN 'CONFIRMED' THEN 2 WHEN 'DISMISSED' THEN 3 ELSE 4 END,
          al.priority_score DESC NULLS LAST, al.id DESC
 """
@@ -160,7 +161,7 @@ def is_waiting(row: dict, now: dt.datetime) -> bool:
 
 def list_alerts(db: Session, *, state=None, change_type=None, cohort=None, asset_id=None, district=None, mandal=None,
                 village=None, waiting: bool = False, new_in_week: str | None = None, now: dt.datetime | None = None) -> list[dict]:
-    rows = db.execute(text(_LIST_SQL), {"alert_id": None, "asset_id": asset_id}).mappings().all()
+    rows = db.execute(text(_LIST_SQL), {"alert_id": None, "asset_id": asset_id, "include_demo": False}).mappings().all()
     out = [_row_out(dict(r)) for r in rows]
     if state:
         out = [r for r in out if r["state"] in set(state.split(","))]
@@ -180,7 +181,7 @@ def list_alerts(db: Session, *, state=None, change_type=None, cohort=None, asset
 
 def row_for(db: Session, alert_id: int) -> dict:
     """One incident's list row: what changed, where, and its flags (for notifications)."""
-    row = db.execute(text(_LIST_SQL), {"alert_id": alert_id, "asset_id": None}).mappings().first()
+    row = db.execute(text(_LIST_SQL), {"alert_id": alert_id, "asset_id": None, "include_demo": True}).mappings().first()
     if row is None:
         raise HTTPException(404, "Incident not found")
     return _row_out(dict(row))
@@ -271,7 +272,7 @@ def _officer_blocks(db: Session, alert: Alert, asset: Asset, users: dict, user: 
 
 
 def detail(db: Session, alert: Alert, user: User) -> dict:
-    row = _row_out(dict(db.execute(text(_LIST_SQL), {"alert_id": alert.id, "asset_id": None}).mappings().one()))
+    row = _row_out(dict(db.execute(text(_LIST_SQL), {"alert_id": alert.id, "asset_id": None, "include_demo": True}).mappings().one()))
     cand = db.get(Candidate, alert.candidate_id)
     asset = db.get(Asset, cand.asset_id)
     bset = bsvc.current_boundary_set(db, asset.id)

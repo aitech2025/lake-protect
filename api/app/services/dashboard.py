@@ -43,6 +43,7 @@ _ASSETS = text(
     LEFT JOIN LATERAL (
         SELECT ST_PointOnSurface(geom) AS p, status::text AS status FROM boundaries
         WHERE asset_id = a.id AND kind IN ('ftl', 'parcel') ORDER BY valid_from DESC, version DESC LIMIT 1) b ON true
+    WHERE a.is_demo = false
     ORDER BY a.name
     """
 )
@@ -223,7 +224,7 @@ def known_areas(db: Session) -> list[dict]:
     rows = db.execute(text(
         """
         SELECT btrim(district) AS district, btrim(mandal) AS mandal, count(*) AS assets FROM assets
-        WHERE coalesce(btrim(district), '') <> '' GROUP BY 1, 2 ORDER BY 1, 2
+        WHERE NOT is_demo AND coalesce(btrim(district), '') <> '' GROUP BY 1, 2 ORDER BY 1, 2
         """)).mappings().all()
     out: dict[str, dict] = {}
     for r in rows:

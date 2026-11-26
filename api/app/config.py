@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     jwt_ttl_minutes: int = 720
     # Shared secret the pipeline sends to POST /candidates. Ingest is off when unset.
     pipeline_token: str | None = None
+    # Local WhatsApp conversation simulator. Off by default; simulated records are flagged is_demo.
+    enable_whatsapp_simulator: bool = False
     storage_dir: Path = Path("/var/lp/storage")
     data_dir: Path = Path("/srv/data")
     repo_dir: Path = Path("/srv/repo")

@@ -48,11 +48,11 @@ def signature_ok(raw_body: bytes, header: str | None) -> bool:
     return hmac.compare_digest(header.removeprefix("sha256="), good)
 
 
-def _chat(db: Session, wa_id: str, at: dt.datetime) -> CitizenChat:
+def _chat(db: Session, wa_id: str, at: dt.datetime, *, is_demo: bool = False) -> CitizenChat:
     h = wa_hash(wa_id)
-    chat = db.scalar(select(CitizenChat).where(CitizenChat.wa_hash == h))
+    chat = db.scalar(select(CitizenChat).where(CitizenChat.wa_hash == h, CitizenChat.is_demo.is_(is_demo)))
     if chat is None:
-        chat = CitizenChat(wa_hash=h, wa_id=wa_id, state="new", draft={}, is_demo=False, updated_at=at)
+        chat = CitizenChat(wa_hash=h, wa_id=wa_id, state="new", draft={}, is_demo=is_demo, updated_at=at)
         db.add(chat)
         db.flush()
     chat.wa_id = wa_id
@@ -60,11 +60,12 @@ def _chat(db: Session, wa_id: str, at: dt.datetime) -> CitizenChat:
 
 
 def _log(db: Session, chat: CitizenChat, direction: str, body: str, at: dt.datetime, *, status: str = "received",
-         detail: str | None = None) -> CitizenMessage:
+         detail: str | None = None, provider_message_id: str | None = None) -> CitizenMessage:
     lang = chat.language or "en"
     msg = CitizenMessage(report_id=chat.report_id, chat_id=chat.id, direction=direction, channel="whatsapp",
                          kind="chat_in" if direction == "in" else "chat_reply", language=lang, to_masked=sender.mask(f"+{chat.wa_id}"),
-                         text=body, status=status, attempt=0 if direction == "in" else 1, detail=detail, is_demo=chat.is_demo, at=at)
+                         text=body, status=status, attempt=0 if direction == "in" else 1, detail=detail,
+                         provider_message_id=provider_message_id, is_demo=chat.is_demo, at=at)
     db.add(msg)
     db.flush()
     return msg
@@ -97,12 +98,15 @@ def _status_reply(db: Session, ref: str, lang: str) -> str:
                                                          note=texts.pick(last, lang))
 
 
-def handle(db: Session, wa_id: str, message: dict, *, at: dt.datetime) -> list[str]:
+def handle(db: Session, wa_id: str, message: dict, *, at: dt.datetime, is_demo: bool = False) -> list[str]:
     """One incoming message; returns the replies, which are also logged and sent (or held)."""
-    chat = _chat(db, wa_id, at)
+    provider_id = message.get("provider_message_id")
+    if provider_id and db.scalar(select(CitizenMessage.id).where(CitizenMessage.provider_message_id == provider_id)) is not None:
+        return []  # WhatsApp retries webhook deliveries; never advance the conversation twice.
+    chat = _chat(db, wa_id, at, is_demo=is_demo)
     kind = message.get("type")
     body = (message.get("text") or "").strip()
-    _log(db, chat, "in", body if kind == "text" else f"[{kind}]", at)
+    _log(db, chat, "in", body if kind == "text" else f"[{kind}]", at, provider_message_id=provider_id)
     replies = _step(db, chat, wa_id, kind, body, message, at)
     chat.updated_at = at
     for r in replies:
@@ -136,7 +140,8 @@ def _step(db: Session, chat: CitizenChat, wa_id: str, kind: str | None, body: st
             lon, lat = float(message["longitude"]), float(message["latitude"])
             if not service.in_telangana(lon, lat):
                 return [texts.pick(texts.BOT["outside"], lang)]
-            draft.update(lon=lon, lat=lat)
+            place_label = ", ".join(x.strip() for x in (message.get("name"), message.get("address")) if x and x.strip())
+            draft.update(lon=lon, lat=lat, location_text=place_label[:300] or None)
         elif kind == "text" and len(body) >= 3:
             draft.update(location_text=body[:300])
         else:
@@ -193,10 +198,11 @@ def _step(db: Session, chat: CitizenChat, wa_id: str, kind: str | None, body: st
             description = ((description or "") + " [A photo was sent on WhatsApp but could not be downloaded.]").strip()
         try:
             report = service.submit(
-                db, channel="whatsapp", language=lang, what=draft["what"], at=at, source=wa_hash(wa_id),
+                db, channel="whatsapp", language=lang, what=draft["what"], at=at,
+                source=service.source_hash(f"{'wa-test' if is_demo else 'wa'}:{wa_id}"),
                 lon=draft.get("lon"), lat=draft.get("lat"), location_text=draft.get("location_text"), description=description,
                 stored_photos=draft.get("photos", []), phone=f"+{wa_id}" if wants else None,
-                phone_verified_via="whatsapp" if wants else None, wants_updates=wants,
+                phone_verified_via="whatsapp" if wants else None, wants_updates=wants, is_demo=is_demo,
             )
         except service.TooMany:
             chat.state, chat.draft = "done", {}
@@ -226,11 +232,13 @@ def parse_webhook(body: dict) -> list[tuple[str, dict]]:
         for change in entry.get("changes", []):
             for m in (change.get("value") or {}).get("messages", []) or []:
                 t = m.get("type")
-                msg: dict = {"type": t}
+                msg: dict = {"type": t, "provider_message_id": m.get("id")}
                 if t == "text":
                     msg["text"] = (m.get("text") or {}).get("body", "")
                 elif t == "location":
-                    msg.update(latitude=m["location"]["latitude"], longitude=m["location"]["longitude"])
+                    location = m.get("location") or {}
+                    msg.update(latitude=location.get("latitude"), longitude=location.get("longitude"),
+                               name=location.get("name"), address=location.get("address"))
                 elif t == "image":
                     msg["media_id"] = (m.get("image") or {}).get("id")
                 elif t == "interactive":

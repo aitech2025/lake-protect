@@ -1,0 +1,39 @@
+.whats-test .page-head { align-items: end; }
+.whats-eyebrow { margin: 0 0 0.25rem; color: var(--green); font-size: var(--step--2); font-weight: 700; letter-spacing: 0.11em; text-transform: uppercase; }
+.whats-sender { min-width: min(100%, 250px); }
+.whats-sender small { display: block; color: var(--ink-3); font-size: var(--step--2); }
+.whats-safe { margin: 0 0 1rem; padding: 0.7rem 0.9rem; border-left: 3px solid var(--amber); background: #fff8e9; color: var(--ink-2); }
+.whats-layout { display: grid; grid-template-columns: minmax(320px, 1.1fr) minmax(320px, 0.9fr); align-items: start; gap: 1rem; }
+.whats-phone { overflow: hidden; display: grid; grid-template-rows: auto minmax(300px, 1fr) auto auto; min-height: 610px; padding: 0; background: #efeae2; }
+.whats-phone-head { display: flex; align-items: center; gap: 0.65rem; padding: 0.75rem 1rem; background: #075e54; color: white; }
+.whats-phone-head > span:nth-child(2) { display: grid; flex: 1; line-height: 1.25; }
+.whats-phone-head small { color: #d7eee7; font-size: var(--step--2); }
+.whats-phone-head .btn.quiet { color: white; }
+.whats-avatar { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border: 1px solid #96c3b8; border-radius: 50%; background: #e5f4ef; color: #075e54; font-weight: 800; }
+.whats-messages { display: flex; flex-direction: column; gap: 0.55rem; min-height: 300px; max-height: 440px; overflow-y: auto; padding: 1rem; background-color: #efeae2; background-image: radial-gradient(#d8d2c9 0.6px, transparent 0.6px); background-size: 12px 12px; }
+.whats-line { max-width: min(88%, 34rem); padding: 0.6rem 0.75rem; border-radius: 0.7rem; box-shadow: 0 1px 1px rgb(28 43 51 / 0.1); white-space: pre-wrap; overflow-wrap: anywhere; }
+.whats-line p { margin: 0; }
+.whats-line small { display: block; margin-top: 0.35rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.whats-line.bot { align-self: start; border-top-left-radius: 0.2rem; background: white; }
+.whats-line.user { align-self: end; border-top-right-radius: 0.2rem; background: #d9fdd3; }
+.whats-empty { display: grid; justify-items: center; align-content: center; gap: 0.65rem; flex: 1; max-width: 22rem; margin: auto; text-align: center; }
+.whats-empty span { color: var(--ink-2); }
+.whats-quick { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0.5rem 0.75rem; background: #f7f5f0; }
+.whats-composer { display: flex; gap: 0.5rem; padding: 0.65rem; background: #f7f5f0; }
+.whats-composer input { min-width: 0; flex: 1; border: 1px solid var(--rule); border-radius: 999px; padding: 0.55rem 0.9rem; background: white; }
+.whats-side { display: grid; gap: 1rem; }
+.whats-pin-panel, .whats-result, .whats-steps { padding: 1rem; }
+.whats-section-head { display: flex; align-items: center; justify-content: space-between; gap: 0.7rem; }
+.whats-section-head h2, .whats-result h2 { margin: 0; font-size: var(--step-1); }
+.whats-section-head .whats-eyebrow, .whats-result .whats-eyebrow { margin-bottom: 0.1rem; }
+.whats-map { height: 265px; margin-top: 0.65rem; border: 1px solid var(--rule); border-radius: var(--radius-s); overflow: hidden; }
+.whats-pin-footer { display: flex; align-items: center; justify-content: space-between; gap: 0.7rem; margin-top: 0.65rem; }
+.whats-pin-footer .small { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.whats-result { border-top: 3px solid var(--green); }
+.whats-result-links { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; }
+.whats-steps summary { cursor: pointer; font-weight: 700; }
+.whats-steps ol { margin-bottom: 0.5rem; padding-left: 1.25rem; }
+.whats-steps li { padding: 0.12rem 0; }
+.whats-test .banner { margin: 0 0.65rem 0.65rem; }
+@media (max-width: 850px) { .whats-layout { grid-template-columns: minmax(0, 1fr); } .whats-phone { min-height: 560px; } }
+@media (max-width: 520px) { .whats-test .page-head { align-items: stretch; } .whats-sender { width: 100%; } .whats-pin-footer { align-items: start; flex-direction: column; } .whats-map { height: 230px; } }

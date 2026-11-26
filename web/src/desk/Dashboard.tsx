@@ -88,6 +88,8 @@ export function Dashboard() {
 
       {data && (
         <nav className="crumbs drill" aria-label={t("dashboard.path")} data-testid="dash-path">
+          {area.mandal && area.district && <button className="btn quiet" onClick={() => go({ district: area.district })}>{t("dashboard.back_district", { district: areaName(area.district) })}</button>}
+          {!area.mandal && area.district && <button className="btn quiet" onClick={() => go({})}>{t("dashboard.back_overview")}</button>}
           {data.path.map((p, i) => (
             <span key={p.level}>
               {i > 0 && <span aria-hidden="true"> › </span>}

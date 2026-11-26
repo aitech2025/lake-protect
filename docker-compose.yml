@@ -8,6 +8,7 @@ x-api-env: &api-env
   LP_TEST_DATABASE_URL: postgresql+psycopg://${LP_DB_USER}:${LP_DB_PASSWORD}@db:5432/${LP_DB_NAME}_test
   LP_JWT_SECRET: ${LP_JWT_SECRET:?set in .env}
   LP_PIPELINE_TOKEN: ${LP_PIPELINE_TOKEN:-}
+  LP_ENABLE_WHATSAPP_SIMULATOR: ${LP_ENABLE_WHATSAPP_SIMULATOR:-false}
   LP_STORAGE_DIR: /var/lp/storage
   LP_DATA_DIR: /srv/data
   LP_REPO_DIR: /srv/repo

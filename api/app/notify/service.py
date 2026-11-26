@@ -88,6 +88,8 @@ def _asset_of(db: Session, alert: Alert) -> Asset:
 
 
 def incident_opened(db: Session, alert: Alert, at: dt.datetime | None = None) -> list[Notification]:
+    if alert.is_demo:
+        return []
     at = as_utc(at)
     asset = _asset_of(db, alert)
     officials = routing.officials_for(db, asset)
@@ -104,6 +106,8 @@ def incident_opened(db: Session, alert: Alert, at: dt.datetime | None = None) ->
 
 
 def incident_decided(db: Session, alert: Alert, actor: User, note_text: str | None, at: dt.datetime | None = None) -> list[Notification]:
+    if alert.is_demo:
+        return []
     at = as_utc(at)
     asset = _asset_of(db, alert)
     reviewers = db.scalars(select(User).join(IncidentReview, IncidentReview.reviewer_id == User.id)
@@ -124,6 +128,8 @@ def incident_decided(db: Session, alert: Alert, actor: User, note_text: str | No
 def satellite_review(db: Session, alert: Alert, at: dt.datetime | None = None, only: int | None = None) -> list[Notification]:
     """A citizen incident's satellite review is back (D-063): the people told about the incident hear the
     result. A look an official asked for goes to that official only (`only`, D-064)."""
+    if alert.is_demo:
+        return []
     at = as_utc(at)
     asset = _asset_of(db, alert)
     base = messages.incident_payload(alert_view.row_for(db, alert.id))
@@ -135,6 +141,8 @@ def satellite_review(db: Session, alert: Alert, at: dt.datetime | None = None, o
 
 def citizen_report(db: Session, report: CitizenReport, at: dt.datetime | None = None) -> list[Notification]:
     """A citizen's report: the area's officials and every admin. Duplicates of a report tell no one again."""
+    if report.is_demo:
+        return []
     from app.citizen import texts
 
     at = as_utc(at)

@@ -8,6 +8,13 @@
 .monthly-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(280px, 2fr); gap: 1.75rem; align-items: start; }
 .monthly-map { margin: 0; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-m); padding: 0.5rem; }
 .monthly-map svg { width: 100%; height: auto; display: block; }
+.monthly-legend { display: flex; flex-wrap: wrap; gap: 0.55rem 1rem; padding: 0.75rem 0.25rem 0.25rem; color: var(--ink-2); font-size: var(--step--1); }
+.monthly-legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.legend-swatch { display: inline-block; width: 0.85rem; height: 0.85rem; border: 1px solid #75848b; border-radius: 2px; }
+.legend-swatch.lake { background: #a4cae6; }
+.legend-swatch.land { background: #e6dcc2; }
+.legend-swatch.incident { width: 0.65rem; height: 0.65rem; margin: 0 0.1rem; border-radius: 50%; background: #b07219; }
+.legend-swatch.waiting { width: 0.7rem; height: 0.7rem; border: 2px solid #c4402f; border-radius: 50%; }
 .who-list, .overdue-list { list-style: none; padding: 0; margin: 0.5rem 0 0; }
 .who-list li { display: flex; justify-content: space-between; padding: 0.45rem 0; border-bottom: 1px solid var(--rule); }
 .overdue-list li { display: grid; grid-template-columns: 1fr auto; gap: 0 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--rule); }

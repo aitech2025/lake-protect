@@ -133,9 +133,22 @@ Look images: `GET /alerts/{id}/looks/{review_id}/{before|after}`.
 |---|---|---|
 | **Status page** `/report/track/<ref>` | Always, in English or Telugu | Nothing |
 | **SMS** | An update at each step to a phone verified by one-time password. Every message is **held** | The State's SMS gateway agreement, and the DLT templates `citizen_update` and `citizen_otp` (`api/app/notify/channels.yaml`). Until then, the portal says SMS updates are not available yet |
-| **WhatsApp** | Replies in the conversation; later updates through the template `citizen_update`. Every message is **held** | The WhatsApp agreement, the app secret, the verify token, the API token, and the approved template |
+| **WhatsApp** | The signed webhook and guided conversation are implemented. A pin keeps its latitude/longitude as the report point; WhatsApp's optional location name/address are kept as context. It asks what happened and for a description before creating the report and incident. Later updates use the `citizen_update` template. | The State's WhatsApp Business agreement/provider, a public HTTPS webhook subscribed to incoming messages, `LP_WHATSAPP_APP_SECRET`, `LP_WHATSAPP_VERIFY_TOKEN`, and a configured outbound gateway in `api/app/notify/channels.yaml` with `LP_WHATSAPP_TOKEN`. Approve the `citizen_update` template for later updates. |
 
 A held message is never sent later.
+
+The inbound endpoint is `GET`/`POST /citizen/whatsapp/webhook` on the API (also exposed under `/api`
+by the web host). The GET verifies the provider challenge. POST verifies `X-Hub-Signature-256`
+against the raw body before processing. Incoming provider message IDs are stored uniquely, so a
+provider retry does not advance the conversation or create a second report. Exact pin coordinates
+are retained on the citizen report; the incident uses the application's normal 30 m reported-place
+boundary around that pin.
+
+**Not live in this repository's current configuration:** `agreement_ref`, `base_url`, and the
+WhatsApp secrets are unset. The app can accept signed webhook traffic once configured, but no
+provider account or credential is available here to turn on a real number. Outbound messages use
+the configured gateway adapter contract; this project has not selected or configured a specific
+provider's outbound API.
 
 ## 7. Privacy (DPDP Act 2023)
 
@@ -164,9 +177,23 @@ A held message is never sent later.
 | Portal | `web/src/portal/Portal.tsx` |
 | Tests | `api/tests/test_citizen.py` (14), `api/tests/test_incident_actions.py` (7), `pipeline/tests/test_review.py` (4), `e2e/tests/m15-citizen.spec.ts` (2) |
 
+## 8a. Local WhatsApp test screen
+
+The admin-only desk page `/whatsapp-test` runs the real guided conversation handler with a fake
+sender ID. It can send text replies and a precise location selected on the map, then shows the
+created report reference and incident link. It does not require a phone, webhook, provider agreement,
+or outbound gateway. Photo upload is not simulated.
+
+Enable it only in a local development stack by setting `LP_ENABLE_WHATSAPP_SIMULATOR=true` in `.env`
+and recreating the API and web containers (`docker compose up -d --build api web`). The API applies
+pending migrations on startup. The page appears in the admin navigation when the setting is enabled.
+Simulated chats/reports/incidents carry `is_demo=true`, use `TEST-` incident codes, do not notify
+officials, and are excluded from live report, incident, location, dashboard and monthly views. The
+endpoint is admin-authenticated and returns 404 while the feature flag is off.
+
 ## 9. Not built yet
 
-- **WhatsApp photo download.** It needs the provider's media token.
+- **WhatsApp photo download.** It needs the provider's media token and media endpoint configuration.
 - **Geocoding of free text** beyond the names of watched locations.
 - **A public map or district figures.**
 - **Delivery receipts.**

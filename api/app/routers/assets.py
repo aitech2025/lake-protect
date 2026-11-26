@@ -61,6 +61,7 @@ _LIST_SQL = text(
     WHERE (CAST(:area_user AS bigint) IS NULL
            OR ST_Intersects(b.geom, (SELECT u.area_geom FROM users u WHERE u.id = CAST(:area_user AS bigint))))
       AND (CAST(:asset_id AS bigint) IS NULL OR a.id = CAST(:asset_id AS bigint))
+      AND NOT a.is_demo
     ORDER BY a.name
     """
 )
