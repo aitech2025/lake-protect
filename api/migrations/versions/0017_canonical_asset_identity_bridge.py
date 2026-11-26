@@ -19,7 +19,7 @@ def upgrade():
     -- Ensure the explicit one-to-one bridge exists even on databases upgraded from older pilots.
     ALTER TABLE public_assets ADD COLUMN IF NOT EXISTS legacy_asset_id bigint;
     CREATE UNIQUE INDEX IF NOT EXISTS ux_public_assets_legacy_asset_id
-      ON public_assets(legacy_asset_id) WHERE legacy_asset_id IS NOT NULL;
+      ON public_assets(legacy_asset_id);
 
     ALTER TABLE assets ADD COLUMN IF NOT EXISTS platform_asset_id uuid;
     CREATE UNIQUE INDEX IF NOT EXISTS ux_assets_platform_asset_id
@@ -136,9 +136,9 @@ def upgrade():
       IF canonical_id IS NULL THEN
         RAISE EXCEPTION 'Unable to resolve canonical GeoGuard identity for legacy asset %', NEW.id;
       END IF;
-      NEW.platform_asset_id := canonical_id;
+      UPDATE assets SET platform_asset_id = canonical_id WHERE id = NEW.id;
       RETURN NEW;
-    END $$;
+    END $;
 
     CREATE OR REPLACE FUNCTION geoguard_sync_child_asset_identity()
     RETURNS trigger LANGUAGE plpgsql AS $$
