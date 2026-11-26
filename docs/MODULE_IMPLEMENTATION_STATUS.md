@@ -14,7 +14,7 @@
 - The existing lake-protection workflow and the statewide geospatial foundations are integrated into one application.
 - The application/control plane, map-first desk, asset/boundary foundations, case workflow, evidence/reporting foundations, STAC/Sentinel-2 screening, ingestion APIs and weekly replay code exist.
 - The key product gate is still **the scored blind historical backtest**. The scorer now enforces explicit detection CRS, metric-CRS IoU and scoring breakdowns, but no validated detection precision/recall/lead-time result exists.
-- Detect-v2 is not frozen. Its five-lake non-scored tuning run has completed; sub-threshold levelling components now export review geometries/chips, and PR #31 now provides the run4/run5 spatial comparison CLI; the artifact comparison and human review remain open.
+- Detect-v2 is not frozen. Its five-lake non-scored tuning run has completed; sub-threshold levelling components now export review geometries/chips, and PR #31 provides the run4/run5 spatial comparison CLI; the comparison found 12 unmatched run4 features, 1 unmatched run5 feature and 2 partial matches. Human review remains open.
 - Government connectors remain placeholders/demo adapters. No live government integration is activated.
 - The existing Asset 360 now has district/mandal filters plus normalised boundary provenance display (source class, source metadata and authority state); authoritative department hierarchy and production controls remain incomplete.
 
@@ -59,7 +59,7 @@ The detect-v2 workflow run completed successfully on 26 November 2026 (PR #23 me
 - 2,068 raw OTHER→BARE pixels; 72 remained after temporal controls.
 - Detect-v1 run4 had 14 clearing candidates / 20.19 acres. The 11 former candidate footprints that disappeared require diagnostic comparison.
 
-PR #25 adds review-only sub-threshold levelling component geometries and before/after chips in `diagnostics.geojson` and `chips/diagnostics/`; these are excluded from candidate/alert outputs. The 11 disappeared detect-v1 candidate footprints still require a run4/run5 spatial comparison and human review. This is tuning evidence only, not a detection accuracy result. Do not freeze detect-v2 or run the scored backtest until the diagnostic review is complete.
+PR #25 adds review-only sub-threshold levelling component geometries and before/after chips in `diagnostics.geojson` and `chips/diagnostics/`; these are excluded from candidate/alert outputs. The 12 unmatched run4 detect-v1 footprints and 1 unmatched run5 footprint require human review; 2 partial-overlap pairs also need visual inspection. This is tuning evidence only, not a detection accuracy result. Do not freeze detect-v2 or run the scored backtest until the diagnostic review is complete.
 
 ### Scored case evidence
 
@@ -106,6 +106,14 @@ The 27 entries in `data/case-register.csv` are discovery leads, not verified gro
 | #35 | P2 OSM provenance classification correction | Merged | Passed |
 
 Important limitations:
-- The run4/run5 comparison code is merged, but the actual run5 artifact comparison and human review have not been executed.
+- The run4/run5 comparison code is merged and executed (workflow #45819230496); 12 run4 features remain unmatched, 1 run5 feature is unmatched and 2 partial matches require human inspection. No detections are adjudicated by spatial IoU alone.
 - The M3 scored case manifest remains unverified/empty. No accuracy metrics are available.
 - The readiness endpoint is an operator checklist only. Production certification is explicitly `not_performed`.
+
+
+### M2 run4/run5 comparison execution — 26 November 2026
+
+- Workflow: [45819230496](https://github.com/aitech2025/lake-protect/actions/runs/45819230496)
+- Artifact: [m2-run4-run5-spatial-diff](https://github.com/aitech2025/lake-protect/actions/runs/45819230496/artifacts/15117485673)
+- Comparison: 14 run4 candidates vs 3 run5 candidates; 2 partial spatial matches, 12 unmatched run4 footprints, 1 unmatched run5 footprint.
+- The result is documented in [run4/run5 spatial review](../reports/m2-tuning/run4-run5-spatial-review.md). All unmatched and partial matches remain unadjudicated review leads.
