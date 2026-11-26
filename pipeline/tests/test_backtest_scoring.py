@@ -73,7 +73,7 @@ def test_exactly_quarter_acre_is_excluded_because_prd_says_over_quarter_acre():
 
 
 def test_unmatched_detection_is_not_automatically_called_false_positive():
-    result = evaluate([case()], [detection("unmatched", detected_at="2024-07-01", review_disposition=None)])
+    result = evaluate([case()], [detection("unmatched", detected_at="2024-09-02", review_disposition=None)])
     assert result["true_positive"] == 0
     assert result["false_positive"] == 0
     assert result["unreviewed_detections"] == 1
