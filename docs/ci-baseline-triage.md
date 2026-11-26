@@ -50,6 +50,20 @@ The API job requires a reachable PostGIS 16 / PostgreSQL 16 test service and the
 
 The test harness recreates the database named by `LP_TEST_DATABASE_URL` and migrates it to head. Never point that variable at a developer or production database.
 
+## Repair validation result — 26 November 2026
+
+The repair is validated on PR #21's latest full CI run:
+
+- [Run #275](https://github.com/aitech2025/lake-protect/actions/runs/45776369043), commit `99c36fb6fcf3421c46331922d17d278cb736f624`.
+- API/PostGIS: **387 passed, 0 failed** (one warning).
+- Pipeline: **77 passed**.
+- Web type-check/build: **passed**.
+- All three jobs completed successfully. No test was skipped or marked xfail to obtain this result.
+- An intermediate run after the first fixture correction left two tests failing: the evidence-pack fixture still expected demo data without explicitly creating a demo asset, and the pipeline rejection test still created a real asset while calling it demo. Both tests now declare demo intent explicitly; the production demo-isolation behavior remains unchanged.
+- The evidence-pack demo banner was also moved into normal printable page flow so PDF text extraction and readers can see it.
+
+CI now writes compact test totals and failing test names to each pytest job summary and uploads API/PostGIS and pipeline JUnit XML reports as workflow artifacts, including on failed test runs.
+
 ## Repair validation criteria
 
 1. Run the full API/PostGIS suite; do not mark P0.3 complete based only on fixture inspection.
