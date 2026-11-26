@@ -69,6 +69,8 @@ class Result:
     candidates: list[Candidate]
     counts: dict = field(default_factory=dict)
     legacy: list[Candidate] = field(default_factory=list)
+    # Review-only components that survive temporal controls but fail candidate area gates.
+    diagnostics: list[Candidate] = field(default_factory=list)
 
 
 def _days(dates: list[dt.date]) -> np.ndarray:
@@ -223,6 +225,19 @@ def detect(
             own_sizes = ndimage.sum(mask, own, index=np.arange(1, n_own + 1))
             small_ids = np.nonzero(own_sizes < min_px)[0] + 1
             counts["patches_small" + ("" if want_after else "_legacy")] = int(len(small_ids))
+            # Preserve otherwise-qualified levelling patches below the area gate for tuning review.
+            # They are diagnostics only: they never enter the alert candidate list.
+            if want_after:
+                for small_id in small_ids:
+                    small_component = own == small_id
+                    values, frequencies = np.unique(ctype[small_component], return_counts=True)
+                    if len(values) and int(values[np.argmax(frequencies)]) == LEVELLING:
+                        diagnostic = _component(
+                            small_component, cls, informative, day, Y, X, ctype,
+                            seasonal, season_seen_any, res_m, cfg, shore_check
+                        )
+                        if isinstance(diagnostic, Candidate):
+                            result.diagnostics.append(diagnostic)
             mask = mask & ~np.isin(own, small_ids)
         grow = int(c.get("merge_distance_m", 0) // (2 * res_m))
         grown = ndimage.binary_dilation(mask, structure=structure, iterations=grow) if grow > 0 else mask
@@ -247,6 +262,7 @@ def detect(
         counts["components_small" + ("" if want_after else "_legacy")] = int((sizes < min_px).sum())
     counts["candidates"] = len(result.candidates)
     counts["legacy_candidates"] = len(result.legacy)
+    counts["diagnostic_levelling_components"] = len(result.diagnostics)
     return result
 
 
