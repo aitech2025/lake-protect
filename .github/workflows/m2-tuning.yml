@@ -48,6 +48,7 @@ jobs:
         working-directory: pipeline
         run: |
           lp detect \
+            --assets ../data/assets.geojson \\
             --asset osm-way-27934981 \
             --asset osm-way-265159686 \
             --asset osm-way-158331211 \
