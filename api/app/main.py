@@ -3,6 +3,7 @@ from fastapi import Depends, FastAPI
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.db import get_db
 from app.enums import Role
 from app.models import User
@@ -51,4 +52,4 @@ def health(db: Session = Depends(get_db)) -> dict:
 @app.get("/readiness")
 def readiness(user: User = Depends(require_roles(Role.admin)), db: Session = Depends(get_db)) -> dict:
     """Admin-only operational configuration checklist; never certifies production readiness."""
-    return build_readiness(db, __import__("app.config", fromlist=["settings"]).settings)
+    return build_readiness(db, settings)
