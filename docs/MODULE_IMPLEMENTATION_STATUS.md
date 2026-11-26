@@ -14,7 +14,7 @@
 - The existing lake-protection workflow and the statewide geospatial foundations are integrated into one application.
 - The application/control plane, map-first desk, asset/boundary foundations, case workflow, evidence/reporting foundations, STAC/Sentinel-2 screening, ingestion APIs and weekly replay code exist.
 - The key product gate is still **the scored blind historical backtest**. The scorer now enforces explicit detection CRS, metric-CRS IoU and scoring breakdowns, but no validated detection precision/recall/lead-time result exists.
-- Detect-v2 is not frozen. Its five-lake non-scored tuning run has completed; sub-threshold levelling components now export review geometries/chips, and PR #31 now provides the run4/run5 spatial comparison CLI; the artifact comparison and human review remain open.
+- Detect-v2 is not frozen. Its five-lake non-scored tuning run has completed; sub-threshold levelling components now export review geometries/chips, and PR #31 provides the run4/run5 spatial comparison CLI; the comparison found 12 unmatched run4 features, 1 unmatched run5 feature and 2 partial matches. Human review remains open.
 - Government connectors remain placeholders/demo adapters. No live government integration is activated.
 - The existing Asset 360 now has district/mandal filters plus normalised boundary provenance display (source class, source metadata and authority state); authoritative department hierarchy and production controls remain incomplete.
 
@@ -29,7 +29,7 @@
 | 5 | Source onboarding and ingestion | **Partial** | File/import foundations, source registry, provenance, authenticated pipeline ingestion for batches/scenes/processing runs and social signal payloads | Provider-specific connectors, source refresh scheduling, retry/monitoring and live government integrations (approval-gated) |
 | 6 | Satellite catalogue and acquisition | **Partial** | STAC discovery, Sentinel-2 Earth Search collection access, suitability checks, scene registration, windowed imagery caching and COG/S3-compatible outputs | Production pgSTAC/catalogue operations, provider licensing/configuration, resilient scheduled acquisition/backfill and coverage SLAs |
 | 7 | Raster preprocessing and map products | **Partial** | Rasterio-based windowed processing, MNDWI masks, COG generation, offline basemap/tile foundations and temporal water comparison | Full production tile-serving/imagery timeline integration, provider health visibility and broader sensor harmonisation |
-| 8 | Sentinel-2 physical-change detection | **Partial — diagnostics improved** | MNDWI water screening and class-based physical-change rules for clearing, soil fill, building and D-058 levelling; review-only levelling components/chips; `lp-geo compare-tuning` for run-to-run footprint comparison | Run4/run5 artifact comparison and human review, immutable rule freeze, independent case validation and scored performance gate |
+| 8 | Sentinel-2 physical-change detection | **Partial — diagnostics improved** | MNDWI water screening and class-based physical-change rules for clearing, soil fill, building and D-058 levelling; review-only levelling components/chips; `lp-geo compare-tuning` executed for run4/run5 | Human review of 12 unmatched run4 footprints, 1 unmatched run5 footprint and 2 partial matches; immutable rule freeze, independent case validation and scored performance gate |
 | 9 | Sentinel-1 / radar confirmation | **Partial** | Calibrated VV threshold screening foundation and radar confirmation check for built candidates; replay code includes Sentinel-1 archive checks | Verify historical RTC processing and scene availability end-to-end; document calibration/terrain correction limitations; independent radar evaluation |
 | 10 | Historical replay and backtesting | **Partial — critical gate** | Strict case validator, 27-lead discovery register, weekly resumable replay, no-look-ahead guards, explicit EPSG:4326 replay CRS, unique detection IDs, EPSG:32644 IoU and median lead-time/sensor/season/event-type breakdowns | Verify cases and event polygons, freeze detector rules, run the scored set, manually adjudicate false flags, complete false-flags-per-lake-year/chips and signed limitations |
 | 11 | Candidate, alert and case workflow | **Implemented for prototype** | Candidate ingestion, alert lifecycle/state machine, priority/rules checks, legal record references, role-gated actions, audit trail and watch-list handling | Validate current approved workflow against owner decisions; authoritative boundaries/legal records required before operational progression |
@@ -57,9 +57,9 @@ The detect-v2 workflow run completed successfully on 26 November 2026 (PR #23 me
 - Rules SHA-256: `7e3ae2398bab87c1133a7a6ecefafe5b4407c8a7a428fdc0b7999cb998fa2a36`.
 - Three clearing candidates totalling 5.78 acres; no final levelling candidate.
 - 2,068 raw OTHER→BARE pixels; 72 remained after temporal controls.
-- Detect-v1 run4 had 14 clearing candidates / 20.19 acres. The 11 former candidate footprints that disappeared require diagnostic comparison.
+- Detect-v1 run4 had 14 clearing candidates / 20.19 acres. The run4/run5 spatial comparison is now documented in the execution checkpoint; 12 run4 features remain unmatched and require human review.
 
-PR #25 adds review-only sub-threshold levelling component geometries and before/after chips in `diagnostics.geojson` and `chips/diagnostics/`; these are excluded from candidate/alert outputs. The 11 disappeared detect-v1 candidate footprints still require a run4/run5 spatial comparison and human review. This is tuning evidence only, not a detection accuracy result. Do not freeze detect-v2 or run the scored backtest until the diagnostic review is complete.
+PR #25 adds review-only sub-threshold levelling component geometries and before/after chips in `diagnostics.geojson` and `chips/diagnostics/`; these are excluded from candidate/alert outputs. The 12 unmatched run4 detect-v1 footprints and 1 unmatched run5 footprint require human review; 2 partial-overlap pairs also need visual inspection. This is tuning evidence only, not a detection accuracy result. Do not freeze detect-v2 or run the scored backtest until the diagnostic review is complete.
 
 ### Scored case evidence
 
@@ -79,7 +79,7 @@ The 27 entries in `data/case-register.csv` are discovery leads, not verified gro
 
 ## Recommended next implementation sequence
 
-1. **Complete the run4/run5 spatial diff** for the 11 disappeared detect-v1 candidate footprints; inspect the new levelling diagnostic chips and record human dispositions.
+1. **Review the run4/run5 spatial diff** for 12 unmatched run4 features, 1 unmatched run5 feature and 2 partial matches; inspect the levelling diagnostic chips and record human dispositions.
 2. **Verify M3 case evidence**: exact event dates, public-action dates, affected areas, event polygons and provenance. Do not infer missing facts.
 3. **Freeze and score** only after the independent case set and detect-v2 rule review are complete; run once and publish metrics, misses, false flags, lead times and limitations.
 4. **Finish P2 acceptance**: authoritative department hierarchy, source-class normalisation, imagery coverage/freshness and consolidated UI integration tests.
@@ -106,6 +106,14 @@ The 27 entries in `data/case-register.csv` are discovery leads, not verified gro
 | #35 | P2 OSM provenance classification correction | Merged | Passed |
 
 Important limitations:
-- The run4/run5 comparison code is merged, but the actual run5 artifact comparison and human review have not been executed.
+- The run4/run5 comparison code is merged and executed (workflow #45819230496); 12 run4 features remain unmatched, 1 run5 feature is unmatched and 2 partial matches require human inspection. No detections are adjudicated by spatial IoU alone.
 - The M3 scored case manifest remains unverified/empty. No accuracy metrics are available.
 - The readiness endpoint is an operator checklist only. Production certification is explicitly `not_performed`.
+
+
+### M2 run4/run5 comparison execution — 26 November 2026
+
+- Workflow: [45819230496](https://github.com/aitech2025/lake-protect/actions/runs/45819230496)
+- Artifact: [m2-run4-run5-spatial-diff](https://github.com/aitech2025/lake-protect/actions/runs/45819230496/artifacts/15117485673)
+- Comparison: 14 run4 candidates vs 3 run5 candidates; 2 partial spatial matches, 12 unmatched run4 footprints, 1 unmatched run5 footprint.
+- The result is documented in [run4/run5 spatial review](../reports/m2-tuning/run4-run5-spatial-review.md). All unmatched and partial matches remain unadjudicated review leads.

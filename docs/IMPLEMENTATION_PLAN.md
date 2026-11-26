@@ -2,7 +2,7 @@
 
 **Branch:** `feature/consolidated`  
 **Plan owner:** Product owner / implementation agent  
-**Baseline commit:** `45aae37c3e6da294f05a922c2618ea95b1603612` (after PRs #31–#35)  
+**Baseline commit:** `99b56e06a0eb6395280797a8b154b16af8924a41` (after PRs #31–#36)  
 **Plan created:** 26 November 2026  
 **Status:** Active — Phase 1 started  
 **Source of truth:** `CONTEXT.md`, latest applicable owner decisions in `DECISIONS.md`, current code, and focused design documents.
@@ -175,7 +175,7 @@ Phase 2 UI work can proceed in parallel with M3 data verification, but it must n
 | Task | Status | Latest evidence / next action |
 |---|---|---|
 | P0 baseline and CI | Complete | API/PostGIS, pipeline and web CI were restored in PR #21; latest canonical runs after PRs #31–#34 are green. |
-| M2 detect-v2 diagnostics | Implemented; review pending | PR #25 exports sub-threshold levelling diagnostics separately from alert candidates. PR #31 adds run4/run5 polygon comparison CLI. The actual artifact comparison and human disposition of 11 disappeared run4 candidates remain outstanding. |
+| M2 detect-v2 diagnostics | Implemented; review pending | PR #25 exports sub-threshold levelling diagnostics separately from alert candidates. PR #31 adds run4/run5 polygon comparison CLI. The run4/run5 comparison has completed: 14 run4 candidates vs 3 run5 candidates; 2 spatial matches, 12 unmatched run4 footprints and 1 unmatched run5 footprint. All remain human-review leads, not accuracy labels. |
 | M3.1–M3.5 case evidence | Blocked on external evidence | 27 discovery leads are recorded; none is independently verified. Exact event dates, public-action dates, affected areas and verified event polygons are still required. |
 | M3.6–M3.7 rule review/freeze | Blocked | Five-lake non-scored tuning exists, but run4/run5 footprint review is incomplete. No immutable detect-v2 tag exists. |
 | M3.8–M3.10 replay | Implemented | Weekly resumable replay and no-look-ahead controls exist; replay detections now explicitly carry EPSG:4326 CRS metadata. |
@@ -339,7 +339,7 @@ The following implementation increments were delivered in parallel on short-live
 
 ### Remaining critical gates
 
-1. Complete the run4/run5 spatial comparison for the 11 disappeared detect-v1 candidate footprints and review all diagnostic chips.
+1. Review the 12 unmatched run4 footprints, the 1 unmatched run5 footprint and the 2 partial-overlap matches; review all diagnostic chips.
 2. Independently verify exact event dates, public-action dates, event polygons and affected areas for the scoring case manifest.
 3. Freeze detect-v2 only after human review; then run the scored replay once and publish full metrics and limitations.
 4. Finish PR #28 CI and merge; then validate the end-to-end citizen operations page against a real (non-demo) queued review and retry scenario.
@@ -376,3 +376,14 @@ No scored detection accuracy claim is authorized by these implementation increme
 6. Treat the readiness endpoint as an operator checklist only; complete actual P5 controls before any production deployment.
 
 No detection accuracy or production-readiness claim is authorized by this fan-out.
+
+
+### 26 November 2026 — Run4/run5 spatial comparison executed
+
+- Executed the merged `lp-geo compare-tuning` command against committed run4 candidates and the archived run5 tuning artifact.
+- Workflow: [45819230496](https://github.com/aitech2025/lake-protect/actions/runs/45819230496); output artifact: [m2-run4-run5-spatial-diff](https://github.com/aitech2025/lake-protect/actions/runs/45819230496/artifacts/15117485673).
+- Results: run4 had 14 clearing features; run5 had 3. The spatial comparison found 2 one-to-one partial matches (IoU 0.348 and 0.319), 12 unmatched run4 features and 1 unmatched run5 feature.
+- The 12 unmatched run4 features are split across `osm-way-158331211` (4) and `osm-way-265159686` (8). The unmatched run5 feature is on `osm-way-158331211`, dated 2026-11-08, 0.5931 acres.
+- The two matched pairs changed materially in area: 12.0340→4.6209 acres and 1.7792→0.5683 acres. These are partial spatial correspondences, not stable/equivalent footprints.
+- Added `reports/m2-tuning/run4-run5-spatial-review.md` with results, identifiers, caveats and the human-review checklist.
+- No unmatched footprint is classified as a false positive or true positive. Human inspection of all 15 review leads plus PR #25 levelling diagnostics remains a prerequisite to rule freeze.
