@@ -85,7 +85,7 @@ def test_unmatched_detection_is_not_automatically_called_false_positive():
 
 def test_human_adjudicated_false_positive_is_counted():
     result = evaluate([case()], [
-        detection("false-1", detected_at="2024-07-01", review_disposition="false_positive")
+        detection("false-1", detected_at="2024-09-02", review_disposition="false_positive")
     ])
     assert result["false_positive"] == 1
     assert result["unreviewed_detections"] == 0
@@ -93,9 +93,10 @@ def test_human_adjudicated_false_positive_is_counted():
     assert result["precision_status"] == "complete"
 
 
-def test_non_exact_case_date_is_rejected_by_case_manifest_validation():
-    with pytest.raises(ValueError, match="Invalid case manifest"):
-        evaluate([case(event_date_precision="month")], [])
+def test_non_exact_case_date_is_excluded_from_primary_scoring():
+    result = evaluate([case(event_date_precision="month")], [])
+    assert result["eligible_cases"] == 0
+    assert "event_date_not_exact" in result["excluded_cases"][0]["reasons"]
 
 
 def test_pre_2018_case_is_excluded_from_scoring():
