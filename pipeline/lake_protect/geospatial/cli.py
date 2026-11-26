@@ -62,4 +62,15 @@ def backtest(cases:Path=typer.Argument(...),detections:Path=typer.Argument(...),
     result=evaluate_files(cases,detections,output,minimum_area_acres=minimum_area_acres,match_iou=match_iou)
     typer.echo(json.dumps({k:v for k,v in result.items() if k!="matches"},indent=2)); typer.echo(f"report={output}")
 
+@app.command("compare-tuning")
+def compare_tuning(before:Path=typer.Argument(...,exists=True,dir_okay=False,readable=True),
+                   after:Path=typer.Argument(...,exists=True,dir_okay=False,readable=True),
+                   output:Path=typer.Option(Path("reports/m2-tuning/run-diff.json")),
+                   iou_threshold:float=typer.Option(0.10,min=0,max=1)):
+    """Compare two non-scored tuning exports and list footprints needing human review."""
+    from .tuning_diff import compare_files
+    result=compare_files(before,after,output,iou_threshold=iou_threshold)
+    typer.echo(json.dumps({k:v for k,v in result.items() if k not in ("matches","disappeared_candidates","added_candidates")},indent=2))
+    typer.echo(f"report={output}")
+
 if __name__=="__main__": app()
