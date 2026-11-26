@@ -17,6 +17,8 @@ class AssetCreate(BaseModel):
 
     @model_validator(mode="after")
     def authoritative_source_required(self):
+        if self.category_code.strip().casefold() == "reported_place":
+            raise ValueError("Reported places must be created as candidate assets, never in the registered asset registry.")
         if self.source_authority in {"AUTHORITATIVE","CERTIFIED"} and not self.source_record_ref:
             raise ValueError("Authoritative or certified assets require a source record reference.")
         return self
