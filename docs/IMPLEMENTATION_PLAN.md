@@ -175,7 +175,7 @@ Phase 2 UI work can proceed in parallel with M3 data verification, but it must n
 | Task | Status | Latest evidence / next action |
 |---|---|---|
 | P0.1 canonical branch baseline | Done | `feature/consolidated`, baseline `65ce4c4` |
-| P0.2 CI status review | Done | PR #20 merged as `cb3b8d7913b922b3e6075e4bb2e3a8583dcb9206`. Validation run `45765808663`: pipeline 77 passed, web build passed; API 347 passed / 40 failed (same baseline failures) |
+| P0.2 CI status review | Done | Latest canonical-branch run #269 (`45766083814`, commit `d17fce6`) completed 26 Nov 2026: pipeline 77 passed; web type-check/build passed; API/PostGIS 347 passed / 40 failed. Overall workflow is **failed** only because the API/PostGIS job failed; see [run #269](https://github.com/aitech2025/lake-protect/actions/runs/45766083814) |
 | P0.3–P0.6 CI triage | Not started | Classify 40 known API failures and establish a reproducible baseline |
 | M3.1–M3.5 case evidence | In progress | 27 discovery leads classified in `data/case-register.csv` into primary candidates, historical-only, restoration controls, boundary controls and unresolved identities. None are independently verified; manifest remains empty |
 | M3.6–M3.7 freeze rules | Not started | `detect-v2`; no tag exists. Freeze only after confirming the rules and case protocol |
@@ -268,3 +268,14 @@ These articles are discovery references only. They are not substitutes for certi
 - Validation run: https://github.com/aitech2025/lake-protect/actions/runs/45765808663
 - Pipeline: **77 passed**. Web build: **passed**. API/PostGIS: **347 passed, 40 failed**, same 40 pre-existing baseline failures.
 - The case register, strict validator, hardened scorer, tests and government evidence request are now part of the canonical branch.
+
+### 26 November 2026 — Latest canonical-branch CI status (run #269)
+
+- Branch: `feature/consolidated`; commit: `d17fce6cad68bb321b3590f7cd22afcdcbd6f993`.
+- Workflow run: https://github.com/aitech2025/lake-protect/actions/runs/45766083814
+- Overall GitHub Actions conclusion: **failure**.
+- Pipeline tests: **77 passed** (job succeeded).
+- Web type-check/build: **passed** (job succeeded).
+- API/PostGIS integration tests: **347 passed, 40 failed** (job failed; 1 warning). The API failure set remains the outstanding CI blocker; the run log records failures across boundaries, citizen reports, dashboard, lifecycle, locations, monthly reports, notifications, rules mode and source fixtures.
+- This confirms the M3 pipeline changes and web build remain green on the canonical branch. It does **not** make the complete CI pipeline green. The 40 API/PostGIS failures still need root-cause classification and remediation; do not describe them as fixed.
+- No change to backtest evidence status: 27 discovery leads remain unverified, the scoring manifest is empty and no detection metrics have been generated.
