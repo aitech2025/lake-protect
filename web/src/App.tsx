@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { homeFor, useAuth } from "./auth";
 import { Layout } from "./components/Layout";
 import { AlertDetail } from "./desk/AlertDetail";
+import { CommandOverview } from "./desk/CommandOverview";
 import { Assets } from "./desk/Assets";
 import { Audit } from "./desk/Audit";
 import { Login } from "./desk/Login";
@@ -27,6 +28,7 @@ export function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route element={<RequireUser><Layout /></RequireUser>}>
+        <Route path="/command" element={<CommandOverview />} />
         <Route path="/alerts" element={<Queue />} />
         <Route path="/alerts/:id" element={<AlertDetail />} />
         <Route path="/assets" element={<Assets />} />

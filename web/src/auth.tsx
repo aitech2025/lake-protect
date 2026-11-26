@@ -70,5 +70,5 @@ export function homeFor(role: string): string {
   if (role === "field_officer") return "/field";
   if (role === "senior_officer") return "/monthly";
   if (role === "auditor") return "/audit";
-  return "/alerts";
+  return "/command";
 }
