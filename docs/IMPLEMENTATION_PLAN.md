@@ -2,7 +2,7 @@
 
 **Branch:** `feature/consolidated`  
 **Plan owner:** Product owner / implementation agent  
-**Baseline commit:** `44448c3004c7505d3501014b1125100a08be5c7d` (after PRs #31–#34)  
+**Baseline commit:** `45aae37c3e6da294f05a922c2618ea95b1603612` (after PRs #31–#35)  
 **Plan created:** 26 November 2026  
 **Status:** Active — Phase 1 started  
 **Source of truth:** `CONTEXT.md`, latest applicable owner decisions in `DECISIONS.md`, current code, and focused design documents.
@@ -96,7 +96,7 @@
 - [ ] P2.1 Map the new registry/ingestion APIs to current UI navigation and data contracts.
 - [ ] P2.2 Complete the statewide registry hierarchy. Existing asset map/list and dashboard drill-down are present; PR #27 adds district → mandal filters. Department/source hierarchy and authoritative master-code mapping remain.
 - [ ] P2.3 Complete Asset 360 integration. Existing page links boundaries/versions, registry links, survey parcels, weekly screens and documents; incident/evidence cross-linking and full source completeness remain.
-- [x] P2.4 Add conservative boundary provenance classes in Asset 360. PR #33 adds source classes, source metadata and authority state; PR #35 separately fixes OSM-vs-generic-derived classification and is awaiting CI/merge.
+- [x] P2.4 Add conservative boundary provenance classes in Asset 360. PR #33 adds source classes, source metadata and authority state; PR #35 fixes OSM-vs-generic-derived classification. Both are merged and CI passed.
 - [ ] P2.5 Add imagery freshness and coverage states, including no usable look and failed processing.
 - [ ] P2.6 Show geospatial screening candidates as review leads; never present MNDWI/radar output as a legal finding.
 - [ ] P2.7 Provide clear provider configuration states: not configured, demo/sample, configured, connected, failed. Do not imply live provider connectivity when credentials are absent.
@@ -356,7 +356,7 @@ No scored detection accuracy claim is authorized by these implementation increme
 | #32 | M3 scorer CRS contract, metric IoU and scoring breakdowns; replay CRS stamping | Merged | Passed |
 | #33 | P2 Asset 360 boundary provenance API/UI and tests | Merged | Passed |
 | #34 | P5 admin-only readiness diagnostics and tests | Merged | Passed |
-| #35 | P2 OSM provenance class correction | Open | API/PostGIS, pipeline and web checks in progress |
+| #35 | P2 OSM provenance class correction | Merged | Passed |
 
 ### What is now implemented
 
@@ -368,7 +368,7 @@ No scored detection accuracy claim is authorized by these implementation increme
 
 ### Immediate next actions
 
-1. Complete PR #35 CI and merge the OSM provenance classification correction.
+1. PR #35 is merged; verify the updated source classes in the Asset 360 demo journey.
 2. Download the existing run5 tuning artifact and run `lp-geo compare-tuning` against the committed run4 candidates; inspect every disappeared/added footprint and diagnostic chip.
 3. Record human review dispositions with reviewer, date and evidence; only then decide whether detect-v2 can be frozen.
 4. Continue the government evidence request for independently verified M3 cases. No scored replay until the manifest and frozen rules are approved.
