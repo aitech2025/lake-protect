@@ -312,7 +312,24 @@
     "filter_mandal": "మండలం",
     "all_mandals": "అన్ని మండలాలు",
     "clear_area_filters": "ప్రాంత ఫిల్టర్లను తొలగించండి",
-    "boundary_source": "హద్దు మూలం"
+    "boundary_source": "హద్దు మూలం",
+    "provenance": "హద్దు మూల వివరాలు",
+    "provenance_date": "మూల తేదీ: {{date}}",
+    "provenance_reference": "రిఫరెన్స్: {{ref}}",
+    "authority_confirmed": "అధికారిక రిఫరెన్స్ నమోదు అయింది",
+    "authority_unconfirmed": "అధికారికత నిర్ధారించలేదు",
+    "provenance_incomplete": "మూల వివరాలు పూర్తిగా లేవు; ఈ హద్దును నిర్ధారించనిదిగా పరిగణించండి.",
+    "provenance_class": {
+      "official_record": "శాఖ నోటిఫికేషన్ రికార్డు",
+      "imported_file": "దిగుమతి చేసిన ఫైల్",
+      "provider_api": "ప్రొవైడర్ API",
+      "imported_source": "దిగుమతి చేసిన మూలం",
+      "osm_derived": "OpenStreetMap ఆధారితం",
+      "user_drawn": "వినియోగదారు గీసినది",
+      "derived_unverified": "ఉత్పన్నమైనది / నిర్ధారించనిది",
+      "demo_sample": "డెమో నమూనా",
+      "unclassified": "వర్గీకరించని మూలం"
+    }
   },
   "records": {
     "title": "రికార్డులు",
