@@ -107,7 +107,7 @@ def handle(db: Session, wa_id: str, message: dict, *, at: dt.datetime, is_demo: 
     kind = message.get("type")
     body = (message.get("text") or "").strip()
     _log(db, chat, "in", body if kind == "text" else f"[{kind}]", at, provider_message_id=provider_id)
-    replies = _step(db, chat, wa_id, kind, body, message, at)
+    replies = _step(db, chat, wa_id, kind, body, message, at, is_demo=is_demo)
     chat.updated_at = at
     for r in replies:
         result = sender.send_whatsapp(f"+{wa_id}", r, in_session=True, template_name=None, params=[], language=chat.language or "en",
@@ -116,7 +116,7 @@ def handle(db: Session, wa_id: str, message: dict, *, at: dt.datetime, is_demo: 
     return replies
 
 
-def _step(db: Session, chat: CitizenChat, wa_id: str, kind: str | None, body: str, message: dict, at: dt.datetime) -> list[str]:
+def _step(db: Session, chat: CitizenChat, wa_id: str, kind: str | None, body: str, message: dict, at: dt.datetime, *, is_demo: bool = False) -> list[str]:
     lang = chat.language or "en"
     word = body.lower()
     found = service.REF_RE.search(body.upper()) if kind == "text" else None
