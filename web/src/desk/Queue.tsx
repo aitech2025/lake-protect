@@ -23,17 +23,31 @@ export function Queue() {
   const [filter, setFilter] = useState<Filter>(linked.length ? "all" : "active");
   const [change, setChange] = useState("");
   const [cohort, setCohort] = useState("");
+  const [landTab, setLandTab] = useState<"all" | "lakes" | "lands">("all");
+  const [district, setDistrict] = useState("");
+  const [mandal, setMandal] = useState("");
+  const [village, setVillage] = useState("");
+  const areas = useAsync(() => api<{ features: any[] }>("/assets"), []);
   const { data, error, status, reload } = useAsync(() => api<{ items: AlertRow[] }>(`/alerts${linkedQuery.replace(/^&/, "?")}`), [linkedQuery]);
   usePageTitle(t("queue.title"));
 
   const items = useMemo(() => {
     let rows = data?.items ?? [];
+    const areaRows = areas.data?.features ?? [];
+    const allowedIds = new Set(areaRows.filter((a) => (!district || a.properties.district === district) && (!mandal || a.properties.mandal === mandal) && (!village || a.properties.village === village) && (landTab === "all" || (landTab === "lakes" ? a.properties.category === "water_body" : a.properties.category !== "water_body"))).map((a) => a.id));
+    rows = rows.filter((r) => allowedIds.has(r.asset_id) && (landTab === "all" || (landTab === "lakes" ? r.asset_type === "lake" : r.asset_type !== "lake")));
     if (filter === "active") rows = rows.filter((r) => r.state !== "CLOSED");
     else if (filter !== "all") rows = rows.filter((r) => r.state === filter);
     if (change) rows = rows.filter((r) => (change === "building" ? ["building", "small_structure"].includes(r.change_type) : r.change_type === change));
     if (cohort) rows = rows.filter((r) => r.cohort === cohort);
     return rows;
-  }, [data, filter, change, cohort]);
+  }, [data, areas.data, filter, change, cohort, landTab, district, mandal, village]);
+
+  const areaFeatures = areas.data?.features ?? [];
+  const matchesTab = (a: any) => landTab === "all" || (landTab === "lakes" ? a.properties.category === "water_body" : a.properties.category !== "water_body");
+  const districts = Array.from(new Set(areaFeatures.filter(matchesTab).map((a) => a.properties.district).filter(Boolean))).sort();
+  const mandals = Array.from(new Set(areaFeatures.filter((a) => (!district || a.properties.district === district) && matchesTab(a)).map((a) => a.properties.mandal).filter(Boolean))).sort();
+  const villages = Array.from(new Set(areaFeatures.filter((a) => (!district || a.properties.district === district) && (!mandal || a.properties.mandal === mandal) && matchesTab(a)).map((a) => a.properties.village).filter(Boolean))).sort();
 
   const pins: Pin[] = useMemo(
     () =>
@@ -85,6 +99,14 @@ export function Queue() {
         </p>
       )}
       <ScreeningSummary />
+      <div className="chips incident-tabs" role="tablist" aria-label={t("queue.land_group")}>
+        {(["all", "lakes", "lands"] as const).map((k) => <button key={k} type="button" role="tab" aria-selected={landTab === k} className="chip" aria-pressed={landTab === k} onClick={() => { setLandTab(k); setDistrict(""); setMandal(""); setVillage(""); }}>{t(k === "all" ? "group.all" : `assets.tab.${k}`)}</button>)}
+      </div>
+      <section className="section incident-area-filters" aria-label={t("assets.registry_filters")}>
+        <label className="field">{t("assets.filter_district")}<select value={district} onChange={(e) => { setDistrict(e.target.value); setMandal(""); setVillage(""); }}><option value="">{t("assets.all_districts")}</option>{districts.map((d) => <option key={d}>{d}</option>)}</select></label>
+        <label className="field">{t("assets.filter_mandal")}<select value={mandal} disabled={!mandals.length} onChange={(e) => { setMandal(e.target.value); setVillage(""); }}><option value="">{t("assets.all_mandals")}</option>{mandals.map((m) => <option key={m}>{m}</option>)}</select></label>
+        <label className="field">{t("assets.filter_village")}<select value={village} disabled={!villages.length} onChange={(e) => setVillage(e.target.value)}><option value="">{t("assets.all_villages")}</option>{villages.map((v) => <option key={v}>{v}</option>)}</select></label>
+      </section>
       <div className="chips" role="group" aria-label={t("queue.state")} style={{ marginBottom: "1rem" }}>
         {FILTERS.map((f) => (
           <button key={f} className="chip" aria-pressed={filter === f} onClick={() => setFilter(f)} data-testid={`group-${f}`}>

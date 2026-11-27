@@ -200,7 +200,7 @@ export function AlertDetail() {
                 <dt>{t("detail.confidence")}</dt>
                 <dd>{Math.round(cand.confidence * 100)}%</dd>
                 <dt>{t("incident.documents")}</dt>
-                <dd><Link to={`/assets?asset=${a.asset.id}`}>{t("incident.documents_count", { count: a.asset.documents })}</Link></dd>
+                <dd><Link to={`/assets/${a.asset.id}?tab=documents`}>{t("incident.documents_count", { count: a.asset.documents })}</Link></dd>
               </dl>
             )}
             {lc && <p className="small muted" style={{ marginTop: "0.6rem" }}>{t("detail.rule_version", { v: lc.rule_version })}</p>}

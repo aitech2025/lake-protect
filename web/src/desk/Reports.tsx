@@ -198,7 +198,7 @@ export function ReportDetail() {
           <section className="panel section">
             <dl className="facts">
               <dt>{t("reports.col.place")}</dt>
-              <dd>{placeLabel(r, t, lang)}{r.asset_id && <> · <Link to={`/assets?asset=${r.asset_id}`}>{t("reports.open_location")}</Link></>}
+              <dd>{placeLabel(r, t, lang)}{r.asset_id && <> · <Link to={`/assets/${r.asset_id}`}>{t("reports.open_location")}</Link></>}
                 {r.location_text && <div className="small muted">{r.location_text}</div>}</dd>
               {r.source_ref && <><dt>{t("reports.intake_source_ref")}</dt><dd>{r.source_ref}</dd></>}
             </dl>

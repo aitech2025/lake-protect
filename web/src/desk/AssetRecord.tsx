@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { API_BASE, api, authHeaders, fmtDate } from "../api";
+import { API_BASE, api, authHeaders, fmtDate, fmtDateTime } from "../api";
 import { isAdmin, useAuth } from "../auth";
 import { AuthImage, StatePill, useAsync } from "../components/Bits";
 import { TableRegion } from "../components/PageState";
@@ -15,7 +15,14 @@ const DOC_TYPES = ["notification", "survey_map", "land_record", "government_orde
  */
 export function WeeklyRecord({ assetId }: { assetId: number }) {
   const { t, i18n } = useTranslation();
-  const { data } = useAsync(() => api<{ items: any[] }>(`/assets/${assetId}/weeks?limit=12`), [assetId]);
+  const { data } = useAsync(() => api<{ items: any[] }>(`/assets/${assetId}/weeks?limit=260`), [assetId]);
+  const [showArchive, setShowArchive] = useState(false);
+  const { active, archive } = useMemo(() => {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 60);
+    const items = data?.items ?? [];
+    return { active: items.filter((w) => new Date(w.as_of) >= cutoff), archive: items.filter((w) => new Date(w.as_of) < cutoff) };
+  }, [data]);
   if (!data) return null;
   return (
     <section className="section" data-testid="weekly-record">
@@ -23,7 +30,7 @@ export function WeeklyRecord({ assetId }: { assetId: number }) {
       <p className="muted small" style={{ marginBottom: "0.6rem" }}>{t("weeks.lede")}</p>
       {data.items.length === 0 && <p className="muted">{t("weeks.none")}</p>}
       <ol className="week-strip">
-        {data.items.map((w) => (
+        {active.map((w) => (
           <li key={w.screen_id} className={`week ${w.changed ? "changed" : ""} ${w.status}`} data-testid={`week-${w.week}`} data-status={w.status}>
             <div className="week-head">
               <b>{t("weeks.week", { week: w.week.split("-W")[1], year: w.week.split("-W")[0] })}</b>
@@ -49,6 +56,18 @@ export function WeeklyRecord({ assetId }: { assetId: number }) {
           </li>
         ))}
       </ol>
+      {archive.length > 0 && <details className="week-archive" open={showArchive} onToggle={(e) => setShowArchive((e.currentTarget as HTMLDetailsElement).open)}>
+        <summary>{t("weeks.archive", { count: archive.length })}</summary>
+        <ol className="week-strip archived-weeks">
+          {archive.map((w) => (
+            <li key={w.screen_id} className={`week ${w.changed ? "changed" : ""} ${w.status}`} data-testid={`week-${w.week}`} data-status={w.status}>
+              <div className="week-head"><b>{t("weeks.week", { week: w.week.split("-W")[1], year: w.week.split("-W")[0] })}</b><span>{t(`weeks.status.${w.status}`)}</span></div>
+              {w.has_image ? <AuthImage frame path={`/assets/${assetId}/weeks/${w.screen_id}/image`} alt={t("weeks.image_alt", { week: w.week })} /> : <div className="week-noimage">{t("weeks.no_image")}</div>}
+              <span className="small muted">{w.image_date ? t("weeks.look", { date: fmtDate(w.image_date, i18n.language) }) : t("weeks.as_of", { date: fmtDate(w.as_of, i18n.language) })}</span>
+            </li>
+          ))}
+        </ol>
+      </details>}
     </section>
   );
 }
@@ -98,6 +117,56 @@ export function Documents({ assetId }: { assetId: number }) {
         </TableRegion>
       )}
       {isAdmin(user) && <AddDocument assetId={assetId} onDone={reload} />}
+    </section>
+  );
+}
+
+/** Append-only field visit history and evidence for Asset 360. */
+export function Inspections({ assetId }: { assetId: number }) {
+  const { t, i18n } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [outcome, setOutcome] = useState("confirmed");
+  const [alertId, setAlertId] = useState("");
+  const [notes, setNotes] = useState("");
+  const [position, setPosition] = useState<[number, number] | null>(null);
+  const [photos, setPhotos] = useState<FileList | null>(null);
+  const { data, reload } = useAsync(() => api<{ items: any[] }>(`/assets/${assetId}/inspections`), [assetId]);
+  const submit = async (e: FormEvent) => {
+    e.preventDefault(); setSaving(true); setMessage(null);
+    const body = new FormData();
+    body.append("outcome", outcome); body.append("notes", notes); body.append("observed_at", new Date().toISOString());
+    if (alertId) body.append("alert_id", alertId);
+    if (position) { body.append("lat", String(position[0])); body.append("lon", String(position[1])); }
+    Array.from(photos ?? []).slice(0, 5).forEach((file) => body.append("photos", file));
+    try {
+      await api(`/assets/${assetId}/inspections`, { method: "POST", body });
+      setMessage(t("inspection.saved")); setNotes(""); setPhotos(null); setAlertId(""); setPosition(null); setOpen(false); reload();
+    } catch (err) { setMessage((err as Error).message); }
+    finally { setSaving(false); }
+  };
+  const capture = () => navigator.geolocation?.getCurrentPosition((p) => setPosition([p.coords.latitude, p.coords.longitude]), () => setMessage(t("inspection.gps_error")), { enableHighAccuracy: true, timeout: 10000 });
+  return (
+    <section className="section panel" data-testid="asset-inspections">
+      <div className="person-head"><div><h2 className="title-s">{t("inspection.title")}</h2><p className="small muted">{t("inspection.lede")}</p></div>
+        {!open && <button type="button" className="btn secondary" onClick={() => setOpen(true)}>{t("inspection.add")}</button>}
+      </div>
+      {message && <p className="banner info" role="status">{message}</p>}
+      {open && <form className="action inspection-form" onSubmit={(e) => void submit(e)}>
+        <label className="field">{t("field.outcome")}<select value={outcome} onChange={(e) => setOutcome(e.target.value)}>{["confirmed", "false_alarm", "cannot_access"].map((v) => <option key={v} value={v}>{t(`field.outcome_${v}`)}</option>)}</select></label>
+        <label className="field">{t("inspection.incident")}<input type="number" min="1" value={alertId} onChange={(e) => setAlertId(e.target.value)} placeholder={t("inspection.incident_optional")} /></label>
+        <label className="field">{t("field.notes")}<textarea required minLength={3} maxLength={5000} rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} /></label>
+        <div className="inspection-gps"><button type="button" className="btn quiet" onClick={capture}>{t("field.get_gps")}</button><span className="small muted">{position ? `${position[0].toFixed(5)}, ${position[1].toFixed(5)}` : t("inspection.gps_optional")}</span></div>
+        <label className="field">{t("inspection.photos")}<input type="file" accept="image/jpeg,image/png,image/webp" capture="environment" multiple onChange={(e) => setPhotos(e.target.files)} /></label>
+        <div className="person-foot"><button className="btn" type="submit" disabled={saving || notes.trim().length < 3}>{saving ? t("inspection.saving") : t("inspection.save")}</button><button className="btn secondary" type="button" onClick={() => setOpen(false)}>{t("action.cancel")}</button></div>
+      </form>}
+      {!data?.items.length ? <p className="muted">{t("inspection.empty")}</p> : <ol className="inspection-list">{data.items.map((v) => <li key={v.id}>
+        <div className="person-head"><b>{t(`field.outcome_${v.outcome}`)}</b><span className="small muted">{fmtDateTime(v.observed_at, i18n.language)} · {v.inspector}</span></div>
+        {v.alert_code && <Link to={`/alerts/${v.alert_id}`}>{v.alert_code}</Link>}<p>{v.notes}</p>
+        {v.lat != null && <span className="small muted">{v.lat.toFixed(5)}, {v.lon.toFixed(5)}</span>}
+        {!!v.photos && <div className="report-photos">{Array.from({ length: v.photos }, (_, i) => <AuthImage key={i} path={`/assets/${assetId}/inspections/${v.id}/photos/${i + 1}`} alt={`${t("inspection.photo_alt")} ${i + 1}`} className="report-photo" />)}</div>}
+      </li>)}</ol>}
     </section>
   );
 }

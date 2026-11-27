@@ -22,3 +22,14 @@
 .overdue-list li b { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
 @media (max-width: 1000px) { .figures { grid-template-columns: repeat(2, 1fr); } .monthly-grid { grid-template-columns: 1fr; } }
 @media print { .page-head .btn, .chips { display: none; } }
+.monthly .page-head { padding:1.25rem 1.4rem; margin-bottom:1.15rem; border-radius:18px; background:linear-gradient(120deg,#eaf4f0,#f3f6f2 58%,#eaf1f5); border:1px solid #d9e5dd; }
+.monthly .figures { gap:.8rem; margin-bottom:1.25rem; }
+.monthly .figure { min-height:130px; padding:1rem; border:1px solid var(--rule); border-top:3px solid #437b66; border-radius:14px; background:var(--sheet); box-shadow:0 5px 18px rgba(18,48,39,.05); }
+.monthly .figure b { font-size:clamp(2rem,3vw,2.65rem); color:#174f3e; }
+.monthly .figure.late { border-top-color:#b64c3a; background:#fff6f3; }
+.monthly .figure.late b { color:#a33728; }
+.monthly-grid { gap:1.4rem; }
+.monthly-map { padding:.8rem; border-radius:16px; box-shadow:0 8px 28px rgba(18,48,39,.07); }
+.monthly-legend { gap:.65rem 1.2rem; padding:.9rem .3rem .3rem; }
+.monthly .who-list li,.monthly .overdue-list li { padding:.7rem .25rem; }
+@media(max-width:1000px) { .monthly .figures { grid-template-columns:repeat(2,minmax(0,1fr)); } }

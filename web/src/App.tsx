@@ -5,8 +5,10 @@ import { Layout } from "./components/Layout";
 import { AlertDetail } from "./desk/AlertDetail";
 import { CitizenOperations } from "./desk/CitizenOperations";
 import { Assets } from "./desk/Assets";
+import { Asset360 } from "./desk/Asset360";
 import { Audit } from "./desk/Audit";
 import { Dashboard } from "./desk/Dashboard";
+import { MapPage } from "./desk/MapPage";
 import { Inbox } from "./desk/Inbox";
 import { Login } from "./desk/Login";
 import { Officials } from "./desk/Officials";
@@ -40,6 +42,7 @@ export function App() {
       <Route path="/report/track/:ref" element={<TrackPage />} />
       <Route element={<RequireUser><Layout /></RequireUser>}>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/map" element={<MapPage />} />
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/officials" element={<Officials />} />
         <Route path="/alerts" element={<Queue />} />
@@ -47,6 +50,7 @@ export function App() {
         <Route path="/reports" element={<Reports />} />
         <Route path="/reports/:id" element={<ReportDetail />} />
         <Route path="/assets" element={<Assets />} />
+        <Route path="/assets/:id" element={<Asset360 />} />
         <Route path="/records" element={<Records />} />
         <Route path="/sources" element={<Sources />} />
         <Route path="/audit" element={<Audit />} />

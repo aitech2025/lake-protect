@@ -277,6 +277,23 @@ class FieldCheck(Base):
     synced_at: Mapped[dt.datetime] = mapped_column(TZ)
 
 
+class AssetInspection(Base):
+    """Append-only field visit evidence attached directly to an asset."""
+    __tablename__ = "asset_inspections"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    asset_id: Mapped[int] = mapped_column(ForeignKey("assets.id"))
+    alert_id: Mapped[int | None] = mapped_column(ForeignKey("alerts.id"))
+    inspector_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    observed_at: Mapped[dt.datetime] = mapped_column(TZ)
+    lat: Mapped[float | None]
+    lon: Mapped[float | None]
+    outcome: Mapped[str] = mapped_column(FIELD_OUTCOME)
+    notes: Mapped[str] = mapped_column(Text)
+    photo_paths: Mapped[list[str]] = mapped_column(ARRAY(Text), default=list)
+    photo_sha256: Mapped[list[str]] = mapped_column(ARRAY(Text), default=list)
+    created_at: Mapped[dt.datetime] = mapped_column(TZ, default=lambda: dt.datetime.now(dt.timezone.utc))
+
+
 class OwnerClaim(Base):
     __tablename__ = "owner_claims"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)

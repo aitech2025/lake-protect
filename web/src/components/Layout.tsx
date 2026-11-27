@@ -8,6 +8,7 @@ import { useAuth } from "../auth";
 const BOTH = ["admin", "viewer"];
 const NAV: { to: string; key: string; roles: string[]; icon: string }[] = [
   { to: "/dashboard", key: "nav.dashboard", roles: BOTH, icon: "dashboard" },
+  { to: "/map", key: "nav.map", roles: BOTH, icon: "map" },
   { to: "/inbox", key: "nav.inbox", roles: BOTH, icon: "inbox" },
   { to: "/alerts", key: "nav.queue", roles: BOTH, icon: "review" },
   { to: "/reports", key: "nav.reports", roles: BOTH, icon: "reports" },
@@ -23,7 +24,7 @@ const NAV: { to: string; key: string; roles: string[]; icon: string }[] = [
 ];
 
 const GROUPS = [
-  { label: "Workspace", labelTe: "పని ప్రదేశం", items: ["/dashboard", "/inbox"] },
+  { label: "Workspace", labelTe: "పని ప్రదేశం", items: ["/dashboard", "/map", "/inbox"] },
   { label: "Review & records", labelTe: "సమీక్ష & రికార్డులు", items: ["/alerts", "/reports", "/assets", "/records"] },
   { label: "Data & oversight", labelTe: "డేటా & పర్యవేక్షణ", items: ["/sources", "/satellites", "/monthly", "/audit"] },
   { label: "Administration", labelTe: "నిర్వహణ", items: ["/officials", "/whatsapp-test", "/citizen-operations"] },
@@ -31,6 +32,7 @@ const GROUPS = [
 
 const ICON_PATH: Record<string, string> = {
   dashboard: "M3 3h7v7H3z M14 3h7v4h-7z M14 10h7v11h-7z M3 14h7v7H3z",
+  map: "M3 6 8 3l8 3 5-3v15l-5 3-8-3-5 3z M8 3v15 M16 6v15",
   inbox: "M4 4h16v12h-5l-3 4-3-4H4z M8 10h8",
   review: "M4 5h16v14H4z M8 9h8 M8 13h5",
   reports: "M5 3h14v18H5z M8 8h8 M8 12h8 M8 16h5",

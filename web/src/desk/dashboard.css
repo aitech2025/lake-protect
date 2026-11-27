@@ -27,3 +27,55 @@
   .dash-grid { grid-template-columns: 1fr; }
 }
 .by-kind { margin: -0.25rem 0 0.6rem; color: var(--ink-2); }
+.dash-figures { grid-template-columns: repeat(4,minmax(0,1fr)); gap:.85rem; margin: .2rem 0 1.15rem; }
+.dash-figure { min-height: 122px; padding:1rem 1.05rem; border:1px solid transparent; border-radius:16px; box-shadow:0 6px 18px rgba(20,48,39,.06); transition:transform .16s ease,box-shadow .16s ease; }
+.dash-figure.link { color:var(--ink); }
+.dash-figure.link:hover { transform:translateY(-2px); box-shadow:0 12px 26px rgba(20,48,39,.13); }
+.dash-figure.link span { color:var(--ink-2); text-decoration:none; }
+.dash-figure b { font-size:clamp(1.75rem,2.4vw,2.3rem); }
+.metric-assets { background:#eaf4f0; border-color:#b9d7c9; }
+.metric-clear_look { background:#eaf3f8; border-color:#c2dce9; }
+.metric-changed,.metric-new_incidents { background:#fff5df; border-color:#efd49a; }
+.metric-open,.metric-waiting { background:#fff0ec; border-color:#ecc2b7; }
+.metric-under_review,.metric-ack { background:#f0effb; border-color:#d2cdee; }
+.metric-confirmed { background:#eaf4e9; border-color:#c6dfc2; }
+.asset-tabs,.incident-tabs { margin: .5rem 0 1rem; }
+.asset-map { min-height:520px; }
+.incident-area-filters { display:flex; flex-wrap:wrap; gap:1rem; align-items:end; padding:1rem; background:var(--surface-sunken); border-radius:14px; }
+.incident-area-filters .field { min-width:min(220px,100%); }
+.records-asset-documents { margin:1rem 0 1.5rem; padding:1.1rem; }
+.records-asset-documents .field { min-width:min(380px,100%); }
+.full-map-page { height:calc(100dvh - 1.75rem); display:flex; flex-direction:column; gap:.75rem; }
+.full-map-head { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+.full-map-head h1,.full-map-head p { margin:.1rem 0; }
+.full-map-head .eyebrow { font-size:.68rem; letter-spacing:.14em; font-weight:750; }
+.full-map-frame { flex:1; min-height:420px; border-radius:18px; overflow:hidden; border:1px solid var(--rule); box-shadow:0 12px 36px rgba(18,48,39,.12); }
+@media(max-width:1000px) { .dash-figures { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:540px) { .dash-figures { grid-template-columns:1fr; } .incident-area-filters { display:grid; grid-template-columns:1fr; } .full-map-page { height:calc(100dvh - 1rem); } }
+.week-archive { margin-top:.9rem; padding:.8rem 1rem; border:1px solid var(--rule); border-radius:12px; background:var(--surface-sunken); }
+.week-archive summary { cursor:pointer; color:var(--ink-2); font-weight:650; }
+.archived-weeks { margin-top:.75rem; opacity:.9; }
+.inspection-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem; margin:1rem 0; }
+.inspection-form .field:nth-child(3),.inspection-form .inspection-gps,.inspection-form .person-foot { grid-column:1/-1; }
+.inspection-gps { display:flex; align-items:center; gap:.75rem; }
+.inspection-list { list-style:none; margin:.75rem 0 0; padding:0; }
+.inspection-list li { padding:1rem 0; border-top:1px solid var(--rule); }
+.inspection-list p { white-space:pre-wrap; }
+@media(max-width:640px) { .inspection-form { grid-template-columns:1fr; } .inspection-form>* { grid-column:1/-1; } }
+.asset360-head { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1.25rem 1.4rem; border-radius:18px; background:linear-gradient(125deg,#eaf4f0,#f4f6f2 62%,#eaf1f5); border:1px solid #d8e5dc; }
+.asset360-head h1 { margin:.15rem 0; }
+.asset360-head p { margin:.2rem 0; }
+.asset360-head .eyebrow { font-size:.68rem; letter-spacing:.14em; font-weight:750; color:var(--ink-3); }
+.asset360-badges { display:flex; gap:.65rem; align-items:center; flex-wrap:wrap; }
+.asset360-tabs { display:flex; flex-wrap:wrap; gap:.5rem; margin:1rem 0; padding-bottom:.7rem; border-bottom:1px solid var(--rule); }
+.asset360-tabs .chip.active { color:#fff; background:#175b48; border-color:#175b48; }
+.asset360-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.75rem; margin:1rem 0; }
+.asset360-summary>div { display:grid; gap:.25rem; padding:1rem; border-radius:14px; border:1px solid var(--rule); background:var(--sheet); }
+.asset360-summary span { color:var(--ink-2); font-size:var(--step--1); }
+.asset360-summary b { font-size:1.1rem; }
+.asset360-overview-grid { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr); gap:1rem; }
+.asset360-incident-list { list-style:none; margin:0; padding:0; }
+.asset360-incident-list li { display:flex; align-items:center; gap:.75rem; padding:.75rem 0; border-top:1px solid var(--rule); }
+.asset360-incident-list li .small { margin-left:auto; }
+@media(max-width:900px) { .asset360-overview-grid { grid-template-columns:1fr; } }
+@media(max-width:600px) { .asset360-head { align-items:flex-start; flex-direction:column; } .asset360-summary { grid-template-columns:repeat(2,minmax(0,1fr)); } .asset360-incident-list li { align-items:flex-start; flex-wrap:wrap; } .asset360-incident-list li .small { margin-left:0; } }

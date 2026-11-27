@@ -58,7 +58,7 @@ export function Dashboard() {
         label: `${lang === "te" && p.name_te ? p.name_te : p.name}: ${t(`dashboard.tone.${p.tone}`)}`,
         // Only the places waiting longest carry a name on the map; the legend explains the colours.
         big: p.tone === "waiting",
-        onClick: () => nav(`/assets?asset=${p.asset_id}`),
+        onClick: () => nav(`/assets/${p.asset_id}`),
       })),
     [data, lang, nav, t],
   );
@@ -118,7 +118,7 @@ export function Dashboard() {
             </div>
             <Trend data={data} />
           </div>
-          <Children data={data} onOpen={(row) => (row.kind === "asset" ? nav(`/assets?asset=${row.asset_id}`) : go(row.params))} />
+          <Children data={data} onOpen={(row) => (row.kind === "asset" ? nav(`/assets/${row.asset_id}`) : go(row.params))} />
         </>
       )}
     </div>
@@ -129,15 +129,15 @@ function FigureRow({ f, area, week }: { f: Figures; area: Record<string, string>
   const { t } = useTranslation();
   const ack = f.ack_considered ? Math.round((100 * f.ack_on_time) / f.ack_considered) : null;
   const tiles: { k: string; n: number | string; to?: string; tone?: Tone; small?: string }[] = [
-    { k: "assets", n: f.assets, small: t("dashboard.boundary", { n: f.boundary_confirmed, total: f.assets }) },
-    { k: "clear_look", n: f.clear_look, small: f.no_clear_look ? t("dashboard.no_clear_look", { n: f.no_clear_look }) : undefined },
-    { k: "changed", n: f.changed },
+    { k: "assets", n: f.assets, to: `/assets${query(area)}`, small: t("dashboard.boundary", { n: f.boundary_confirmed, total: f.assets }) },
+    { k: "clear_look", n: f.clear_look, to: `/map${query(area)}`, small: f.no_clear_look ? t("dashboard.no_clear_look", { n: f.no_clear_look }) : undefined },
+    { k: "changed", n: f.changed, to: incidentsLink(area, week ? { week } : {}) },
     { k: "new_incidents", n: f.new_incidents, to: week ? incidentsLink(area, { week }) : undefined },
     { k: "open", n: f.open, to: incidentsLink(area, { state: "OPEN" }), tone: f.open ? "open" : undefined },
     { k: "under_review", n: f.under_review, to: incidentsLink(area, { state: "UNDER_REVIEW" }) },
     { k: "waiting", n: f.waiting, to: incidentsLink(area, { waiting: "true" }), tone: f.waiting ? "waiting" : undefined },
     { k: "confirmed", n: f.confirmed, to: incidentsLink(area, { state: "CONFIRMED" }) },
-    { k: "ack", n: ack === null ? "–" : `${ack}%`, small: ack === null ? t("dashboard.ack_none") : t("dashboard.ack_of", { n: f.ack_on_time, total: f.ack_considered }) },
+    { k: "ack", n: ack === null ? "–" : `${ack}%`, to: "/inbox", small: ack === null ? t("dashboard.ack_none") : t("dashboard.ack_of", { n: f.ack_on_time, total: f.ack_considered }) },
   ];
   return (
     <div className="dash-figures" data-testid="dash-figures">
@@ -149,11 +149,7 @@ function FigureRow({ f, area, week }: { f: Figures; area: Record<string, string>
             {x.small && <small>{x.small}</small>}
           </>
         );
-        return x.to ? (
-          <Link key={x.k} to={x.to} className="dash-figure link" data-testid={`fig-${x.k}`}>{body}</Link>
-        ) : (
-          <div key={x.k} className="dash-figure" data-testid={`fig-${x.k}`}>{body}</div>
-        );
+        return <Link key={x.k} to={x.to ?? "/map"} className={`dash-figure link metric-${x.k}`} data-testid={`fig-${x.k}`}>{body}</Link>;
       })}
     </div>
   );

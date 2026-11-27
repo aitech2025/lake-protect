@@ -33,7 +33,7 @@ const STYLE: maplibregl.StyleSpecification = {
         tileSize: 256,
         minzoom: 9,
         maxzoom: 14,
-        attribution: "Contains modified Copernicus Sentinel data · Lake outlines © OpenStreetMap contributors",
+        attribution: "",
       },
     },
     layers: [

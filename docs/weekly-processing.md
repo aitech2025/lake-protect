@@ -37,6 +37,7 @@ POST /pipeline/runs: one row per asset per week, with that week's image and the 
   - the changes, each with the incident ingest gave it.
 - **No clear look is never "no change".** The record says "no change seen" only when there was a clear look.
 - **Older reports.** `lp replay` resends a saved screen with its images. A report saved before M12 has no images; the API then finds its changes by time.
+- **Image retention.** The most recent 60 days of per-asset weekly images use the active `weeks/` namespace and `lp_storage` volume. Older images use `archive/weeks/` and the separate durable `lp_archive` volume; their recorded object keys keep the history links working. This is a separate local archive volume, not a remote cold-storage tier.
 
 **What changed, in the words officials use.**
 

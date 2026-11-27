@@ -1,0 +1,3127 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.26280083162891,
+        17.527562945746478
+       ],
+       [
+        78.26280489662055,
+        17.52729208460525
+       ],
+       [
+        78.26261668438512,
+        17.527289484523802
+       ],
+       [
+        78.26261261911482,
+        17.527560345622323
+       ],
+       [
+        78.26280083162891,
+        17.527562945746478
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.26251851286993,
+        17.527559045493394
+       ],
+       [
+        78.26251715771717,
+        17.52764933251727
+       ],
+       [
+        78.26242305143394,
+        17.52764803233665
+       ],
+       [
+        78.26242169622665,
+        17.527738319352487
+       ],
+       [
+        78.26251580255634,
+        17.52773961954022
+       ],
+       [
+        78.26251444738737,
+        17.52782990656225
+       ],
+       [
+        78.2626085537716,
+        17.527831206712538
+       ],
+       [
+        78.26261261911482,
+        17.527560345622323
+       ],
+       [
+        78.26251851286993,
+        17.527559045493394
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 7,
+    "asset_key": "osm-way-115771999",
+    "change_type": "clearing",
+    "stage_estimate": "land_levelled",
+    "last_clear_at": "2026-05-12",
+    "first_changed_at": "2026-05-17",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260512T052201_L2A",
+      "acquired_at": "2026-05-12T05:23:59.180000+00:00",
+      "cloud_pct": 0.0,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260512T052201_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260517T052338_L2A",
+      "acquired_at": "2026-05-17T05:24:01.912000+00:00",
+      "cloud_pct": 44.54,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260517T052338_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260601T051356_L2A",
+      "acquired_at": "2026-06-01T05:23:58.072000+00:00",
+      "cloud_pct": 11.84,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260601T051356_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260606T052340_L2A",
+      "acquired_at": "2026-06-06T05:24:01.324000+00:00",
+      "cloud_pct": 16.77,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260606T052340_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260616T051534_L2A",
+      "acquired_at": "2026-06-16T05:24:02.261000+00:00",
+      "cloud_pct": 1.19,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260616T051534_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260919T051841_L2A",
+      "acquired_at": "2026-09-19T05:24:01.132000+00:00",
+      "cloud_pct": 44.41,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260919T051841_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.8,
+    "rule_version": "detect-v2",
+    "flags": [],
+    "area_growth": 0.0,
+    "area_sq_m": 1000.0,
+    "looks_changed": 5,
+    "latest_changed_at": "2026-09-19",
+    "asset_name": "PATANCHERU CHERUVU",
+    "before_chip": "chips/osm-way-115771999_1_before.png",
+    "after_chip": "chips/osm-way-115771999_1_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.34536380481971,
+        17.487865754815978
+       ],
+       [
+        78.34536511581473,
+        17.487775461248994
+       ],
+       [
+        78.34527102362048,
+        17.487774203162182
+       ],
+       [
+        78.34527233465397,
+        17.487683909601177
+       ],
+       [
+        78.34517824251392,
+        17.487682651476796
+       ],
+       [
+        78.3451795535859,
+        17.487592357921784
+       ],
+       [
+        78.34508546150003,
+        17.487591099759833
+       ],
+       [
+        78.34508677261049,
+        17.487500806210807
+       ],
+       [
+        78.34527495669741,
+        17.487503322476442
+       ],
+       [
+        78.34527364567963,
+        17.48759361603927
+       ],
+       [
+        78.34546182989061,
+        17.487596132140823
+       ],
+       [
+        78.34546051895765,
+        17.48768642571653
+       ],
+       [
+        78.34564870329271,
+        17.487688941654003
+       ],
+       [
+        78.34564739244456,
+        17.48777923524261
+       ],
+       [
+        78.3457414846702,
+        17.487780493151533
+       ],
+       [
+        78.34574017386053,
+        17.487870786746118
+       ],
+       [
+        78.34555198932442,
+        17.48786827087
+       ],
+       [
+        78.34555330022677,
+        17.487777977289213
+       ],
+       [
+        78.34545920801682,
+        17.48777671929134
+       ],
+       [
+        78.34545789706814,
+        17.48786701286522
+       ],
+       [
+        78.34536380481971,
+        17.487865754815978
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 13,
+    "asset_key": "osm-way-122444390",
+    "change_type": "clearing",
+    "stage_estimate": "land_levelled",
+    "last_clear_at": "2026-06-16",
+    "first_changed_at": "2026-09-06",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260616T051534_L2A",
+      "acquired_at": "2026-06-16T05:24:02.261000+00:00",
+      "cloud_pct": 1.19,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260616T051534_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2A_T44QKE_20260906T051802_L2A",
+      "acquired_at": "2026-09-06T05:24:17.098000+00:00",
+      "cloud_pct": 31.63,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2A_T44QKE_20260906T051802_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260919T051841_L2A",
+      "acquired_at": "2026-09-19T05:24:01.132000+00:00",
+      "cloud_pct": 44.41,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260919T051841_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.6,
+    "rule_version": "detect-v2",
+    "flags": [],
+    "area_growth": 0.0,
+    "area_sq_m": 1200.0,
+    "looks_changed": 2,
+    "latest_changed_at": "2026-09-19",
+    "asset_name": "Madinaguda Cheruvu",
+    "before_chip": "chips/osm-way-122444390_1_before.png",
+    "after_chip": "chips/osm-way-122444390_1_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.33465171721024,
+        17.49964321244076
+       ],
+       [
+        78.33465435165235,
+        17.499462627096797
+       ],
+       [
+        78.3345602542673,
+        17.499461363121327
+       ],
+       [
+        78.3345615715229,
+        17.49937107045489
+       ],
+       [
+        78.3344674741921,
+        17.499369806441848
+       ],
+       [
+        78.33446879148617,
+        17.499279513781435
+       ],
+       [
+        78.33465698606291,
+        17.499282041749165
+       ],
+       [
+        78.33465830325638,
+        17.499191749073976
+       ],
+       [
+        78.33475240051018,
+        17.49919301298415
+       ],
+       [
+        78.33474844904528,
+        17.499463891027766
+       ],
+       [
+        78.33484254644608,
+        17.499465154914233
+       ],
+       [
+        78.33483991218945,
+        17.49964574028591
+       ],
+       [
+        78.33465171721024,
+        17.49964321244076
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 26,
+    "asset_key": "osm-way-158331211",
+    "change_type": "clearing",
+    "stage_estimate": "land_levelled",
+    "last_clear_at": "2026-05-17",
+    "first_changed_at": "2026-06-01",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260517T052338_L2A",
+      "acquired_at": "2026-05-17T05:24:01.912000+00:00",
+      "cloud_pct": 44.54,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260517T052338_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260601T051356_L2A",
+      "acquired_at": "2026-06-01T05:23:58.072000+00:00",
+      "cloud_pct": 11.84,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260601T051356_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260611T052057_L2A",
+      "acquired_at": "2026-06-11T05:24:00.272000+00:00",
+      "cloud_pct": 3.15,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260611T052057_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260616T051534_L2A",
+      "acquired_at": "2026-06-16T05:24:02.261000+00:00",
+      "cloud_pct": 1.19,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260616T051534_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2A_T44QKE_20260628T051804_L2A",
+      "acquired_at": "2026-06-28T05:24:18.962000+00:00",
+      "cloud_pct": 44.1,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2A_T44QKE_20260628T051804_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260904T052339_L2A",
+      "acquired_at": "2026-09-04T05:24:00.233000+00:00",
+      "cloud_pct": 47.18,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260904T052339_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.8,
+    "rule_version": "detect-v2",
+    "flags": [],
+    "area_growth": 0.0,
+    "area_sq_m": 1000.0,
+    "looks_changed": 5,
+    "latest_changed_at": "2026-09-04",
+    "asset_name": "Gangaram Cheruvu",
+    "before_chip": "chips/osm-way-158331211_1_before.png",
+    "after_chip": "chips/osm-way-158331211_1_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.37853988908769,
+        17.385710493413843
+       ],
+       [
+        78.37854246223539,
+        17.385529899586697
+       ],
+       [
+        78.37873054688772,
+        17.38553237015091
+       ],
+       [
+        78.37873311982038,
+        17.385351776292875
+       ],
+       [
+        78.3788271620661,
+        17.38535301149506
+       ],
+       [
+        78.37882587564967,
+        17.38544330843134
+       ],
+       [
+        78.37891991794915,
+        17.38544454359613
+       ],
+       [
+        78.37892249068221,
+        17.385263949709035
+       ],
+       [
+        78.37882844847478,
+        17.385262714557868
+       ],
+       [
+        78.37882973487575,
+        17.385172417619767
+       ],
+       [
+        78.3790178192063,
+        17.385174887864284
+       ],
+       [
+        78.3790165328974,
+        17.38526518481601
+       ],
+       [
+        78.37911057512031,
+        17.385266419878775
+       ],
+       [
+        78.37910800257133,
+        17.385447013793115
+       ],
+       [
+        78.37901396025637,
+        17.385445778716726
+       ],
+       [
+        78.37901267392425,
+        17.385536075665726
+       ],
+       [
+        78.37910671628524,
+        17.385537310748926
+       ],
+       [
+        78.37910542999143,
+        17.385627607703825
+       ],
+       [
+        78.37891734518513,
+        17.38562513747959
+       ],
+       [
+        78.37891863157101,
+        17.385534840538316
+       ],
+       [
+        78.3788245892255,
+        17.385533605366714
+       ],
+       [
+        78.3788233027936,
+        17.385623902301173
+       ],
+       [
+        78.3787292604098,
+        17.385622667078557
+       ],
+       [
+        78.37872797392413,
+        17.385712964005307
+       ],
+       [
+        78.37853988908769,
+        17.385710493413843
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 28,
+    "asset_key": "osm-way-238310640",
+    "change_type": "clearing",
+    "stage_estimate": "land_levelled",
+    "last_clear_at": "2026-06-28",
+    "first_changed_at": "2026-08-17",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2A_T44QKE_20260628T051804_L2A",
+      "acquired_at": "2026-06-28T05:24:18.962000+00:00",
+      "cloud_pct": 44.1,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2A_T44QKE_20260628T051804_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2A_T44QKE_20260817T051803_L2A",
+      "acquired_at": "2026-08-17T05:24:17.644000+00:00",
+      "cloud_pct": 49.43,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2A_T44QKE_20260817T051803_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260904T052339_L2A",
+      "acquired_at": "2026-09-04T05:24:00.233000+00:00",
+      "cloud_pct": 47.18,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260904T052339_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.6,
+    "rule_version": "detect-v2",
+    "flags": [],
+    "area_growth": 0.0,
+    "area_sq_m": 1700.0,
+    "looks_changed": 2,
+    "latest_changed_at": "2026-09-04",
+    "asset_name": "Pedda Cheruvu",
+    "before_chip": "chips/osm-way-238310640_1_before.png",
+    "after_chip": "chips/osm-way-238310640_1_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.55079601939447,
+        17.49673854454273
+       ],
+       [
+        78.55079843990447,
+        17.496557928547364
+       ],
+       [
+        78.55032788080523,
+        17.496552121332797
+       ],
+       [
+        78.55032909128131,
+        17.49646181336562
+       ],
+       [
+        78.55023497952959,
+        17.496460651795505
+       ],
+       [
+        78.550239821547,
+        17.496099419943242
+       ],
+       [
+        78.55042804468654,
+        17.49610174298798
+       ],
+       [
+        78.5504256238779,
+        17.496282358941396
+       ],
+       [
+        78.55051973555132,
+        17.496283520409722
+       ],
+       [
+        78.55052215626719,
+        17.496102904443564
+       ],
+       [
+        78.55061626785509,
+        17.496104065854627
+       ],
+       [
+        78.55061747815576,
+        17.496013757863828
+       ],
+       [
+        78.5507115897045,
+        17.496014919224
+       ],
+       [
+        78.55071037945024,
+        17.496105227221168
+       ],
+       [
+        78.55089860266226,
+        17.49610754982068
+       ],
+       [
+        78.5508961823175,
+        17.496288165837797
+       ],
+       [
+        78.55080207061509,
+        17.496287004547565
+       ],
+       [
+        78.55080086038546,
+        17.496377312548404
+       ],
+       [
+        78.55089497213427,
+        17.496378473845002
+       ],
+       [
+        78.55089013132884,
+        17.49673970586481
+       ],
+       [
+        78.55079601939447,
+        17.49673854454273
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 31,
+    "asset_key": "osm-way-265159686",
+    "change_type": "clearing",
+    "stage_estimate": "land_levelled",
+    "last_clear_at": "2026-06-16",
+    "first_changed_at": "2026-08-10",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260616T051534_L2A",
+      "acquired_at": "2026-06-16T05:24:02.261000+00:00",
+      "cloud_pct": 1.19,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260616T051534_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260810T051403_L2A",
+      "acquired_at": "2026-08-10T05:24:01.232000+00:00",
+      "cloud_pct": 20.96,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260810T051403_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260904T052339_L2A",
+      "acquired_at": "2026-09-04T05:24:00.233000+00:00",
+      "cloud_pct": 47.18,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260904T052339_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.7,
+    "rule_version": "detect-v2",
+    "flags": [],
+    "area_growth": 0.0,
+    "area_sq_m": 3400.0,
+    "looks_changed": 2,
+    "latest_changed_at": "2026-09-04",
+    "asset_name": "Kapra lake",
+    "before_chip": "chips/osm-way-265159686_1_before.png",
+    "after_chip": "chips/osm-way-265159686_1_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.38209430940375,
+        17.5253818622738
+       ],
+       [
+        78.38209819684255,
+        17.52511097455086
+       ],
+       [
+        78.38219231106238,
+        17.525112217757933
+       ],
+       [
+        78.38219619829206,
+        17.52484133000635
+       ],
+       [
+        78.38200797013887,
+        17.524838843588466
+       ],
+       [
+        78.38200667431049,
+        17.524929139492958
+       ],
+       [
+        78.38191256019905,
+        17.524927896210343
+       ],
+       [
+        78.38190996842611,
+        17.525108488002974
+       ],
+       [
+        78.38172174004069,
+        17.52510600127677
+       ],
+       [
+        78.38172303602394,
+        17.525015705394534
+       ],
+       [
+        78.38181715016633,
+        17.525016948773114
+       ],
+       [
+        78.38182103793022,
+        17.52474606110049
+       ],
+       [
+        78.3817269239272,
+        17.52474481774233
+       ],
+       [
+        78.38172951582396,
+        17.524564225969623
+       ],
+       [
+        78.38201185757755,
+        17.524567955869504
+       ],
+       [
+        78.3820105617724,
+        17.524658251776735
+       ],
+       [
+        78.38210467575222,
+        17.52465949499435
+       ],
+       [
+        78.38210597151091,
+        17.524569199080304
+       ],
+       [
+        78.38220008545203,
+        17.524570442246535
+       ],
+       [
+        78.38219878973979,
+        17.524660738167388
+       ],
+       [
+        78.38229290373509,
+        17.524661981295846
+       ],
+       [
+        78.3822851295777,
+        17.52520375684261
+       ],
+       [
+        78.38219101530366,
+        17.525202513673307
+       ],
+       [
+        78.38218842376295,
+        17.5253831055013
+       ],
+       [
+        78.38209430940375,
+        17.5253818622738
+       ]
+      ],
+      [
+       [
+        78.38191385607391,
+        17.52483760031266
+       ],
+       [
+        78.38200797013887,
+        17.524838843588466
+       ],
+       [
+        78.38200926595951,
+        17.52474854768306
+       ],
+       [
+        78.381915151941,
+        17.524747304414063
+       ],
+       [
+        78.38191385607391,
+        17.52483760031266
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 40,
+    "asset_key": "osm-way-274497491",
+    "change_type": "clearing",
+    "stage_estimate": "land_levelled",
+    "last_clear_at": "2026-06-16",
+    "first_changed_at": "2026-08-10",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260616T051534_L2A",
+      "acquired_at": "2026-06-16T05:24:02.261000+00:00",
+      "cloud_pct": 1.19,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260616T051534_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260810T051403_L2A",
+      "acquired_at": "2026-08-10T05:24:01.232000+00:00",
+      "cloud_pct": 20.96,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260810T051403_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260904T052339_L2A",
+      "acquired_at": "2026-09-04T05:24:00.233000+00:00",
+      "cloud_pct": 47.18,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260904T052339_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.6,
+    "rule_version": "detect-v2",
+    "flags": [
+     "seasonal_history_partial"
+    ],
+    "area_growth": 0.0,
+    "area_sq_m": 2600.0,
+    "looks_changed": 2,
+    "latest_changed_at": "2026-09-04",
+    "asset_name": "Nizam Talab",
+    "before_chip": "chips/osm-way-274497491_1_before.png",
+    "after_chip": "chips/osm-way-274497491_1_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.41352682657924,
+        17.392669757330612
+       ],
+       [
+        78.41353190636775,
+        17.39230855983688
+       ],
+       [
+        78.41343785796329,
+        17.392307340505955
+       ],
+       [
+        78.41344039790383,
+        17.3921267417671
+       ],
+       [
+        78.4133463495991,
+        17.392125522405394
+       ],
+       [
+        78.4133488896012,
+        17.39194492367637
+       ],
+       [
+        78.41344293781383,
+        17.391946143024626
+       ],
+       [
+        78.41344166786264,
+        17.39203644239631
+       ],
+       [
+        78.41362976440291,
+        17.392038880973608
+       ],
+       [
+        78.41362468489025,
+        17.392400078505098
+       ],
+       [
+        78.41371873335603,
+        17.392401297754294
+       ],
+       [
+        78.41371746350482,
+        17.39249159714162
+       ],
+       [
+        78.41362341499298,
+        17.3924903778857
+       ],
+       [
+        78.41362087517557,
+        17.3926709766442
+       ],
+       [
+        78.41352682657924,
+        17.392669757330612
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 47,
+    "asset_key": "osm-way-28196632",
+    "change_type": "soil_fill",
+    "stage_estimate": "soil_dumped",
+    "last_clear_at": "2026-06-11",
+    "first_changed_at": "2026-06-16",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260611T052057_L2A",
+      "acquired_at": "2026-06-11T05:24:00.272000+00:00",
+      "cloud_pct": 3.15,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260611T052057_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260616T051534_L2A",
+      "acquired_at": "2026-06-16T05:24:02.261000+00:00",
+      "cloud_pct": 1.19,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260616T051534_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260810T051403_L2A",
+      "acquired_at": "2026-08-10T05:24:01.232000+00:00",
+      "cloud_pct": 20.96,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260810T051403_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260904T052339_L2A",
+      "acquired_at": "2026-09-04T05:24:00.233000+00:00",
+      "cloud_pct": 47.18,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260904T052339_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.7,
+    "rule_version": "detect-v2",
+    "flags": [],
+    "area_growth": 0.0,
+    "area_sq_m": 1300.0,
+    "looks_changed": 3,
+    "latest_changed_at": "2026-09-04",
+    "drought": {
+     "lake_anomaly_pp": -4.4,
+     "neighbour_median_pp": -1.0,
+     "neighbours": 5
+    },
+    "asset_name": "Shah Hatim Talab",
+    "before_chip": "chips/osm-way-28196632_1_before.png",
+    "after_chip": "chips/osm-way-28196632_1_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.57525259399746,
+        17.405539990460618
+       ],
+       [
+        78.57525974310903,
+        17.40499812761242
+       ],
+       [
+        78.57516567653357,
+        17.404996983669943
+       ],
+       [
+        78.57516091030341,
+        17.405358225547115
+       ],
+       [
+        78.5748787100667,
+        17.40535479337837
+       ],
+       [
+        78.57487632663194,
+        17.405535414273754
+       ],
+       [
+        78.57525259399746,
+        17.405539990460618
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.57543477039445,
+        17.405993830700275
+       ],
+       [
+        78.57543715334744,
+        17.405813209738202
+       ],
+       [
+        78.57553122035938,
+        17.405814353604566
+       ],
+       [
+        78.57553360319149,
+        17.4056337326263
+       ],
+       [
+        78.57515733555557,
+        17.405629156945594
+       ],
+       [
+        78.57515614395864,
+        17.405719467409956
+       ],
+       [
+        78.57506207702144,
+        17.405718323372767
+       ],
+       [
+        78.57506088537123,
+        17.40580863382994
+       ],
+       [
+        78.57515495235454,
+        17.40580977787343
+       ],
+       [
+        78.57515376074328,
+        17.405900088336
+       ],
+       [
+        78.57534189482361,
+        17.405902376302738
+       ],
+       [
+        78.57534070329743,
+        17.405992686777022
+       ],
+       [
+        78.57543477039445,
+        17.405993830700275
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 49,
+    "asset_key": "osm-way-28268709",
+    "change_type": "clearing",
+    "stage_estimate": "land_levelled",
+    "last_clear_at": "2025-11-18",
+    "first_changed_at": "2025-12-13",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20251118T051240_L2A",
+      "acquired_at": "2025-11-18T05:24:11.884000+00:00",
+      "cloud_pct": 0.0,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20251118T051240_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.11; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2025"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20251213T052354_L2A",
+      "acquired_at": "2025-12-13T05:24:03.413000+00:00",
+      "cloud_pct": 0.0,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20251213T052354_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.11; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2025"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20251218T051234_L2A",
+      "acquired_at": "2025-12-18T05:24:09.888000+00:00",
+      "cloud_pct": 0.0,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20251218T051234_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.11; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2025"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20251228T051231_L2A",
+      "acquired_at": "2025-12-28T05:24:09.859000+00:00",
+      "cloud_pct": 0.06,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20251228T051231_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.11; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2025"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260107T052302_L2A",
+      "acquired_at": "2026-01-07T05:24:07.532000+00:00",
+      "cloud_pct": 0.06,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260107T052302_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.11; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260810T051403_L2A",
+      "acquired_at": "2026-08-10T05:24:01.232000+00:00",
+      "cloud_pct": 20.96,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260810T051403_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.9,
+    "rule_version": "detect-v2",
+    "flags": [],
+    "area_growth": 0.0,
+    "area_sq_m": 2500.0,
+    "looks_changed": 20,
+    "latest_changed_at": "2026-08-10",
+    "asset_name": "Nallacheruvu ( Uppal Mini Tank Bund )",
+    "before_chip": "chips/osm-way-28268709_1_before.png",
+    "after_chip": "chips/osm-way-28268709_1_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.5814133024624,
+        17.40209212914943
+       ],
+       [
+        78.58131923694364,
+        17.402090988292606
+       ],
+       [
+        78.58131804862997,
+        17.402181299201995
+       ],
+       [
+        78.58122398307228,
+        17.402180158294616
+       ],
+       [
+        78.58122517143205,
+        17.402089847391515
+       ],
+       [
+        78.58113110592761,
+        17.40208870644615
+       ],
+       [
+        78.5811287291087,
+        17.402269328238873
+       ],
+       [
+        78.58122279470535,
+        17.402270469196818
+       ],
+       [
+        78.58122041795008,
+        17.40245109099854
+       ],
+       [
+        78.58131448364608,
+        17.402452231924787
+       ],
+       [
+        78.58131329530384,
+        17.40254254283059
+       ],
+       [
+        78.5814073610531,
+        17.40254368371885
+       ],
+       [
+        78.5814037961218,
+        17.40281461644976
+       ],
+       [
+        78.5815919279184,
+        17.402816898131178
+       ],
+       [
+        78.58159430436197,
+        17.402636276286323
+       ],
+       [
+        78.58150023855232,
+        17.402635135480324
+       ],
+       [
+        78.5815049915382,
+        17.402273891805006
+       ],
+       [
+        78.5814109259201,
+        17.402272750979883
+       ],
+       [
+        78.5814133024624,
+        17.40209212914943
+       ]
+      ],
+      [
+       [
+        78.58140973763824,
+        17.402363061893766
+       ],
+       [
+        78.58131567198119,
+        17.40236192101808
+       ],
+       [
+        78.58131686030914,
+        17.402271610110482
+       ],
+       [
+        78.5814109259201,
+        17.402272750979883
+       ],
+       [
+        78.58140973763824,
+        17.402363061893766
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.58159073968591,
+        17.40290720905227
+       ],
+       [
+        78.58177887160328,
+        17.402909490569165
+       ],
+       [
+        78.58178005974356,
+        17.4028191796355
+       ],
+       [
+        78.5815919279184,
+        17.402816898131178
+       ],
+       [
+        78.58159073968591,
+        17.40290720905227
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 49,
+    "asset_key": "osm-way-28268709",
+    "change_type": "clearing",
+    "stage_estimate": "land_levelled",
+    "last_clear_at": "2026-01-17",
+    "first_changed_at": "2026-02-01",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260117T052059_L2A",
+      "acquired_at": "2026-01-17T05:24:03.094000+00:00",
+      "cloud_pct": 0.0,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260117T052059_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.11; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260201T051504_L2A",
+      "acquired_at": "2026-02-01T05:23:57.326000+00:00",
+      "cloud_pct": 7.98,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260201T051504_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.11; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260206T052200_L2A",
+      "acquired_at": "2026-02-06T05:24:02.791000+00:00",
+      "cloud_pct": 0.58,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260206T052200_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260221T052041_L2A",
+      "acquired_at": "2026-02-21T05:23:59.443000+00:00",
+      "cloud_pct": 0.0,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260221T052041_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260303T052248_L2A",
+      "acquired_at": "2026-03-03T05:24:00.920000+00:00",
+      "cloud_pct": 0.1,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260303T052248_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260810T051403_L2A",
+      "acquired_at": "2026-08-10T05:24:01.232000+00:00",
+      "cloud_pct": 20.96,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260810T051403_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.8,
+    "rule_version": "detect-v2",
+    "flags": [],
+    "area_growth": 0.0,
+    "area_sq_m": 1900.0,
+    "looks_changed": 16,
+    "latest_changed_at": "2026-08-10",
+    "asset_name": "Nallacheruvu ( Uppal Mini Tank Bund )",
+    "before_chip": "chips/osm-way-28268709_2_before.png",
+    "after_chip": "chips/osm-way-28268709_2_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.52232842111759,
+        17.32540572054609
+       ],
+       [
+        78.5223272095422,
+        17.325496028148905
+       ],
+       [
+        78.52242123182565,
+        17.325497191838284
+       ],
+       [
+        78.52242486639236,
+        17.325226269007846
+       ],
+       [
+        78.52251888854552,
+        17.32522743263385
+       ],
+       [
+        78.52252010000728,
+        17.325137125015477
+       ],
+       [
+        78.52242607789996,
+        17.32513596139591
+       ],
+       [
+        78.52242728940028,
+        17.325045653783075
+       ],
+       [
+        78.52233326734614,
+        17.32504449012589
+       ],
+       [
+        78.5223296326857,
+        17.32531541294239
+       ],
+       [
+        78.52223561050127,
+        17.325314249221833
+       ],
+       [
+        78.52223439888732,
+        17.32540455681909
+       ],
+       [
+        78.52232842111759,
+        17.32540572054609
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.52214037666434,
+        17.325403393048045
+       ],
+       [
+        78.52214279997668,
+        17.32522277786549
+       ],
+       [
+        78.52195475573608,
+        17.32522045021697
+       ],
+       [
+        78.521955967473,
+        17.325130142637224
+       ],
+       [
+        78.52186194540953,
+        17.325128978753316
+       ],
+       [
+        78.52186073362674,
+        17.32521928632662
+       ],
+       [
+        78.52167268942999,
+        17.325216958413762
+       ],
+       [
+        78.52167390130451,
+        17.32512665085334
+       ],
+       [
+        78.52139183520178,
+        17.325123158672938
+       ],
+       [
+        78.52139062318967,
+        17.325213466214045
+       ],
+       [
+        78.52129660112419,
+        17.32521230205936
+       ],
+       [
+        78.52129781318214,
+        17.325121994524693
+       ],
+       [
+        78.52120379116984,
+        17.325120830332395
+       ],
+       [
+        78.52120257906601,
+        17.325211137860617
+       ],
+       [
+        78.52092051293533,
+        17.325207645000045
+       ],
+       [
+        78.52091930068663,
+        17.325297952508055
+       ],
+       [
+        78.52185952183666,
+        17.32530959389904
+       ],
+       [
+        78.52185831003925,
+        17.32539990147055
+       ],
+       [
+        78.5219523322403,
+        17.325401065373768
+       ],
+       [
+        78.52195112048146,
+        17.325491372950836
+       ],
+       [
+        78.52204514273568,
+        17.325492536816437
+       ],
+       [
+        78.5220439310154,
+        17.325582844399044
+       ],
+       [
+        78.5223259979595,
+        17.325586335750824
+       ],
+       [
+        78.5223272095422,
+        17.325496028148905
+       ],
+       [
+        78.52223318726607,
+        17.32549486441548
+       ],
+       [
+        78.52223439888732,
+        17.32540455681909
+       ],
+       [
+        78.52214037666434,
+        17.325403393048045
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 56,
+    "asset_key": "osm-way-291435733",
+    "change_type": "clearing",
+    "stage_estimate": "land_levelled",
+    "last_clear_at": "2026-08-10",
+    "first_changed_at": "2026-09-04",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260810T051403_L2A",
+      "acquired_at": "2026-08-10T05:24:01.232000+00:00",
+      "cloud_pct": 20.96,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260810T051403_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260904T052339_L2A",
+      "acquired_at": "2026-09-04T05:24:00.233000+00:00",
+      "cloud_pct": 47.18,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260904T052339_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260919T051841_L2A",
+      "acquired_at": "2026-09-19T05:24:01.132000+00:00",
+      "cloud_pct": 44.41,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260919T051841_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.6,
+    "rule_version": "detect-v2",
+    "flags": [
+     "seasonal_history_partial"
+    ],
+    "area_growth": 0.0,
+    "area_sq_m": 3400.0,
+    "looks_changed": 2,
+    "latest_changed_at": "2026-09-19",
+    "asset_name": "Mantrala Cheruvu",
+    "before_chip": "chips/osm-way-291435733_1_before.png",
+    "after_chip": "chips/osm-way-291435733_1_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.41164165825995,
+        17.47961904984619
+       ],
+       [
+        78.4116429359042,
+        17.479528751395357
+       ],
+       [
+        78.41154884293849,
+        17.479527525256543
+       ],
+       [
+        78.41154756524793,
+        17.47961782370064
+       ],
+       [
+        78.41164165825995,
+        17.47961904984619
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.41135937924683,
+        17.479615371276168
+       ],
+       [
+        78.41135810145599,
+        17.479705669705893
+       ],
+       [
+        78.41116991539288,
+        17.47970321709012
+       ],
+       [
+        78.41116863750173,
+        17.479793515505477
+       ],
+       [
+        78.41126273057577,
+        17.47979474184233
+       ],
+       [
+        78.4112614527233,
+        17.4798850402635
+       ],
+       [
+        78.41135554585131,
+        17.479886266562623
+       ],
+       [
+        78.41135682365747,
+        17.479795968134717
+       ],
+       [
+        78.41173319606082,
+        17.479800872859673
+       ],
+       [
+        78.41173447367404,
+        17.479710574403928
+       ],
+       [
+        78.41154628754971,
+        17.47970812214383
+       ],
+       [
+        78.41154756524793,
+        17.47961782370064
+       ],
+       [
+        78.41135937924683,
+        17.479615371276168
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 60,
+    "asset_key": "osm-way-29251874",
+    "change_type": "clearing",
+    "stage_estimate": "land_levelled",
+    "last_clear_at": "2026-06-16",
+    "first_changed_at": "2026-06-28",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260616T051534_L2A",
+      "acquired_at": "2026-06-16T05:24:02.261000+00:00",
+      "cloud_pct": 1.19,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260616T051534_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2A_T44QKE_20260628T051804_L2A",
+      "acquired_at": "2026-06-28T05:24:18.962000+00:00",
+      "cloud_pct": 44.1,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2A_T44QKE_20260628T051804_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260810T051403_L2A",
+      "acquired_at": "2026-08-10T05:24:01.232000+00:00",
+      "cloud_pct": 20.96,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260810T051403_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2A_T44QKE_20260906T051802_L2A",
+      "acquired_at": "2026-09-06T05:24:17.098000+00:00",
+      "cloud_pct": 31.63,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2A_T44QKE_20260906T051802_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.7,
+    "rule_version": "detect-v2",
+    "flags": [],
+    "area_growth": 0.0,
+    "area_sq_m": 1000.0,
+    "looks_changed": 3,
+    "latest_changed_at": "2026-09-06",
+    "asset_name": "IDPL Tank",
+    "before_chip": "chips/osm-way-29251874_1_before.png",
+    "after_chip": "chips/osm-way-29251874_1_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.40900961469235,
+        17.47940410443969
+       ],
+       [
+        78.4090108936182,
+        17.47931380617558
+       ],
+       [
+        78.4088227083086,
+        17.479311351390724
+       ],
+       [
+        78.40882526632257,
+        17.479130754886715
+       ],
+       [
+        78.4090134514469,
+        17.479133209644615
+       ],
+       [
+        78.40901600924495,
+        17.478952613110017
+       ],
+       [
+        78.40892191677159,
+        17.478951385766766
+       ],
+       [
+        78.40892319570543,
+        17.478861087504843
+       ],
+       [
+        78.40911138056718,
+        17.478863542133414
+       ],
+       [
+        78.40911265940073,
+        17.478773243857102
+       ],
+       [
+        78.40920675179679,
+        17.478774471097967
+       ],
+       [
+        78.40920547300955,
+        17.478864769381012
+       ],
+       [
+        78.40929956545958,
+        17.47886599658415
+       ],
+       [
+        78.40929572919086,
+        17.479136891448043
+       ],
+       [
+        78.40920163660188,
+        17.479135664224692
+       ],
+       [
+        78.40919907895845,
+        17.4793162607826
+       ],
+       [
+        78.40910498628449,
+        17.47931503350132
+       ],
+       [
+        78.40910370740497,
+        17.479405331772167
+       ],
+       [
+        78.40900961469235,
+        17.47940410443969
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 60,
+    "asset_key": "osm-way-29251874",
+    "change_type": "clearing",
+    "stage_estimate": "land_levelled",
+    "last_clear_at": "2026-06-28",
+    "first_changed_at": "2026-08-10",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2A_T44QKE_20260628T051804_L2A",
+      "acquired_at": "2026-06-28T05:24:18.962000+00:00",
+      "cloud_pct": 44.1,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2A_T44QKE_20260628T051804_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260810T051403_L2A",
+      "acquired_at": "2026-08-10T05:24:01.232000+00:00",
+      "cloud_pct": 20.96,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260810T051403_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2A_T44QKE_20260906T051802_L2A",
+      "acquired_at": "2026-09-06T05:24:17.098000+00:00",
+      "cloud_pct": 31.63,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2A_T44QKE_20260906T051802_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.6,
+    "rule_version": "detect-v2",
+    "flags": [],
+    "area_growth": 0.0,
+    "area_sq_m": 2000.0,
+    "looks_changed": 2,
+    "latest_changed_at": "2026-09-06",
+    "asset_name": "IDPL Tank",
+    "before_chip": "chips/osm-way-29251874_2_before.png",
+    "after_chip": "chips/osm-way-29251874_2_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.54011923035776,
+        17.401587036864424
+       ],
+       [
+        78.54002516800146,
+        17.401585876573655
+       ],
+       [
+        78.5400239594492,
+        17.40167618469935
+       ],
+       [
+        78.5401180218516,
+        17.401677344996518
+       ],
+       [
+        78.54011923035776,
+        17.401587036864424
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.53964045733979,
+        17.402213391649855
+       ],
+       [
+        78.53973451998972,
+        17.402214552162455
+       ],
+       [
+        78.53973210249963,
+        17.402395168362006
+       ],
+       [
+        78.53982616524902,
+        17.402396328843132
+       ],
+       [
+        78.53982374782208,
+        17.402576945051877
+       ],
+       [
+        78.54001187352708,
+        17.4025792659069
+       ],
+       [
+        78.54001308215199,
+        17.402488957790187
+       ],
+       [
+        78.54020120779384,
+        17.402491278455354
+       ],
+       [
+        78.54020241631929,
+        17.40240097032495
+       ],
+       [
+        78.54029647910501,
+        17.402402130584736
+       ],
+       [
+        78.54029889604189,
+        17.40222151430845
+       ],
+       [
+        78.54039295874267,
+        17.402222674511183
+       ],
+       [
+        78.5403953755583,
+        17.402042058218516
+       ],
+       [
+        78.54048943817415,
+        17.40204321836419
+       ],
+       [
+        78.54049064652497,
+        17.401952910210124
+       ],
+       [
+        78.54067877168627,
+        17.401955230355888
+       ],
+       [
+        78.54067997993764,
+        17.40186492218814
+       ],
+       [
+        78.54077404248306,
+        17.40186608218822
+       ],
+       [
+        78.5407764588718,
+        17.40168546583724
+       ],
+       [
+        78.54068239641856,
+        17.40168430584993
+       ],
+       [
+        78.54068360464812,
+        17.40159399767948
+       ],
+       [
+        78.54049547985562,
+        17.40159167758486
+       ],
+       [
+        78.54049427153386,
+        17.401681985742524
+       ],
+       [
+        78.5401180218516,
+        17.401677344996518
+       ],
+       [
+        78.54011681333819,
+        17.401767653127703
+       ],
+       [
+        78.54002275088969,
+        17.401766492824144
+       ],
+       [
+        78.5400239594492,
+        17.40167618469935
+       ],
+       [
+        78.53992989705408,
+        17.40167502435792
+       ],
+       [
+        78.53992747983557,
+        17.40185564059382
+       ],
+       [
+        78.53973935488268,
+        17.401853319752583
+       ],
+       [
+        78.53974056358778,
+        17.401763011647862
+       ],
+       [
+        78.53964650116833,
+        17.401761851167244
+       ],
+       [
+        78.53964529241715,
+        17.401852159265562
+       ],
+       [
+        78.53936310506414,
+        17.40184867753891
+       ],
+       [
+        78.53936189616739,
+        17.401938985617143
+       ],
+       [
+        78.53945595865723,
+        17.401940146243355
+       ],
+       [
+        78.53945474979932,
+        17.402030454327086
+       ],
+       [
+        78.53954881234253,
+        17.40203161491543
+       ],
+       [
+        78.53954760352345,
+        17.402121923004657
+       ],
+       [
+        78.53964166612002,
+        17.402123083555132
+       ],
+       [
+        78.53964045733979,
+        17.402213391649855
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.53945233206171,
+        17.40221107049185
+       ],
+       [
+        78.53954639469711,
+        17.40221223109298
+       ],
+       [
+        78.53954760352345,
+        17.402121923004657
+       ],
+       [
+        78.53945354093415,
+        17.402120762409922
+       ],
+       [
+        78.53945233206171,
+        17.40221107049185
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 61,
+    "asset_key": "osm-way-29252764",
+    "change_type": "clearing",
+    "stage_estimate": "land_levelled",
+    "last_clear_at": "2026-06-16",
+    "first_changed_at": "2026-08-10",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260616T051534_L2A",
+      "acquired_at": "2026-06-16T05:24:02.261000+00:00",
+      "cloud_pct": 1.19,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260616T051534_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260810T051403_L2A",
+      "acquired_at": "2026-08-10T05:24:01.232000+00:00",
+      "cloud_pct": 20.96,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260810T051403_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260820T052200_L2A",
+      "acquired_at": "2026-08-20T05:23:58.611000+00:00",
+      "cloud_pct": 54.91,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260820T052200_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260904T052339_L2A",
+      "acquired_at": "2026-09-04T05:24:00.233000+00:00",
+      "cloud_pct": 47.18,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260904T052339_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.7,
+    "rule_version": "detect-v2",
+    "flags": [
+     "seasonal_history_partial"
+    ],
+    "area_growth": 0.0,
+    "area_sq_m": 8200.0,
+    "looks_changed": 3,
+    "latest_changed_at": "2026-09-04",
+    "asset_name": "Ramanthapur Cheruvu",
+    "before_chip": "chips/osm-way-29252764_1_before.png",
+    "after_chip": "chips/osm-way-29252764_1_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.55319980526704,
+        17.61211019881985
+       ],
+       [
+        78.55320102282982,
+        17.612019891709394
+       ],
+       [
+        78.5531068511758,
+        17.612018724093115
+       ],
+       [
+        78.55310806877809,
+        17.611928416988118
+       ],
+       [
+        78.5529197255853,
+        17.61192608163378
+       ],
+       [
+        78.55292216095506,
+        17.61174546744655
+       ],
+       [
+        78.55282798946305,
+        17.61174429971486
+       ],
+       [
+        78.55282920718379,
+        17.611653992626255
+       ],
+       [
+        78.55264086431502,
+        17.611651657041115
+       ],
+       [
+        78.552642082122,
+        17.611561349964337
+       ],
+       [
+        78.55254791074525,
+        17.61156018211088
+       ],
+       [
+        78.55254547503054,
+        17.611740796250785
+       ],
+       [
+        78.5526396465008,
+        17.61174196411698
+       ],
+       [
+        78.55263721085053,
+        17.611922578266004
+       ],
+       [
+        78.5528255539998,
+        17.611924913889357
+       ],
+       [
+        78.55282190075047,
+        17.6121958351443
+       ],
+       [
+        78.55291607247622,
+        17.612197002907823
+       ],
+       [
+        78.55291485475868,
+        17.61228730999737
+       ],
+       [
+        78.55300902653843,
+        17.612288477722423
+       ],
+       [
+        78.55301024420923,
+        17.612198170626517
+       ],
+       [
+        78.55310441594949,
+        17.61219933830037
+       ],
+       [
+        78.55310563356628,
+        17.6121090311972
+       ],
+       [
+        78.55319980526704,
+        17.61211019881985
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.55319615253515,
+        17.612381120145763
+       ],
+       [
+        78.5531973701197,
+        17.612290813038033
+       ],
+       [
+        78.55329154192123,
+        17.61229198062858
+       ],
+       [
+        78.55329275945178,
+        17.61220167351357
+       ],
+       [
+        78.55310441594949,
+        17.61219933830037
+       ],
+       [
+        78.55310198069414,
+        17.61237995250401
+       ],
+       [
+        78.55319615253515,
+        17.612381120145763
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.55310198069414,
+        17.61237995250401
+       ],
+       [
+        78.55300780886037,
+        17.61237878481742
+       ],
+       [
+        78.55300659117508,
+        17.612469091911514
+       ],
+       [
+        78.55310076305558,
+        17.612470259604464
+       ],
+       [
+        78.55310198069414,
+        17.61237995250401
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.55291120156252,
+        17.612558231260536
+       ],
+       [
+        78.5530053734825,
+        17.6125593990047
+       ],
+       [
+        78.55300659117508,
+        17.612469091911514
+       ],
+       [
+        78.55291241930182,
+        17.612467924173718
+       ],
+       [
+        78.55291120156252,
+        17.612558231260536
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 69,
+    "asset_key": "osm-way-45056467",
+    "change_type": "soil_fill",
+    "stage_estimate": "soil_dumped",
+    "last_clear_at": "2026-06-11",
+    "first_changed_at": "2026-06-16",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260611T052057_L2A",
+      "acquired_at": "2026-06-11T05:24:00.272000+00:00",
+      "cloud_pct": 3.15,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260611T052057_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260616T051534_L2A",
+      "acquired_at": "2026-06-16T05:24:02.261000+00:00",
+      "cloud_pct": 1.19,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260616T051534_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260810T051403_L2A",
+      "acquired_at": "2026-08-10T05:24:01.232000+00:00",
+      "cloud_pct": 20.96,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260810T051403_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.7,
+    "rule_version": "detect-v2",
+    "flags": [],
+    "area_growth": 0.0,
+    "area_sq_m": 2600.0,
+    "looks_changed": 2,
+    "latest_changed_at": "2026-08-10",
+    "drought": {
+     "lake_anomaly_pp": -10.5,
+     "neighbour_median_pp": 8.3,
+     "neighbours": 5
+    },
+    "asset_name": "Shamirpet Lake",
+    "before_chip": "chips/osm-way-45056467_1_before.png",
+    "after_chip": "chips/osm-way-45056467_1_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.54709940905578,
+        17.61049899613172
+       ],
+       [
+        78.54710062953343,
+        17.610408689420233
+       ],
+       [
+        78.5470064591463,
+        17.61040751899813
+       ],
+       [
+        78.5470052386219,
+        17.610497825703238
+       ],
+       [
+        78.54709940905578,
+        17.61049899613172
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.54691106819531,
+        17.61049665522992
+       ],
+       [
+        78.5469098476169,
+        17.610586961927737
+       ],
+       [
+        78.54681567715083,
+        17.61058579140321
+       ],
+       [
+        78.5468132358787,
+        17.610766404783345
+       ],
+       [
+        78.54690740643825,
+        17.610767575320644
+       ],
+       [
+        78.54690618583803,
+        17.610857882015726
+       ],
+       [
+        78.54718869770053,
+        17.61086139337777
+       ],
+       [
+        78.54718991816054,
+        17.610771086663537
+       ],
+       [
+        78.54709574757918,
+        17.610769916260733
+       ],
+       [
+        78.54709818857086,
+        17.6105893028423
+       ],
+       [
+        78.54700401809025,
+        17.610588132407436
+       ],
+       [
+        78.5470052386219,
+        17.610497825703238
+       ],
+       [
+        78.54691106819531,
+        17.61049665522992
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 69,
+    "asset_key": "osm-way-45056467",
+    "change_type": "soil_fill",
+    "stage_estimate": "soil_dumped",
+    "last_clear_at": "2026-06-11",
+    "first_changed_at": "2026-06-16",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260611T052057_L2A",
+      "acquired_at": "2026-06-11T05:24:00.272000+00:00",
+      "cloud_pct": 3.15,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260611T052057_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260616T051534_L2A",
+      "acquired_at": "2026-06-16T05:24:02.261000+00:00",
+      "cloud_pct": 1.19,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260616T051534_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260810T051403_L2A",
+      "acquired_at": "2026-08-10T05:24:01.232000+00:00",
+      "cloud_pct": 20.96,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260810T051403_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.6,
+    "rule_version": "detect-v2",
+    "flags": [],
+    "area_growth": 0.0,
+    "area_sq_m": 1100.0,
+    "looks_changed": 2,
+    "latest_changed_at": "2026-08-10",
+    "drought": {
+     "lake_anomaly_pp": -10.5,
+     "neighbour_median_pp": 8.3,
+     "neighbours": 5
+    },
+    "asset_name": "Shamirpet Lake",
+    "before_chip": "chips/osm-way-45056467_2_before.png",
+    "after_chip": "chips/osm-way-45056467_2_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.47388445503464,
+        17.524766790507275
+       ],
+       [
+        78.47388695576475,
+        17.524586185612606
+       ],
+       [
+        78.47369871426739,
+        17.524583786257722
+       ],
+       [
+        78.47369996471417,
+        17.524493483822162
+       ],
+       [
+        78.47360584402315,
+        17.524492284084406
+       ],
+       [
+        78.47360209252099,
+        17.524763191368642
+       ],
+       [
+        78.47388445503464,
+        17.524766790507275
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.47341510148375,
+        17.524670489305905
+       ],
+       [
+        78.47341635207741,
+        17.52458018689097
+       ],
+       [
+        78.47332223136237,
+        17.524578987012877
+       ],
+       [
+        78.47331973007464,
+        17.524759591828694
+       ],
+       [
+        78.47350797169806,
+        17.52476199156658
+       ],
+       [
+        78.47350922225273,
+        17.524671689145983
+       ],
+       [
+        78.47341510148375,
+        17.524670489305905
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.4736008420053,
+        17.52485349379491
+       ],
+       [
+        78.47360209252099,
+        17.524763191368642
+       ],
+       [
+        78.47350797169806,
+        17.52476199156658
+       ],
+       [
+        78.4735067211359,
+        17.524852293986275
+       ],
+       [
+        78.4736008420053,
+        17.52485349379491
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 74,
+    "asset_key": "osm-way-52014012",
+    "change_type": "soil_fill",
+    "stage_estimate": "soil_dumped",
+    "last_clear_at": "2026-06-01",
+    "first_changed_at": "2026-06-11",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260601T051356_L2A",
+      "acquired_at": "2026-06-01T05:23:58.072000+00:00",
+      "cloud_pct": 11.84,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260601T051356_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260611T052057_L2A",
+      "acquired_at": "2026-06-11T05:24:00.272000+00:00",
+      "cloud_pct": 3.15,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260611T052057_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260616T051534_L2A",
+      "acquired_at": "2026-06-16T05:24:02.261000+00:00",
+      "cloud_pct": 1.19,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260616T051534_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260810T051403_L2A",
+      "acquired_at": "2026-08-10T05:24:01.232000+00:00",
+      "cloud_pct": 20.96,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260810T051403_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260904T052339_L2A",
+      "acquired_at": "2026-09-04T05:24:00.233000+00:00",
+      "cloud_pct": 47.18,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260904T052339_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.8,
+    "rule_version": "detect-v2",
+    "flags": [],
+    "area_growth": 0.0,
+    "area_sq_m": 1100.0,
+    "looks_changed": 4,
+    "latest_changed_at": "2026-09-04",
+    "drought": {
+     "lake_anomaly_pp": 1.7,
+     "neighbour_median_pp": -0.8,
+     "neighbours": 5
+    },
+    "asset_name": "Fox Sagar",
+    "before_chip": "chips/osm-way-52014012_1_before.png",
+    "after_chip": "chips/osm-way-52014012_1_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.49497505721747,
+        17.476442452638437
+       ],
+       [
+        78.49497629351441,
+        17.476352148284597
+       ],
+       [
+        78.49507039097598,
+        17.476353334720155
+       ],
+       [
+        78.49507409968336,
+        17.47608242163367
+       ],
+       [
+        78.49498000236076,
+        17.47608123521765
+       ],
+       [
+        78.49498123862807,
+        17.475990930860192
+       ],
+       [
+        78.49507533590436,
+        17.475992117269698
+       ],
+       [
+        78.4950778083241,
+        17.47581150853904
+       ],
+       [
+        78.49479551679538,
+        17.475807949216225
+       ],
+       [
+        78.49479304409772,
+        17.475988557907797
+       ],
+       [
+        78.49469894684366,
+        17.47598737136491
+       ],
+       [
+        78.49469647402373,
+        17.476167980039833
+       ],
+       [
+        78.49460237668443,
+        17.476166793439454
+       ],
+       [
+        78.49460114021701,
+        17.47625709776905
+       ],
+       [
+        78.49469523760263,
+        17.47625828437594
+       ],
+       [
+        78.49469276473825,
+        17.476438893045447
+       ],
+       [
+        78.49497505721747,
+        17.476442452638437
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.49515830734941,
+        17.47680604293656
+       ],
+       [
+        78.49516201602896,
+        17.47653512984409
+       ],
+       [
+        78.49506791846734,
+        17.476533943439964
+       ],
+       [
+        78.49506668220191,
+        17.47662424779851
+       ],
+       [
+        78.49497258460137,
+        17.47662306134341
+       ],
+       [
+        78.49497011195564,
+        17.476803670044763
+       ],
+       [
+        78.49487601426988,
+        17.47680248353217
+       ],
+       [
+        78.49487230510674,
+        17.477073396557877
+       ],
+       [
+        78.49496640293148,
+        17.477074583090012
+       ],
+       [
+        78.49496763928028,
+        17.476984278742503
+       ],
+       [
+        78.4950617370661,
+        17.47698546522366
+       ],
+       [
+        78.49506420964882,
+        17.476804856512892
+       ],
+       [
+        78.49515830734941,
+        17.47680604293656
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.4951545986032,
+        17.47707695602089
+       ],
+       [
+        78.49515583485933,
+        17.47698665166035
+       ],
+       [
+        78.4950617370661,
+        17.47698546522366
+       ],
+       [
+        78.49506050076363,
+        17.477075769577688
+       ],
+       [
+        78.4951545986032,
+        17.47707695602089
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 93,
+    "asset_key": "osm-way-89581482",
+    "change_type": "clearing",
+    "stage_estimate": "land_levelled",
+    "last_clear_at": "2026-06-11",
+    "first_changed_at": "2026-06-16",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260611T052057_L2A",
+      "acquired_at": "2026-06-11T05:24:00.272000+00:00",
+      "cloud_pct": 3.15,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260611T052057_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260616T051534_L2A",
+      "acquired_at": "2026-06-16T05:24:02.261000+00:00",
+      "cloud_pct": 1.19,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260616T051534_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260810T051403_L2A",
+      "acquired_at": "2026-08-10T05:24:01.232000+00:00",
+      "cloud_pct": 20.96,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260810T051403_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260904T052339_L2A",
+      "acquired_at": "2026-09-04T05:24:00.233000+00:00",
+      "cloud_pct": 47.18,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260904T052339_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.7,
+    "rule_version": "detect-v2",
+    "flags": [
+     "seasonal_history_partial"
+    ],
+    "area_growth": 0.0938,
+    "area_sq_m": 3600.0,
+    "looks_changed": 3,
+    "latest_changed_at": "2026-09-04",
+    "asset_name": "Bon Cheruvu",
+    "before_chip": "chips/osm-way-89581482_1_before.png",
+    "after_chip": "chips/osm-way-89581482_1_after.png"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        78.49528577952266,
+        17.47436901101478
+       ],
+       [
+        78.49528701551027,
+        17.474278706620602
+       ],
+       [
+        78.49538111192875,
+        17.47427989277298
+       ],
+       [
+        78.49538605561983,
+        17.473918675161197
+       ],
+       [
+        78.49529195938662,
+        17.47391748903487
+       ],
+       [
+        78.49529319533718,
+        17.47382718463618
+       ],
+       [
+        78.49510500298558,
+        17.473824812263178
+       ],
+       [
+        78.49510253089178,
+        17.474005421033613
+       ],
+       [
+        78.4951966271565,
+        17.474006607255365
+       ],
+       [
+        78.49519168306529,
+        17.47436782481143
+       ],
+       [
+        78.49528577952266,
+        17.47436901101478
+       ]
+      ]
+     ],
+     [
+      [
+       [
+        78.49500349017272,
+        17.474365452271368
+       ],
+       [
+        78.49500225403877,
+        17.474455756645092
+       ],
+       [
+        78.49509635052766,
+        17.474456942943867
+       ],
+       [
+        78.4950951144326,
+        17.474547247323205
+       ],
+       [
+        78.49518921097521,
+        17.47454843358404
+       ],
+       [
+        78.49519168306529,
+        17.47436782481143
+       ],
+       [
+        78.49500349017272,
+        17.474365452271368
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "asset_id": 93,
+    "asset_key": "osm-way-89581482",
+    "change_type": "clearing",
+    "stage_estimate": "land_levelled",
+    "last_clear_at": "2026-06-16",
+    "first_changed_at": "2026-08-10",
+    "observations": [
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260616T051534_L2A",
+      "acquired_at": "2026-06-16T05:24:02.261000+00:00",
+      "cloud_pct": 1.19,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260616T051534_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2B_T44QKE_20260810T051403_L2A",
+      "acquired_at": "2026-08-10T05:24:01.232000+00:00",
+      "cloud_pct": 20.96,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2B_T44QKE_20260810T051403_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     },
+     {
+      "sensor": "sentinel-2",
+      "scene_id": "S2C_T44QKE_20260904T052339_L2A",
+      "acquired_at": "2026-09-04T05:24:00.233000+00:00",
+      "cloud_pct": 47.18,
+      "stac_href": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-c1-l2a/items/S2C_T44QKE_20260904T052339_L2A",
+      "processing_version": "earth-search sentinel-2-c1-l2a, baseline 05.12; detect-v2",
+      "licence_notice": "Contains modified Copernicus Sentinel data 2026"
+     }
+    ],
+    "sensor_basis": "optical_only",
+    "confidence": 0.6,
+    "rule_version": "detect-v2",
+    "flags": [],
+    "area_growth": 0.0,
+    "area_sq_m": 1500.0,
+    "looks_changed": 2,
+    "latest_changed_at": "2026-09-04",
+    "asset_name": "Bon Cheruvu",
+    "before_chip": "chips/osm-way-89581482_2_before.png",
+    "after_chip": "chips/osm-way-89581482_2_after.png"
+   }
+  }
+ ]
+}

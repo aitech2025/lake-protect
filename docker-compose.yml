@@ -10,6 +10,7 @@ x-api-env: &api-env
   LP_PIPELINE_TOKEN: ${LP_PIPELINE_TOKEN:-}
   LP_ENABLE_WHATSAPP_SIMULATOR: ${LP_ENABLE_WHATSAPP_SIMULATOR:-false}
   LP_STORAGE_DIR: /var/lp/storage
+  LP_ARCHIVE_DIR: /var/lp/archive
   LP_DATA_DIR: /srv/data
   LP_REPO_DIR: /srv/repo
   # Notifications (DECISIONS.md D-059). Email goes to the local outbox folder unless set to smtp.
@@ -57,6 +58,7 @@ services:
       - ./data:/srv/data:ro
       - ./:/srv/repo:ro
       - lp_storage:/var/lp/storage
+      - lp_archive:/var/lp/archive
     depends_on:
       db:
         condition: service_healthy
@@ -103,8 +105,10 @@ services:
       LP_API_URL: http://api:8000
       LP_PIPELINE_TOKEN: ${LP_PIPELINE_TOKEN:?set in .env}
       LP_CACHE_DIR: /var/lp/cache
+      PYTHONPATH: /srv/pipeline
     volumes:
       - lp_cache:/var/lp/cache
+      - ./pipeline/lake_protect:/srv/pipeline/lake_protect:ro
       - ./reports:/srv/repo/reports
     depends_on:
       api:
@@ -151,4 +155,5 @@ services:
 volumes:
   lp_pgdata:
   lp_storage:
+  lp_archive:
   lp_cache:

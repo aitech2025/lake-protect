@@ -89,14 +89,20 @@ def upgrade():
     ALTER TABLE monitoring_changes ADD COLUMN IF NOT EXISTS platform_asset_id uuid;
     ALTER TABLE signals ADD COLUMN IF NOT EXISTS platform_asset_id uuid;
 
+    -- These columns are a one-time identity backfill. Keep the append-only protections enabled
+    -- for normal writes, but temporarily bypass their row triggers inside this migration only.
+    ALTER TABLE boundaries DISABLE TRIGGER boundaries_append_only;
     UPDATE boundaries b SET platform_asset_id = a.platform_asset_id
       FROM assets a WHERE a.id=b.asset_id AND b.platform_asset_id IS DISTINCT FROM a.platform_asset_id;
+    ALTER TABLE boundaries ENABLE TRIGGER boundaries_append_only;
     UPDATE candidates c SET platform_asset_id = a.platform_asset_id
       FROM assets a WHERE a.id=c.asset_id AND c.platform_asset_id IS DISTINCT FROM a.platform_asset_id;
     UPDATE alerts al SET platform_asset_id = c.platform_asset_id
       FROM candidates c WHERE c.id=al.candidate_id AND al.platform_asset_id IS DISTINCT FROM c.platform_asset_id;
+    ALTER TABLE monitoring_changes DISABLE TRIGGER monitoring_changes_append_only;
     UPDATE monitoring_changes m SET platform_asset_id = a.platform_asset_id
       FROM assets a WHERE a.id=m.asset_id AND m.platform_asset_id IS DISTINCT FROM a.platform_asset_id;
+    ALTER TABLE monitoring_changes ENABLE TRIGGER monitoring_changes_append_only;
     UPDATE signals s SET platform_asset_id = a.platform_asset_id
       FROM assets a WHERE a.id=s.asset_id AND s.platform_asset_id IS DISTINCT FROM a.platform_asset_id;
 

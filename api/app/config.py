@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     # Local WhatsApp conversation simulator. Off by default; simulated records are flagged is_demo.
     enable_whatsapp_simulator: bool = False
     storage_dir: Path = Path("/var/lp/storage")
+    archive_dir: Path = Path("/var/lp/archive")
     data_dir: Path = Path("/srv/data")
     repo_dir: Path = Path("/srv/repo")
     # Stays False until counsel has reviewed the section 63(4) template. Not settable from the UI.

@@ -20,7 +20,8 @@
     "officials": "Officials",
     "reports": "Citizen reports",
     "satellites": "Satellites",
-    "whatsapp_test": "WhatsApp test"
+    "whatsapp_test": "WhatsApp test",
+    "map": "Map"
   },
   "login": {
     "title": "Sign in with a demo account",
@@ -183,7 +184,8 @@
     "linked_asset": "one location",
     "linked_clear": "Show all incidents",
     "citizen": "Citizen report",
-    "citizen_reports": "{{count}} citizen report(s)"
+    "citizen_reports": "{{count}} citizen report(s)",
+    "land_group": "Incident category"
   },
   "detail": {
     "back": "All incidents",
@@ -328,7 +330,15 @@
       "derived_unverified": "Derived / unverified",
       "demo_sample": "Demo sample",
       "unclassified": "Unclassified source"
-    }
+    },
+    "tabs": "Asset groups",
+    "tab": {
+      "lakes": "Lakes",
+      "lands": "Government land",
+      "citizen": "Citizen reports"
+    },
+    "filter_village": "Village",
+    "all_villages": "All villages"
   },
   "records": {
     "title": "Records",
@@ -351,7 +361,10 @@
       "court": "Court",
       "status": "Status",
       "hearing": "Next hearing"
-    }
+    },
+    "asset_documents": "Documents by asset",
+    "asset_documents_help": "Select a location to review its attached legal and boundary records.",
+    "choose_asset": "Choose an asset"
   },
   "audit": {
     "title": "Audit",
@@ -671,7 +684,8 @@
     "look": "Image of {{date}}",
     "as_of": "Screen of {{date}}",
     "area": "About {{area}} sq m",
-    "continues": "seen again"
+    "continues": "seen again",
+    "archive": "Archive ? {{count}} older checks"
   },
   "docs": {
     "title": "Legal documents",
@@ -1334,5 +1348,59 @@
     "last_attempt": "Last attempt",
     "channel_readiness": "Gateway readiness",
     "ready": "Ready"
+  },
+  "map": {
+    "assets_count": "{{count}} assets across the map"
+  },
+  "inspection": {
+    "title": "Field inspections",
+    "lede": "Append visit notes, GPS and photos to this asset record.",
+    "add": "Record a field visit",
+    "incident": "Related incident ID",
+    "incident_optional": "Optional incident ID",
+    "photos": "Visit photos (up to five)",
+    "gps_optional": "GPS position is optional",
+    "gps_error": "Could not get GPS position.",
+    "photo_alt": "Inspection evidence",
+    "save": "Save inspection",
+    "saving": "Saving inspection?",
+    "saved": "Field inspection saved.",
+    "empty": "No field visits recorded for this asset yet."
+  },
+  "asset360": {
+    "title": "Asset 360",
+    "back": "Locations",
+    "kicker": "ASSET 360",
+    "sections": "Asset 360 sections",
+    "asset_code": "Permanent asset ID",
+    "baseline": "Monitoring baseline",
+    "category": "Asset category",
+    "latest_look": "Latest screening",
+    "open_incidents": "Incidents",
+    "boundary": "Spatial boundary",
+    "identity": "Asset identity",
+    "district": "District",
+    "mandal": "Mandal",
+    "village": "Village",
+    "provenance": "Boundary source",
+    "boundary_status": "Boundary status",
+    "manage": "Open monitoring controls",
+    "recent_incidents": "Recent incidents",
+    "incident_history": "Incident history",
+    "incident": "Incident",
+    "boundary_versions": "Boundary versions",
+    "version": "Version",
+    "valid_from": "Valid from",
+    "audit_history": "Audit history",
+    "audit_empty": "No asset audit actions are available.",
+    "watched": "On weekly monitoring",
+    "tab": {
+      "overview": "Overview",
+      "imagery": "Imagery timeline",
+      "incidents": "Incidents",
+      "inspections": "Field inspections",
+      "documents": "Legal records",
+      "audit": "Audit"
+    }
   }
 }

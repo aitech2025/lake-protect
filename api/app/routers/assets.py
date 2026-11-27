@@ -9,11 +9,13 @@
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
+import uuid
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Response, UploadFile
 from pydantic import BaseModel, ConfigDict
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from app import categories
@@ -21,7 +23,7 @@ from app.audit import chain
 from app.clock import utcnow
 from app.db import db_guard, get_db
 from app.enums import BoundaryStatus, Role
-from app.models import Asset, User
+from app.models import Alert, Asset, AssetInspection, Candidate, User
 from app.rules import config as rules
 from app.security import current_user, require_roles
 from app.services import boundaries as bsvc
@@ -33,7 +35,7 @@ router = APIRouter(tags=["assets"])
 
 _LIST_SQL = text(
     """
-    SELECT a.id, a.asset_key, a.name, a.name_te, a.type::text AS type, a.cohort::text AS cohort,
+    SELECT a.id, a.asset_key, a.platform_asset_id, pa.asset_code, a.name, a.name_te, a.type::text AS type, a.cohort::text AS cohort,
            a.district, a.mandal, a.village, a.survey_numbers, a.area_acres, a.custodian_agency,
            a.has_cctv, a.baseline_date, a.is_demo, a.notes, a.monitored, a.added_at,
            (SELECT u.name FROM users u WHERE u.id = a.added_by) AS added_by,
@@ -46,6 +48,7 @@ _LIST_SQL = text(
            sc.last_look AS screen_last_look, sc.candidates AS screen_candidates, sc.as_of AS screened_as_of,
            sc.rule_version AS screen_rule_version
     FROM assets a
+    LEFT JOIN public_assets pa ON pa.id = a.platform_asset_id
     LEFT JOIN LATERAL (
         SELECT bv.* FROM boundary_versions bv
         WHERE bv.asset_id = a.id AND bv.kind IN ('ftl', 'parcel')
@@ -56,7 +59,7 @@ _LIST_SQL = text(
     LEFT JOIN LATERAL (
         SELECT s.status, s.looks, s.first_look, s.last_look, s.candidates, r.as_of, r.rule_version
         FROM asset_screens s JOIN screen_runs r ON r.id = s.run_id
-        WHERE s.asset_id = a.id ORDER BY s.run_id DESC LIMIT 1
+        WHERE s.asset_id = a.id ORDER BY r.as_of DESC, s.run_id DESC, s.id DESC LIMIT 1
     ) sc ON true
     WHERE (CAST(:area_user AS bigint) IS NULL
            OR ST_Intersects(b.geom, (SELECT u.area_geom FROM users u WHERE u.id = CAST(:area_user AS bigint))))
@@ -267,3 +270,90 @@ def asset_week_image(asset_id: int, screen_id: int, user: User = Depends(current
     chain.record(db, actor_id=user.id, action="view.week_image", entity="asset", entity_id=asset_id, details={"screen_id": screen_id})
     db.commit()
     return Response(store.get_object(key), media_type="image/png", headers={"Cache-Control": "private, max-age=86400"})
+
+
+@router.get("/assets/{asset_id}/inspections")
+def list_asset_inspections(asset_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    if db.get(Asset, asset_id) is None:
+        raise HTTPException(404, "Asset not found")
+    rows = db.execute(text("""
+        SELECT i.id, i.alert_id, a.code AS alert_code, i.inspector_id, u.name AS inspector,
+               i.observed_at, i.lat, i.lon, i.outcome::text AS outcome, i.notes,
+               cardinality(i.photo_paths) AS photos
+        FROM asset_inspections i JOIN users u ON u.id=i.inspector_id
+        LEFT JOIN alerts a ON a.id=i.alert_id
+        WHERE i.asset_id=:asset_id ORDER BY i.observed_at DESC, i.id DESC
+    """), {"asset_id": asset_id}).mappings().all()
+    chain.record(db, actor_id=user.id, action="view.asset_inspections", entity="asset", entity_id=asset_id,
+                 details={"count": len(rows)})
+    db.commit()
+    return {"asset_id": asset_id, "items": [dict(r) for r in rows]}
+
+
+@router.post("/assets/{asset_id}/inspections", status_code=201)
+async def record_asset_inspection(
+    asset_id: int,
+    outcome: Literal["confirmed", "false_alarm", "cannot_access"] = Form(...),
+    notes: str = Form(..., min_length=3, max_length=5000),
+    observed_at: dt.datetime = Form(...),
+    alert_id: int | None = Form(None),
+    lat: float | None = Form(None, ge=-90, le=90),
+    lon: float | None = Form(None, ge=-180, le=180),
+    photos: list[UploadFile] = File(default=[]),
+    user: User = Depends(current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Append a field visit with optional EXIF-stripped evidence photos."""
+    asset = db.get(Asset, asset_id)
+    if asset is None:
+        raise HTTPException(404, "Asset not found")
+    if not notes.strip():
+        raise HTTPException(422, "Inspection notes are required")
+    if (lat is None) != (lon is None):
+        raise HTTPException(422, "Give both GPS coordinates, or neither")
+    if len(photos) > 5:
+        raise HTTPException(422, "At most five inspection photos are allowed")
+    if alert_id is not None and db.scalar(select(Alert.id).join(Candidate, Candidate.id == Alert.candidate_id)
+                                         .where(Alert.id == alert_id, Candidate.asset_id == asset_id)) is None:
+        raise HTTPException(422, "The incident does not belong to this asset")
+
+    from app.citizen.service import clean_photo
+
+    keys: list[str] = []
+    hashes: list[str] = []
+    inspection_key = uuid.uuid4().hex
+    for n, photo in enumerate(photos, 1):
+        raw = await photo.read(8 * 1024 * 1024 + 1)
+        try:
+            clean, _, _ = clean_photo(raw)
+        except Exception as exc:
+            raise HTTPException(422, str(exc)) from exc
+        key = f"field-inspections/{asset_id}/{inspection_key}/{n}.jpg"
+        digest = hashlib.sha256(clean).hexdigest()
+        store.put_object(key, clean)
+        keys.append(key)
+        hashes.append(digest)
+
+    row = AssetInspection(asset_id=asset_id, alert_id=alert_id, inspector_id=user.id,
+                          observed_at=observed_at, lat=lat, lon=lon, outcome=outcome,
+                          notes=notes.strip(), photo_paths=keys, photo_sha256=hashes)
+    db.add(row)
+    db.flush()
+    chain.record(db, actor_id=user.id, action="asset.inspection_recorded", entity="asset", entity_id=asset_id,
+                 details={"inspection_id": row.id, "alert_id": alert_id, "outcome": outcome,
+                          "observed_at": observed_at.isoformat(), "photos": len(keys)})
+    db.commit()
+    return {"id": row.id, "asset_id": asset_id, "alert_id": alert_id, "outcome": outcome}
+
+
+@router.get("/assets/{asset_id}/inspections/{inspection_id}/photos/{number}")
+def asset_inspection_photo(asset_id: int, inspection_id: int, number: int,
+                           user: User = Depends(current_user), db: Session = Depends(get_db)) -> Response:
+    row = db.get(AssetInspection, inspection_id)
+    if row is None or row.asset_id != asset_id or number < 1 or number > len(row.photo_paths):
+        raise HTTPException(404, "Inspection photo not found")
+    chain.record(db, actor_id=user.id, action="view.asset_inspection_photo", entity="asset", entity_id=asset_id,
+                 details={"inspection_id": inspection_id, "photo": number})
+    db.commit()
+    return Response(store.get_object(row.photo_paths[number - 1]), media_type="image/jpeg",
+                    headers={"Cache-Control": "private, max-age=86400"})

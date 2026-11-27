@@ -5,6 +5,7 @@ import { api, fmtDate } from "../api";
 import { useAuth } from "../auth";
 import { useAsync, usePageTitle } from "../components/Bits";
 import { PageState, TableRegion } from "../components/PageState";
+import { Documents } from "./AssetRecord";
 
 const KINDS = ["permits", "works", "court-cases"] as const;
 
@@ -12,6 +13,8 @@ export function Records() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [kind, setKind] = useState<(typeof KINDS)[number]>("permits");
+  const [assetId, setAssetId] = useState("");
+  const assets = useAsync(() => api<{ features: any[] }>("/assets"), []);
   const [message, setMessage] = useState<string | null>(null);
   const { data, error, status, loading, reload } = useAsync(() => api<{ items: any[] }>(`/records/${kind}`), [kind]);
   usePageTitle(t("records.title"));
@@ -50,6 +53,12 @@ export function Records() {
       <div className="chips" style={{ marginBottom: "1rem" }}>
         {KINDS.map((k) => <button key={k} className="chip" aria-pressed={kind === k} onClick={() => setKind(k)}>{t(`records.${k}`)}</button>)}
       </div>
+      <section className="panel records-asset-documents" data-testid="records-asset-documents">
+        <div className="person-head"><div><h2 className="title-s">{t("records.asset_documents")}</h2><p className="small muted">{t("records.asset_documents_help")}</p></div>
+          <label className="field">{t("assets.title")}<select value={assetId} onChange={(e) => setAssetId(e.target.value)}><option value="">{t("records.choose_asset")}</option>{(assets.data?.features ?? []).map((f) => <option key={f.id} value={f.id}>{f.properties.name} · {[f.properties.district, f.properties.mandal, f.properties.village].filter(Boolean).join(", ")}</option>)}</select></label>
+        </div>
+        {assetId ? <Documents assetId={Number(assetId)} /> : <p className="muted">{t("records.choose_asset")}</p>}
+      </section>
       {message && <p className="banner info" role="status" style={{ marginBottom: "1rem" }}>{message}</p>}
       <PageState loading={loading && !data} error={error} status={status} onRetry={reload} />
       {!error && data && data.items.length === 0 && <p className="muted">{t("records.empty")}</p>}

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api, fmtDate, fmtDateTime } from "../api";
 import { isAdmin, useAuth } from "../auth";
@@ -124,6 +124,7 @@ export function Assets() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const linked = params.get("asset");
   const [selected, setSelected] = useState<number | null>(linked ? Number(linked) : null);
@@ -133,31 +134,34 @@ export function Assets() {
   const { data, error, status, loading, reload } = useAsync(() => api<{ features: any[] }>("/assets"), []);
   const cats = useAsync(() => api<Categories>("/categories"), []);
   const [kind, setKind] = useState("all");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedMandal, setSelectedMandal] = useState("");
+  const [tab, setTab] = useState<"all" | "lakes" | "lands" | "citizen">("all");
+  const reports = useAsync(() => api<{ items: any[] }>("/reports"), []);
+  const [selectedDistrict, setSelectedDistrict] = useState(params.get("district") ?? "");
+  const [selectedMandal, setSelectedMandal] = useState(params.get("mandal") ?? "");
   const [showStopped, setShowStopped] = useState(false);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState<string | null>(null);
   const all = useMemo(() => data?.features ?? [], [data]);
   const districts = useMemo(
-    () => Array.from(new Set(all.map((f) => f.properties.district).filter(Boolean))).sort(),
-    [all],
+    () => Array.from(new Set((tab === "citizen" ? reports.data?.items ?? [] : all).map((f: any) => f.properties?.district ?? f.district).filter(Boolean))).sort(),
+    [all, reports.data, tab],
   );
   const mandals = useMemo(
-    () => Array.from(new Set(all.filter((f) => !selectedDistrict || f.properties.district === selectedDistrict)
-      .map((f) => f.properties.mandal).filter(Boolean))).sort(),
-    [all, selectedDistrict],
+    () => Array.from(new Set((tab === "citizen" ? reports.data?.items ?? [] : all).filter((f: any) => !selectedDistrict || (f.properties?.district ?? f.district) === selectedDistrict)
+      .map((f: any) => f.properties?.mandal ?? f.mandal).filter(Boolean))).sort(),
+    [all, reports.data, selectedDistrict, tab],
   );
   const stopped = all.filter((f) => !f.properties.monitored).length;
   const features = useMemo(
     // Places made from citizens' reports are not watched until an official adds them (D-063, D-064),
     // so choosing their kind shows them all.
-    () => all.filter((f) => (kind === "all" || f.properties.category === kind)
+    () => all.filter((f) => (tab === "all" || (tab === "lakes" ? f.properties.category === "water_body" : tab === "lands" ? f.properties.category !== "water_body" && f.properties.category !== "citizen_reported" : false))
+      && (kind === "all" || f.properties.category === kind)
       && (!selectedDistrict || f.properties.district === selectedDistrict)
       && (!selectedMandal || f.properties.mandal === selectedMandal)
       && (showStopped || f.properties.monitored || f.id === selected || kind === "citizen_reported")
       && (!linked || f.id === selected)),
-    [all, kind, selectedDistrict, selectedMandal, showStopped, selected, linked],
+    [all, kind, selectedDistrict, selectedMandal, showStopped, selected, linked, tab],
   );
   const labelOf = (category: string) => {
     const c = cats.data?.items.find((x) => x.name === category);
@@ -178,6 +182,8 @@ export function Assets() {
     () => (versions ? { type: "FeatureCollection" as const, features: versions.features.filter((f) => f.properties.in_force) } : mapFc),
     [versions, mapFc],
   );
+  const reportRows = (reports.data?.items ?? []).filter((r) => tab === "citizen" && (!selectedDistrict || r.district === selectedDistrict) && (!selectedMandal || r.mandal === selectedMandal));
+  const reportPins = reportRows.filter((r) => r.lon != null && r.lat != null).map((r) => ({ id: r.id, lon: r.lon, lat: r.lat, colour: "#bb5949", label: r.ref, onClick: () => navigate(`/reports/${r.id}`) }));
 
   const startAdding = () => {
     setSelected(null);
@@ -212,7 +218,10 @@ export function Assets() {
           }}
         />
       )}
-      {cats.data && <KindsStrip cats={cats.data} kind={kind} setKind={setKind} />}
+      {cats.data && tab !== "citizen" && <KindsStrip cats={cats.data} kind={kind} setKind={(k) => { setKind(k); setTab(k === "all" ? "all" : k === "water_body" ? "lakes" : "lands"); }} />}
+      <nav className="chips asset-tabs" aria-label={t("assets.tabs")} role="tablist">
+        {(["all", "lakes", "lands", "citizen"] as const).map((k) => <button key={k} type="button" role="tab" aria-selected={tab === k} className="chip" aria-pressed={tab === k} onClick={() => { setTab(k); setKind("all"); setSelected(null); }}>{t(k === "all" ? "group.all" : `assets.tab.${k}`)}</button>)}
+      </nav>
       <section className="section asset-registry-filters" data-testid="registry-filters" aria-label={t("assets.registry_filters")}>
         <label className="field">
           {t("assets.filter_district")}
@@ -240,17 +249,17 @@ export function Assets() {
         </label>
       )}
       <p className="note" style={{ marginBottom: "1rem" }}>{t("assets.real_note")}</p>
-      <ScreeningSummary />
+      {tab !== "citizen" && <ScreeningSummary />}
       <PageState loading={loading && !data} error={error} status={status} onRetry={reload} />
       <div className="queue" style={{ height: "auto" }}>
-        <div className="mapbox" style={{ height: 520 }}>
-          <MapView boundaries={selected ? selectedFc : mapFc} />
+        <div className="mapbox asset-map" style={{ height: 620 }}>
+          <MapView boundaries={tab === "citizen" ? undefined : selected ? selectedFc : mapFc} pins={tab === "citizen" ? reportPins : []} />
         </div>
-        <div className="list" style={{ maxHeight: 520 }}>
-          {features.map((f) => {
+        <div className="list" style={{ maxHeight: 620 }}>
+          {tab === "citizen" ? reportRows.map((r) => <button key={r.id} type="button" className="row" onClick={() => navigate(`/reports/${r.id}`)}><span className="bar" style={{ background: "#bb5949" }} /><span><h3>{r.ref} · {t(`reports.what.${r.what}`)}</h3><span className="meta"><span>{r.district ?? t("dashboard.not_recorded")}{r.mandal ? ` · ${r.mandal}` : ""}{r.village ? ` · ${r.village}` : ""}</span><span>{t(`reports.status.${r.status}`)}</span></span></span></button>) : features.map((f) => {
             const p = f.properties;
             return (
-              <button key={f.id} className="row" style={{ width: "100%", border: 0, background: selected === f.id ? "#eef3f0" : "transparent", textAlign: "left" }} onClick={() => setSelected(f.id)}>
+              <button key={f.id} className="row" style={{ width: "100%", border: 0, background: selected === f.id ? "#eef3f0" : "transparent", textAlign: "left" }} onClick={() => navigate(`/assets/${f.id}`)}>
                 <span className="bar" style={{ background: !p.monitored ? "#9aa5a0" : p.category === "water_body" ? "#1f6fa8" : "#b08a3e" }} />
                 <span>
                   <h3>{lang === "te" && p.name_te ? p.name_te : p.name} {!p.monitored && <span className="pill closed">{t("locations.not_watched")}</span>}</h3>
@@ -260,7 +269,7 @@ export function Assets() {
                     <span>{t(`mode.${p.mode}`)}</span>
                     {p.area_acres !== null && <span>{t("assets.acres", { acres: p.area_acres })}</span>}
                     <span>{t("assets.baseline", { date: fmtDate(p.baseline_date, lang) })}</span>
-                    {p.district && <span>{p.district}{p.mandal ? " · " + p.mandal : ""}</span>}
+                    <span>{p.district ?? t("dashboard.not_recorded")}{p.mandal ? " · " + p.mandal : ""}{p.village ? " · " + p.village : ""}</span>
                   </span>
                   {p.boundary_source && <span className="small muted" data-testid="boundary-provenance">{t("assets.boundary_source")}: {p.boundary_source}</span>}
                   <CoverageLine p={p} />

@@ -26,6 +26,11 @@ STATUS_LABEL = {
     "failed": "Screen failed",
 }
 
+# Keep the active imagery thread to the most recent two months. Older weekly artifacts remain
+# addressable through their stored object key, but live in the archive namespace on the same durable
+# object store until a remote cold-storage backend is configured.
+ACTIVE_IMAGE_DAYS = 60
+
 
 def iso_week(day: dt.date) -> str:
     year, week, _ = day.isocalendar()
@@ -39,7 +44,9 @@ def store_image(asset: Asset, as_of: dt.date, png_b64: str | None) -> str | None
     if not data.startswith(b"\x89PNG"):
         raise ValueError("A weekly image must be a PNG")
     digest = hashlib.sha256(data).hexdigest()[:16]
-    return store.put_object(f"weeks/{asset.asset_key}/{as_of.isoformat()}_{digest}.png", data)
+    cutoff = dt.datetime.now(dt.timezone.utc).date() - dt.timedelta(days=ACTIVE_IMAGE_DAYS)
+    namespace = "weeks" if as_of >= cutoff else "archive/weeks"
+    return store.put_object(f"{namespace}/{asset.asset_key}/{as_of.isoformat()}_{digest}.png", data)
 
 
 def change_entries(db: Session, asset_id: int, items: list[dict]) -> list[dict]:
@@ -70,12 +77,22 @@ def changes_since(db: Session, asset_id: int, since: dt.datetime) -> list[dict]:
 
 _WEEKS_SQL = text(
     """
-    SELECT s.id AS screen_id, s.run_id, r.as_of, coalesce(s.week, to_char(r.as_of, 'IYYY-"W"IW')) AS week,
-           s.status, s.looks, s.first_look, s.last_look, s.candidates, s.legacy_changes, s.image_key IS NOT NULL AS has_image,
-           s.image_date, s.image_scene_id, s.changes, r.rule_version
-    FROM asset_screens s JOIN screen_runs r ON r.id = s.run_id
-    WHERE s.asset_id = :a
-    ORDER BY r.as_of DESC, s.id DESC
+    WITH ranked AS (
+        SELECT s.id AS screen_id, s.run_id, r.as_of, coalesce(s.week, to_char(r.as_of, 'IYYY-"W"IW')) AS week,
+               s.status, s.looks, s.first_look, s.last_look, s.candidates, s.legacy_changes,
+               s.image_key IS NOT NULL AS has_image, s.image_date, s.image_scene_id, s.changes, r.rule_version,
+               row_number() OVER (
+                   PARTITION BY coalesce(s.week, to_char(r.as_of, 'IYYY-"W"IW'))
+                   ORDER BY r.as_of DESC, s.id DESC
+               ) AS week_rank
+        FROM asset_screens s JOIN screen_runs r ON r.id = s.run_id
+        WHERE s.asset_id = :a
+    )
+    SELECT screen_id, run_id, as_of, week, status, looks, first_look, last_look, candidates, legacy_changes,
+           has_image, image_date, image_scene_id, changes, rule_version
+    FROM ranked
+    WHERE week_rank = 1
+    ORDER BY as_of DESC, screen_id DESC
     LIMIT :n
     """
 )
