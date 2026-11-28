@@ -2,7 +2,8 @@
 
 Sent after each weekly screen. It counts the assets watched and seen clearly, names those with no
 clear look, lists each change found that week with its incident, and says what is waiting for the
-reader: reviews for an official, decisions for the admin.
+reader (D-067): reviews and recommendations for a district officer, approvals for a senior official.
+The admin gets the State's figures with nothing waiting; field officers get none.
 """
 from __future__ import annotations
 
@@ -28,7 +29,9 @@ def week_dates(week: str) -> tuple[dt.date, dt.date]:
 def build(db: Session, user: User, week: str, at: dt.datetime) -> dict | None:
     """The digest's facts for this user, or None when the user covers no area."""
     areas = routing.areas_of(db, user.id)
-    admin = user.role == Role.admin.value
+    if user.role == Role.field_officer.value:
+        return None
+    admin = user.role in (Role.admin.value, Role.senior_official.value)
     if not admin and not areas:
         return None
     scope = routing.scope_sql(user)
@@ -71,11 +74,13 @@ def build(db: Session, user: User, week: str, at: dt.datetime) -> dict | None:
     start_t = dt.datetime.combine(start, dt.time(), tzinfo=dt.timezone.utc)
     end_t = start_t + dt.timedelta(days=7)
     new = [i for i in incidents if start_t <= i["created_at"] < end_t and i["resolution"] != "auto"]
-    reviewable = [i for i in incidents if i["state"] in ("OPEN", "UNDER_REVIEW")]
-    if admin:
-        waiting = [i for i in reviewable if i["state"] == "UNDER_REVIEW"]
+    reviewable = [i for i in incidents if i["state"] in ("OPEN", "UNDER_REVIEW", "FIELD_VISIT", "FIELD_REPORTED", "RECOMMENDED")]
+    if user.role == Role.senior_official.value:
+        waiting = [i for i in reviewable if i["state"] == "RECOMMENDED"]
+    elif user.role == Role.admin.value:
+        waiting = []
     else:
-        waiting = [i for i in reviewable if not i["reviewed_by_me"]]
+        waiting = [i for i in reviewable if i["state"] in ("OPEN", "UNDER_REVIEW", "FIELD_REPORTED") and not i["reviewed_by_me"]]
     waiting.sort(key=lambda i: i["created_at"])
     old = [i for i in reviewable if (at - i["created_at"]).days > WAITING_DAYS]
 

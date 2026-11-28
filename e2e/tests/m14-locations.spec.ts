@@ -15,6 +15,7 @@ test("the admin adds, refuses a duplicate of, and stops watching a location", as
   const districtFilter = page.getByTestId("filter-district");
   const mandalFilter = page.getByTestId("filter-mandal");
   await expect(districtFilter).toBeVisible();
+  await expect.poll(async () => districtFilter.locator("option").count()).toBeGreaterThan(1);
   expect(await districtFilter.locator("option").count()).toBeGreaterThan(1);
   let selectedDistrict = "";
   for (let i = 1; i < await districtFilter.locator("option").count(); i++) {
@@ -34,9 +35,10 @@ test("the admin adds, refuses a duplicate of, and stops watching a location", as
 
   // Asset 360 must expose source class and avoid implying authority for unverified outlines.
   await page.locator(".list .row", { hasText: "Kapra lake" }).first().click();
-  await expect(page.getByTestId("asset-register")).toBeVisible();
-  await expect(page.getByTestId("boundary-provenance")).toBeVisible();
-  await expect(page.getByTestId("boundary-provenance")).toContainText(/unverified|unclassified|OpenStreetMap/i);
+  await expect(page).toHaveURL(/\/assets\/\d+$/);
+  await expect(page.getByTestId("asset360")).toBeVisible();
+  await expect(page.getByTestId("asset360")).toContainText(/OpenStreetMap/i);
+  await page.goto("/assets");
 
   // What GeoGuard watches now, and what is planned.
   await expect(page.getByTestId("kind-card-water_body")).toContainText("99 watched");
@@ -85,6 +87,9 @@ test("the admin adds, refuses a duplicate of, and stops watching a location", as
 
   // Stop watching the test location: nothing is deleted, and the reason is kept.
   await page.locator(".list .row", { hasText: "Test parcel, browser check" }).last().click();
+  const assetRoute = new URL(page.url());
+  const assetId = assetRoute.pathname.split("/").at(-1);
+  await page.goto(`/assets?asset=${assetId}`);
   await page.getByTestId("watch-toggle").click();
   await expect(page.locator(".watch-form .banner")).toContainText("Nothing is deleted");
   await page.getByTestId("watch-reason").fill("End of the browser check");

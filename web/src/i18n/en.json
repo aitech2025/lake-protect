@@ -1,7 +1,8 @@
 {
   "app": {
     "name": "GeoGuard",
-    "tagline": "Weekly satellite watch over lakes and government land"
+    "tagline": "Weekly satellite watch over lakes and government land",
+    "region": "Telangana"
   },
   "nav": {
     "queue": "Incidents",
@@ -21,7 +22,26 @@
     "reports": "Citizen reports",
     "satellites": "Satellites",
     "whatsapp_test": "WhatsApp test",
-    "map": "Map"
+    "map": "Map",
+    "workspace_label": "OFFICIAL OPERATIONS",
+    "evidence_note": "Evidence-led public administration",
+    "open_menu": "Open navigation",
+    "close_menu": "Close navigation",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar",
+    "group": {
+      "workspace": "Workspace",
+      "investigations": "Casework",
+      "registry": "Places and records",
+      "data": "Data and oversight",
+      "admin": "Administration"
+    },
+    "registry": "Registry",
+    "system": "System status",
+    "citizen_ops": "Citizen operations",
+    "account": "Account menu for {{name}}",
+    "breadcrumb": "Current page",
+    "switch_language": "Switch language"
   },
   "login": {
     "title": "Sign in with a demo account",
@@ -30,7 +50,16 @@
       "admin": "Runs the application: sources, documents and decisions on incidents",
       "viewer": "Sees every location, week and incident, and records reviews"
     },
-    "citizen": "Are you a citizen? Report a problem on public land"
+    "citizen": "Are you a citizen? Report a problem on public land",
+    "kicker": "Land and asset protection",
+    "platform": "Officials review each change the weekly screen finds against the boundary on record. Every review and decision is kept in the audit log.",
+    "access_label": "SECURE ACCESS",
+    "staff_label": "OFFICIAL SIGN IN",
+    "signing_in": "Signing in…",
+    "continue": "Continue",
+    "secure_note": "Access follows your existing account role.",
+    "footer": "Government monitoring workspace",
+    "imagery_caption": "Sentinel-2 base map of central Hyderabad, latest scene {{date}}"
   },
   "role": {
     "admin": "Admin",
@@ -115,7 +144,8 @@
     "legend_solid": "Solid line: confirmed",
     "legend_dashed": "Dashed line: preliminary",
     "legend_dotted": "Dotted line: estimated",
-    "version": "Version {{v}}"
+    "version": "Version {{v}}",
+    "legend_title": "How boundary lines are drawn"
   },
   "mode": {
     "ACTION": "Full path to officer",
@@ -185,7 +215,9 @@
     "linked_clear": "Show all incidents",
     "citizen": "Citizen report",
     "citizen_reports": "{{count}} citizen report(s)",
-    "land_group": "Incident category"
+    "land_group": "Incident category",
+    "filters": "Filter incidents",
+    "clear_filters": "Clear filters"
   },
   "detail": {
     "back": "All incidents",
@@ -487,7 +519,8 @@
     "legend_water": "Lakes and water bodies",
     "legend_land": "Government land",
     "legend_new": "New incident this month",
-    "legend_waiting": "Waiting over {{days}} days for a decision"
+    "legend_waiting": "Waiting over {{days}} days for a decision",
+    "choose": "Month"
   },
   "officer": {
     "title": "Officer record",
@@ -685,7 +718,7 @@
     "as_of": "Screen of {{date}}",
     "area": "About {{area}} sq m",
     "continues": "seen again",
-    "archive": "Archive ? {{count}} older checks"
+    "archive": "Archive: {{count}} older checks"
   },
   "docs": {
     "title": "Legal documents",
@@ -779,7 +812,15 @@
     "planned": "planned",
     "not_watched": "no longer watched",
     "back_district": "Back to {{district}} district",
-    "back_overview": "Back to state overview"
+    "back_overview": "Back to state overview",
+    "group": {
+      "week": "This week's satellite look",
+      "casework": "Casework",
+      "notices": "Notices"
+    },
+    "legend": "Map legend",
+    "as_chart": "Show as chart",
+    "table_hint": "Numbers open the incidents behind them"
   },
   "inbox": {
     "title": "Inbox",
@@ -825,7 +866,8 @@
     "banner_reminded": "A reminder followed.",
     "banner_viewer": "Recording your review acknowledges it.",
     "banner_admin": "Your next step on it acknowledges it.",
-    "open_report": "Open report"
+    "open_report": "Open report",
+    "show_all": "Show all notifications"
   },
   "officials": {
     "title": "Officials",
@@ -1100,7 +1142,8 @@
     "place_title": "Put it on the map",
     "place_help": "Click where it is. An incident opens there with a satellite review, as for any report.",
     "place": "Place it here",
-    "incident_flow": "Officials work this report on its incident: reviews, sharper images, decision and closing."
+    "incident_flow": "Officials work this report on its incident: reviews, sharper images, decision and closing.",
+    "photo_count": "{{count}} photos attached"
   },
   "citizen_incident": {
     "title": "Reported by a citizen",
@@ -1289,10 +1332,10 @@
     "restart": "Restart chat",
     "ready_title": "Start a test conversation",
     "ready_text": "The first message opens the same guided flow used by WhatsApp intake.",
-    "start": "Send ?Hi?",
+    "start": "Send “Hi”",
     "quick_replies": "Suggested replies",
     "message_placeholder": "Type a reply",
-    "sending": "Sending?",
+    "sending": "Sending…",
     "send": "Send",
     "pin_sent": "Shared a location pin",
     "location_step": "Location message",
@@ -1314,8 +1357,8 @@
     "flow_detail": "Photo skip and written details",
     "flow_created": "Report and incident creation",
     "no_photo_download": "Photo upload is not simulated here; WhatsApp media download still needs provider configuration.",
-    "english": "1 ? English",
-    "telugu": "2 ? Telugu",
+    "english": "1: English",
+    "telugu": "2: Telugu",
     "skip": "Skip",
     "yes": "Yes",
     "no": "No"
@@ -1350,7 +1393,12 @@
     "ready": "Ready"
   },
   "map": {
-    "assets_count": "{{count}} assets across the map"
+    "assets_count": "{{count}} assets across the map",
+    "show": "Show",
+    "hint": "Select a pin to open the location's record.",
+    "legend_lake": "Lake or water body",
+    "legend_land": "Government land",
+    "legend_stopped": "Not watched"
   },
   "inspection": {
     "title": "Field inspections",
@@ -1363,14 +1411,14 @@
     "gps_error": "Could not get GPS position.",
     "photo_alt": "Inspection evidence",
     "save": "Save inspection",
-    "saving": "Saving inspection?",
+    "saving": "Saving inspection…",
     "saved": "Field inspection saved.",
     "empty": "No field visits recorded for this asset yet."
   },
   "asset360": {
     "title": "Asset 360",
     "back": "Locations",
-    "kicker": "ASSET 360",
+    "kicker": "Asset 360",
     "sections": "Asset 360 sections",
     "asset_code": "Permanent asset ID",
     "baseline": "Monitoring baseline",
@@ -1402,5 +1450,244 @@
       "documents": "Legal records",
       "audit": "Audit"
     }
+  },
+  "search": {
+    "label": "Search assets, incidents and reports",
+    "placeholder": "Search locations, incidents, reports",
+    "results": "Search results",
+    "empty": "No matching records",
+    "hint": "Assets · incidents · citizen reports",
+    "group": {
+      "assets": "Locations",
+      "incidents": "Incidents",
+      "citizen": "Citizen reports",
+      "pages": "Go to"
+    },
+    "loading": "Searching…",
+    "unavailable": "Search is unavailable. Try again later.",
+    "partial": "Some search sources are unavailable: {{sources}}.",
+    "retry": "Retry",
+    "move": "to move",
+    "open": "to open",
+    "close": "to close"
+  },
+  "rail": {
+    "never": "The weekly screen has not run yet",
+    "screen": "Weekly screen, {{date}}",
+    "seen": "{{seen}} of {{total}} locations seen clearly",
+    "rules": "Rules {{rule}}"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "Match device"
+  },
+  "common": {
+    "close": "Close"
+  },
+  "registry": {
+    "title": "Registry",
+    "lede": "The statewide register of public assets with permanent codes, the departments responsible for them, and reported places waiting for verification. The admin makes changes, and each one is recorded in the audit log.",
+    "sections": "Registry sections",
+    "tab": {
+      "assets": "Registered assets",
+      "candidates": "Reported places",
+      "departments": "Departments"
+    },
+    "search": "Find",
+    "search_hint": "Code or name",
+    "category": "Category",
+    "category_name": {
+      "lake": "Lake",
+      "revenue_parcel": "Revenue parcel",
+      "water_body": "Water body",
+      "government_land": "Government land"
+    },
+    "add_asset": "Add a registered asset",
+    "add_asset_help": "A registered asset carries a permanent code. Places reported by citizens stay under Reported places until verified.",
+    "asset_added": "Asset {{code}} added to the registry.",
+    "no_assets": "No registered assets match",
+    "col": {
+      "code": "Asset code",
+      "name": "Name",
+      "authority": "Source authority",
+      "lifecycle": "Lifecycle",
+      "baseline": "Baseline",
+      "candidate": "Reference",
+      "hint": "Reported as",
+      "place": "Place",
+      "status": "Status",
+      "reported": "Reported",
+      "incident": "Incident",
+      "dept_code": "Code",
+      "parent": "Parent department"
+    },
+    "authority": {
+      "AUTHORITATIVE": "Authoritative",
+      "CERTIFIED": "Certified",
+      "DERIVED": "Derived",
+      "EXTERNAL": "External",
+      "FIELD": "Field",
+      "MODEL": "Model",
+      "UNVERIFIED": "Unverified"
+    },
+    "lifecycle": {
+      "ACTIVE": "Active",
+      "RETIRED": "Retired",
+      "MERGED": "Merged",
+      "DRAFT": "Draft"
+    },
+    "showing": "{{n}} shown",
+    "more": "Show more",
+    "source_ref": "Source record reference",
+    "none": "None recorded",
+    "no_footprint": "No footprint is recorded for this asset.",
+    "responsibilities": "Responsible departments",
+    "no_responsibilities": "No department is recorded as responsible today.",
+    "valid": "From {{from}} to {{to}}",
+    "open_ended": "no end date",
+    "relationship": {
+      "OWNER": "Owner",
+      "CUSTODIAN": "Custodian",
+      "POSSESSOR": "In possession",
+      "JURISDICTION": "Jurisdiction",
+      "OPERATIONAL": "Operations",
+      "ENFORCEMENT": "Enforcement",
+      "DATA_STEWARD": "Data steward"
+    },
+    "relationship_label": "Relationship",
+    "add_responsibility": "Record a responsible department",
+    "record_responsibility": "Record responsibility",
+    "responsibility_added": "Responsibility recorded.",
+    "need_department": "Add a department on the Departments tab before recording responsibility.",
+    "department": "Department",
+    "choose": "Choose…",
+    "valid_from": "Valid from",
+    "valid_to": "Valid to (optional)",
+    "code_help": "Letters, numbers, dots, dashes and underscores",
+    "category_help": "For example lake or revenue_parcel",
+    "reported_place": "Reported places are kept separately until verified",
+    "ref_required": "Required for authoritative or certified sources",
+    "ref_optional": "Optional for this source authority",
+    "create_asset": "Add to registry",
+    "candidate_notice": "Reported places are unverified, not registered government assets. An official verifies each one before it can be registered.",
+    "no_candidates": "No reported places are waiting",
+    "no_candidates_help": "Places that citizens report outside the registry appear here until they are verified.",
+    "candidate_status": {
+      "PENDING_VERIFICATION": "Waiting for verification",
+      "VERIFIED": "Verified",
+      "REJECTED": "Rejected",
+      "MERGED": "Merged"
+    },
+    "open_incident": "Open incident",
+    "previous": "Previous",
+    "next": "Next",
+    "source_report": "Citizen report",
+    "predictions": "Review priority score",
+    "no_prediction": "No priority score has been recorded for this place.",
+    "prediction_unavailable": "The priority score could not be loaded: {{msg}}",
+    "prediction_score": "{{type}}: {{score}}",
+    "no_departments": "No departments yet",
+    "no_departments_admin": "Add the first department with the form beside this list.",
+    "no_departments_viewer": "The admin adds departments; they will appear here.",
+    "add_department": "Add a department",
+    "no_parent": "None (top level)",
+    "create_department": "Add department",
+    "department_added": "{{name}} added.",
+    "access_title": "Department access",
+    "user": "Person",
+    "access_level": "Access",
+    "access": {
+      "READ": "Read",
+      "CONTRIBUTE": "Contribute",
+      "MANAGE": "Manage"
+    },
+    "access_help": "Granting starts access on the date chosen. Revoking ends any open access today. The registry does not list current members yet.",
+    "grant": "Grant access",
+    "revoke": "Revoke access",
+    "access_granted": "Access granted.",
+    "access_revoked": "Access revoked."
+  },
+  "system": {
+    "title": "System status",
+    "lede": "Configuration checks for this installation, the detection models and the pipeline's processing runs. A passing check is not a security audit or a production approval.",
+    "readiness": "Configuration checks",
+    "refresh": "Check again",
+    "overall": {
+      "prototype_ready": "Prototype ready",
+      "not_ready": "Not ready"
+    },
+    "production_yes": "Production ready",
+    "production_no": "Not certified for production",
+    "migration": "Database migration",
+    "check": {
+      "database": "Database",
+      "schema_migrations": "Schema migrations",
+      "object_storage": "File storage",
+      "jwt_signing_secret": "Sign-in signing secret",
+      "pipeline_ingestion": "Pipeline ingestion",
+      "public_url": "Public address",
+      "email_delivery": "Email delivery",
+      "department_data_isolation": "Department data isolation",
+      "sso_mfa": "Single sign-on and MFA",
+      "government_authorization": "Government data agreements",
+      "high_availability_dr": "Availability and recovery",
+      "security_assessment": "Security assessment"
+    },
+    "status": {
+      "configured": "Configured",
+      "failed": "Failed",
+      "not_configured": "Not configured",
+      "weak_or_missing": "Weak or missing",
+      "not_production_url": "Not a production address",
+      "local_or_disabled": "Local or disabled",
+      "not_verified": "Not verified"
+    },
+    "models": "Detection models",
+    "models_help": "Approval needs a passing evaluation; promotion needs an approved model",
+    "no_models": "No model versions are registered",
+    "no_models_help": "The pipeline registers a model version with its stored artifact and model card. It then appears here for evaluation and approval.",
+    "col": {
+      "model": "Model",
+      "task": "Task",
+      "status": "Status",
+      "schema": "Feature schema",
+      "registered": "Registered",
+      "approved": "Approved",
+      "type": "Type",
+      "dataset": "Dataset",
+      "result": "Result",
+      "evaluator": "Evaluator",
+      "when": "When",
+      "notes": "Notes",
+      "pipeline": "Pipeline",
+      "attempt": "Attempt",
+      "started": "Started",
+      "finished": "Finished",
+      "error": "Error code",
+      "correlation": "Correlation ID"
+    },
+    "approve": "Approve",
+    "promote": "Promote to production",
+    "approve_confirm": "Approve this model version? Its latest evaluation must have passed and the stored artifact must match its SHA-256.",
+    "promote_confirm": "Promote this model to production? The current production model for the same task moves to shadow.",
+    "approve_done": "Model approved.",
+    "promote_done": "Model promoted to production.",
+    "evaluations": "Evaluations",
+    "evaluations_for": "Evaluations of {{name}}",
+    "all_models": "Show all models",
+    "no_evaluations": "No evaluations recorded.",
+    "passed": "Passed",
+    "failed": "Did not pass",
+    "record_evaluation": "Record an evaluation of {{name}}",
+    "metrics": "Metrics (JSON object)",
+    "metrics_help": "For example {\"precision\": 0.82, \"recall\": 0.74}",
+    "passed_label": "The evaluation passed",
+    "save_evaluation": "Save evaluation",
+    "evaluation_saved": "Evaluation recorded.",
+    "runs": "Processing runs",
+    "no_runs": "No processing runs recorded",
+    "no_runs_help": "Runs reported by the pipeline appear here with their status and any error."
   }
 }

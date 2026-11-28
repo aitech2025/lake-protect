@@ -17,8 +17,8 @@ export default defineConfig({
         start_url: "/alerts",
         scope: "/",
         display: "standalone",
-        background_color: "#ffffff",
-        theme_color: "#1c2b33",
+        background_color: "#f1f2ef",
+        theme_color: "#1d4f91",
         icons: [{ src: "/favicon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" }],
       },
       workbox: {

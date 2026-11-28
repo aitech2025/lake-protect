@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { Camera } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api, fmtDate, fmtDateTime } from "../api";
 import { AuthImage, useAsync, usePageTitle } from "../components/Bits";
@@ -16,7 +17,7 @@ type Row = {
   duplicate_of_ref: string | null; duplicates: number; status: string; closed_reason: string | null; false_report: boolean; flags: string[];
   updates: boolean; phone_masked: string | null; has_name: boolean; source_ref: string | null; created_at: string;
 };
-const STATUS_COLOUR: Record<string, string> = { RECEIVED: "#b5651d", CHECKING: "#1f6fa8", CLOSED: "#75848b" };
+const STATUS_COLOUR: Record<string, string> = { RECEIVED: "#9a6508", CHECKING: "#11686e", CLOSED: "#64748b" };
 
 function placeLabel(r: Row, t: (k: string, o?: any) => string, lang: string): string {
   if (r.asset_name) return `${lang === "te" && r.asset_name_te ? r.asset_name_te : r.asset_name}, ${t(`reports.zone.${r.zone ?? "inside"}`)}`;
@@ -76,7 +77,7 @@ export function Reports() {
                   <tr key={r.id} data-testid={`report-row-${r.ref}`}>
                     <td><Link to={`/reports/${r.id}`}><code>{r.ref}</code></Link><div className="small muted">{t(`reports.channel.${r.channel}`)}</div></td>
                     <td>{fmtDateTime(r.created_at, lang)}</td>
-                    <td>{t(`reports.what.${r.what}`)}{r.photos > 0 && <span className="small muted"> · {r.photos} 📷</span>}</td>
+                    <td>{t(`reports.what.${r.what}`)}{r.photos > 0 && <span className="small muted photo-count" title={t("reports.photo_count", { count: r.photos })}><Camera size={14} aria-hidden="true" />{r.photos}<span className="sr-only"> {t("reports.photo_count", { count: r.photos })}</span></span>}</td>
                     <td>{placeLabel(r, t, lang)}{r.alert_code && <div className="small"><Link to={`/alerts/${r.alert_id}`}>{r.alert_code}</Link></div>}
                       {r.duplicate_of_ref && <div className="small muted">{t("reports.duplicate_of", { ref: r.duplicate_of_ref })}</div>}</td>
                     <td><span className="pill" style={{ background: "#eef1ef", color: STATUS_COLOUR[r.status] }}>{t(`reports.status.${r.status}`)}</span>

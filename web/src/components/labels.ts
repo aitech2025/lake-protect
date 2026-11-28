@@ -10,11 +10,11 @@ export const GROUP_OF: Record<string, string> = {
 };
 
 export const GROUP_COLOUR: Record<string, string> = {
-  open: "#b07219",
-  review: "#1f6fa8",
-  confirmed: "#c4402f",
-  dismissed: "#6b5a91",
-  closed: "#8a979d",
+  open: "#c94b4b",
+  review: "#167c80",
+  confirmed: "#27845a",
+  dismissed: "#64748b",
+  closed: "#8795a2",
 };
 
 /** What changed, in the order officials name it. */

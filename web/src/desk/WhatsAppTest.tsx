@@ -36,7 +36,9 @@ export function WhatsAppTest() {
     api<{ whats: Whats[] }>("/citizen/config").then((r) => live && setChoices(r.whats)).catch(() => undefined);
     return () => { live = false; };
   }, []);
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }), [lines]);
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [lines]);
 
   const call = async (message: { type: "text"; text: string } | { type: "location"; latitude: number; longitude: number }, display: string, location?: [number, number]) => {
     if (busy) return;

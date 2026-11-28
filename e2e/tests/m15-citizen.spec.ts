@@ -178,12 +178,7 @@ test.describe("a place no one watches yet", () => {
     await page.screenshot({ path: shot("m18-05-weekly-watch"), fullPage: true });
     await page.goto(`/report/track/${ref}`);
     await expect(page.getByTestId("track-events")).toContainText("weekly watch");
-    // Stop watching it again, as m14 does, so a rerun starts from the same counts.
-    await page.goto("/assets");
-    await page.locator(".list .row", { hasText: ref }).first().click();
-    await page.getByTestId("watch-toggle").click();
-    await page.getByTestId("watch-reason").fill("End of the browser check");
-    await page.getByTestId("watch-confirm").click();
-    await expect(page.getByTestId("watch-status")).toContainText("Not watched since");
+    // A citizen location remains an incident candidate until authority verification. It is not
+    // converted into a permanent registry asset here, so there is no asset watch to stop.
   });
 });

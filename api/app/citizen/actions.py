@@ -1,18 +1,20 @@
-"""What officials and the admin do on an incident a citizen reported (DECISIONS.md D-064).
+"""What officers do on an incident a citizen reported (DECISIONS.md D-064, D-067).
 
-Both roles may:
+The district officer of the area and senior officials may (the admin takes no step on an incident):
 - **acknowledge** it, once each, with an optional note. The first acknowledgement starts the
   review, and the citizen is told an official is reviewing it.
 - **add notes** at any time. Notes stay inside and are kept for good.
 - **request a satellite look**: the latest, or a past date to compare (app.citizen.incident).
-- **request a sharper paid image**. The admin approves or declines it; nothing is ordered in the
-  prototype.
+- **request a sharper paid image**. A senior official approves or declines it; nothing is ordered
+  in the prototype.
 - **attach the legal records** at the place. Each attachment is a dated snapshot, kept beside the
   earlier ones.
-- **attach a legal document**: a file or a reference, kept on the location as well.
-- **approve** (confirm), **decline** (dismiss; passed to a department, or false), and then
-  **close**, each with a note. Approving or declining an open incident starts its review first.
+- **attach a legal document**: a file or a reference, kept on the location as well. The field
+  officer on the visit may attach documents and add notes too.
 - **add the place to the weekly watch**, with a reason, when it is not watched yet.
+
+Deciding follows the incident lifecycle (app.workflow.incidents): the district officer recommends,
+the senior official approves and closes.
 
 Every step is in the audit log. The citizen is told the steps that matter to them, in their
 language, never an official's note.
@@ -41,6 +43,14 @@ def require_citizen(alert: Alert) -> None:
         raise lifecycle.Refused("This is for incidents opened by a citizen's report", 422)
 
 
+def require_officer(db: Session, alert: Alert, user: User, *, field_officer: bool = False) -> None:
+    """The district officer of the area or a senior official; with `field_officer`, also the one on the visit."""
+    who = lifecycle.Actor(db, alert, user)
+    if who.officer or (field_officer and who.assigned):
+        return
+    raise lifecycle.Refused("Only the officers working this incident can do this", 403)
+
+
 def _text(value: str | None, what: str = "A note") -> str:
     value = (value or "").strip()
     if not value:
@@ -53,6 +63,7 @@ def _text(value: str | None, what: str = "A note") -> str:
 # Acknowledging and notes ------------------------------------------------------------------------
 def acknowledge(db: Session, alert: Alert, user: User, note: str | None, at: dt.datetime) -> IncidentNote:
     require_citizen(alert)
+    require_officer(db, alert, user)
     if db.scalar(select(IncidentNote.id).where(IncidentNote.alert_id == alert.id, IncidentNote.author_id == user.id,
                                                IncidentNote.kind == "acknowledged")):
         raise lifecycle.Refused("You have already acknowledged this incident")
@@ -72,6 +83,7 @@ def acknowledge(db: Session, alert: Alert, user: User, note: str | None, at: dt.
 
 
 def add_note(db: Session, alert: Alert, user: User, note: str, at: dt.datetime) -> IncidentNote:
+    require_officer(db, alert, user, field_officer=True)
     row = IncidentNote(alert_id=alert.id, author_id=user.id, kind="note", text=_text(note), at=at, is_demo=alert.is_demo)
     db.add(row)
     db.flush()
@@ -81,6 +93,9 @@ def add_note(db: Session, alert: Alert, user: User, note: str, at: dt.datetime) 
 
 # Sharper images ---------------------------------------------------------------------------------
 def decide_imagery(db: Session, req: ImageryRequest, admin: User, approve: bool, note: str | None, at: dt.datetime) -> None:
+    """A senior official approves or declines a sharper paid image (D-067)."""
+    if admin.role != "senior_official":
+        raise lifecycle.Refused("A senior official approves sharper images", 403)
     if req.status != "requested":
         raise lifecycle.Refused(f"This request is already {req.status}")
     req.status = "approved" if approve else "declined"
@@ -162,6 +177,7 @@ def legal_snapshot(db: Session, alert: Alert, at: dt.datetime) -> dict:
 
 
 def attach_legal(db: Session, alert: Alert, user: User, at: dt.datetime) -> IncidentLegalRecord:
+    require_officer(db, alert, user)
     records = legal_snapshot(db, alert, at)
     row = IncidentLegalRecord(alert_id=alert.id, attached_by=user.id, at=at, records=records, is_demo=alert.is_demo)
     db.add(row)
@@ -172,6 +188,7 @@ def attach_legal(db: Session, alert: Alert, user: User, at: dt.datetime) -> Inci
 
 
 def attach_document(db: Session, alert: Alert, user: User, at: dt.datetime, **doc) -> object:
+    require_officer(db, alert, user, field_officer=True)
     cand = db.get(Candidate, alert.candidate_id)
     asset = db.get(Asset, cand.asset_id)
     row = doc_svc.add(db, asset, actor_id=user.id, at=at, alert_id=alert.id, **doc)
@@ -180,28 +197,11 @@ def attach_document(db: Session, alert: Alert, user: User, at: dt.datetime, **do
     return row
 
 
-# Decisions --------------------------------------------------------------------------------------
-def decide(db: Session, alert: Alert, user: User, decision: str, note: str, at: dt.datetime, *,
-           department: str | None = None, false_report: bool = False) -> dict:
-    """Approve (confirm), decline (dismiss) or close, with a note. An open incident's review starts first."""
-    require_citizen(alert)
-    note = _text(note)
-    if decision in ("approve", "decline"):
-        if alert.state == lifecycle.S.OPEN.value:
-            lifecycle.transition(db, alert, lifecycle.S.UNDER_REVIEW.value, actor=user, note=f"Review started by {user.name}", at=at)
-        to = lifecycle.S.CONFIRMED.value if decision == "approve" else lifecycle.S.DISMISSED.value
-        return lifecycle.transition(db, alert, to, actor=user, note=note, at=at,
-                                    department=department if decision == "decline" else None,
-                                    false_report=false_report if decision == "decline" else False)
-    if decision == "close":
-        return lifecycle.transition(db, alert, lifecycle.S.CLOSED.value, actor=user, note=note, at=at)
-    raise lifecycle.Refused("The decision is approve, decline or close", 422)
-
-
 # The weekly watch -------------------------------------------------------------------------------
 def watch_place(db: Session, alert: Alert, user: User, reason: str, name: str | None, at: dt.datetime) -> Asset:
     """Put the incident's place on the weekly watch, so every screen from now on looks at it."""
     require_citizen(alert)
+    require_officer(db, alert, user)
     cand = db.get(Candidate, alert.candidate_id)
     asset = db.get(Asset, cand.asset_id)
     if asset.monitored:

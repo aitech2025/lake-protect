@@ -30,7 +30,7 @@ def request(db: Session, alert: Alert, user: User, provider: str | None, note: s
 
     source = satellites.sharper_source(db, provider)  # refuses a source that is off or unknown
     provider = source.key
-    by_admin = user.role == Role.admin.value
+    by_admin = user.role == Role.senior_official.value  # a senior official's own request is approved as made (D-067)
     area = db.scalar(
         text("SELECT ST_Area(ST_Transform(ST_Envelope(ST_Buffer(geom::geography, 250)::geometry), 32644)) / 1e6 FROM candidates WHERE id = :c"),
         {"c": alert.candidate_id},

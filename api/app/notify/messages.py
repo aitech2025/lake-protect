@@ -38,9 +38,27 @@ TEXT = {
         "incident_opened.subject": "New incident {code}: {change} at {asset}",
         "incident_opened.body": "{summary}.\n\nAsset: {asset}, {area}.\nIncident {code}, opened {opened}.\n{flags}"
                                 "Please look at the images, record your review and acknowledge this message:\n{link}",
-        "incident_opened.unrouted": "No official covers this area yet. Set one on the Officials page.\n",
+        "incident_opened.unrouted": "No district officer covers this area yet. Set one on the Officials page.\n",
         "incident_decided.subject": "Incident {code} {decision}: {asset}",
-        "incident_decided.body": "The admin has {decision} incident {code} at {asset}, {area}.\n{summary}.\n\nThe admin's note: {note}\n{link}",
+        "incident_decided.body": "The senior official has {decision} incident {code} at {asset}, {area}.\n{summary}.\n\nTheir note: {note}\n{link}",
+        "incident_assigned.subject": "Field visit: incident {code} at {asset}",
+        "incident_assigned.body": "{by} has assigned you a field visit for incident {code} at {asset}, {area}.\n{summary}.\n\n"
+                                  "Their note: {note}\n\nVisit the place, record what you find with photos and GPS, and submit your field report:\n{link}",
+        "field_reported.subject": "Field report in: incident {code} at {asset}",
+        "field_reported.body": "{by} has submitted a field report for incident {code} at {asset}, {area}: {outcome}.\n\n"
+                               "Findings: {note}\n\nPlease review it, then recommend a decision or return it for another visit:\n{link}",
+        "recommended.subject": "For your approval: incident {code} at {asset}",
+        "recommended.body": "{by} recommends that incident {code} at {asset}, {area} be {recommendation}.\n{summary}.\n\n"
+                            "Their note: {note}\n\nPlease approve it, or return it to the district officer:\n{link}",
+        "returned.subject": "Returned to you: incident {code} at {asset}",
+        "returned.field_report": "{by} has returned your field report on incident {code} at {asset}, {area}.\n\nTheir note: {note}\n\n"
+                                 "Please visit again or add the evidence asked for, and submit the report again:\n{link}",
+        "returned.recommendation": "{by} has returned your recommendation on incident {code} at {asset}, {area}.\n\nTheir note: {note}\n{link}",
+        "outcome.confirmed": "the change is there on the ground",
+        "outcome.false_alarm": "no change on the ground",
+        "outcome.cannot_access": "the place could not be reached",
+        "recommendation.confirm": "confirmed as a real change",
+        "recommendation.dismiss": "dismissed as not a real change",
         "reminder.subject": "Reminder: incident {code} at {asset} is waiting for you",
         "reminder.body": "You were notified on {notified} and have not acknowledged it yet.\n\n{summary}.\nAsset: {asset}, {area}.\n{link}",
         "not_acknowledged.subject": "{official} has not acknowledged incident {code}",
@@ -77,9 +95,27 @@ TEXT = {
         "incident_opened.subject": "కొత్త సంఘటన {code}: {asset} వద్ద {change}",
         "incident_opened.body": "{summary}.\n\nఆస్తి: {asset}, {area}.\nసంఘటన {code}, {opened} న తెరవబడింది.\n{flags}"
                                 "దయచేసి చిత్రాలను చూసి, మీ పరిశీలనను నమోదు చేసి, ఈ సందేశం అందినట్లు నిర్ధారించండి:\n{link}",
-        "incident_opened.unrouted": "ఈ ప్రాంతానికి ఇంకా అధికారి లేరు. అధికారుల పేజీలో ఒకరిని నియమించండి.\n",
+        "incident_opened.unrouted": "ఈ ప్రాంతానికి ఇంకా జిల్లా అధికారి లేరు. అధికారుల పేజీలో ఒకరిని నియమించండి.\n",
         "incident_decided.subject": "సంఘటన {code} {decision}: {asset}",
-        "incident_decided.body": "{asset}, {area} వద్ద సంఘటన {code} {decision}.\n{summary}.\n\nనిర్వాహకుల గమనిక: {note}\n{link}",
+        "incident_decided.body": "{asset}, {area} వద్ద సంఘటన {code} {decision}.\n{summary}.\n\nసీనియర్ అధికారి గమనిక: {note}\n{link}",
+        "incident_assigned.subject": "క్షేత్ర సందర్శన: {asset} వద్ద సంఘటన {code}",
+        "incident_assigned.body": "{asset}, {area} వద్ద సంఘటన {code} కోసం {by} మీకు క్షేత్ర సందర్శన అప్పగించారు.\n{summary}.\n\n"
+                                  "వారి గమనిక: {note}\n\nప్రదేశాన్ని సందర్శించి, ఫోటోలు, GPS తో మీరు చూసినది నమోదు చేసి, క్షేత్ర నివేదిక సమర్పించండి:\n{link}",
+        "field_reported.subject": "క్షేత్ర నివేదిక అందింది: {asset} వద్ద సంఘటన {code}",
+        "field_reported.body": "{asset}, {area} వద్ద సంఘటన {code} పై {by} క్షేత్ర నివేదిక సమర్పించారు: {outcome}.\n\n"
+                               "గుర్తించినవి: {note}\n\nదయచేసి పరిశీలించి, నిర్ణయాన్ని సిఫార్సు చేయండి లేదా మళ్లీ సందర్శనకు తిప్పి పంపండి:\n{link}",
+        "recommended.subject": "మీ ఆమోదం కోసం: {asset} వద్ద సంఘటన {code}",
+        "recommended.body": "{asset}, {area} వద్ద సంఘటన {code} ను {recommendation} చేయాలని {by} సిఫార్సు చేశారు.\n{summary}.\n\n"
+                            "వారి గమనిక: {note}\n\nదయచేసి ఆమోదించండి, లేదా జిల్లా అధికారికి తిప్పి పంపండి:\n{link}",
+        "returned.subject": "మీకు తిప్పి పంపబడింది: {asset} వద్ద సంఘటన {code}",
+        "returned.field_report": "{asset}, {area} వద్ద సంఘటన {code} పై మీ క్షేత్ర నివేదికను {by} తిప్పి పంపారు.\n\nవారి గమనిక: {note}\n\n"
+                                 "దయచేసి మళ్లీ సందర్శించి లేదా అడిగిన సాక్ష్యాన్ని జోడించి, నివేదికను మళ్లీ సమర్పించండి:\n{link}",
+        "returned.recommendation": "{asset}, {area} వద్ద సంఘటన {code} పై మీ సిఫార్సును {by} తిప్పి పంపారు.\n\nవారి గమనిక: {note}\n{link}",
+        "outcome.confirmed": "క్షేత్రంలో మార్పు ఉంది",
+        "outcome.false_alarm": "క్షేత్రంలో మార్పు లేదు",
+        "outcome.cannot_access": "ప్రదేశాన్ని చేరుకోలేకపోయారు",
+        "recommendation.confirm": "నిజమైన మార్పుగా నిర్ధారణ",
+        "recommendation.dismiss": "నిజమైన మార్పు కాదని తోసిపుచ్చడం",
         "reminder.subject": "గుర్తు: {asset} వద్ద సంఘటన {code} మీ కోసం వేచి ఉంది",
         "reminder.body": "మీకు {notified} న తెలియజేశాం; ఇంకా అందినట్లు నిర్ధారించలేదు.\n\n{summary}.\nఆస్తి: {asset}, {area}.\n{link}",
         "not_acknowledged.subject": "{official} సంఘటన {code} అందినట్లు నిర్ధారించలేదు",
@@ -220,6 +256,20 @@ def compose(kind: str, language: str, p: dict) -> Message:
         decision = DECISION[language][p["decision"]]
         return Message(t(language, "incident_decided.subject", decision=decision, **values),
                        t(language, "incident_decided.body", decision=decision, note=p.get("note") or "", **values))
+    if kind == "incident_assigned":
+        return Message(t(language, "incident_assigned.subject", **values),
+                       t(language, "incident_assigned.body", by=p.get("by") or "", note=p.get("note") or "", **values))
+    if kind == "field_reported":
+        outcome = t(language, f"outcome.{p.get('outcome') or 'confirmed'}")
+        return Message(t(language, "field_reported.subject", **values),
+                       t(language, "field_reported.body", by=p.get("by") or "", outcome=outcome, note=p.get("note") or "", **values))
+    if kind == "recommended":
+        rec = t(language, f"recommendation.{p.get('recommendation') or 'confirm'}")
+        return Message(t(language, "recommended.subject", **values),
+                       t(language, "recommended.body", by=p.get("by") or "", recommendation=rec, note=p.get("note") or "", **values))
+    if kind == "returned":
+        what = "returned.field_report" if p.get("what") == "field_report" else "returned.recommendation"
+        return Message(t(language, "returned.subject", **values), t(language, what, by=p.get("by") or "", note=p.get("note") or "", **values))
     if kind == "reminder":
         return Message(t(language, "reminder.subject", **values),
                        t(language, "reminder.body", notified=_date(p["notified_at"]), **values))
@@ -314,7 +364,7 @@ def digest_message(language: str, d: dict) -> Message:
     else:
         lines.append(t(language, "digest.no_changes"))
     lines += ["", t(language, "digest.new", count=f["new_incidents"])]
-    lines.append(t(language, "digest.waiting_admin" if d["role"] == "admin" else "digest.waiting_viewer", count=f["waiting_for_you"]))
+    lines.append(t(language, "digest.waiting_admin" if d["role"] == "senior_official" else "digest.waiting_viewer", count=f["waiting_for_you"]))
     for w in d["waiting"][:10]:
         asset = (w.get("asset_name_te") or w["asset_name"]) if language == "te" else w["asset_name"]
         lines.append(t(language, "digest.waiting_item", code=w["code"], asset=asset, days=w["days_open"]))

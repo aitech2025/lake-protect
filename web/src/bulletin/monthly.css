@@ -1,35 +1,41 @@
-.figures { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-.figure { border-top: 3px solid var(--ink); padding-top: 0.5rem; display: grid; gap: 0.1rem; }
-.figure b { font-size: 2.6rem; line-height: 1; font-variant-numeric: tabular-nums; }
-.figure span { font-weight: 600; }
-.figure small { color: var(--ink-2); }
-.figure.late { border-top-color: var(--buffer); }
-.figure.late b { color: var(--text-danger); }
-.monthly-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(280px, 2fr); gap: 1.75rem; align-items: start; }
-.monthly-map { margin: 0; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius-m); padding: 0.5rem; }
-.monthly-map svg { width: 100%; height: auto; display: block; }
-.monthly-legend { display: flex; flex-wrap: wrap; gap: 0.55rem 1rem; padding: 0.75rem 0.25rem 0.25rem; color: var(--ink-2); font-size: var(--step--1); }
-.monthly-legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
-.legend-swatch { display: inline-block; width: 0.85rem; height: 0.85rem; border: 1px solid #75848b; border-radius: 2px; }
-.legend-swatch.lake { background: #a4cae6; }
-.legend-swatch.land { background: #e6dcc2; }
-.legend-swatch.incident { width: 0.65rem; height: 0.65rem; margin: 0 0.1rem; border-radius: 50%; background: #b07219; }
-.legend-swatch.waiting { width: 0.7rem; height: 0.7rem; border: 2px solid #c4402f; border-radius: 50%; }
-.who-list, .overdue-list { list-style: none; padding: 0; margin: 0.5rem 0 0; }
-.who-list li { display: flex; justify-content: space-between; padding: 0.45rem 0; border-bottom: 1px solid var(--rule); }
-.overdue-list li { display: grid; grid-template-columns: 1fr auto; gap: 0 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--rule); }
+/* The monthly page (section 9.4). The map is drawn by the server (api/app/bulletin/render.py);
+   the legend swatches below use exactly the colours it draws with. */
+.figures { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-bottom: 24px; border: 1px solid var(--line-strong); border-radius: var(--r-lg); overflow: hidden; }
+.figure { display: grid; align-content: start; gap: 4px; padding: 16px 20px 18px; border-left: 1px solid var(--line); min-width: 0; }
+.figure:first-child { border-left: 0; }
+.figure b { font: 500 var(--fs-3xl)/1.1 var(--font); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.figure span { color: var(--text); font-size: var(--fs-sm); }
+.figure small { color: var(--text-3); font-size: var(--fs-xs); }
+.figure.late b { color: var(--open-ink); }
+.figure.late { background: var(--open-tint); }
+.monthly-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: 28px; align-items: start; }
+.monthly-map { margin: 0; padding: 8px; border-radius: var(--r-lg); border: 1px solid var(--line-strong); background: #f0ece2; }
+.monthly-map svg { display: block; width: 100%; height: auto; border-radius: var(--r-md); }
+.monthly-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; padding: 12px 6px 4px; color: #3d4742; font-size: var(--fs-sm); }
+.monthly-legend span { display: inline-flex; align-items: center; gap: 8px; }
+.legend-swatch { display: inline-block; flex: none; width: 14px; height: 14px; border-radius: 3px; }
+.legend-swatch.lake { background: #a4cae6; border: 1px solid #1f6fa8; }
+.legend-swatch.land { background: #e6dcc2; border: 1px solid #1f6fa8; }
+.legend-swatch.incident { width: 12px; height: 12px; border-radius: 50%; background: #b07219; box-shadow: 0 0 0 2px #fff, 0 0 0 3px rgb(0 0 0 / 0.15); }
+.legend-swatch.waiting { width: 16px; height: 16px; border-radius: 50%; border: 2.5px solid #c4402f; background: transparent; }
+.monthly h2 { font-size: var(--fs-lg); }
+.monthly-sub { margin-top: 28px; }
+.who-list, .overdue-list { list-style: none; padding: 0; margin: 12px 0 0; border-top: 1px solid var(--line); }
+.who-list li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 2px; border-bottom: 1px solid var(--line); }
+.who-list li b { font-weight: 500; font-variant-numeric: tabular-nums; }
+.overdue-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; padding: 10px 2px; border-bottom: 1px solid var(--line); }
 .overdue-list li .small { grid-column: 1; }
-.overdue-list li b { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
-@media (max-width: 1000px) { .figures { grid-template-columns: repeat(2, 1fr); } .monthly-grid { grid-template-columns: 1fr; } }
-@media print { .page-head .btn, .chips { display: none; } }
-.monthly .page-head { padding:1.25rem 1.4rem; margin-bottom:1.15rem; border-radius:18px; background:linear-gradient(120deg,#eaf4f0,#f3f6f2 58%,#eaf1f5); border:1px solid #d9e5dd; }
-.monthly .figures { gap:.8rem; margin-bottom:1.25rem; }
-.monthly .figure { min-height:130px; padding:1rem; border:1px solid var(--rule); border-top:3px solid #437b66; border-radius:14px; background:var(--sheet); box-shadow:0 5px 18px rgba(18,48,39,.05); }
-.monthly .figure b { font-size:clamp(2rem,3vw,2.65rem); color:#174f3e; }
-.monthly .figure.late { border-top-color:#b64c3a; background:#fff6f3; }
-.monthly .figure.late b { color:#a33728; }
-.monthly-grid { gap:1.4rem; }
-.monthly-map { padding:.8rem; border-radius:16px; box-shadow:0 8px 28px rgba(18,48,39,.07); }
-.monthly-legend { gap:.65rem 1.2rem; padding:.9rem .3rem .3rem; }
-.monthly .who-list li,.monthly .overdue-list li { padding:.7rem .25rem; }
-@media(max-width:1000px) { .monthly .figures { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.overdue-list li b { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-weight: 500; }
+@media (max-width: 1100px) {
+  .figures { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .figure:nth-child(4) { border-left: 0; }
+  .figure:nth-child(n + 4) { border-top: 1px solid var(--line); }
+  .monthly-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .figures { grid-template-columns: 1fr 1fr; }
+  .figure:nth-child(odd) { border-left: 0; }
+  .figure:nth-child(4) { border-left: 1px solid var(--line); }
+  .figure:nth-child(n + 3) { border-top: 1px solid var(--line); }
+}
+@media print { .page-head .btn, .page-head .chips { display: none; } }

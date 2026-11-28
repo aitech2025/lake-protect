@@ -145,7 +145,7 @@ def list_evaluations(
         SELECT e.id, e.model_version_id, e.evaluation_type, e.dataset_ref,
                e.metrics, e.slice_metrics, e.evaluated_at, e.evaluator, e.passed, e.notes
         FROM ml_evaluations e
-        WHERE (:model_id IS NULL OR e.model_version_id = :model_id)
+        WHERE (CAST(:model_id AS uuid) IS NULL OR e.model_version_id = CAST(:model_id AS uuid))
         ORDER BY e.evaluated_at DESC
         LIMIT :limit
     """), {"model_id": model_version_id, "limit": limit}).mappings()
@@ -164,7 +164,7 @@ def list_processing_runs(
                output_manifest, correlation_id, attempt, started_at, finished_at,
                error_code, created_at
         FROM processing_runs
-        WHERE (:status IS NULL OR status = :status)
+        WHERE (CAST(:status AS text) IS NULL OR status = CAST(:status AS text))
         ORDER BY created_at DESC LIMIT :limit
     """), {"status": status, "limit": limit}).mappings()
     return {"items": [dict(row) for row in rows]}

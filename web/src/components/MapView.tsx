@@ -37,7 +37,7 @@ const STYLE: maplibregl.StyleSpecification = {
       },
     },
     layers: [
-      { id: "bg", type: "background", paint: { "background-color": "#262a28" } },
+      { id: "bg", type: "background", paint: { "background-color": "#17293b" } },
       { id: "base", type: "raster", source: "base" },
     ],
 };
@@ -93,27 +93,31 @@ export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, h
       m.addSource("boundaries", { type: "geojson", data: EMPTY });
       m.addSource("changes", { type: "geojson", data: EMPTY });
       const isKind = (k: string[]) => ["in", ["get", "kind"], ["literal", k]] as maplibregl.ExpressionSpecification;
-      m.addLayer({ id: "ring", type: "line", source: "boundaries", filter: isKind(["watch_ring"]), paint: { "line-color": "#75848b", "line-width": 1.2, "line-dasharray": [1, 3] } });
-      m.addLayer({ id: "buffer", type: "line", source: "boundaries", filter: isKind(["buffer"]), paint: { "line-color": "#c4402f", "line-width": 1.6, "line-dasharray": [3, 2] } });
+      m.addLayer({ id: "ring", type: "line", source: "boundaries", filter: isKind(["watch_ring"]), paint: { "line-color": "#8292a3", "line-width": 1.2, "line-dasharray": [1, 3] } });
+      m.addLayer({ id: "buffer", type: "line", source: "boundaries", filter: isKind(["buffer"]), paint: { "line-color": "#c94b4b", "line-width": 1.6, "line-dasharray": [3, 2] } });
       const primary = ["ftl", "parcel"];
       const certaintyIs = (c: string) => ["all", isKind(primary), ["==", ["get", "certainty"], c]] as maplibregl.FilterSpecification;
-      m.addLayer({ id: "primary-fill", type: "fill", source: "boundaries", filter: isKind(primary), paint: { "fill-color": "#1f6fa8", "fill-opacity": 0.06 } });
-      m.addLayer({ id: "primary-confirmed", type: "line", source: "boundaries", filter: certaintyIs("confirmed"), paint: { "line-color": "#1f6fa8", "line-width": 2.6 } });
-      m.addLayer({ id: "primary-preliminary", type: "line", source: "boundaries", filter: certaintyIs("preliminary"), paint: { "line-color": "#1f6fa8", "line-width": 2.6, "line-dasharray": [3, 2] } });
-      m.addLayer({ id: "primary-estimated", type: "line", source: "boundaries", filter: certaintyIs("estimated"), paint: { "line-color": "#1f6fa8", "line-width": 2.6, "line-dasharray": [0.6, 2] } });
-      m.addLayer({ id: "change-fill", type: "fill", source: "changes", paint: { "fill-color": "#e0a526", "fill-opacity": 0.55 } });
-      m.addLayer({ id: "change-line", type: "line", source: "changes", paint: { "line-color": "#7a4f05", "line-width": 1.6 } });
+      m.addLayer({ id: "primary-fill", type: "fill", source: "boundaries", filter: isKind(primary), paint: { "fill-color": "#167c80", "fill-opacity": 0.08 } });
+      m.addLayer({ id: "primary-confirmed", type: "line", source: "boundaries", filter: certaintyIs("confirmed"), paint: { "line-color": "#167c80", "line-width": 2.6 } });
+      m.addLayer({ id: "primary-preliminary", type: "line", source: "boundaries", filter: certaintyIs("preliminary"), paint: { "line-color": "#d69b32", "line-width": 2.6, "line-dasharray": [3, 2] } });
+      m.addLayer({ id: "primary-estimated", type: "line", source: "boundaries", filter: certaintyIs("estimated"), paint: { "line-color": "#8292a3", "line-width": 2.6, "line-dasharray": [0.6, 2] } });
+      m.addLayer({ id: "change-fill", type: "fill", source: "changes", paint: { "fill-color": "#d69b32", "fill-opacity": 0.55 } });
+      m.addLayer({ id: "change-line", type: "line", source: "changes", paint: { "line-color": "#74500f", "line-width": 1.6 } });
       m.addSource("draft", { type: "geojson", data: EMPTY });
-      m.addLayer({ id: "draft-fill", type: "fill", source: "draft", filter: ["==", ["geometry-type"], "Polygon"], paint: { "fill-color": "#e0a526", "fill-opacity": 0.25 } });
-      m.addLayer({ id: "draft-line", type: "line", source: "draft", filter: ["!=", ["geometry-type"], "Point"], paint: { "line-color": "#e0a526", "line-width": 2.4 } });
-      m.addLayer({ id: "draft-points", type: "circle", source: "draft", filter: ["==", ["geometry-type"], "Point"], paint: { "circle-radius": 5, "circle-color": "#ffffff", "circle-stroke-color": "#7a4f05", "circle-stroke-width": 2 } });
+      m.addLayer({ id: "draft-fill", type: "fill", source: "draft", filter: ["==", ["geometry-type"], "Polygon"], paint: { "fill-color": "#d69b32", "fill-opacity": 0.25 } });
+      m.addLayer({ id: "draft-line", type: "line", source: "draft", filter: ["!=", ["geometry-type"], "Point"], paint: { "line-color": "#d69b32", "line-width": 2.4 } });
+      m.addLayer({ id: "draft-points", type: "circle", source: "draft", filter: ["==", ["geometry-type"], "Point"], paint: { "circle-radius": 5, "circle-color": "#ffffff", "circle-stroke-color": "#74500f", "circle-stroke-width": 2 } });
       loaded.current = true;
       m.fire("lp:data");
     });
     m.on("click", (e) => clickRef.current?.([Number(e.lngLat.lng.toFixed(6)), Number(e.lngLat.lat.toFixed(6))]));
     map.current = m;
     setGeneration((g) => g + 1);
+    // The container can change size without the window resizing (sidebar, panels, layout), so follow it.
+    const observer = new ResizeObserver(() => m.resize());
+    observer.observe(ref.current);
     return () => {
+      observer.disconnect();
       m.remove();
       map.current = null;
       loaded.current = false;
@@ -152,16 +156,20 @@ export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, h
   useEffect(() => {
     const m = map.current;
     if (!m) return;
+    // Many names on one map overlap; past a handful they appear on hover and focus instead.
+    ref.current?.classList.toggle("many-labels", pins.filter((p) => p.big && p.label).length > 6);
     markers.current.forEach((mk) => mk.remove());
     markers.current = pins.map((p) => {
-      const el = document.createElement("div");
+      const el = document.createElement("button");
+      el.type = "button";
       el.className = "pin-wrap";
-      const dot = document.createElement("button");
+      el.dataset.assetId = String(p.id);
+      el.setAttribute("aria-label", p.label ?? String(p.id));
+      if (p.onClick) el.addEventListener("click", p.onClick);
+      const dot = document.createElement("span");
       dot.className = `pin${p.big ? " big" : ""}`;
       dot.style.background = p.colour;
-      dot.setAttribute("aria-label", p.label ?? String(p.id));
-      dot.dataset.alertId = String(p.id);
-      if (p.onClick) dot.addEventListener("click", p.onClick);
+      dot.setAttribute("aria-hidden", "true");
       el.appendChild(dot);
       if (p.label && p.big) {
         const label = document.createElement("div");
@@ -169,7 +177,10 @@ export function MapView({ boundaries = EMPTY, changes = EMPTY, pins = [], fit, h
         label.textContent = p.label;
         el.appendChild(label);
       }
-      return new maplibregl.Marker({ element: el, anchor: "center" }).setLngLat([p.lon, p.lat]).addTo(m);
+      const marker = new maplibregl.Marker({ element: el, anchor: "center" }).setLngLat([p.lon, p.lat]).addTo(m);
+      marker.getElement().setAttribute("aria-label", p.label ?? String(p.id));
+      marker.getElement().dataset.assetId = String(p.id);
+      return marker;
     });
   }, [pins, generation]);
 

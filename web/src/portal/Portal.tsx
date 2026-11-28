@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
 import { api, ApiError } from "../api";
 import { MapView } from "../components/MapView";
+import { BrandMark } from "../components/Brand";
 import "./portal.css";
 
 /**
@@ -59,10 +60,13 @@ function Shell({ lang, setLang, children }: { lang: Lang; setLang: (l: Lang) => 
   return (
     <div className={`portal lang-${lang}`} lang={lang} data-testid="portal">
       <header className="portal-head">
-        <div className="brand">
-          <span className="brand-name">GeoGuard</span>
-          <span className="brand-tag">{t("citizen.tagline")}</span>
-        </div>
+        <Link to="/report" className="brand">
+          <BrandMark />
+          <span className="brand-copy">
+            <span className="brand-name">GeoGuard</span>
+            <span className="brand-tag">{t("citizen.tagline")}</span>
+          </span>
+        </Link>
         <div className="portal-langs" role="group" aria-label={t("citizen.language")}>
           {LANGS.map((l) => (
             <button key={l.code} type="button" lang={l.code} aria-pressed={lang === l.code} onClick={() => setLang(l.code)} data-testid={`lang-${l.code}`}>
@@ -72,8 +76,10 @@ function Shell({ lang, setLang, children }: { lang: Lang; setLang: (l: Lang) => 
         </div>
       </header>
       <nav className="portal-tabs" aria-label="GeoGuard">
-        <NavLink to="/report" end data-testid="tab-report">{t("citizen.tab_report")}</NavLink>
-        <NavLink to="/report/track" data-testid="tab-track">{t("citizen.tab_track")}</NavLink>
+        <div className="portal-tabs-inner">
+          <NavLink to="/report" end data-testid="tab-report">{t("citizen.tab_report")}</NavLink>
+          <NavLink to="/report/track" data-testid="tab-track">{t("citizen.tab_track")}</NavLink>
+        </div>
       </nav>
       <main className="portal-main">{children}</main>
       <footer className="portal-foot">

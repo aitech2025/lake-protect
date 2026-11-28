@@ -219,10 +219,10 @@ export function Assets() {
         />
       )}
       {cats.data && tab !== "citizen" && <KindsStrip cats={cats.data} kind={kind} setKind={(k) => { setKind(k); setTab(k === "all" ? "all" : k === "water_body" ? "lakes" : "lands"); }} />}
-      <nav className="chips asset-tabs" aria-label={t("assets.tabs")} role="tablist">
-        {(["all", "lakes", "lands", "citizen"] as const).map((k) => <button key={k} type="button" role="tab" aria-selected={tab === k} className="chip" aria-pressed={tab === k} onClick={() => { setTab(k); setKind("all"); setSelected(null); }}>{t(k === "all" ? "group.all" : `assets.tab.${k}`)}</button>)}
-      </nav>
-      <section className="section asset-registry-filters" data-testid="registry-filters" aria-label={t("assets.registry_filters")}>
+      <div className="chips asset-tabs" aria-label={t("assets.tabs")} role="group">
+        {(["all", "lakes", "lands", "citizen"] as const).map((k) => <button key={k} type="button" className="chip" aria-pressed={tab === k} onClick={() => { setTab(k); setKind("all"); setSelected(null); }}>{t(k === "all" ? "group.all" : `assets.tab.${k}`)}</button>)}
+      </div>
+      <section className="asset-registry-filters" data-testid="registry-filters" aria-label={t("assets.registry_filters")}>
         <label className="field">
           {t("assets.filter_district")}
           <select value={selectedDistrict} onChange={(e) => { setSelectedDistrict(e.target.value); setSelectedMandal(""); }} data-testid="filter-district">
@@ -248,18 +248,18 @@ export function Assets() {
           <input type="checkbox" checked={showStopped} onChange={(e) => setShowStopped(e.target.checked)} data-testid="show-stopped" /> {t("locations.show_stopped", { n: stopped })}
         </label>
       )}
-      <p className="note" style={{ marginBottom: "1rem" }}>{t("assets.real_note")}</p>
+      <p className="note" style={{ marginBottom: 16 }}>{t("assets.real_note")}</p>
       {tab !== "citizen" && <ScreeningSummary />}
       <PageState loading={loading && !data} error={error} status={status} onRetry={reload} />
-      <div className="queue" style={{ height: "auto" }}>
-        <div className="mapbox asset-map" style={{ height: 620 }}>
+      <div className="queue asset-queue">
+        <div className="mapbox asset-map">
           <MapView boundaries={tab === "citizen" ? undefined : selected ? selectedFc : mapFc} pins={tab === "citizen" ? reportPins : []} />
         </div>
-        <div className="list" style={{ maxHeight: 620 }}>
+        <div className="list asset-list">
           {tab === "citizen" ? reportRows.map((r) => <button key={r.id} type="button" className="row" onClick={() => navigate(`/reports/${r.id}`)}><span className="bar" style={{ background: "#bb5949" }} /><span><h3>{r.ref} · {t(`reports.what.${r.what}`)}</h3><span className="meta"><span>{r.district ?? t("dashboard.not_recorded")}{r.mandal ? ` · ${r.mandal}` : ""}{r.village ? ` · ${r.village}` : ""}</span><span>{t(`reports.status.${r.status}`)}</span></span></span></button>) : features.map((f) => {
             const p = f.properties;
             return (
-              <button key={f.id} className="row" style={{ width: "100%", border: 0, background: selected === f.id ? "#eef3f0" : "transparent", textAlign: "left" }} onClick={() => navigate(`/assets/${f.id}`)}>
+              <button key={f.id} className={`row${selected === f.id ? " selected" : ""}`} aria-current={selected === f.id || undefined} onClick={() => navigate(`/assets/${f.id}`)}>
                 <span className="bar" style={{ background: !p.monitored ? "#9aa5a0" : p.category === "water_body" ? "#1f6fa8" : "#b08a3e" }} />
                 <span>
                   <h3>{lang === "te" && p.name_te ? p.name_te : p.name} {!p.monitored && <span className="pill closed">{t("locations.not_watched")}</span>}</h3>

@@ -1,14 +1,13 @@
-"""Incidents (DECISIONS.md D-057). Kept at /alerts so links and audit entries stay stable.
+"""Incidents (DECISIONS.md D-057, D-067). Kept at /alerts so links and audit entries stay stable.
 
-Every signed-in user can read every incident. Viewers record reviews; the admin moves an incident
-through its lifecycle. Every state change goes through app.workflow.incidents.
+Who sees an incident is decided in app.access: the State for the admin and senior officials, their
+areas for district officers, their assignments for field officers. Every state change goes through
+app.workflow.incidents: the district officer reviews, assigns field visits and recommends; the
+field officer reports; the senior official approves and closes. The admin takes no step.
 
-On an incident a citizen reported (D-064), officials and the admin alike can:
-- acknowledge it, and add notes;
-- request satellite looks (latest or by date), and sharper images (the admin approves them);
-- attach legal records and documents;
-- approve, decline or close it, with notes;
-- put its place on the weekly watch.
+On an incident a citizen reported (D-064), the officers can also acknowledge it, add notes, request
+satellite looks and sharper images (a senior official approves those), attach legal records and
+documents, and put its place on the weekly watch.
 """
 from __future__ import annotations
 
@@ -20,6 +19,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app import access
 from app.audit import chain
 from app.citizen import actions
 from app.clock import utcnow
@@ -53,7 +53,7 @@ def list_alerts(
     open (D-060)."""
     items = alert_view.list_alerts(db, state=state, change_type=change_type, cohort=cohort, asset_id=asset_id,
                                    district=district, mandal=mandal, village=village, waiting=waiting,
-                                   new_in_week=week, now=utcnow())
+                                   new_in_week=week, now=utcnow(), user=user)
     filters = {"state": state, "change_type": change_type, "cohort": cohort, "asset_id": asset_id, "district": district,
                "mandal": mandal, "village": village, "waiting": waiting, "week": week}
     chain.record(db, actor_id=user.id, action="view.alerts", entity="alert",
@@ -64,7 +64,7 @@ def list_alerts(
 
 @router.get("/{alert_id}")
 def get_alert(alert_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    alert = alert_view.get_visible(db, alert_id)
+    alert = access.require_alert(db, user, alert_id)
     out = alert_view.detail(db, alert, user)
     chain.record(db, actor_id=user.id, action="view.alert", entity="alert", entity_id=alert_id)
     db.commit()
@@ -73,7 +73,7 @@ def get_alert(alert_id: int, user: User = Depends(current_user), db: Session = D
 
 @router.get("/{alert_id}/chips/{which}")
 def get_chip(alert_id: int, which: Literal["before", "after"], user: User = Depends(current_user), db: Session = Depends(get_db)) -> Response:
-    alert = alert_view.get_visible(db, alert_id)
+    alert = access.require_alert(db, user, alert_id)
     cand = db.get(Candidate, alert.candidate_id)
     key = cand.before_chip if which == "before" else cand.after_chip
     if not key or store.head_object(key) is None:
@@ -91,9 +91,8 @@ class ReviewIn(BaseModel):
 
 @router.post("/{alert_id}/reviews", status_code=201)
 def post_review(alert_id: int, body: ReviewIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    """A viewer's review: real change, not real, or needs a site visit, with a note. On a citizen's
-    incident the admin may review too (D-064)."""
-    alert = alert_view.get_visible(db, alert_id)
+    """An officer's review: real change, not real, or needs a site visit, with a note."""
+    alert = access.require_alert(db, user, alert_id)
     with db_guard(db):
         row = _act(db, lambda: lifecycle.review(db, alert, user, body.outcome.value, body.note))
     return {"id": row.id, "state": alert.state}
@@ -109,11 +108,75 @@ class TransitionIn(BaseModel):
 
 @router.post("/{alert_id}/transitions")
 def post_transition(alert_id: int, body: TransitionIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    """The admin's steps; on a citizen's incident an official's too (D-064). The lifecycle checks who may."""
-    alert = alert_view.get_visible(db, alert_id)
+    """The plain steps: start, withdraw a visit, return a report, approve, return a recommendation, close.
+    The lifecycle checks who may take each one (D-067)."""
+    alert = access.require_alert(db, user, alert_id)
     with db_guard(db):
         return _act(db, lambda: lifecycle.transition(db, alert, body.to, actor=user, note=body.note, department=body.citizen_department or None,
                                                      false_report=body.citizen_false_report))
+
+
+class AssignIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    field_officer_id: int
+    note: str = Field(min_length=1, max_length=4000)
+
+
+@router.get("/{alert_id}/field-officers")
+def get_field_officers(alert_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """The field officers who cover this incident's place, for the officer assigning a visit."""
+    alert = access.require_alert(db, user, alert_id)
+    if user.role not in access.CASEWORK:
+        raise HTTPException(403, "Field visits are assigned by district officers and senior officials")
+    return {"items": lifecycle.field_officers_for(db, alert)}
+
+
+@router.post("/{alert_id}/assignments", status_code=201)
+def post_assignment(alert_id: int, body: AssignIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """Send a field officer to the place (or replace the one on the visit), with a note for them."""
+    alert = access.require_alert(db, user, alert_id)
+    with db_guard(db):
+        row = _act(db, lambda: lifecycle.assign(db, alert, user, body.field_officer_id, body.note, utcnow()))
+    return {"id": row.id, "state": alert.state}
+
+
+@router.post("/{alert_id}/field-report", status_code=201)
+async def post_field_report(
+    alert_id: int,
+    outcome: Literal["confirmed", "false_alarm", "cannot_access"] = Form(...),
+    findings: str = Form(..., min_length=3, max_length=4000),
+    observed_at: dt.datetime = Form(...),
+    lat: float | None = Form(None, ge=-90, le=90),
+    lon: float | None = Form(None, ge=-180, le=180),
+    photos: list[UploadFile] = File(default=[]),
+    user: User = Depends(current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """The assigned field officer's report: what they found, when, where (GPS) and up to five photos."""
+    alert = access.require_alert(db, user, alert_id)
+    raw = [await p.read(8 * 1024 * 1024 + 1) for p in photos if p.filename]
+    with db_guard(db):
+        row = _act(db, lambda: lifecycle.submit_field_report(db, alert, user, outcome=outcome, findings=findings, observed_at=observed_at,
+                                                             lat=lat, lon=lon, photos=raw, at=utcnow()))
+    return {"id": row.id, "inspection_id": row.inspection_id, "state": alert.state}
+
+
+class RecommendIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    recommendation: Literal["confirm", "dismiss"]
+    note: str = Field(min_length=1, max_length=4000)
+    citizen_department: str | None = None
+    citizen_false_report: bool = False
+
+
+@router.post("/{alert_id}/recommendation", status_code=201)
+def post_recommendation(alert_id: int, body: RecommendIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """The district officer's recommendation, for the senior official's final approval."""
+    alert = access.require_alert(db, user, alert_id)
+    with db_guard(db):
+        row = _act(db, lambda: lifecycle.recommend(db, alert, user, body.recommendation, body.note, utcnow(),
+                                                   department=body.citizen_department or None, false_report=body.citizen_false_report))
+    return {"id": row.id, "state": alert.state}
 
 
 class ImageryIn(BaseModel):
@@ -124,11 +187,13 @@ class ImageryIn(BaseModel):
 
 @router.post("/{alert_id}/imagery-request", status_code=201)
 def post_imagery_request(alert_id: int, body: ImageryIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    """Stub: records a request for a sharper image and its estimated cost. Nothing is ordered. Officials
-    may ask on a citizen's incident; the admin approves (D-064)."""
-    alert = alert_view.get_visible(db, alert_id)
-    if user.role != Role.admin.value and alert.origin != "citizen":
-        raise HTTPException(403, "Officials request sharper images on incidents a citizen reported")
+    """Stub: records a request for a sharper image and its estimated cost. Nothing is ordered. The
+    officers working the incident ask; a senior official approves (D-064, D-067)."""
+    alert = access.require_alert(db, user, alert_id)
+    try:
+        actions.require_officer(db, alert, user)
+    except lifecycle.Refused as exc:
+        raise HTTPException(exc.status, exc.message) from exc
     from app.services import satellites
 
     try:
@@ -163,7 +228,7 @@ class AckIn(BaseModel):
 @router.post("/{alert_id}/acknowledge", status_code=201)
 def post_acknowledge(alert_id: int, body: AckIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
     """I have seen this citizen's incident. The first acknowledgement starts its review."""
-    alert = alert_view.get_visible(db, alert_id)
+    alert = access.require_alert(db, user, alert_id)
     row = _act(db, lambda: actions.acknowledge(db, alert, user, body.note, utcnow()))
     return {"id": row.id, "state": alert.state}
 
@@ -176,7 +241,7 @@ class NoteIn(BaseModel):
 @router.post("/{alert_id}/notes", status_code=201)
 def post_note(alert_id: int, body: NoteIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
     """A note for the record, by an official or the admin. Kept for good; never shown to citizens."""
-    alert = alert_view.get_visible(db, alert_id)
+    alert = access.require_alert(db, user, alert_id)
     row = _act(db, lambda: actions.add_note(db, alert, user, body.text, utcnow()))
     return {"id": row.id}
 
@@ -191,10 +256,11 @@ def post_look(alert_id: int, body: LookIn, user: User = Depends(current_user), d
     """A satellite look at the reported place: the latest, or the newest clear image on or before a date."""
     from app.citizen import incident
 
-    alert = alert_view.get_visible(db, alert_id)
+    alert = access.require_alert(db, user, alert_id)
 
     def run():
         actions.require_citizen(alert)
+        actions.require_officer(db, alert, user)
         return incident.request_look(db, alert, user, body.date, utcnow())
 
     rv = _act(db, run)
@@ -206,6 +272,7 @@ def get_look_image(alert_id: int, review_id: int, which: Literal["before", "afte
                    db: Session = Depends(get_db)) -> Response:
     from app.models import SatelliteReview
 
+    access.require_alert(db, user, alert_id)
     rv = db.get(SatelliteReview, review_id)
     if rv is None or rv.alert_id != alert_id:
         raise HTTPException(404, "No such look")
@@ -224,11 +291,12 @@ class ImageryDecisionIn(BaseModel):
 
 
 @router.post("/{alert_id}/imagery-requests/{request_id}/decision")
-def post_imagery_decision(alert_id: int, request_id: int, body: ImageryDecisionIn, user: User = Depends(require_roles(Role.admin)),
+def post_imagery_decision(alert_id: int, request_id: int, body: ImageryDecisionIn, user: User = Depends(require_roles(Role.senior_official)),
                           db: Session = Depends(get_db)) -> dict:
-    """The admin approves or declines an official's request for a sharper image. Nothing is ordered."""
+    """A senior official approves or declines an officer's request for a sharper image. Nothing is ordered."""
     from app.models import ImageryRequest
 
+    access.require_alert(db, user, alert_id)
     req = db.get(ImageryRequest, request_id)
     if req is None or req.alert_id != alert_id:
         raise HTTPException(404, "No such request")
@@ -239,7 +307,7 @@ def post_imagery_decision(alert_id: int, request_id: int, body: ImageryDecisionI
 @router.post("/{alert_id}/legal-records", status_code=201)
 def post_legal_records(alert_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
     """Attach the legal records at the place as they stand now: a dated snapshot, kept beside earlier ones."""
-    alert = alert_view.get_visible(db, alert_id)
+    alert = access.require_alert(db, user, alert_id)
     row = _act(db, lambda: actions.attach_legal(db, alert, user, utcnow()))
     return {"id": row.id, "at": row.at.isoformat(), "records": row.records}
 
@@ -260,9 +328,7 @@ async def post_document(
     It is kept on the location too, so the next incident there sees it."""
     from app.services import documents as doc_svc
 
-    alert = alert_view.get_visible(db, alert_id)
-    if user.role != Role.admin.value and alert.origin != "citizen":
-        raise HTTPException(403, "Officials attach documents to incidents a citizen reported; the admin to any")
+    alert = access.require_alert(db, user, alert_id)
     try:
         issued = dt.date.fromisoformat(issued_on) if issued_on else None
     except ValueError as exc:
@@ -275,24 +341,10 @@ async def post_document(
                                           content_type=file.content_type if content else None)
     except doc_svc.DocumentRefused as exc:
         raise HTTPException(422, str(exc)) from exc
+    except lifecycle.Refused as exc:
+        raise HTTPException(exc.status, exc.message) from exc
     db.commit()
     return doc_svc.as_dict(row, set())
-
-
-class DecisionIn(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    decision: Literal["approve", "decline", "close"]
-    note: str
-    citizen_department: str | None = None
-    citizen_false_report: bool = False
-
-
-@router.post("/{alert_id}/decision")
-def post_decision(alert_id: int, body: DecisionIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    """Approve (a real change), decline (not a change that needs action), or close, with a note."""
-    alert = alert_view.get_visible(db, alert_id)
-    return _act(db, lambda: actions.decide(db, alert, user, body.decision, body.note, utcnow(),
-                                           department=body.citizen_department or None, false_report=body.citizen_false_report))
 
 
 class WatchIn(BaseModel):
@@ -304,7 +356,7 @@ class WatchIn(BaseModel):
 @router.post("/{alert_id}/watch")
 def post_watch(alert_id: int, body: WatchIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
     """Add the incident's place to the weekly watch, so every screen from now on looks at it."""
-    alert = alert_view.get_visible(db, alert_id)
+    alert = access.require_alert(db, user, alert_id)
     asset = _act(db, lambda: actions.watch_place(db, alert, user, body.reason, body.name, utcnow()))
     return {"asset_id": asset.id, "name": asset.name, "monitored": asset.monitored}
 
@@ -318,7 +370,7 @@ class OverrideIn(BaseModel):
 @router.post("/{alert_id}/priority-override")
 def post_priority_override(alert_id: int, body: OverrideIn, user: User = Depends(require_roles(Role.admin)), db: Session = Depends(get_db)) -> dict:
     """Manual overrides need a reason and are logged."""
-    alert = alert_view.get_visible(db, alert_id)
+    alert = access.require_alert(db, user, alert_id)
     before = float(alert.priority_score) if alert.priority_score is not None else None
     alert.priority_factors = {**(alert.priority_factors or {}), "override": {"score": body.score, "reason": body.reason, "by": user.id, "at": utcnow().isoformat(), "previous": before}}
     alert.priority_score = body.score
@@ -340,11 +392,12 @@ def _pack(db: Session, alert_id: int, version: int | None) -> EvidencePack:
 
 
 @router.post("/{alert_id}/evidence-pack", status_code=201)
-def post_evidence_pack(alert_id: int, user: User = Depends(require_roles(Role.admin)), db: Session = Depends(get_db)) -> dict:
+def post_evidence_pack(alert_id: int, user: User = Depends(require_roles(Role.senior_official, Role.district_officer)),
+                       db: Session = Depends(get_db)) -> dict:
     """Generate a new version for a confirmed change. An earlier version is never overwritten."""
     from app.evidence import pack as pack_svc
 
-    alert = alert_view.get_visible(db, alert_id)
+    alert = access.require_alert(db, user, alert_id)
     if alert.resolution != "confirmed":  # checked before any write
         raise HTTPException(409, f"A pack is made for a confirmed change (incident is {alert.state})")
     with db_guard(db):
@@ -359,7 +412,7 @@ def post_evidence_pack(alert_id: int, user: User = Depends(require_roles(Role.ad
 
 @router.get("/{alert_id}/evidence-pack")
 def get_evidence_pack(alert_id: int, version: int | None = None, user: User = Depends(current_user), db: Session = Depends(get_db)) -> Response:
-    alert = alert_view.get_visible(db, alert_id)
+    alert = access.require_alert(db, user, alert_id)
     pack = _pack(db, alert.id, version)
     chain.record(db, actor_id=user.id, action="export.evidence_pack", entity="alert", entity_id=alert.id, details={"version": pack.version, "file": "zip"})
     db.commit()
@@ -370,7 +423,7 @@ def get_evidence_pack(alert_id: int, version: int | None = None, user: User = De
 
 @router.get("/{alert_id}/evidence-pack/pdf")
 def get_evidence_pdf(alert_id: int, version: int | None = None, user: User = Depends(current_user), db: Session = Depends(get_db)) -> Response:
-    alert = alert_view.get_visible(db, alert_id)
+    alert = access.require_alert(db, user, alert_id)
     pack = _pack(db, alert.id, version)
     chain.record(db, actor_id=user.id, action="export.evidence_pdf", entity="alert", entity_id=alert.id, details={"version": pack.version, "file": "pdf"})
     db.commit()
@@ -383,7 +436,7 @@ def verify_evidence_pack(alert_id: int, version: int | None = None, user: User =
     """Run the same check as `lp verify-pack`, against the manifest hash recorded when the pack was made."""
     from app.evidence.verify import verify
 
-    alert = alert_view.get_visible(db, alert_id)
+    alert = access.require_alert(db, user, alert_id)
     pack = _pack(db, alert.id, version)
     result = verify(store.local_path(pack.zip_path), pack.manifest_sha256)
     chain.record(db, actor_id=user.id, action="view.evidence_verify", entity="alert", entity_id=alert.id, details={"version": pack.version, "ok": result["ok"]})

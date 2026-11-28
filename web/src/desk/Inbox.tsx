@@ -3,8 +3,10 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { api, fmtDateTime, type Note } from "../api";
 import { useAsync, usePageTitle } from "../components/Bits";
-import { PageState } from "../components/PageState";
+import { EmptyState, PageState } from "../components/PageState";
 import { notifyCountChanged } from "../components/Layout";
+import { Segmented } from "../components/Segmented";
+import { Inbox as InboxIcon } from "lucide-react";
 
 const KIND_CLASS: Record<Note["kind"], string> = {
   incident_opened: "review",
@@ -50,14 +52,23 @@ export function Inbox() {
           <h1>{t("inbox.title")}</h1>
           <p className="muted">{data ? t("inbox.lede", { count: data.unacknowledged }) : " "}</p>
         </div>
-        <div className="chips" role="group" aria-label={t("inbox.show")}>
-          <button className="chip" aria-pressed={pending} onClick={() => setPending(true)} data-testid="inbox-pending">{t("inbox.pending")}</button>
-          <button className="chip" aria-pressed={!pending} onClick={() => setPending(false)} data-testid="inbox-all">{t("inbox.all")}</button>
-        </div>
+        <Segmented
+          label={t("inbox.show")}
+          value={pending ? "pending" : "all"}
+          onChange={(v) => setPending(v === "pending")}
+          options={[
+            { value: "pending", label: t("inbox.pending"), testId: "inbox-pending" },
+            { value: "all", label: t("inbox.all"), testId: "inbox-all" },
+          ]}
+        />
       </div>
       {failure && <p className="banner stop" role="alert">{failure}</p>}
       <PageState loading={loading && !data} error={error} status={status} onRetry={reload} />
-      {data && data.items.length === 0 && <p className="muted">{pending ? t("inbox.empty_pending") : t("inbox.empty")}</p>}
+      {data && data.items.length === 0 && (
+        <EmptyState icon={<InboxIcon aria-hidden="true" />} title={pending ? t("inbox.empty_pending") : t("inbox.empty")}>
+          {pending && <button type="button" className="btn quiet" onClick={() => setPending(false)}>{t("inbox.show_all")}</button>}
+        </EmptyState>
+      )}
       <ul className="notes" data-testid="notes">
         {data?.items.map((n) => (
           <li key={n.id} className={`note-card${n.needs_ack && !n.acknowledged_at ? " needs" : ""}`} data-testid={`note-${n.kind}`} data-alert-id={n.alert_id ?? undefined}>
@@ -66,7 +77,7 @@ export function Inbox() {
               <span className="small muted">{fmtDateTime(n.created_at, lang)}</span>
             </div>
             <h3>{n.subject}</h3>
-            <p className="note-body">{n.body}</p>
+            <p className="note-body" tabIndex={0}>{n.body}</p>
             <div className="note-foot">
               {n.alert_id && <Link to={`/alerts/${n.alert_id}`} className="btn secondary" data-testid="note-open">{t("inbox.open_incident")}</Link>}
               {n.report_id && <Link to={`/reports/${n.report_id}`} className="btn secondary" data-testid="note-open-report">{t("inbox.open_report")}</Link>}

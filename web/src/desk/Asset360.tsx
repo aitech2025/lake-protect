@@ -6,6 +6,7 @@ import { BoundarySeal, StatePill, useAsync, usePageTitle } from "../components/B
 import { MapView } from "../components/MapView";
 import { PageState, TableRegion } from "../components/PageState";
 import { Documents, Inspections, WeeklyRecord } from "./AssetRecord";
+import { Segmented } from "../components/Segmented";
 
 type Tab = "overview" | "imagery" | "incidents" | "inspections" | "documents" | "audit";
 const TABS: Tab[] = ["overview", "imagery", "incidents", "inspections", "documents", "audit"];
@@ -28,20 +29,23 @@ export function Asset360() {
 
   if (!feature) return <div className="page"><PageState loading={loading} error={error} status={status} onRetry={reload} /></div>;
   return <div className="page asset360" data-testid="asset360">
-    <p className="crumbs"><Link to="/assets">{t("asset360.back")}</Link> / {name}</p>
     <header className="asset360-head">
-      <div><p className="eyebrow">{t("asset360.kicker")}</p><h1>{name}</h1><p className="muted">{props.asset_code ?? props.platform_asset_id ?? props.asset_key} · {[props.district, props.mandal, props.village].filter(Boolean).join(" · ") || t("dashboard.not_recorded")}</p></div>
-      <div className="asset360-badges"><BoundarySeal status={props.boundary_status} version={props.boundary_version} /><span className={`pill ${props.monitored ? "ok" : "closed"}`}>{props.monitored ? t("asset360.watched") : t("locations.not_watched")}</span></div>
+      <div>
+        <p className="crumbs"><Link to="/assets">{t("asset360.back")}</Link><span aria-hidden="true">/</span><span>{t("asset360.kicker")}</span></p>
+        <h1>{name}</h1>
+        <p className="muted"><span className="mono">{props.asset_code ?? props.platform_asset_id ?? props.asset_key}</span>, {[props.district, props.mandal, props.village].filter(Boolean).join(", ") || t("dashboard.not_recorded")}</p>
+      </div>
+      <div className="asset360-badges"><span className={`pill ${props.monitored ? "ok" : "closed"}`}>{props.monitored ? t("asset360.watched") : t("locations.not_watched")}</span><BoundarySeal status={props.boundary_status} version={props.boundary_version} /></div>
     </header>
-    <nav className="asset360-tabs" role="tablist" aria-label={t("asset360.sections")}>
-      {TABS.map((key) => <button key={key} type="button" role="tab" aria-selected={tab === key} className={`chip${tab === key ? " active" : ""}`} onClick={() => setParams({ tab: key })}>{t(`asset360.tab.${key}`)}</button>)}
-    </nav>
+    <div className="asset360-tabs">
+      <Segmented mode="tabs" label={t("asset360.sections")} value={tab} onChange={(key) => setParams({ tab: key })} options={TABS.map((key) => ({ value: key, label: t(`asset360.tab.${key}`) }))} />
+    </div>
 
     {tab === "overview" && <>
       <section className="asset360-summary">
-        <div><span>{t("asset360.asset_code")}</span><b>{props.asset_code ?? props.platform_asset_id ?? props.asset_key}</b></div>
+        <div><span>{t("asset360.asset_code")}</span><b className="mono">{props.asset_code ?? props.platform_asset_id ?? props.asset_key}</b></div>
         <div><span>{t("asset360.baseline")}</span><b>{fmtDate(props.baseline_date, i18n.language)}</b></div>
-        <div><span>{t("asset360.category")}</span><b>{props.category}</b></div>
+        <div><span>{t("asset360.category")}</span><b>{t(`registry.category_name.${props.category}`, { defaultValue: props.category })}</b></div>
         <div><span>{t("assets.col.extent")}</span><b>{props.area_acres != null ? t("assets.acres", { acres: props.area_acres }) : "—"}</b></div>
         <div><span>{t("asset360.latest_look")}</span><b>{props.screened_as_of ? fmtDate(props.screened_as_of, i18n.language) : t("weeks.none")}</b><small>{props.screen_status ? t(`weeks.status.${props.screen_status}`) : ""}</small></div>
         <div><span>{t("asset360.open_incidents")}</span><b>{incidents?.count ?? incidents?.items?.length ?? "—"}</b></div>

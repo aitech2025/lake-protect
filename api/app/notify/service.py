@@ -1,20 +1,27 @@
 """Notifications to officials (DECISIONS.md D-059): what is sent, to whom, and when.
 
-Events, called inside the same transaction as the change that causes them:
-- incident_opened: a new incident that stays open. Its area's officials and every admin are told,
-  and each must acknowledge it. Changes the legal check closes at once, and changes seen again on
-  an open incident, notify no one: they appear in the weekly digest.
-- incident_decided: the admin confirmed or dismissed an incident. The area's officials and every
-  official who reviewed it are told. No acknowledgement is needed.
-- acknowledgement: in the inbox, or by acting on the incident (a review, or the admin's step).
-- citizen_report (D-062): a citizen's report in the area. Its area's officials and every admin are
-  told; it needs acknowledgement unless it already sits on an incident. Recording a check on the
-  report, or closing it, acknowledges it. Outside channels carry it by email only.
+Events, called inside the same transaction as the change that causes them (D-059, D-067):
+- incident_opened: a new incident that stays open. Its area's district officers and every senior
+  official are told, and each must acknowledge it; the admin too when no district officer covers
+  the place. Changes the legal check closes at once, and changes seen again on an open incident,
+  notify no one: they appear in the weekly digest.
+- incident_assigned: a field visit, to the field officer (needs acknowledgement).
+- field_reported: a field report is in, to the area's district officers (or the senior officials
+  where none covers it).
+- recommended: a district officer's recommendation, to every senior official.
+- returned: a field report back to its field officer, or a recommendation back to its officer.
+- incident_decided: the senior official confirmed or dismissed an incident. The area's district
+  officers and the incident's reviewers, field officers and recommending officer are told.
+- acknowledgement: in the inbox, or by acting on the incident.
+- citizen_report (D-062): a citizen's report in the area. Its area's district officers and every
+  senior official are told; it needs acknowledgement unless it already sits on an incident.
+  Recording a check on the report, or closing it, acknowledges it. Outside channels carry it by
+  email only.
 
 Follow-up, run by the notifier every minute (`python -m app.notify run`):
-- 24 hours without an acknowledgement while the incident is still open or under review: a
-  reminder to the same person, once.
-- 48 hours without one from an official: every admin is told, once.
+- 24 hours without an acknowledgement while the incident is still undecided: a reminder to the
+  same person, once.
+- 48 hours without one from a district or field officer: every senior official is told, once.
 
 Outside channels never block the event: a notification queues one delivery per channel the person
 wants, and the outbox sends them on the next run (app.notify.channels).
@@ -95,10 +102,10 @@ def incident_opened(db: Session, alert: Alert, at: dt.datetime | None = None) ->
     officials = routing.officials_for(db, asset)
     base = messages.incident_payload(alert_view.row_for(db, alert.id))
     out = []
-    for user in officials + routing.admins(db):
+    for user in officials + routing.seniors(db) + ([] if officials else routing.admins(db)):
         if _already(db, user.id, "incident_opened", alert_id=alert.id):
             continue
-        payload = {**base, "unrouted": not officials} if user.role == Role.admin.value else base
+        payload = {**base, "unrouted": not officials} if user.role != Role.district_officer.value else base
         out.append(create(db, user, "incident_opened", payload, at=at, needs_ack=True, is_demo=alert.is_demo, alert_id=alert.id))
     chain.record(db, actor_id=None, action="notify.incident_opened", entity="alert", entity_id=alert.id,
                  details={"recipients": [n.user_id for n in out], "officials": len(officials), "area": base["area"]}, at=at)
@@ -112,9 +119,10 @@ def incident_decided(db: Session, alert: Alert, actor: User, note_text: str | No
     asset = _asset_of(db, alert)
     reviewers = db.scalars(select(User).join(IncidentReview, IncidentReview.reviewer_id == User.id)
                            .where(IncidentReview.alert_id == alert.id, User.is_active.is_(True)).distinct()).all()
-    # An official's decision on a citizen's incident also goes to every admin (D-064).
-    admins = routing.admins(db) if actor.role != Role.admin.value else []
-    people = {u.id: u for u in [*routing.officials_for(db, asset), *reviewers, *admins] if u.id != actor.id}
+    workers = db.scalars(text(
+        "SELECT DISTINCT u.id FROM users u WHERE u.is_active AND (u.id IN (SELECT field_officer_id FROM incident_assignments WHERE alert_id = :a) "
+        "OR u.id IN (SELECT recommended_by FROM incident_recommendations WHERE alert_id = :a))"), {"a": alert.id}).all()
+    people = {u.id: u for u in [*routing.officials_for(db, asset), *reviewers, *(db.get(User, i) for i in workers)] if u.id != actor.id}
     payload = {**messages.incident_payload(alert_view.row_for(db, alert.id)), "decision": alert.state, "note": note_text}
     out = [create(db, u, "incident_decided", payload, at=at, needs_ack=False, is_demo=alert.is_demo, alert_id=alert.id)
            for u in people.values() if not _already(db, u.id, "incident_decided", alert_id=alert.id)]
@@ -122,6 +130,41 @@ def incident_decided(db: Session, alert: Alert, actor: User, note_text: str | No
         chain.record(db, actor_id=None, action="notify.incident_decided", entity="alert", entity_id=alert.id,
                      details={"recipients": [n.user_id for n in out], "decision": alert.state}, at=at)
     return out
+
+
+# The field visit and the two-step decision (D-067) -----------------------------------------------
+def _step_note(db: Session, people: list[User], kind: str, alert: Alert, at: dt.datetime, extra: dict,
+               needs_ack: bool = False) -> list[Notification]:
+    if alert.is_demo or not people:
+        return []
+    payload = {**messages.incident_payload(alert_view.row_for(db, alert.id)), **extra}
+    out = [create(db, u, kind, payload, at=at, needs_ack=needs_ack, is_demo=alert.is_demo, alert_id=alert.id)
+           for u in {p.id: p for p in people}.values()]
+    chain.record(db, actor_id=None, action=f"notify.{kind}", entity="alert", entity_id=alert.id,
+                 details={"recipients": [n.user_id for n in out]}, at=at)
+    return out
+
+
+def assigned(db: Session, alert: Alert, field_officer: User, actor: User, note: str, at: dt.datetime) -> list[Notification]:
+    return _step_note(db, [field_officer], "incident_assigned", alert, as_utc(at), {"by": actor.name, "note": note}, needs_ack=True)
+
+
+def field_reported(db: Session, alert: Alert, actor: User, outcome: str, findings: str, at: dt.datetime) -> list[Notification]:
+    asset = _asset_of(db, alert)
+    people = routing.officials_for(db, asset) or routing.seniors(db)
+    return _step_note(db, [p for p in people if p.id != actor.id], "field_reported", alert, as_utc(at),
+                      {"by": actor.name, "outcome": outcome, "note": findings[:500]})
+
+
+def recommended(db: Session, alert: Alert, actor: User, recommendation: str, note: str, at: dt.datetime) -> list[Notification]:
+    return _step_note(db, [p for p in routing.seniors(db) if p.id != actor.id], "recommended", alert, as_utc(at),
+                      {"by": actor.name, "recommendation": recommendation, "note": note})
+
+
+def returned(db: Session, alert: Alert, people: list[User], actor: User, what: str, note: str, at: dt.datetime) -> list[Notification]:
+    """`what`: "field_report" (back to the field officer) or "recommendation" (back to its officer)."""
+    return _step_note(db, [p for p in people if p and p.id != actor.id], "returned", alert, as_utc(at),
+                      {"by": actor.name, "what": what, "note": note}, needs_ack=what == "field_report")
 
 
 # Acknowledging ----------------------------------------------------------------------------------
@@ -133,7 +176,7 @@ def satellite_review(db: Session, alert: Alert, at: dt.datetime | None = None, o
     at = as_utc(at)
     asset = _asset_of(db, alert)
     base = messages.incident_payload(alert_view.row_for(db, alert.id))
-    people = {u.id: u for u in routing.officials_for(db, asset) + routing.admins(db)}
+    people = {u.id: u for u in routing.officials_for(db, asset) + routing.seniors(db)}
     if only is not None:
         people = {only: db.get(User, only)}
     return [create(db, u, "satellite_review", base, at=at, needs_ack=False, is_demo=alert.is_demo, alert_id=alert.id) for u in people.values()]
@@ -160,7 +203,7 @@ def citizen_report(db: Session, report: CitizenReport, at: dt.datetime | None = 
         "not_watched": asset is None, "no_place": report.geom is None, "repeat_false": "repeat_false_reports" in (report.flags or []),
         "unrouted": not officials,
     }
-    people = {u.id: u for u in officials + routing.admins(db)}
+    people = {u.id: u for u in officials + routing.seniors(db) + ([] if officials else routing.admins(db))}
     out = []
     for user in people.values():
         if db.scalar(select(Notification.id).where(Notification.user_id == user.id, Notification.report_id == report.id,
@@ -227,9 +270,10 @@ _UNACKED = text(
     """
     SELECT n.id FROM notifications n JOIN users u ON u.id = n.user_id
     LEFT JOIN alerts al ON al.id = n.alert_id LEFT JOIN citizen_reports cr ON cr.id = n.report_id
-    WHERE n.kind::text IN ('incident_opened', 'citizen_report') AND n.needs_ack AND n.acknowledged_at IS NULL
+    WHERE n.kind::text IN ('incident_opened', 'incident_assigned', 'citizen_report') AND n.needs_ack AND n.acknowledged_at IS NULL
       AND n.created_at <= :before AND u.is_active
-      AND ((n.kind::text = 'incident_opened' AND al.state IN ('OPEN', 'UNDER_REVIEW'))
+      AND ((n.kind::text = 'incident_opened' AND al.state IN ('OPEN', 'UNDER_REVIEW', 'FIELD_VISIT', 'FIELD_REPORTED', 'RECOMMENDED'))
+           OR (n.kind::text = 'incident_assigned' AND al.state = 'FIELD_VISIT')
            OR (n.kind::text = 'citizen_report' AND cr.status <> 'CLOSED'))
     ORDER BY n.id
     """
@@ -251,10 +295,10 @@ def follow_up(db: Session, now: dt.datetime | None = None) -> dict:
     for nid in db.scalars(_UNACKED, {"before": now - ESCALATE_AFTER}).all():
         note = db.get(Notification, nid)
         official = db.get(User, note.user_id)
-        if official.role != Role.viewer.value:
+        if official.role not in (Role.district_officer.value, Role.field_officer.value):
             continue
         payload = {**note.payload, "notified_at": note.created_at.isoformat(), "official_name": official.name, "official_id": official.id}
-        for admin in routing.admins(db):
+        for admin in routing.seniors(db):
             if _already(db, admin.id, "not_acknowledged", about_id=note.id):
                 continue
             create(db, admin, "not_acknowledged", payload, at=now, needs_ack=False, is_demo=note.is_demo, alert_id=note.alert_id, about_id=note.id,
@@ -369,7 +413,7 @@ def pending_filter():
     return (
         Notification.needs_ack.is_(True),
         Notification.acknowledged_at.is_(None),
-        or_(Notification.alert_id.in_(select(Alert.id).where(Alert.state.in_(("OPEN", "UNDER_REVIEW")))),
+        or_(Notification.alert_id.in_(select(Alert.id).where(Alert.state.in_(("OPEN", "UNDER_REVIEW", "FIELD_VISIT", "FIELD_REPORTED", "RECOMMENDED")))),
             Notification.report_id.in_(select(CitizenReport.id).where(CitizenReport.status != "CLOSED"))),
     )
 

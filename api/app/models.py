@@ -515,7 +515,7 @@ class LandParcel(Base):
 
 
 class IncidentReview(Base):
-    """A viewer's review of an incident (migration 0006). Append-only."""
+    """An official's review of an incident (migration 0006). Append-only."""
 
     __tablename__ = "incident_reviews"
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
@@ -744,6 +744,50 @@ class SatelliteReview(Base):
     kind: Mapped[str] = mapped_column(Text, server_default="automatic")
     requested_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
     look_date: Mapped[dt.date | None] = mapped_column(Date)
+
+
+class IncidentAssignment(Base):
+    """Append-only: a field officer assigned to an incident (migration 0019). The latest row is current."""
+
+    __tablename__ = "incident_assignments"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    alert_id: Mapped[int] = mapped_column(ForeignKey("alerts.id"))
+    field_officer_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    assigned_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    note: Mapped[str] = mapped_column(Text)
+    at: Mapped[dt.datetime] = mapped_column(TZ)
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class FieldReport(Base):
+    """Append-only: what a field officer found on a visit, with the inspection that holds the evidence (0019)."""
+
+    __tablename__ = "field_reports"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    alert_id: Mapped[int] = mapped_column(ForeignKey("alerts.id"))
+    assignment_id: Mapped[int] = mapped_column(ForeignKey("incident_assignments.id"))
+    field_officer_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    inspection_id: Mapped[int] = mapped_column(ForeignKey("asset_inspections.id"))
+    outcome: Mapped[str] = mapped_column(Text)
+    findings: Mapped[str] = mapped_column(Text)
+    submitted_at: Mapped[dt.datetime] = mapped_column(TZ)
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class IncidentRecommendation(Base):
+    """Append-only: a district officer's recommendation, for the senior official to approve (0019)."""
+
+    __tablename__ = "incident_recommendations"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    alert_id: Mapped[int] = mapped_column(ForeignKey("alerts.id"))
+    recommended_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    recommendation: Mapped[str] = mapped_column(Text)
+    note: Mapped[str] = mapped_column(Text)
+    field_report_id: Mapped[int | None] = mapped_column(ForeignKey("field_reports.id"))
+    citizen_department: Mapped[str | None] = mapped_column(Text)
+    citizen_false_report: Mapped[bool] = mapped_column(Boolean, default=False)
+    at: Mapped[dt.datetime] = mapped_column(TZ)
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 class IncidentNote(Base):

@@ -12,7 +12,8 @@
 # A held message is never sent later: once a channel is set up, only new messages go out on it.
 
 email:
-  kinds: [incident_opened, incident_decided, reminder, not_acknowledged, weekly_digest, citizen_report, satellite_review]
+  kinds: [incident_opened, incident_decided, reminder, not_acknowledged, weekly_digest, citizen_report, satellite_review,
+          incident_assigned, field_reported, recommended, returned]
 
 sms:
   agreement_ref: null          # the State's gateway agreement

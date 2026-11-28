@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { X } from "lucide-react";
 import { api, fmtDate, type AlertRow } from "../api";
 import { StatePill, useAsync, usePageTitle } from "../components/Bits";
 import { CHANGE_TYPES, GROUP_COLOUR, GROUP_OF, STATES } from "../components/labels";
 import { MapView, type Pin } from "../components/MapView";
 import { PageState } from "../components/PageState";
+import { Segmented } from "../components/Segmented";
 import { ScreeningSummary } from "./Screening";
 
 type Filter = "active" | "all" | (typeof STATES)[number];
@@ -48,6 +51,7 @@ export function Queue() {
   const districts = Array.from(new Set(areaFeatures.filter(matchesTab).map((a) => a.properties.district).filter(Boolean))).sort();
   const mandals = Array.from(new Set(areaFeatures.filter((a) => (!district || a.properties.district === district) && matchesTab(a)).map((a) => a.properties.mandal).filter(Boolean))).sort();
   const villages = Array.from(new Set(areaFeatures.filter((a) => (!district || a.properties.district === district) && (!mandal || a.properties.mandal === mandal) && matchesTab(a)).map((a) => a.properties.village).filter(Boolean))).sort();
+  const narrowed = !!(change || cohort || district || mandal || village || landTab !== "all");
 
   const pins: Pin[] = useMemo(
     () =>
@@ -64,6 +68,7 @@ export function Queue() {
   );
   const name = (r: AlertRow) => (i18n.language === "te" && r.asset_name_te ? r.asset_name_te : r.asset_name);
   const zone = (r: AlertRow) => (r.zone ? t(r.asset_type === "recovered_parcel" && r.zone === "inside_ftl" ? "zone_parcel.inside_ftl" : `zone.${r.zone}`) : "");
+  const clearNarrowing = () => { setChange(""); setCohort(""); setDistrict(""); setMandal(""); setVillage(""); setLandTab("all"); };
 
   return (
     <div className="page">
@@ -72,7 +77,37 @@ export function Queue() {
           <h1>{t("queue.title")}</h1>
           <p className="muted" aria-hidden={!data}>{data ? `${t("queue.count", { count: items.length })}. ${t("queue.sorted")}.` : " "}</p>
         </div>
-        <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", alignItems: "flex-end" }}>
+      </div>
+      {linked.length > 0 && (
+        <p className="banner info linked-filter" data-testid="linked-filter">
+          {t("queue.linked")}{" "}
+          {linked.map((k, i) => (
+            <b key={k}>{i > 0 ? ", " : ""}{k === "waiting" ? t("dashboard.figure.waiting") : k === "state" ? (params.get(k) ?? "").split(",").map((x) => t(`state.${x}`)).join(", ") : k === "week" ? t("queue.linked_week", { week: params.get(k) }) : k === "asset_id" ? t("queue.linked_asset") : params.get(k) === "-" ? t("dashboard.not_recorded") : params.get(k)}</b>
+          ))}
+          <button className="btn quiet" onClick={() => { setParams({}); setFilter("active"); }} data-testid="linked-clear">{t("queue.linked_clear")}</button>
+        </p>
+      )}
+      <ScreeningSummary />
+      <div className="toolbar" role="search" aria-label={t("queue.filters")}>
+        <div className="toolbar-row">
+          <Segmented
+            label={t("queue.state")}
+            value={filter}
+            onChange={setFilter}
+            options={FILTERS.map((f) => ({ value: f, testId: `group-${f}`, label: f === "active" ? t("group.active") : f === "all" ? t("group.all") : t(`state.${f}`) }))}
+          />
+          <Segmented
+            label={t("queue.land_group")}
+            className="incident-tabs"
+            value={landTab}
+            onChange={(k) => { setLandTab(k); setDistrict(""); setMandal(""); setVillage(""); }}
+            options={(["all", "lakes", "lands"] as const).map((k) => ({ value: k, label: t(k === "all" ? "group.all" : `assets.tab.${k}`) }))}
+          />
+        </div>
+        <div className="toolbar-row">
+          <label className="field">{t("assets.filter_district")}<select value={district} onChange={(e) => { setDistrict(e.target.value); setMandal(""); setVillage(""); }}><option value="">{t("assets.all_districts")}</option>{districts.map((d) => <option key={d}>{d}</option>)}</select></label>
+          <label className="field">{t("assets.filter_mandal")}<select value={mandal} disabled={!mandals.length} onChange={(e) => { setMandal(e.target.value); setVillage(""); }}><option value="">{t("assets.all_mandals")}</option>{mandals.map((m) => <option key={m}>{m}</option>)}</select></label>
+          <label className="field">{t("assets.filter_village")}<select value={village} disabled={!villages.length} onChange={(e) => setVillage(e.target.value)}><option value="">{t("assets.all_villages")}</option>{villages.map((v) => <option key={v}>{v}</option>)}</select></label>
           <label className="field">
             {t("queue.what_changed")}
             <select value={change} onChange={(e) => setChange(e.target.value)} data-testid="filter-change">
@@ -87,46 +122,14 @@ export function Queue() {
               {["A_RECOVERED", "B_FINAL", "C_PRELIM", "D_UNNOTIFIED"].map((c) => <option key={c} value={c}>{t(`cohort.${c}`)}</option>)}
             </select>
           </label>
+          {narrowed && <button type="button" className="btn secondary sm" onClick={clearNarrowing}><X aria-hidden="true" />{t("queue.clear_filters")}</button>}
         </div>
-      </div>
-      {linked.length > 0 && (
-        <p className="banner info linked-filter" data-testid="linked-filter">
-          {t("queue.linked")}{" "}
-          {linked.map((k) => (
-            <b key={k}>{k === "waiting" ? t("dashboard.figure.waiting") : k === "state" ? (params.get(k) ?? "").split(",").map((x) => t(`state.${x}`)).join(", ") : k === "week" ? t("queue.linked_week", { week: params.get(k) }) : k === "asset_id" ? t("queue.linked_asset") : params.get(k) === "-" ? t("dashboard.not_recorded") : params.get(k)} · </b>
-          ))}
-          <button className="btn quiet" onClick={() => { setParams({}); setFilter("active"); }} data-testid="linked-clear">{t("queue.linked_clear")}</button>
-        </p>
-      )}
-      <ScreeningSummary />
-      <div className="chips incident-tabs" role="tablist" aria-label={t("queue.land_group")}>
-        {(["all", "lakes", "lands"] as const).map((k) => <button key={k} type="button" role="tab" aria-selected={landTab === k} className="chip" aria-pressed={landTab === k} onClick={() => { setLandTab(k); setDistrict(""); setMandal(""); setVillage(""); }}>{t(k === "all" ? "group.all" : `assets.tab.${k}`)}</button>)}
-      </div>
-      <section className="section incident-area-filters" aria-label={t("assets.registry_filters")}>
-        <label className="field">{t("assets.filter_district")}<select value={district} onChange={(e) => { setDistrict(e.target.value); setMandal(""); setVillage(""); }}><option value="">{t("assets.all_districts")}</option>{districts.map((d) => <option key={d}>{d}</option>)}</select></label>
-        <label className="field">{t("assets.filter_mandal")}<select value={mandal} disabled={!mandals.length} onChange={(e) => { setMandal(e.target.value); setVillage(""); }}><option value="">{t("assets.all_mandals")}</option>{mandals.map((m) => <option key={m}>{m}</option>)}</select></label>
-        <label className="field">{t("assets.filter_village")}<select value={village} disabled={!villages.length} onChange={(e) => setVillage(e.target.value)}><option value="">{t("assets.all_villages")}</option>{villages.map((v) => <option key={v}>{v}</option>)}</select></label>
-      </section>
-      <div className="chips" role="group" aria-label={t("queue.state")} style={{ marginBottom: "1rem" }}>
-        {FILTERS.map((f) => (
-          <button key={f} className="chip" aria-pressed={filter === f} onClick={() => setFilter(f)} data-testid={`group-${f}`}>
-            {f === "active" ? t("group.active") : f === "all" ? t("group.all") : t(`state.${f}`)}
-          </button>
-        ))}
       </div>
       <PageState error={error} status={status} onRetry={reload} />
       <div className="queue">
-        <div className="mapbox">
-          <MapView pins={pins} testId="queue-map" />
-          <div className="legend">
-            {STATES.map((s) => (
-              <span key={s}><i className="pin" style={{ width: 10, height: 10, borderWidth: 2, background: GROUP_COLOUR[GROUP_OF[s]] }} />{t(`state.${s}`)}</span>
-            ))}
-          </div>
-        </div>
         <div className="list" data-testid="alert-list">
           <PageState loading={!data && !error} />
-          {items.length === 0 && data && <p className="muted" style={{ padding: "1rem" }}>{t("queue.empty_real")}</p>}
+          {items.length === 0 && data && <p className="list-empty">{t("queue.empty_real")}</p>}
           {items.map((r) => (
             <Link key={r.id} to={`/alerts/${r.id}`} className="row" data-testid={`alert-row-${r.code}`}>
               <span className="bar" style={{ background: GROUP_COLOUR[GROUP_OF[r.state]] }} />
@@ -138,9 +141,9 @@ export function Queue() {
                   {r.origin === "citizen" && <span className="pill field" data-testid="origin-citizen">{t("queue.citizen")}</span>}
                   <span>{t("queue.acres", { acres: r.area_acres })}</span>
                   {zone(r) && <span>{zone(r)}</span>}
-                  <span>{t("queue.first_seen", { date: fmtDate(r.first_changed_at, i18n.language) })}</span>
                 </span>
                 <span className="meta">
+                  <span>{t("queue.first_seen", { date: fmtDate(r.first_changed_at, i18n.language) })}</span>
                   {r.review_count > 0 && <span>{t("queue.reviews", { count: r.review_count })}</span>}
                   {(r.citizen_reports ?? 0) > 0 && r.origin !== "citizen" && <span>{t("queue.citizen_reports", { count: r.citizen_reports })}</span>}
                   {r.resolution && <span>{t(`resolution.${r.resolution}`)}</span>}
@@ -148,7 +151,7 @@ export function Queue() {
                   {!r.boundary_confirmed && <span className="flag">{t("queue.boundary_unconfirmed")}</span>}
                   {r.permit_conflict && <span className="flag">{t("detail.permits")}</span>}
                   {r.related_alert_id && <span>{t("queue.seen_again")}</span>}
-                  <span className="small">{r.code}</span>
+                  <span className="mono">{r.code}</span>
                 </span>
               </span>
               <span className="score">
@@ -157,6 +160,14 @@ export function Queue() {
               </span>
             </Link>
           ))}
+        </div>
+        <div className="mapbox">
+          <MapView pins={pins} testId="queue-map" />
+          <div className="legend">
+            {STATES.map((s) => (
+              <span key={s}><i className="pin" style={{ background: GROUP_COLOUR[GROUP_OF[s]] }} />{t(`state.${s}`)}</span>
+            ))}
+          </div>
         </div>
       </div>
     </div>

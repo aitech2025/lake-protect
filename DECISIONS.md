@@ -470,6 +470,67 @@ Built as M19 (the **Satellites** page; `api/app/services/satellites.py`).
 - **Why thresholds are not on the page:** the scored backtest (M3) must run on rules fixed and
   tagged before the run (section 8.6). A threshold changed from a screen would break that.
 
+### D-067: Four personas, district scope and a field visit with two-step approval (owner, 28 Nov 2026)
+The owner replaced D-057's two roles with four personas:
+- **Senior official** (`senior_official`): sees State-level data (locations, maps, incidents,
+  records, citizen reports, the monthly page and the audit log).
+- **Admin** (`admin`): maintains the application (users and their areas, locations, sources,
+  satellites, integrations, system status). Sees everything; takes no step on an incident.
+- **District officer** (`district_officer`): like the senior official, but sees only the districts
+  (or mandals) set for them on the Officials page.
+- **Field officer** (`field_officer`): sees only the incidents assigned to them, visits the place,
+  attaches photos, GPS and documents, and submits a field report.
+
+Asked how the review runs, the owner chose:
+- **Two steps.** The district officer recommends approve (a real change) or decline (not a real
+  change); the senior official gives the final approval and closes.
+- **Declining a field report sends it back** to the same field officer, with a note, for another
+  visit or more evidence.
+- **The admin maintains only**: no review, assignment, decision or closing.
+- **A field visit is optional**: an officer may recommend from the satellite evidence alone.
+
+Built as M21 (migration 0019, `app/workflow/incidents.py`, `app/access.py`):
+- **Lifecycle.** OPEN, UNDER_REVIEW, FIELD_VISIT, FIELD_REPORTED, RECOMMENDED, CONFIRMED or
+  DISMISSED, CLOSED. The database guards stay: start open, change only through the lifecycle, the
+  resolution matching the state.
+
+  | Step | Who |
+  |---|---|
+  | Start the review (OPEN to UNDER_REVIEW) | district officer of the area, senior official |
+  | Assign or reassign a field officer (to FIELD_VISIT) | district officer of the area, senior official |
+  | Withdraw a field visit (to UNDER_REVIEW) | district officer of the area, senior official |
+  | Submit the field report (to FIELD_REPORTED) | the assigned field officer |
+  | Return the field report (to FIELD_VISIT) | district officer of the area |
+  | Recommend approve or decline (to RECOMMENDED) | district officer of the area |
+  | Approve the recommendation (to CONFIRMED or DISMISSED) | senior official |
+  | Return the recommendation (to UNDER_REVIEW) | senior official |
+  | Close | senior official |
+  | Close at once on the legal check | system |
+
+- **Default chosen where no district officer covers the place** (not the owner's words): an asset
+  with no district, or in an area no active district officer covers, would otherwise never get a
+  recommendation. There the senior official takes the district officer's steps and decides in one
+  step; the audit entry says the area had no district officer. The Officials page shows the gap.
+- **Seeing.** The API filters every list and refuses every record outside a person's scope:
+  incidents, locations and their weeks, boundaries, documents and inspections, citizen reports,
+  the overview and the search. Field officers see the incidents ever assigned to them and the
+  locations of those incidents. Registry, records, the monthly page, sources and the full audit log
+  are State-level (senior official and admin). This replaces D-059's "seeing is not restricted by
+  area" for district and field officers.
+- **Citizen incidents** follow the same steps (D-064's "both roles do all of it" ends). District
+  officers and senior officials acknowledge, add notes, request satellite looks and sharper images,
+  attach legal records and documents, and add the place to the weekly watch. The senior official,
+  not the admin, approves a sharper paid image. A dismissal passed to a department, or marked
+  false, is set in the recommendation and applied on approval.
+- **Notifications** (D-059 updated): a new incident goes to the district officers of its area and
+  to every senior official; to the admin only when no district officer covers it. An assignment
+  and a returned report go to the field officer; a field report to the area's district officers; a
+  recommendation to every senior official; a returned recommendation to the recommending officer.
+  An unacknowledged incident is escalated to the senior officials after 48 hours, not the admin.
+- **Accounts.** Migration 0019 maps each `viewer` with an area to `district_officer`, and any other
+  to `senior_official`. The role accounts become demo.admin, demo.senior, demo.district1 and
+  demo.district2 (the old viewers, renamed), demo.field1 and demo.field2 (`data/accounts.yml`).
+
 ## Errors and gaps found in CONTEXT.md
 
 ### E-001: `boundaries` is append-only but has `valid_to` (section 7, invariant 12)

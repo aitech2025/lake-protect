@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import { API_BASE, api, authHeaders, fmtDate } from "../api";
 import { useAsync, usePageTitle } from "../components/Bits";
 import { PageState } from "../components/PageState";
+import { Segmented } from "../components/Segmented";
+import { Printer } from "lucide-react";
 import "./monthly.css";
 
 function months(n: number): string[] {
@@ -56,10 +58,10 @@ export function Monthly() {
             </p>
           )}
         </div>
-        <button className="btn" onClick={() => void print()} data-testid="print-monthly">{t("monthly.print")}</button>
-      </div>
-      <div className="chips" style={{ marginBottom: "1.25rem" }}>
-        {choices.map((m) => <button key={m} className="chip" aria-pressed={m === month} onClick={() => setMonth(m)}>{monthName(m, lang)}</button>)}
+        <div className="head-actions">
+          <Segmented label={t("monthly.choose")} value={month} onChange={setMonth} options={choices.map((m) => ({ value: m, label: monthName(m, lang) }))} />
+          <button className="btn secondary" onClick={() => void print()} data-testid="print-monthly"><Printer aria-hidden="true" />{t("monthly.print")}</button>
+        </div>
       </div>
       <PageState loading={loading && !data} error={error} status={status} onRetry={reload} />
       {data && !error && (
@@ -89,7 +91,7 @@ export function Monthly() {
               <ul className="who-list" data-testid="change-types">
                 {Object.entries(data.change_types).map(([k, n]) => <li key={k}><span>{t(`change.${k}`)}</span><b>{n as number}</b></li>)}
               </ul>
-              <h2 style={{ marginTop: "1.5rem" }}>{t("monthly.list", { days: data.wait_days })}</h2>
+              <h2 className="monthly-sub">{t("monthly.list", { days: data.wait_days })}</h2>
               {data.waiting.length === 0 && <p className="muted">{t("monthly.none", { days: data.wait_days })}</p>}
               <ul className="overdue-list" data-testid="waiting-list">
                 {data.waiting.map((o: any) => (
@@ -102,7 +104,7 @@ export function Monthly() {
               </ul>
             </div>
           </div>
-          <p className="small muted" style={{ marginTop: "1.5rem" }}>{t("monthly.source")}</p>
+          <p className="small muted section">{t("monthly.source")}</p>
         </>
       )}
     </div>

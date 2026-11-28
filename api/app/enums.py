@@ -124,6 +124,9 @@ class Role(StrEnum):
 class IncidentState(StrEnum):
     OPEN = "OPEN"
     UNDER_REVIEW = "UNDER_REVIEW"
+    FIELD_VISIT = "FIELD_VISIT"  # a field officer is assigned (D-067)
+    FIELD_REPORTED = "FIELD_REPORTED"  # the field report is in, for the district officer
+    RECOMMENDED = "RECOMMENDED"  # the district officer recommends; the senior official decides
     CONFIRMED = "CONFIRMED"
     DISMISSED = "DISMISSED"
     CLOSED = "CLOSED"
@@ -162,6 +165,10 @@ class NotificationKind(StrEnum):
     weekly_digest = "weekly_digest"  # after each weekly screen: the official's area that week
     citizen_report = "citizen_report"  # a citizen's report in the area (D-062): needs acknowledgement
     satellite_review = "satellite_review"  # the satellite review of a citizen incident is done (D-063)
+    incident_assigned = "incident_assigned"  # to a field officer: a field visit is theirs (D-067)
+    field_reported = "field_reported"  # to the area's district officers: a field report is in
+    recommended = "recommended"  # to the senior officials: a recommendation waits for approval
+    returned = "returned"  # a field report or a recommendation was sent back, with a note
 
 
 class Channel(StrEnum):

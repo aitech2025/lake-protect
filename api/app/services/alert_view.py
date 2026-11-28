@@ -1,6 +1,6 @@
 """Incident list rows and the incident detail payload.
 
-Two roles see the same incidents (DECISIONS.md D-057). Owner names never appear here: the
+Who sees which incidents is decided in app.access (DECISIONS.md D-067). Owner names never appear here: the
 change is described by what the satellite saw, where it is and what the records say about the
 land. Each incident says plainly what changed: construction, land fill, levelling or clearing.
 """
@@ -66,17 +66,22 @@ SELECT al.id, al.code, al.state::text AS state, al.resolution, al.closed_at, al.
        cr.created_at AS report_at, cr.placed_by AS report_placed_by,
        sr.status AS review_status, sr.result AS review_result, sr.after_date AS review_after_date,
        sr.first_changed_at AS review_first_changed, sr.change_area_sq_m AS review_change_area, sr.source AS review_source,
-       (SELECT count(*) FROM citizen_reports r2 WHERE r2.alert_id = al.id) AS citizen_reports
+       (SELECT count(*) FROM citizen_reports r2 WHERE r2.alert_id = al.id) AS citizen_reports,
+       fo.field_officer_id, fo.field_officer
 FROM alerts al
 JOIN candidates c ON c.id = al.candidate_id
 JOIN assets a ON a.id = c.asset_id
 LEFT JOIN citizen_reports cr ON cr.id = al.report_id
 LEFT JOIN satellite_reviews sr ON sr.alert_id = al.id AND sr.kind = 'automatic'
 LEFT JOIN LATERAL (SELECT * FROM legal_checks l WHERE l.candidate_id = c.id ORDER BY l.id DESC LIMIT 1) lc ON true
+LEFT JOIN LATERAL (SELECT ia.field_officer_id, u.name AS field_officer FROM incident_assignments ia JOIN users u ON u.id = ia.field_officer_id
+                   WHERE ia.alert_id = al.id ORDER BY ia.id DESC LIMIT 1) fo ON true
 WHERE (CAST(:alert_id AS bigint) IS NULL OR al.id = CAST(:alert_id AS bigint))
+  AND {scope}
   AND (CAST(:asset_id AS bigint) IS NULL OR a.id = CAST(:asset_id AS bigint))
   AND (CAST(:include_demo AS boolean) OR NOT al.is_demo)
-ORDER BY CASE al.state WHEN 'OPEN' THEN 0 WHEN 'UNDER_REVIEW' THEN 1 WHEN 'CONFIRMED' THEN 2 WHEN 'DISMISSED' THEN 3 ELSE 4 END,
+ORDER BY CASE al.state WHEN 'OPEN' THEN 0 WHEN 'FIELD_REPORTED' THEN 1 WHEN 'RECOMMENDED' THEN 2 WHEN 'UNDER_REVIEW' THEN 3
+                       WHEN 'FIELD_VISIT' THEN 4 WHEN 'CONFIRMED' THEN 5 WHEN 'DISMISSED' THEN 6 ELSE 7 END,
          al.priority_score DESC NULLS LAST, al.id DESC
 """
 
@@ -155,13 +160,21 @@ def in_area(row: dict, district: str | None = None, mandal: str | None = None, v
 
 
 def is_waiting(row: dict, now: dt.datetime) -> bool:
-    """Open or under review for more than 14 whole days: the monthly page's rule."""
-    return row["state"] in lifecycle.REVIEWABLE and (now - row["created_at"]).days > WAITING_DAYS
+    """Not decided after more than 14 whole days: the monthly page's rule."""
+    return row["state"] in lifecycle.UNDECIDED and (now - row["created_at"]).days > WAITING_DAYS
+
+
+def _sql(user: User | None) -> str:
+    from app import access
+
+    return _LIST_SQL.replace("{scope}", access.alert_sql(user, "al", "a") if user is not None else "TRUE")
 
 
 def list_alerts(db: Session, *, state=None, change_type=None, cohort=None, asset_id=None, district=None, mandal=None,
-                village=None, waiting: bool = False, new_in_week: str | None = None, now: dt.datetime | None = None) -> list[dict]:
-    rows = db.execute(text(_LIST_SQL), {"alert_id": None, "asset_id": asset_id, "include_demo": False}).mappings().all()
+                village=None, waiting: bool = False, new_in_week: str | None = None, now: dt.datetime | None = None,
+                user: User | None = None) -> list[dict]:
+    """The incidents, filtered to what `user` may see (all of them when no user is given, for internal use)."""
+    rows = db.execute(text(_sql(user)), {"alert_id": None, "asset_id": asset_id, "include_demo": False}).mappings().all()
     out = [_row_out(dict(r)) for r in rows]
     if state:
         out = [r for r in out if r["state"] in set(state.split(","))]
@@ -181,7 +194,7 @@ def list_alerts(db: Session, *, state=None, change_type=None, cohort=None, asset
 
 def row_for(db: Session, alert_id: int) -> dict:
     """One incident's list row: what changed, where, and its flags (for notifications)."""
-    row = db.execute(text(_LIST_SQL), {"alert_id": alert_id, "asset_id": None, "include_demo": True}).mappings().first()
+    row = db.execute(text(_sql(None)), {"alert_id": alert_id, "asset_id": None, "include_demo": True}).mappings().first()
     if row is None:
         raise HTTPException(404, "Incident not found")
     return _row_out(dict(row))
@@ -265,14 +278,52 @@ def _officer_blocks(db: Session, alert: Alert, asset: Asset, users: dict, user: 
             "acknowledged_by": [n["author"] for n in notes if n["kind"] == "acknowledged"],
             "can_decide": alert.state in lifecycle.REVIEWABLE,
             "can_close": alert.state in (lifecycle.S.CONFIRMED.value, lifecycle.S.DISMISSED.value),
-            "can_approve_imagery": user.role == "admin",
+            "can_approve_imagery": user.role == "senior_official",
             "can_watch": not asset.monitored,
         },
     }
 
 
+def _casework_block(db: Session, alert: Alert, users: dict) -> dict:
+    """The field visits, field reports and recommendations on an incident (D-067), newest last."""
+    from app.models import AssetInspection, FieldReport, IncidentAssignment, IncidentRecommendation
+    from app import access
+
+    name = lambda uid: users[uid].name if uid in users else None  # noqa: E731
+    assignments = db.scalars(select(IncidentAssignment).where(IncidentAssignment.alert_id == alert.id).order_by(IncidentAssignment.id)).all()
+    reports = db.scalars(select(FieldReport).where(FieldReport.alert_id == alert.id).order_by(FieldReport.id)).all()
+    visits = {v.id: v for v in db.scalars(select(AssetInspection).where(AssetInspection.id.in_([r.inspection_id for r in reports] or [0])))}
+    recs = db.scalars(select(IncidentRecommendation).where(IncidentRecommendation.alert_id == alert.id).order_by(IncidentRecommendation.id)).all()
+    asset = access.asset_of(db, alert)
+    cur = assignments[-1] if assignments else None
+    return {
+        "assignment": None if cur is None else {
+            "id": cur.id, "field_officer_id": cur.field_officer_id, "field_officer": name(cur.field_officer_id),
+            "assigned_by": name(cur.assigned_by), "note": cur.note, "at": _iso(cur.at),
+            "open": alert.state == lifecycle.S.FIELD_VISIT.value,
+        },
+        "assignments": [{"id": a.id, "field_officer": name(a.field_officer_id), "assigned_by": name(a.assigned_by), "note": a.note, "at": _iso(a.at)}
+                        for a in assignments],
+        "field_reports": [{
+            "id": r.id, "field_officer": name(r.field_officer_id), "outcome": r.outcome, "findings": r.findings, "submitted_at": _iso(r.submitted_at),
+            "inspection_id": r.inspection_id, "asset_id": asset.id,
+            "observed_at": _iso(visits[r.inspection_id].observed_at) if r.inspection_id in visits else None,
+            "lat": visits[r.inspection_id].lat if r.inspection_id in visits else None,
+            "lon": visits[r.inspection_id].lon if r.inspection_id in visits else None,
+            "photos": len(visits[r.inspection_id].photo_paths) if r.inspection_id in visits else 0,
+        } for r in reports],
+        "recommendation": None if not recs else {
+            "id": recs[-1].id, "recommendation": recs[-1].recommendation, "note": recs[-1].note, "by": name(recs[-1].recommended_by),
+            "at": _iso(recs[-1].at), "field_report_id": recs[-1].field_report_id, "citizen_department": recs[-1].citizen_department,
+            "citizen_false_report": recs[-1].citizen_false_report, "pending": alert.state == lifecycle.S.RECOMMENDED.value,
+        },
+        "recommendations": len(recs),
+        "district_officer_covers": not access.uncovered(db, asset),
+    }
+
+
 def detail(db: Session, alert: Alert, user: User) -> dict:
-    row = _row_out(dict(db.execute(text(_LIST_SQL), {"alert_id": alert.id, "asset_id": None, "include_demo": True}).mappings().one()))
+    row = _row_out(dict(db.execute(text(_sql(None)), {"alert_id": alert.id, "asset_id": None, "include_demo": True}).mappings().one()))
     cand = db.get(Candidate, alert.candidate_id)
     asset = db.get(Asset, cand.asset_id)
     bset = bsvc.current_boundary_set(db, asset.id)
@@ -297,6 +348,7 @@ def detail(db: Session, alert: Alert, user: User) -> dict:
 
     return {
         **row,
+        **_casework_block(db, alert, users),
         "statement": STATEMENT_EN,
         "statement_key": "statement.imagery",
         "candidate": {
@@ -361,7 +413,7 @@ def detail(db: Session, alert: Alert, user: User) -> dict:
         "allowed_actions": lifecycle.allowed_actions(db, alert, user),
         # What this person was sent about the incident and has not acknowledged yet, while it is
         # still open or under review (D-059).
-        "my_notifications": [] if alert.state not in lifecycle.REVIEWABLE else [
+        "my_notifications": [] if alert.state not in lifecycle.UNDECIDED else [
             {"id": n.id, "kind": n.kind, "created_at": _iso(n.created_at)}
             for n in db.scalars(select(Notification).where(Notification.user_id == user.id, Notification.alert_id == alert.id,
                                                            Notification.needs_ack.is_(True), Notification.acknowledged_at.is_(None))
