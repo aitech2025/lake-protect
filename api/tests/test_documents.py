@@ -26,16 +26,16 @@ def test_admin_uploads_and_everyone_reads(db, client, isolated_storage):
     assert r.status_code == 201, r.text
     doc = r.json()
     assert doc["has_file"] and doc["sha256"] == hashlib.sha256(PDF).hexdigest() and doc["issued_on"] == "2025-03-14"
-    listed = client.get(f"/assets/{asset.id}/documents", headers=auth(team.viewer)).json()["items"]
+    listed = client.get(f"/assets/{asset.id}/documents", headers=auth(team.district)).json()["items"]
     assert [d["title"] for d in listed] == ["Final FTL notification TEST/1"]
-    file = client.get(f"/documents/{doc['id']}/file", headers=auth(team.viewer))
+    file = client.get(f"/documents/{doc['id']}/file", headers=auth(team.district))
     assert file.status_code == 200 and file.content == PDF and file.headers["X-SHA256"] == doc["sha256"]
     assert db.scalar(text("SELECT count(*) FROM audit_log WHERE action = 'export.document'")) == 1
 
 
 def test_viewers_cannot_add_documents(db, client):
     team = Team(db)
-    assert _upload(client, make_asset(db).id, team.viewer).status_code == 403
+    assert _upload(client, make_asset(db).id, team.district).status_code == 403
 
 
 def test_files_must_be_what_they_claim(db, client):
@@ -61,7 +61,7 @@ def test_corrections_supersede_and_rows_never_change(db, client):
     asset = make_asset(db)
     first = _upload(client, asset.id, team.admin).json()
     second = _upload(client, asset.id, team.admin, title="Final FTL notification TEST/1 (corrected)", supersedes_id=str(first["id"])).json()
-    listed = {d["id"]: d for d in client.get(f"/assets/{asset.id}/documents", headers=auth(team.viewer)).json()["items"]}
+    listed = {d["id"]: d for d in client.get(f"/assets/{asset.id}/documents", headers=auth(team.district)).json()["items"]}
     assert listed[first["id"]]["superseded"] is True and listed[second["id"]]["superseded"] is False
     with pytest.raises(DBAPIError, match="append-only"):
         with db.begin_nested():

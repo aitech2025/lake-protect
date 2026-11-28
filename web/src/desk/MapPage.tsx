@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../api";
@@ -22,7 +22,7 @@ function point(geometry: any): [number, number] | null {
   return [coords.reduce((n, p) => n + p[0], 0) / coords.length, coords.reduce((n, p) => n + p[1], 0) / coords.length];
 }
 
-/** Every watched location on the satellite base map; a pin opens its record. */
+/** Every watched location on the world map (D-068), fitted to Hyderabad; a pin opens its record. */
 export function MapPage() {
   const { t, i18n } = useTranslation();
   const nav = useNavigate();
@@ -37,6 +37,10 @@ export function MapPage() {
       label: i18n.language === "te" && f.properties.name_te ? f.properties.name_te : f.properties.name,
       onClick: () => nav(`/assets/${f.id}`) }];
   }), [features, i18n.language, nav]);
+  // The map fits the locations clear of the heading card and the legend drawn over it.
+  const headRef = useRef<HTMLElement>(null);
+  const legendRef = useRef<HTMLDivElement>(null);
+  const panels = useMemo(() => [headRef, legendRef], []);
   const counts = useMemo(() => {
     const all = data?.features ?? [];
     const lakes = all.filter((f) => f.properties.category === "water_body").length;
@@ -44,8 +48,8 @@ export function MapPage() {
   }, [data]);
   return (
     <section className="full-map-page" aria-labelledby="full-map-title" data-testid="full-map-page">
-      <div className="full-map-frame"><MapView pins={pins} testId="full-asset-map" /></div>
-      <header className="full-map-head">
+      <div className="full-map-frame"><MapView pins={pins} testId="full-asset-map" world avoid={panels} /></div>
+      <header className="full-map-head" ref={headRef}>
         <div>
           <h1 id="full-map-title">{t("nav.map")}</h1>
           <p className="muted small">{data ? t("map.assets_count", { count: pins.length }) : t("error.loading")}</p>
@@ -58,7 +62,7 @@ export function MapPage() {
         />
         <p className="small muted">{t("map.hint")}</p>
       </header>
-      <div className="legend map-legend" aria-label={t("dashboard.legend")}>
+      <div className="legend map-legend" aria-label={t("dashboard.legend")} ref={legendRef}>
         <span><i className="legend-dot" style={{ background: LAKE }} />{t("map.legend_lake")}</span>
         <span><i className="legend-dot" style={{ background: LAND }} />{t("map.legend_land")}</span>
         <span><i className="legend-dot" style={{ background: STOPPED }} />{t("map.legend_stopped")}</span>

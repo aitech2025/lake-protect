@@ -105,13 +105,16 @@ export type AlertRow = {
   lat: number;
   geometry: GeoJSON.Geometry;
   flags: string[];
+  field_officer_id?: number | null;
+  field_officer?: string | null;
 };
 
 /** A notification in the inbox (DECISIONS.md D-059). */
 export type Delivery = { channel: "email" | "sms" | "whatsapp"; status: string; attempt: number; to_masked: string | null; detail: string | null; at: string };
 export type Note = {
   id: number;
-  kind: "incident_opened" | "incident_decided" | "reminder" | "not_acknowledged" | "weekly_digest" | "citizen_report" | "satellite_review";
+  kind: "incident_opened" | "incident_decided" | "reminder" | "not_acknowledged" | "weekly_digest" | "citizen_report" | "satellite_review"
+    | "incident_assigned" | "field_reported" | "recommended" | "returned";
   alert_id: number | null;
   report_id?: number | null;
   week: string | null;
@@ -129,7 +132,7 @@ export type Note = {
 /** The drill-down dashboard (DECISIONS.md D-060). */
 export type Figures = {
   assets: number; clear_look: number; no_clear_look: number; changed: number; new_incidents: number; open: number;
-  under_review: number; waiting: number; confirmed: number; court_matters: number; boundary_confirmed: number;
+  under_review: number; field_visit: number; awaiting_approval: number; waiting: number; confirmed: number; court_matters: number; boundary_confirmed: number;
   ack_considered: number; ack_on_time: number;
 };
 export type Tone = "waiting" | "open" | "changed" | "no_look" | "quiet";

@@ -8,11 +8,11 @@ days, confirmed, and how many officials' notifications were acknowledged within 
 figure is counted with the incident list's own rules (app.services.alert_view), so every number
 opens exactly the incidents behind it.
 
-A level whose assets all lack the next area (the real lakes have no village) is skipped, and the
-lakes are listed directly. Only locations being watched count as watched and in the weekly figures;
+A level whose assets all lack the next area is skipped, and the lakes are listed directly. The real
+lakes' villages are the nearest OpenStreetMap place (D-069). Only locations being watched count as watched and in the weekly figures;
 a location whose watch was stopped still shows while it has incidents (D-061). Assets with no
-district are grouped as "area not recorded". Everyone sees every area: areas decide who is
-notified, not who may look. GeoGuard holds real data only (D-065).
+district are grouped as "area not recorded". A district officer sees only their areas, a field
+officer only the places of their assigned incidents (D-067). GeoGuard holds real data only (D-065).
 """
 from __future__ import annotations
 
@@ -21,12 +21,13 @@ import datetime as dt
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app import categories
+from app import access, categories
 from app.models import User
 from app.notify import routing
 from app.services import alert_view
 from app.services.alert_view import NOT_RECORDED, in_area, is_waiting
 from app.services.weeks import STATUS_LABEL
+from app.workflow.incidents import UNDECIDED
 
 LEVELS = ("state", "district", "mandal", "village")
 CLEAR = ("no_candidate", "candidate_found")
@@ -35,7 +36,7 @@ ACK_WINDOW = dt.timedelta(days=30)
 ACK_WITHIN = dt.timedelta(hours=24)
 CONFIRMED_STATUSES = ("physically_marked", "final_notification", "surveyed_agency")
 
-_ASSETS = text(
+_ASSETS = (
     """
     SELECT a.id, a.name, a.name_te, a.cohort::text AS cohort, a.type::text AS type, a.district, a.mandal, a.village,
            a.monitored, ST_X(b.p) AS lon, ST_Y(b.p) AS lat, b.status AS boundary_status
@@ -43,7 +44,7 @@ _ASSETS = text(
     LEFT JOIN LATERAL (
         SELECT ST_PointOnSurface(geom) AS p, status::text AS status FROM boundaries
         WHERE asset_id = a.id AND kind IN ('ftl', 'parcel') ORDER BY valid_from DESC, version DESC LIMIT 1) b ON true
-    WHERE a.is_demo = false
+    WHERE a.is_demo = false AND {scope}
     ORDER BY a.name
     """
 )
@@ -67,7 +68,7 @@ _ACKS = text(
     """
     SELECT n.alert_id, n.created_at, n.acknowledged_at
     FROM notifications n JOIN users u ON u.id = n.user_id
-    WHERE n.kind = 'incident_opened' AND u.role = 'viewer' AND n.created_at >= :since
+    WHERE n.kind = 'incident_opened' AND u.role = 'district_officer' AND n.created_at >= :since
     """
 )
 
@@ -99,10 +100,12 @@ def _figures(assets: list[dict], incidents: list[dict], screens: dict, week: str
         "changed": sum(1 for s in this_week.values() if s["status"] == "candidate_found"),
         "new_incidents": len(new),
         "open": sum(1 for i in mine if i["state"] == "OPEN"),
-        "under_review": sum(1 for i in mine if i["state"] == "UNDER_REVIEW"),
+        "under_review": sum(1 for i in mine if i["state"] in ("UNDER_REVIEW", "FIELD_VISIT", "FIELD_REPORTED")),
+        "field_visit": sum(1 for i in mine if i["state"] == "FIELD_VISIT"),
+        "awaiting_approval": sum(1 for i in mine if i["state"] == "RECOMMENDED"),
         "waiting": sum(1 for i in mine if is_waiting(i, now)),
         "confirmed": sum(1 for i in mine if i["state"] == "CONFIRMED"),
-        "court_matters": sum(1 for i in mine if i["state"] in ("OPEN", "UNDER_REVIEW") and i["court_matter"]),
+        "court_matters": sum(1 for i in mine if i["state"] in UNDECIDED and i["court_matter"]),
         "boundary_confirmed": sum(1 for a in watched if a["boundary_status"] in CONFIRMED_STATUSES),
         "ack_considered": len(considered),
         "ack_on_time": len(on_time),
@@ -113,7 +116,7 @@ def _tone(f: dict) -> str:
     """One word for a row's colour on the map and in the table."""
     if f["waiting"]:
         return "waiting"
-    if f["open"] or f["under_review"]:
+    if f["open"] or f["under_review"] or f["awaiting_approval"]:
         return "open"
     if f["changed"]:
         return "changed"
@@ -129,8 +132,8 @@ def overview(db: Session, user: User, *, district: str | None = None, mandal: st
     depth = 0 if district is None else 1 if mandal is None else 2 if village is None else 3
     level = LEVELS[depth]
 
-    every = [dict(r) for r in db.execute(_ASSETS).mappings()]
-    incidents = alert_view.list_alerts(db)
+    every = [dict(r) for r in db.execute(text(_ASSETS.replace("{scope}", access.asset_sql(user, "a")))).mappings()]
+    incidents = alert_view.list_alerts(db, user=user)
     with_incidents = {i["asset_id"] for i in incidents}
     assets = [a for a in every if in_area(a, district, mandal, village) and (a["monitored"] or a["id"] in with_incidents)]
     weeks = sorted(db.scalars(_WEEKS, {"n": TREND_WEEKS}).all())
@@ -138,7 +141,7 @@ def overview(db: Session, user: User, *, district: str | None = None, mandal: st
     screens = {(r["asset_id"], r["week"]): dict(r) for r in db.execute(_SCREENS, {"weeks": weeks or [""]}).mappings()}
     acks = [dict(r) for r in db.execute(_ACKS, {"since": now - ACK_WINDOW}).mappings()]
 
-    # The next level down; skipped while every asset here lacks it (real lakes have no village).
+    # The next level down; skipped while every asset here lacks it.
     child_level = None
     for nxt in LEVELS[depth + 1:]:
         if any(_key(a[nxt]) for a in assets):
@@ -214,7 +217,7 @@ def overview(db: Session, user: User, *, district: str | None = None, mandal: st
         "trend": trend,
         "pins": pins,
         "my_areas": routing.areas_of(db, user.id),
-        "area_source": "Districts and mandals of the OpenStreetMap lakes come from OpenStreetMap boundaries, not the revenue record.",
+        "area_source": "Districts and mandals of the OpenStreetMap lakes come from OpenStreetMap boundaries, and villages from the nearest OpenStreetMap place: not the revenue record.",
         "as_of": now.isoformat(),
     }
 

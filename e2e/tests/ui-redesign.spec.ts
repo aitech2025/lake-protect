@@ -6,8 +6,8 @@ async function signInViewer(page: import("@playwright/test").Page) {
   const response = await page.request.get("/api/auth/demo-users");
   expect(response.ok()).toBeTruthy();
   const users = await response.json() as { username: string; role: string; language?: string }[];
-  const viewer = users.find((user) => user.role === "viewer" && user.language === "en") ?? users.find((user) => user.role === "viewer");
-  expect(viewer, "a viewer demo account should be seeded").toBeTruthy();
+  const viewer = users.find((user) => user.role === "district_officer" && user.language === "en") ?? users.find((user) => user.role === "district_officer");
+  expect(viewer, "a district officer demo account should be seeded").toBeTruthy();
   await login(page, viewer!.username);
 }
 

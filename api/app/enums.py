@@ -114,11 +114,12 @@ class FieldOutcome(StrEnum):
 
 
 class Role(StrEnum):
-    """Two roles since 24 Nov 2026 (DECISIONS.md D-057): the admin runs the application; viewers
-    are the officials, who see everything and record reviews of incidents."""
+    """Four personas since 28 Nov 2026 (DECISIONS.md D-067)."""
 
-    admin = "admin"
-    viewer = "viewer"
+    admin = "admin"  # maintains the application; sees everything, takes no step on an incident
+    senior_official = "senior_official"  # State level: gives the final approval and closes
+    district_officer = "district_officer"  # their districts: assigns field visits and recommends
+    field_officer = "field_officer"  # the incidents assigned to them: visits and reports
 
 
 class IncidentState(StrEnum):

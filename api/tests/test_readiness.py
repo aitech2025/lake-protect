@@ -69,7 +69,7 @@ def test_readiness_does_not_claim_production_ready_for_weak_configuration(tmp_pa
 
 
 def test_readiness_endpoint_is_admin_only_and_never_returns_secret_values(client, db):
-    viewer = make_user(db, "viewer")
+    viewer = make_user(db, "senior_official")
     admin = make_user(db, "admin")
 
     denied = client.get("/readiness", headers=auth(viewer))

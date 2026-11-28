@@ -22,7 +22,8 @@ export default defineConfig({
         icons: [{ src: "/favicon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" }],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,svg,woff2}"],
+        // The world map's local outlines (D-068) are precached, so its offline fallback works in the field.
+        globPatterns: ["**/*.{js,css,html,svg,woff2,geojson}"],
         maximumFileSizeToCacheInBytes: 6_000_000,
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/api\//],

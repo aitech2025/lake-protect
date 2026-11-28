@@ -39,7 +39,7 @@ def test_invariant_4_owner_claims_wait_for_a_confirmed_change(db):
         with db.begin_nested():
             db.add(OwnerClaim(alert_id=alert.id, claim_type="private_title", claimant_name="Test", entered_by=team.admin.id, entered_at=T0))
             db.flush()
-    decide(db, alert, team.admin, "CONFIRMED")
+    decide(db, alert, team.senior, "CONFIRMED")
     db.add(OwnerClaim(alert_id=alert.id, claim_type="private_title", claimant_name="Test", entered_by=team.admin.id, entered_at=T0))
     db.flush()
 
@@ -121,7 +121,7 @@ def test_invariant_8_database_refuses_an_incident_for_water_loss(db):
 def test_invariant_9_editing_any_audit_row_makes_verify_fail(db, client, tamper):
     team = Team(db)
     _, alert = ingest(db, make_asset(db), at=T0)
-    review(db, alert, team.viewer)
+    review(db, alert, team.district)
     ok = client.get("/audit/verify", headers=auth(team.admin)).json()
     assert ok["ok"] is True and ok["rows_checked"] > 3
 
@@ -130,7 +130,7 @@ def test_invariant_9_editing_any_audit_row_makes_verify_fail(db, client, tamper)
     db.execute(text(tamper), {"i": target})
     db.execute(text("SET LOCAL session_replication_role = origin"))
     db.expire_all()
-    bad = client.get("/audit/verify", headers=auth(team.viewer)).json()
+    bad = client.get("/audit/verify", headers=auth(team.senior)).json()
     assert bad["ok"] is False
 
 

@@ -149,7 +149,7 @@ def build(db: Session, alert: Alert, user: User, at: dt.datetime | None = None) 
             f"Minimum area {rules.rules()['min_candidate_area_sq_m']} sq m.",
             f"Legal check against boundary version {lc.boundary_version if lc else '?'}: zone, baseline date, authorised works, permits, court register, asset mode.",
             "Image chips: true colour, same window for both dates, boundary drawn on top.",
-            "Reviews by officials and the admin's decision are taken from the hash-chained audit log.",
+            "Reviews, field visits, the district officer's recommendation and the senior official's approval are taken from the hash-chained audit log.",
             "Legal documents tagged to the asset: each file's hash was recorded when it was added and checked again here.",
         ],
     }

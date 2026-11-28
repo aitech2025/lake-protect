@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { api, fmtDateTime } from "../api";
+import { useAuth } from "../auth";
 import { useAsync, usePageTitle } from "../components/Bits";
 import { PageState, TableRegion } from "../components/PageState";
 
@@ -16,6 +17,7 @@ const OUTSIDE = ["email", "sms", "whatsapp"] as const;
 /** Admin only (DECISIONS.md D-059): who covers which area, how each is reached, and what was delivered. */
 export function Officials() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const people = useAsync(() => api<Person[]>("/users"), []);
   const areas = useAsync(() => api<{ items: KnownArea[] }>("/areas"), []);
   const log = useAsync(() => api<any>("/notifications/deliveries?limit=150"), []);
@@ -62,7 +64,7 @@ export function Officials() {
       <h2 className="title-s" style={{ margin: "1.25rem 0 0.5rem" }}>{t("officials.people")}</h2>
       <PageState loading={people.loading && !people.data} error={people.error} status={people.status} onRetry={people.reload} />
       <div className="people">
-        {people.data?.map((p) => <PersonCard key={p.id} p={p} known={areas.data?.items ?? []} onSaved={people.reload} />)}
+        {people.data?.map((p) => <PersonCard key={`${p.id}-${p.role}`} p={p} known={areas.data?.items ?? []} onSaved={people.reload} self={p.id === user?.id} />)}
       </div>
 
       <h2 className="title-s" style={{ margin: "1.5rem 0 0.5rem" }}>{t("officials.log")}</h2>
@@ -104,8 +106,12 @@ export function Officials() {
   );
 }
 
-function PersonCard({ p, known, onSaved }: { p: Person; known: KnownArea[]; onSaved: () => void }) {
+const ROLES = ["admin", "senior_official", "district_officer", "field_officer"] as const;
+const AREA_ROLES = ["district_officer", "field_officer"];
+
+function PersonCard({ p, known, onSaved, self }: { p: Person; known: KnownArea[]; onSaved: () => void; self: boolean }) {
   const { t } = useTranslation();
+  const [role, setRole] = useState(p.role);
   const [email, setEmail] = useState(p.email ?? "");
   const [phone, setPhone] = useState(p.phone ?? "");
   const [channels, setChannels] = useState<string[]>(p.channels);
@@ -113,7 +119,7 @@ function PersonCard({ p, known, onSaved }: { p: Person; known: KnownArea[]; onSa
   const [district, setDistrict] = useState("");
   const [mandal, setMandal] = useState("");
   const [note, setNote] = useState<string | null>(null);
-  const isViewer = p.role === "viewer";
+  const isViewer = AREA_ROLES.includes(role);
   const mandals = known.find((k) => k.district === district)?.mandals ?? [];
 
   const save = async () => {
@@ -121,7 +127,7 @@ function PersonCard({ p, known, onSaved }: { p: Person; known: KnownArea[]; onSa
     try {
       await api(`/users/${p.id}`, {
         method: "PATCH",
-        json: { email: email || undefined, phone: phone || undefined, channels, clear: [...(email ? [] : ["email"]), ...(phone ? [] : ["phone"])] },
+        json: { ...(role !== p.role ? { role } : {}), email: email || undefined, phone: phone || undefined, channels, clear: [...(email ? [] : ["email"]), ...(phone ? [] : ["phone"])] },
       });
       if (isViewer) await api(`/users/${p.id}/areas`, { method: "PUT", json: { areas: list } });
       setNote(t("officials.saved"));
@@ -143,11 +149,17 @@ function PersonCard({ p, known, onSaved }: { p: Person; known: KnownArea[]; onSa
       <div className="person-head">
         <div>
           <h3>{p.name}</h3>
-          <span className="small muted">{t(`role.${p.role}`)} · {p.language === "te" ? "తెలుగు" : "English"} · {p.username}</span>
+          <span className="small muted">{p.language === "te" ? "తెలుగు" : "English"} · <span className="mono">{p.username}</span></span>
         </div>
         {p.unacknowledged > 0 && <span className="pill review">{t("officials.unacked", { n: p.unacknowledged })}</span>}
       </div>
       <div className="person-grid">
+        <label className="field wide-field">{t("officials.persona")}
+          <select value={role} onChange={(e) => setRole(e.target.value)} disabled={self} data-testid="person-role">
+            {ROLES.map((r) => <option key={r} value={r}>{t(`role.${r}`)}</option>)}
+          </select>
+          <small>{self ? t("officials.persona_self") : t(`role_help.${role}`)}</small>
+        </label>
         <label className="field">{t("officials.email")}<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} data-testid="person-email" /></label>
         <label className="field">{t("officials.phone")}<input value={phone} placeholder="+91…" onChange={(e) => setPhone(e.target.value)} data-testid="person-phone" /></label>
         <fieldset className="field channels-field">
@@ -161,7 +173,7 @@ function PersonCard({ p, known, onSaved }: { p: Person; known: KnownArea[]; onSa
       <div className="person-areas">
         <b className="small">{t("officials.areas")}</b>
         {!isViewer ? (
-          <p className="small muted">{t("officials.admin_all")}</p>
+          <p className="small muted">{t("officials.statewide")}</p>
         ) : (
           <>
             <div className="chips" data-testid="person-areas">

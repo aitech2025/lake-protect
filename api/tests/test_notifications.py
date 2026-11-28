@@ -1,5 +1,5 @@
-"""Notifications to officials (DECISIONS.md D-059): routing by area, acknowledgement, follow-up,
-channels, the weekly digest, and the admin's pages."""
+"""Notifications to officials (DECISIONS.md D-059, D-067): routing by area to district officers and to
+the senior officials, acknowledgement, follow-up, channels, the weekly digest, and the admin's pages."""
 from __future__ import annotations
 
 import datetime as dt
@@ -13,6 +13,7 @@ from app.config import settings
 from app.models import AssetScreen, AuditLog, Notification, NotificationDelivery, ScreenRun
 from app.notify import channels, messages, service
 from app.services import alert_view
+from app.workflow import incidents
 from tests.factories import auth, cover, decide, ingest, make_asset, make_user, review
 
 T0 = dt.datetime(2025, 6, 20, 6, tzinfo=dt.timezone.utc)
@@ -22,13 +23,14 @@ H = dt.timedelta(hours=1)
 @pytest.fixture()
 def w(db):
     admin = make_user(db, "admin", email="admin@geoguard.invalid")
-    north = make_user(db, "viewer", email="north@geoguard.invalid", phone="+910000000011", channels=["in_app", "email", "sms", "whatsapp"])
-    south = make_user(db, "viewer", language="te")
-    idle = make_user(db, "viewer")  # covers no area
+    senior = make_user(db, "senior_official", email="senior@geoguard.invalid")
+    north = make_user(db, "district_officer", email="north@geoguard.invalid", phone="+910000000011", channels=["in_app", "email", "sms", "whatsapp"])
+    south = make_user(db, "district_officer", language="te")
+    idle = make_user(db, "district_officer")  # covers no area
     cover(db, north, "North")
     cover(db, south, "South", "Mandal B")
     return SimpleNamespace(
-        admin=admin, north=north, south=south, idle=idle,
+        admin=admin, senior=senior, north=north, south=south, idle=idle,
         a_north=make_asset(db, district="North", mandal="Mandal A", village="Village 1"),
         a_south_b=make_asset(db, district=" south", mandal="MANDAL B "),  # case and spaces do not matter
         a_south_c=make_asset(db, district="South", mandal="Mandal C"),
@@ -41,32 +43,32 @@ def notes_for(db, alert_id: int, kind: str = "incident_opened") -> dict[int, Not
 
 
 # Routing ----------------------------------------------------------------------------------------
-def test_an_incident_notifies_the_officials_of_its_area_and_the_admin(db, w):
+def test_an_incident_notifies_the_district_officers_of_its_area_and_the_senior_officials(db, w):
     _, a = ingest(db, w.a_north)
     got = notes_for(db, a.id)
-    assert set(got) == {w.north.id, w.admin.id}
+    assert set(got) == {w.north.id, w.senior.id}  # the admin only where no district officer covers the place
     n = got[w.north.id]
     assert n.needs_ack and n.acknowledged_at is None
     assert a.code in n.subject and "Land fill" in n.subject
     assert n.body.startswith("Land fill of about") and f"/alerts/{a.id}" in n.body
     assert n.payload["area"] == {"district": "North", "mandal": "Mandal A", "village": "Village 1"}
     audit = db.scalar(select(AuditLog).where(AuditLog.action == "notify.incident_opened", AuditLog.entity_id == str(a.id)))
-    assert set(audit.details["recipients"]) == {w.north.id, w.admin.id}
+    assert set(audit.details["recipients"]) == {w.north.id, w.senior.id}
 
 
 def test_a_mandal_area_matches_only_that_mandal(db, w):
     _, b = ingest(db, w.a_south_b)
     _, c = ingest(db, w.a_south_c)
-    assert set(notes_for(db, b.id)) == {w.south.id, w.admin.id}
-    assert set(notes_for(db, c.id)) == {w.admin.id}
+    assert set(notes_for(db, b.id)) == {w.south.id, w.senior.id}
+    assert set(notes_for(db, c.id)) == {w.senior.id, w.admin.id}
 
 
-def test_an_asset_with_no_area_reaches_the_admin_who_is_told_why(db, w):
+def test_where_no_district_officer_covers_the_place_the_admin_is_told_why(db, w):
     _, a = ingest(db, w.a_nowhere)
     got = notes_for(db, a.id)
-    assert set(got) == {w.admin.id}
+    assert set(got) == {w.senior.id, w.admin.id}
     assert got[w.admin.id].payload["unrouted"] is True
-    assert "No official covers this area yet" in got[w.admin.id].body
+    assert "No district officer covers this area yet" in got[w.admin.id].body
 
 
 def test_telugu_officials_get_telugu_messages_without_english_labels(db, w):
@@ -99,13 +101,15 @@ def test_a_review_acknowledges_and_a_decision_tells_the_area_and_reviewers(db, w
     review(db, a, w.north)
     got = notes_for(db, a.id)
     assert got[w.north.id].ack_via == "review"
-    assert got[w.admin.id].acknowledged_at is None
-    review(db, a, w.south, outcome="needs_site_visit", at=T0 + 30 * H)  # an official from elsewhere may review too
-    decide(db, a, w.admin, to="CONFIRMED")
-    db.refresh(got[w.admin.id])
-    assert got[w.admin.id].ack_via == "decision"
+    assert got[w.senior.id].acknowledged_at is None
+    with pytest.raises(incidents.Refused):  # a district officer from elsewhere cannot review it
+        review(db, a, w.south, outcome="needs_site_visit", at=T0 + 30 * H)
+    review(db, a, w.senior, outcome="needs_site_visit", at=T0 + 30 * H)
+    decide(db, a, w.senior, to="CONFIRMED")
+    db.refresh(got[w.senior.id])
+    assert got[w.senior.id].ack_via in ("review", "decision")
     decided = notes_for(db, a.id, "incident_decided")
-    assert set(decided) == {w.north.id, w.south.id}
+    assert set(decided) == {w.north.id}  # the area's district officer, who reviewed and recommended
     assert not decided[w.north.id].needs_ack
     assert "confirmed as a real change" in decided[w.north.id].subject
     assert "Test decision" in decided[w.north.id].body
@@ -129,14 +133,14 @@ def test_the_database_keeps_notifications_and_allows_one_acknowledgement(db, w):
 
 
 # Follow-up --------------------------------------------------------------------------------------
-def test_a_reminder_after_24_hours_and_the_admin_told_after_48(db, w):
+def test_a_reminder_after_24_hours_and_the_senior_officials_told_after_48(db, w):
     _, a = ingest(db, w.a_north, at=T0)
     assert service.follow_up(db, T0 + 23 * H) == {"reminders": 0, "not_acknowledged": 0}
-    assert service.follow_up(db, T0 + 25 * H) == {"reminders": 2, "not_acknowledged": 0}  # the official and the admin
+    assert service.follow_up(db, T0 + 25 * H) == {"reminders": 2, "not_acknowledged": 0}  # the district officer and the senior official
     assert service.follow_up(db, T0 + 26 * H) == {"reminders": 0, "not_acknowledged": 0}  # once only
-    assert service.follow_up(db, T0 + 49 * H) == {"reminders": 0, "not_acknowledged": 1}  # about the official only
+    assert service.follow_up(db, T0 + 49 * H) == {"reminders": 0, "not_acknowledged": 1}  # about the district officer only
     assert service.follow_up(db, T0 + 72 * H) == {"reminders": 0, "not_acknowledged": 0}
-    told = notes_for(db, a.id, "not_acknowledged")[w.admin.id]
+    told = notes_for(db, a.id, "not_acknowledged")[w.senior.id]
     assert w.north.name in told.subject and not told.needs_ack
     # Acknowledging from the inbox clears the reminder too.
     service.acknowledge(db, notes_for(db, a.id)[w.north.id], w.north, T0 + 73 * H)
@@ -148,7 +152,7 @@ def test_a_reminder_after_24_hours_and_the_admin_told_after_48(db, w):
 def test_no_follow_up_once_acknowledged_or_decided(db, w):
     _, a = ingest(db, w.a_north, at=T0)
     review(db, a, w.north, at=T0 + 2 * H)
-    decide(db, a, w.admin, to="DISMISSED", at=T0 + 3 * H)
+    decide(db, a, w.senior, to="DISMISSED", at=T0 + 3 * H)
     assert service.follow_up(db, T0 + 50 * H) == {"reminders": 0, "not_acknowledged": 0}
 
 
@@ -174,7 +178,7 @@ def test_email_goes_to_the_outbox_and_sms_and_whatsapp_are_held_without_a_gatewa
 def test_demo_data_never_leaves_the_machine_on_smtp(db, monkeypatch):
     monkeypatch.setattr(settings, "email_transport", "smtp")
     monkeypatch.setattr(settings, "smtp_host", "relay.invalid")
-    demo_user = make_user(db, "viewer", is_demo=True, email="demo@geoguard.invalid")
+    demo_user = make_user(db, "senior_official", is_demo=True, email="demo@geoguard.invalid")
     demo_asset = make_asset(db, is_demo=True)
     _, demo_alert = ingest(db, demo_asset)
     n = Notification(user_id=demo_user.id, kind="incident_opened", alert_id=demo_alert.id,
@@ -255,7 +259,7 @@ def test_the_weekly_digest_covers_each_officials_area_once(db, w):
     _, a = ingest(db, w.a_north)
     _week(db, {w.a_north: "candidate_found", w.a_south_b: "no_usable_look", w.a_south_c: "no_candidate", w.a_nowhere: "no_candidate"})
     out = service.send_digests(db, "2025-W25", at=T0 + H)
-    assert out["sent"] == 3  # two officials with areas, and the admin; not the official with none
+    assert out["sent"] == 4  # two district officers with areas, the senior official and the admin; not the one with none
     digests = {n.user_id: n for n in db.scalars(select(Notification).where(Notification.kind == "weekly_digest"))}
     north = digests[w.north.id].payload
     assert north["figures"] == {"watched": 1, "clear_look": 1, "no_clear_look": 0, "changed": 1, "new_incidents": 1,
@@ -264,9 +268,10 @@ def test_the_weekly_digest_covers_each_officials_area_once(db, w):
     south = digests[w.south.id].payload
     assert south["figures"]["watched"] == 1 and [x["asset_name"] for x in south["no_clear_look"]] == [w.a_south_b.name]
     assert "వారం 2025-W25" in digests[w.south.id].subject
-    admin = digests[w.admin.id].payload
-    assert admin["scope"] == "all" and admin["figures"]["watched"] == 4 and admin["figures"]["waiting_for_you"] == 0
-    assert "Waiting for your decision: 0." in digests[w.admin.id].body
+    senior = digests[w.senior.id].payload
+    assert senior["scope"] == "all" and senior["figures"]["watched"] == 4 and senior["figures"]["waiting_for_you"] == 0
+    assert "Waiting for your approval: 0." in digests[w.senior.id].body
+    assert "Waiting for your" not in digests[w.admin.id].body  # the admin takes no step on an incident
     assert service.send_digests(db, "2025-W25", at=T0 + 2 * H)["sent"] == 0
 
 
@@ -297,7 +302,7 @@ def test_the_delivery_log_digests_and_runs_are_for_the_admin(client, db, w):
     assert {(i["channel"], i["status"]) for i in log["items"]} >= {("email", "sent"), ("sms", "held"), ("whatsapp", "held")}
     assert {c["channel"]: c["ready"] for c in log["channels"]} == {"email": True, "sms": False, "whatsapp": False}
     _week(db, {w.a_north: "no_candidate"})
-    assert client.post("/notifications/digests", json={"week": "2025-W25"}, headers=auth(w.admin)).json()["sent"] == 3
+    assert client.post("/notifications/digests", json={"week": "2025-W25"}, headers=auth(w.admin)).json()["sent"] == 4
 
 
 def test_the_admin_sets_contacts_channels_and_areas(client, db, w):
@@ -324,7 +329,11 @@ def test_the_admin_sets_contacts_channels_and_areas(client, db, w):
 def test_a_request_to_acknowledge_lapses_once_the_incident_is_decided(client, db, w):
     _, a = ingest(db, w.a_north)
     assert client.get("/notifications/count", headers=auth(w.north)).json() == {"unacknowledged": 1}
-    decide(db, a, w.admin, to="DISMISSED")
+    # Another district officer of the area recommends; the senior official approves. North never acted.
+    other = make_user(db, "district_officer")
+    cover(db, other, "North")
+    incidents.recommend(db, a, other, "dismiss", "Not a change", at=T0 + H)
+    incidents.transition(db, a, "DISMISSED", actor=w.senior, note="Agreed", at=T0 + 2 * H)
     assert client.get("/notifications/count", headers=auth(w.north)).json() == {"unacknowledged": 0}
     assert client.get("/notifications?pending=true", headers=auth(w.north)).json()["items"] == []
     assert client.get(f"/alerts/{a.id}", headers=auth(w.north)).json()["my_notifications"] == []

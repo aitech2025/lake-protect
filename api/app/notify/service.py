@@ -176,7 +176,8 @@ def satellite_review(db: Session, alert: Alert, at: dt.datetime | None = None, o
     at = as_utc(at)
     asset = _asset_of(db, alert)
     base = messages.incident_payload(alert_view.row_for(db, alert.id))
-    people = {u.id: u for u in routing.officials_for(db, asset) + routing.seniors(db)}
+    officials = routing.officials_for(db, asset)
+    people = {u.id: u for u in officials + routing.seniors(db) + ([] if officials else routing.admins(db))}
     if only is not None:
         people = {only: db.get(User, only)}
     return [create(db, u, "satellite_review", base, at=at, needs_ack=False, is_demo=alert.is_demo, alert_id=alert.id) for u in people.values()]

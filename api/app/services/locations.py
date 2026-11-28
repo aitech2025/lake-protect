@@ -38,7 +38,7 @@ STATUSES = {
     "ftl": ("physically_marked", "final_notification", "preliminary_notification", "derived"),
     "parcel": ("physically_marked", "surveyed_agency", "survey_number_only", "derived"),
 }
-OPEN_STATES = ("OPEN", "UNDER_REVIEW")
+OPEN_STATES = ("OPEN", "UNDER_REVIEW", "FIELD_VISIT", "FIELD_REPORTED", "RECOMMENDED")
 
 
 class LocationError(ValueError):

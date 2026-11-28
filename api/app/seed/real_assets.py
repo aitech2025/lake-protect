@@ -10,7 +10,8 @@ policy cut-off, 19 July 2024), otherwise the date the boundary was retrieved (D-
 first seen after it can alert (rule 3). A changed baseline on an existing asset is updated and
 logged. The backtest sets its own per-case baseline and does not read this value.
 
-district, mandal and village: from the file (for the OpenStreetMap lakes, `lp assets-areas`, D-060).
+district, mandal and village: from the file (for the OpenStreetMap lakes, `lp assets-areas`: D-060 for
+district and mandal, D-069 for the village).
 A changed area on an existing asset is updated and logged: it decides which officials are notified.
 """
 from __future__ import annotations
@@ -85,7 +86,8 @@ def load(db: Session, path: Path) -> dict:
                     action="asset.area_changed",
                     entity="asset",
                     entity_id=asset.id,
-                    details={"from": {k: getattr(asset, k) for k in area}, "to": area, "source": p.get("area_source") or str(path.name)},
+                    details={"from": {k: getattr(asset, k) for k in area}, "to": area, "source": p.get("area_source") or str(path.name),
+                             **({"village_source": p["village_source"]} if p.get("village_source") else {})},
                 )
                 for k, v in area.items():
                     setattr(asset, k, v)

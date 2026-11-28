@@ -14,7 +14,7 @@ from app.models import User
 from app.security import require_roles
 
 router = APIRouter(prefix="/audit", tags=["audit"])
-READERS = (Role.admin, Role.viewer)
+READERS = (Role.admin, Role.senior_official)
 
 
 @router.get("")

@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api, fmtDate, fmtDateTime } from "../api";
 import { isAdmin, useAuth } from "../auth";
+import { AreaFilter, NO_AREA, inArea, useAreaParams, type Placed } from "../components/AreaFilter";
 import { BoundarySeal, useAsync, usePageTitle } from "../components/Bits";
 import { MapView } from "../components/MapView";
 import { PageState, TableRegion } from "../components/PageState";
@@ -136,32 +137,25 @@ export function Assets() {
   const [kind, setKind] = useState("all");
   const [tab, setTab] = useState<"all" | "lakes" | "lands" | "citizen">("all");
   const reports = useAsync(() => api<{ items: any[] }>("/reports"), []);
-  const [selectedDistrict, setSelectedDistrict] = useState(params.get("district") ?? "");
-  const [selectedMandal, setSelectedMandal] = useState(params.get("mandal") ?? "");
+  // District, mandal and village, in the address (D-069).
+  const [area, setArea] = useAreaParams();
   const [showStopped, setShowStopped] = useState(false);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState<string | null>(null);
   const all = useMemo(() => data?.features ?? [], [data]);
-  const districts = useMemo(
-    () => Array.from(new Set((tab === "citizen" ? reports.data?.items ?? [] : all).map((f: any) => f.properties?.district ?? f.district).filter(Boolean))).sort(),
-    [all, reports.data, tab],
-  );
-  const mandals = useMemo(
-    () => Array.from(new Set((tab === "citizen" ? reports.data?.items ?? [] : all).filter((f: any) => !selectedDistrict || (f.properties?.district ?? f.district) === selectedDistrict)
-      .map((f: any) => f.properties?.mandal ?? f.mandal).filter(Boolean))).sort(),
-    [all, reports.data, selectedDistrict, tab],
-  );
+  const places: Placed[] = useMemo(() => (tab === "citizen" ? reports.data?.items ?? [] : all.map((f) => f.properties)), [all, reports.data, tab]);
   const stopped = all.filter((f) => !f.properties.monitored).length;
+  const areaKey = `${area.district}|${area.mandal}|${area.village}`;
   const features = useMemo(
     // Places made from citizens' reports are not watched until an official adds them (D-063, D-064),
     // so choosing their kind shows them all.
     () => all.filter((f) => (tab === "all" || (tab === "lakes" ? f.properties.category === "water_body" : tab === "lands" ? f.properties.category !== "water_body" && f.properties.category !== "citizen_reported" : false))
       && (kind === "all" || f.properties.category === kind)
-      && (!selectedDistrict || f.properties.district === selectedDistrict)
-      && (!selectedMandal || f.properties.mandal === selectedMandal)
+      && inArea(f.properties, area)
       && (showStopped || f.properties.monitored || f.id === selected || kind === "citizen_reported")
       && (!linked || f.id === selected)),
-    [all, kind, selectedDistrict, selectedMandal, showStopped, selected, linked, tab],
+    // `area` is rebuilt on each render; its key says when it changed.
+    [all, kind, areaKey, showStopped, selected, linked, tab],
   );
   const labelOf = (category: string) => {
     const c = cats.data?.items.find((x) => x.name === category);
@@ -182,7 +176,7 @@ export function Assets() {
     () => (versions ? { type: "FeatureCollection" as const, features: versions.features.filter((f) => f.properties.in_force) } : mapFc),
     [versions, mapFc],
   );
-  const reportRows = (reports.data?.items ?? []).filter((r) => tab === "citizen" && (!selectedDistrict || r.district === selectedDistrict) && (!selectedMandal || r.mandal === selectedMandal));
+  const reportRows = (reports.data?.items ?? []).filter((r) => tab === "citizen" && inArea(r, area));
   const reportPins = reportRows.filter((r) => r.lon != null && r.lat != null).map((r) => ({ id: r.id, lon: r.lon, lat: r.lat, colour: "#bb5949", label: r.ref, onClick: () => navigate(`/reports/${r.id}`) }));
 
   const startAdding = () => {
@@ -206,6 +200,7 @@ export function Assets() {
         <AddLocation
           cats={cats.data}
           context={mapFc}
+          places={all.map((f) => f.properties)}
           onCancel={() => setAdding(false)}
           onOpen={(id) => { setAdding(false); setShowStopped(true); setSelected(id); }}
           onAdded={(id, name) => {
@@ -223,22 +218,9 @@ export function Assets() {
         {(["all", "lakes", "lands", "citizen"] as const).map((k) => <button key={k} type="button" className="chip" aria-pressed={tab === k} onClick={() => { setTab(k); setKind("all"); setSelected(null); }}>{t(k === "all" ? "group.all" : `assets.tab.${k}`)}</button>)}
       </div>
       <section className="asset-registry-filters" data-testid="registry-filters" aria-label={t("assets.registry_filters")}>
-        <label className="field">
-          {t("assets.filter_district")}
-          <select value={selectedDistrict} onChange={(e) => { setSelectedDistrict(e.target.value); setSelectedMandal(""); }} data-testid="filter-district">
-            <option value="">{t("assets.all_districts")}</option>
-            {districts.map((district) => <option key={district} value={district}>{district}</option>)}
-          </select>
-        </label>
-        <label className="field">
-          {t("assets.filter_mandal")}
-          <select value={selectedMandal} onChange={(e) => setSelectedMandal(e.target.value)} data-testid="filter-mandal" disabled={mandals.length === 0}>
-            <option value="">{t("assets.all_mandals")}</option>
-            {mandals.map((mandal) => <option key={mandal} value={mandal}>{mandal}</option>)}
-          </select>
-        </label>
-        {(selectedDistrict || selectedMandal) && (
-          <button type="button" className="btn quiet" onClick={() => { setSelectedDistrict(""); setSelectedMandal(""); }} data-testid="clear-area-filters">
+        <AreaFilter places={places} value={area} onChange={setArea} />
+        {(area.district || area.mandal || area.village) && (
+          <button type="button" className="btn quiet" onClick={() => setArea(NO_AREA)} data-testid="clear-area-filters">
             {t("assets.clear_area_filters")}
           </button>
         )}

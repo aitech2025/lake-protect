@@ -8,34 +8,37 @@ import {
   ScanSearch, ShieldCheck, Sun, Users,
 } from "lucide-react";
 import { api, fmtDate } from "../api";
-import { isAdmin, useAuth } from "../auth";
+import { homeFor, isAdmin, useAuth } from "../auth";
 import { applyTheme, savedTheme, type Theme } from "../theme";
 import { BrandMark } from "./Brand";
 import { GlobalSearch, type PageCommand } from "./GlobalSearch";
 
 type Icon = ComponentType<{ className?: string; "aria-hidden"?: boolean | "true" }>;
 
-// Both roles see the shared workspace; the API remains authoritative for every mutation.
-const BOTH = ["admin", "viewer"];
+// What each persona sees (D-067). The API remains authoritative for every read and every step.
+const ALL = ["admin", "senior_official", "district_officer", "field_officer"];
+const AREA = ["admin", "senior_official", "district_officer"];
+const STATE = ["admin", "senior_official"];
 const NAV: { to: string; key: string; roles: string[]; icon: Icon }[] = [
-  { to: "/dashboard", key: "nav.dashboard", roles: BOTH, icon: LayoutGrid },
-  { to: "/map", key: "nav.map", roles: BOTH, icon: MapIcon },
-  { to: "/inbox", key: "nav.inbox", roles: BOTH, icon: Inbox },
-  { to: "/alerts", key: "nav.queue", roles: BOTH, icon: ScanSearch },
-  { to: "/reports", key: "nav.reports", roles: BOTH, icon: MessageSquareText },
-  { to: "/assets", key: "nav.assets", roles: BOTH, icon: MapPin },
-  { to: "/registry", key: "nav.registry", roles: BOTH, icon: Landmark },
-  { to: "/records", key: "nav.records", roles: BOTH, icon: FolderOpen },
-  { to: "/monthly", key: "nav.monthly", roles: BOTH, icon: CalendarRange },
-  { to: "/sources", key: "nav.sources", roles: BOTH, icon: Database },
-  { to: "/satellites", key: "nav.satellites", roles: BOTH, icon: Satellite },
-  { to: "/audit", key: "nav.audit", roles: BOTH, icon: ShieldCheck },
+  { to: "/dashboard", key: "nav.dashboard", roles: AREA, icon: LayoutGrid },
+  { to: "/map", key: "nav.map", roles: ALL, icon: MapIcon },
+  { to: "/inbox", key: "nav.inbox", roles: ALL, icon: Inbox },
+  { to: "/alerts", key: "nav.queue", roles: ALL, icon: ScanSearch },
+  { to: "/reports", key: "nav.reports", roles: AREA, icon: MessageSquareText },
+  { to: "/assets", key: "nav.assets", roles: AREA, icon: MapPin },
+  { to: "/registry", key: "nav.registry", roles: STATE, icon: Landmark },
+  { to: "/records", key: "nav.records", roles: STATE, icon: FolderOpen },
+  { to: "/monthly", key: "nav.monthly", roles: STATE, icon: CalendarRange },
+  { to: "/sources", key: "nav.sources", roles: STATE, icon: Database },
+  { to: "/satellites", key: "nav.satellites", roles: STATE, icon: Satellite },
+  { to: "/audit", key: "nav.audit", roles: STATE, icon: ShieldCheck },
   { to: "/system", key: "nav.system", roles: ["admin"], icon: Activity },
   { to: "/officials", key: "nav.officials", roles: ["admin"], icon: Users },
   { to: "/whatsapp-test", key: "nav.whatsapp_test", roles: ["admin"], icon: MessagesSquare },
   { to: "/citizen-operations", key: "nav.citizen_ops", roles: ["admin"], icon: ClipboardList },
 ];
 const GROUPS = [
+  { key: "nav.group.workspace", items: ["/alerts", "/dashboard", "/map", "/inbox"], fieldOnly: true },
   { key: "nav.group.workspace", items: ["/dashboard", "/map", "/inbox"] },
   { key: "nav.group.investigations", items: ["/alerts", "/reports"] },
   { key: "nav.group.registry", items: ["/assets", "/registry", "/records", "/monthly"] },
@@ -127,7 +130,7 @@ function ProfileMenu() {
   const themes: { v: Theme; icon: Icon }[] = [{ v: "light", icon: Sun }, { v: "dark", icon: Moon }, { v: "system", icon: Monitor }];
   return (
     <details className="profile-menu" ref={ref}>
-      <summary aria-label={t("nav.account", { name: user?.name ?? "" })}>
+      <summary title={t("nav.account", { name: user?.name ?? "" })}>
         <span className="profile-avatar" aria-hidden="true">{user?.name?.trim().slice(0, 1).toLocaleUpperCase() ?? "G"}</span>
         <span className="profile-copy"><b>{user?.name}</b><small>{user && t(`role.${user.role}`)}</small></span>
         <ChevronDown className="profile-chevron" aria-hidden="true" />
@@ -162,11 +165,14 @@ export function Layout() {
   });
   const [mobileOpen, setMobileOpen] = useState(false);
   const toggleLanguage = () => void i18n.changeLanguage(i18n.language === "te" ? "en" : "te");
+  const field = user?.role === "field_officer";
+  const label = (n: { to: string; key: string }) => (field && n.to === "/alerts" ? "nav.field_visits" : n.key);
+  const groups = GROUPS.filter((g) => !!g.fieldOnly === field);
   const visible = NAV.filter((n) => user && n.roles.includes(user.role) && (n.to !== "/whatsapp-test" || simulatorEnabled));
   const active = NAV.filter((n) => pathname === n.to || pathname.startsWith(n.to + "/")).sort((a, b) => b.to.length - a.to.length)[0];
-  const group = GROUPS.find((g) => active && g.items.includes(active.to));
+  const group = groups.find((g) => active && g.items.includes(active.to));
   const pages: PageCommand[] = useMemo(
-    () => visible.map((n) => ({ to: n.to, label: t(n.key), group: t(GROUPS.find((g) => g.items.includes(n.to))?.key ?? "nav.group.workspace") })),
+    () => visible.map((n) => ({ to: n.to, label: t(label(n)), group: t(groups.find((g) => g.items.includes(n.to))?.key ?? "nav.group.workspace") })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [visible.length, i18n.language, t],
   );
@@ -209,13 +215,13 @@ export function Layout() {
         )}
       </AnimatePresence>
       <aside className="rail" aria-label={t("nav.label")}>
-        <Link to="/dashboard" className="brand" title={collapsed ? t("app.name") : undefined}>
+        <Link to={user ? homeFor(user.role) : "/dashboard"} className="brand" title={collapsed ? t("app.name") : undefined}>
           <BrandMark />
           <span className="brand-copy"><b>{t("app.name")}</b><span>{t("app.region")}</span></span>
         </Link>
         <nav className="nav-links" aria-label={t("nav.label")}>
-          {GROUPS.map((g) => {
-            const items = visible.filter((n) => g.items.includes(n.to));
+          {groups.map((g) => {
+            const items = visible.filter((n) => g.items.includes(n.to)).sort((x, y) => g.items.indexOf(x.to) - g.items.indexOf(y.to));
             if (!items.length) return null;
             return (
               <section className="nav-group" key={g.key} aria-label={t(g.key)}>
@@ -226,14 +232,14 @@ export function Layout() {
                     <NavLink
                       key={n.to}
                       to={n.to}
-                      title={collapsed ? t(n.key) : undefined}
-                      aria-label={collapsed ? t(n.key) : undefined}
+                      title={collapsed ? t(label(n)) : undefined}
+                      aria-label={collapsed ? t(label(n)) : undefined}
                       data-testid={`nav-${n.to.slice(1)}`}
                       className={({ isActive }) => `nav-item${isActive ? " active" : ""}`}
                       onClick={() => setMobileOpen(false)}
                     >
                       <I className="nav-icon" aria-hidden="true" />
-                      <span>{t(n.key)}</span>
+                      <span>{t(label(n))}</span>
                       {n.to === "/inbox" && unacknowledged > 0 && <span className="nav-count" aria-label={t("inbox.count_label", { count: unacknowledged })}>{unacknowledged}</span>}
                     </NavLink>
                   );
@@ -255,7 +261,7 @@ export function Layout() {
             </button>
             <nav className="topbar-context" aria-label={t("nav.breadcrumb")}>
               {group && <><span className="breadcrumb-root">{t(group.key)}</span><span className="breadcrumb-sep" aria-hidden="true">/</span></>}
-              <p className="topbar-page-title" aria-current="page">{active ? t(active.key) : t("app.name")}</p>
+              <p className="topbar-page-title" aria-current="page">{active ? t(label(active)) : t("app.name")}</p>
             </nav>
           </div>
           <div className="topbar-tools">
@@ -267,7 +273,7 @@ export function Layout() {
               title={t("nav.inbox")}
             >
               <Inbox className="nav-icon" aria-hidden="true" />
-              {unacknowledged > 0 && <span className="notification-dot" aria-hidden="true">{unacknowledged > 9 ? "9+" : unacknowledged}</span>}
+              {unacknowledged > 0 && <span className="notification-dot" aria-hidden="true" data-count={unacknowledged > 9 ? "9+" : String(unacknowledged)} />}
             </Link>
             <button className="utility-button language-button" onClick={toggleLanguage} lang={i18n.language === "te" ? "en" : "te"} title={t("nav.switch_language")}>
               <Languages size={15} aria-hidden="true" />{i18n.language === "te" ? "English" : "తెలుగు"}

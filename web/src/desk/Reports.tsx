@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Camera } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api, fmtDate, fmtDateTime } from "../api";
+import { isCasework, isFieldOfficer, useAuth } from "../auth";
 import { AuthImage, useAsync, usePageTitle } from "../components/Bits";
 import { notifyCountChanged } from "../components/Layout";
 import { MapView, type Pin } from "../components/MapView";
@@ -28,6 +29,7 @@ function placeLabel(r: Row, t: (k: string, o?: any) => string, lang: string): st
 export function Reports() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const { user } = useAuth();
   const nav = useNavigate();
   const [filter, setFilter] = useState<"open" | "all" | "CLOSED">("open");
   const [intake, setIntake] = useState(false);
@@ -50,7 +52,7 @@ export function Reports() {
           <p className="muted">{t("reports.lede")}</p>
         </div>
         <div className="head-actions">
-          <button type="button" className="btn" onClick={() => setIntake((x) => !x)} data-testid="intake-open">{t("reports.enter")}</button>
+          {!isFieldOfficer(user) && <button type="button" className="btn" onClick={() => setIntake((x) => !x)} data-testid="intake-open">{t("reports.enter")}</button>}
           <a className="btn secondary" href="/report" target="_blank" rel="noreferrer">{t("reports.portal_link")}</a>
         </div>
       </div>
@@ -154,6 +156,7 @@ export function ReportDetail() {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const { user } = useAuth();
   const { data: r, error, status, loading, reload } = useAsync(() => api<any>(`/reports/${id}`), [id]);
   usePageTitle(r ? `${t("reports.title")}: ${r.ref}` : t("reports.title"));
   const [pin, setPin] = useState<[number, number] | null>(null);
@@ -248,6 +251,8 @@ export function ReportDetail() {
             <div className="mapbox" style={{ height: 260 }}>
               <MapView draft={[[r.lon, r.lat]]} fit={[r.lon - 0.004, r.lat - 0.003, r.lon + 0.004, r.lat + 0.003]} />
             </div>
+          ) : !isCasework(user) ? (
+            <p className="note">{t("reports.place_officers")}</p>
           ) : (
             <section className="panel" data-testid="place-form">
               <h2 className="title-s">{t("reports.place_title")}</h2>

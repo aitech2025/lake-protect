@@ -1,7 +1,7 @@
 """The drill-down dashboard (DECISIONS.md D-060).
 
 - GET /dashboard   figures for one level (state, district, mandal or village), the next level's
-                   rows, an eight-week trend and map pins. Every signed-in user sees every area.
+                   rows, an eight-week trend and map pins, within what the person may see (D-067).
 - GET /areas       the districts and mandals that hold assets, for the admin's area picker.
 """
 from __future__ import annotations
@@ -38,5 +38,5 @@ def get_dashboard(
 
 
 @router.get("/areas")
-def get_areas(user: User = Depends(require_roles(Role.admin)), db: Session = Depends(get_db)) -> dict:
+def get_areas(user: User = Depends(require_roles(Role.admin, Role.senior_official)), db: Session = Depends(get_db)) -> dict:
     return {"items": dashboard.known_areas(db)}

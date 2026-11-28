@@ -48,7 +48,7 @@ def test_real_assets_load_once_and_reload_unchanged(db, client, collection):
     rows = db.scalar(select(func.count()).select_from(Boundary).where(Boundary.asset_id.in_([a.id for a in assets])))
     assert rows == 3 * n  # ftl, buffer and watch ring, version 1
 
-    analyst = make_user(db, "viewer")
+    analyst = make_user(db, "senior_official")
     listed = {
         f["properties"]["asset_key"]: f["properties"]
         for f in client.get("/assets", headers=auth(analyst)).json()["features"]
@@ -67,6 +67,15 @@ def test_every_real_lake_has_a_district_and_mandal_from_osm(collection):
         p = f["properties"]
         assert p["district"] and p["mandal"], p["asset_key"]
         assert "not the revenue record" in p["area_source"]
+
+
+def test_every_real_lake_has_a_village_named_after_the_nearest_osm_place(collection):
+    """D-069: the village is the nearest OpenStreetMap place in the mandal, and says it is not the revenue village."""
+    assert "villages" in collection["source"]
+    for f in collection["features"]:
+        p = f["properties"]
+        assert p["village"], p["asset_key"]
+        assert "OpenStreetMap" in p["village_source"] and "not the revenue village" in p["village_source"], p["asset_key"]
 
 
 def test_a_changed_area_is_updated_and_logged(db, tmp_path, collection):

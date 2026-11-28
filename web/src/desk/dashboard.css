@@ -9,7 +9,7 @@
 .drill-sep { color: var(--text-3); }
 
 /* Figures: one band, grouped by what the numbers are for. */
-.dash-figures { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 4fr) minmax(0, 1.25fr); border: 1px solid var(--line-strong); border-radius: var(--r-lg); background: var(--surface); overflow: hidden; }
+.dash-figures { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 5fr) minmax(0, 1.25fr); border: 1px solid var(--line-strong); border-radius: var(--r-lg); background: var(--surface); overflow: hidden; }
 .fig-group { min-width: 0; padding: 14px 6px 6px; border-left: 1px solid var(--line-strong); }
 .fig-group:first-child { border-left: 0; }
 .fig-group-label { margin: 0 0 4px; padding: 0 12px; color: var(--text-3); font-size: var(--fs-sm); font-weight: 400; }
@@ -32,7 +32,7 @@
 
 .dash-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(300px, 1fr); gap: 16px; align-items: stretch; }
 .dash-map { height: clamp(360px, 46vh, 520px); }
-.map-note { position: absolute; right: 10px; bottom: 10px; z-index: 2; max-width: 46%; padding: 4px 8px; border-radius: var(--r-sm); background: rgb(10 14 13 / 0.7); color: #e6ebe8; font-size: var(--fs-xs); }
+.map-note { position: absolute; right: 10px; bottom: 34px; z-index: 2; max-width: 46%; padding: 4px 8px; border-radius: var(--r-sm); background: rgb(10 14 13 / 0.7); color: #e6ebe8; font-size: var(--fs-xs); }
 .trend { display: grid; align-content: start; gap: 20px; }
 .trend-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .trend-head .btn.quiet { font-size: var(--fs-sm); }
@@ -79,3 +79,5 @@
 @media (max-width: 720px) {
   .fig-notices .fig-row { grid-template-columns: 1fr 1fr; }
 }
+.fig-casework .fig-row { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 720px) { .fig-casework .fig-row { grid-template-columns: 1fr 1fr; } }

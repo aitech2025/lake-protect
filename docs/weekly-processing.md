@@ -121,10 +121,17 @@ Every asset carries its legal documents. Each document is a file (PDF, PNG or JP
 
 ## 4. Roles
 
-| Role | Can |
-|---|---|
-| `admin` | Run sources; add documents and boundaries; import records; start a review; confirm, dismiss and close incidents; make evidence packs; request sharper images; override a priority |
-| `viewer` | See every asset, week, incident, document, record, monthly page and audit entry; record reviews |
+Superseded by D-067 (four personas, 28 Nov 2026):
+
+| Persona | Sees | Can |
+|---|---|---|
+| `admin` | Everything | Maintain the application: people and areas, sources, documents, boundaries, records, satellites; override a priority. No step on an incident |
+| `senior_official` | The whole State, including records, the monthly page and the audit log | Review; assign field visits; approve or return a recommendation; close; approve sharper images; make evidence packs. Decide directly where no district officer covers the place |
+| `district_officer` | Their districts (or mandals) only | Review; assign, reassign or withdraw a field visit; return a field report; recommend confirm or dismiss; make evidence packs |
+| `field_officer` | The incidents ever assigned to them, and their locations | Submit the field report (findings, GPS, up to five photos); add notes and documents while on the visit |
+
+Lifecycle: OPEN, UNDER_REVIEW, FIELD_VISIT, FIELD_REPORTED, RECOMMENDED, CONFIRMED or DISMISSED, CLOSED.
+The field visit is optional. See DECISIONS.md D-067 for who takes each step.
 
 **What was retired:**
 - the field app;

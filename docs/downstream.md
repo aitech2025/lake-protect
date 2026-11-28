@@ -117,7 +117,7 @@ At every level:
 - the last 8 weeks as two bar charts (assets with a change, new incidents), each with a table view;
 - a row per district, mandal, village or lake.
 
-A level that no asset in the area records is skipped. The real lakes have no village, so a mandal lists its lakes directly. Assets with no district appear as "Area not recorded". Officials get "My area" shortcuts.
+A level that no asset in the area records is skipped. Each real lake's village is the nearest OpenStreetMap place in its mandal (D-069), so a mandal lists its villages and a village its lakes. Assets with no district appear as "Area not recorded". Officials get "My area" shortcuts.
 
 **Where the real lakes' areas come from.** Government records carry district, mandal and village (M11's data contracts). The 99 OpenStreetMap lakes do not, so `lp assets-areas` places each lake in OpenStreetMap's district and mandal boundaries, by a point on its surface:
 - all 99 are placed, in 5 districts and 27 mandals;

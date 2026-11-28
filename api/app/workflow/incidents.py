@@ -139,7 +139,8 @@ def _set_state(db: Session, alert: Alert, to: str, at: dt.datetime, resolution: 
 
 
 def _step(db: Session, alert: Alert, to: str, *, actor: User | None, note: str, label: str, at: dt.datetime,
-          resolution: str | None = None, details: dict | None = None, department: str | None = None, false_report: bool = False) -> dict:
+          resolution: str | None = None, details: dict | None = None, department: str | None = None, false_report: bool = False,
+          ack_via: str = "decision") -> dict:
     frm = alert.state
     _set_state(db, alert, to, at, resolution)
     chain.record(
@@ -156,7 +157,7 @@ def _step(db: Session, alert: Alert, to: str, *, actor: User | None, note: str, 
     from app.notify import service as notify
 
     if actor is not None:
-        notify.acknowledge_for_alert(db, actor, alert, "decision", at)
+        notify.acknowledge_for_alert(db, actor, alert, ack_via, at)
     if to in (S.CONFIRMED.value, S.DISMISSED.value) and actor is not None:
         notify.incident_decided(db, alert, actor, note, at)
         citizen.on_incident_decided(db, alert, to, at, department, false_report)  # their reports close with the decision (D-062, D-063)
@@ -393,7 +394,7 @@ def review(db: Session, alert: Alert, user: User, outcome: str, note: str, at: d
                  details={"review_id": row.id, "outcome": outcome, "note": row.note}, at=at)
     if alert.state == S.OPEN.value:
         _step(db, alert, S.UNDER_REVIEW.value, actor=user, note="First review recorded", label=LABEL["start"], at=at,
-              details={"by_review": True, "review_id": row.id})
+              details={"by_review": True, "review_id": row.id}, ack_via="review")
     from app.notify import service as notify
 
     notify.acknowledge_for_alert(db, user, alert, "review", at)

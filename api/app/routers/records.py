@@ -17,7 +17,7 @@ _TABLE = {"permits": "permits", "works": "authorised_works", "court-cases": "cou
 
 
 @router.get("/{kind}")
-def list_records(kind: str, user: User = Depends(require_roles(Role.admin, Role.viewer)), db: Session = Depends(get_db)) -> dict:
+def list_records(kind: str, user: User = Depends(require_roles(Role.admin, Role.senior_official)), db: Session = Depends(get_db)) -> dict:
     if kind not in _TABLE:
         raise HTTPException(404, "Unknown record kind")
     rows = db.execute(text(f"SELECT t.*, ST_AsGeoJSON(t.geom)::json AS geometry FROM {_TABLE[kind]} t ORDER BY t.id")).mappings().all()

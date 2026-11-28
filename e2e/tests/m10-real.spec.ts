@@ -11,7 +11,7 @@ test("the desk shows only real lakes, on the Sentinel-2 map", async ({ page }) =
   page.on("request", (r) => {
     if (r.url().includes("/api/tiles/")) tiles.push(r.url());
   });
-  await login(page, "demo.viewer2");
+  await login(page, "demo.senior"); // State-level: every real lake (D-067)
   await expect(page.getByTestId("dataset-demo")).toHaveCount(0);
   await expect(page.getByTestId("demo-badge")).toHaveCount(0);
 

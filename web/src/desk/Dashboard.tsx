@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ChevronRight } from "lucide-react";
@@ -64,8 +64,15 @@ export function Dashboard() {
     [data, lang, nav, t],
   );
 
+  // The map fits its locations clear of the legend and the note drawn over it.
+  const legendRef = useRef<HTMLDivElement>(null);
+  const noteRef = useRef<HTMLParagraphElement>(null);
+  const mapPanels = useMemo(() => [legendRef, noteRef], []);
+
   const f = data?.figures;
-  const parent: { to: Record<string, string>; label: string } | null = area.mandal && area.district ? { to: { district: area.district }, label: t("dashboard.back_district", { district: areaName(area.district) }) }
+  const parent: { to: Record<string, string>; label: string } | null =
+    area.village && area.mandal && area.district ? { to: { district: area.district, mandal: area.mandal }, label: t("dashboard.back_mandal", { mandal: areaName(area.mandal) }) }
+    : area.mandal && area.district ? { to: { district: area.district }, label: t("dashboard.back_district", { district: areaName(area.district) }) }
     : area.district ? { to: {}, label: t("dashboard.back_overview") } : null;
   return (
     <div className="page dashboard" data-testid="dashboard">
@@ -120,13 +127,13 @@ export function Dashboard() {
           </p>
           <div className="dash-grid">
             <div className="mapbox dash-map">
-              <MapView pins={pins} testId="dashboard-map" />
-              <div className="legend" aria-label={t("dashboard.legend")}>
+              <MapView pins={pins} testId="dashboard-map" world avoid={mapPanels} />
+              <div className="legend" aria-label={t("dashboard.legend")} ref={legendRef}>
                 {(Object.keys(TONE) as Tone[]).map((k) => (
                   <span key={k}><i className="pin" style={{ background: TONE[k].colour }} />{t(`dashboard.tone.${k}`)}</span>
                 ))}
               </div>
-              {data.area_source && <p className="map-note">{t("dashboard.area_source")}</p>}
+              {data.area_source && <p className="map-note" ref={noteRef}>{t("dashboard.area_source")}</p>}
             </div>
             <Trend data={data} />
           </div>
@@ -155,7 +162,8 @@ function FigureRow({ f, area, week }: { f: Figures; area: Record<string, string>
       key: "casework",
       tiles: [
         { k: "open", n: f.open, to: incidentsLink(area, { state: "OPEN" }), tone: f.open ? "open" : undefined },
-        { k: "under_review", n: f.under_review, to: incidentsLink(area, { state: "UNDER_REVIEW" }) },
+        { k: "under_review", n: f.under_review, to: incidentsLink(area, { state: "UNDER_REVIEW,FIELD_VISIT,FIELD_REPORTED" }), small: f.field_visit ? t("dashboard.on_field_visit", { n: f.field_visit }) : undefined },
+        { k: "awaiting_approval", n: f.awaiting_approval, to: incidentsLink(area, { state: "RECOMMENDED" }) },
         { k: "waiting", n: f.waiting, to: incidentsLink(area, { waiting: "true" }), tone: f.waiting ? "waiting" : undefined },
         { k: "confirmed", n: f.confirmed, to: incidentsLink(area, { state: "CONFIRMED" }) },
       ],
@@ -267,7 +275,8 @@ function Children({ data, onOpen }: { data: Overview; onOpen: (row: DashRow) => 
     { k: "changed" },
     { k: "new_incidents", rule: data.week ? { week: data.week } : undefined },
     { k: "open", rule: { state: "OPEN" } },
-    { k: "under_review", rule: { state: "UNDER_REVIEW" } },
+    { k: "under_review", rule: { state: "UNDER_REVIEW,FIELD_VISIT,FIELD_REPORTED" } },
+    { k: "awaiting_approval", rule: { state: "RECOMMENDED" } },
     { k: "waiting", rule: { waiting: "true" } },
     { k: "confirmed", rule: { state: "CONFIRMED" } },
   ];

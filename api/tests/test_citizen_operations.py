@@ -2,7 +2,7 @@ from tests.factories import auth, make_user
 
 
 def test_citizen_operations_is_admin_only_and_exposes_privacy_safe_queue_metadata(client, db):
-    viewer = make_user(db, "viewer")
+    viewer = make_user(db, "senior_official")
     admin = make_user(db, "admin")
 
     denied = client.get("/citizen/operations", headers=auth(viewer))

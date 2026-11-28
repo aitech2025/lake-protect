@@ -1,7 +1,7 @@
-﻿import { useEffect, useState } from "react";
+﻿import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Languages, Lock, Megaphone, ShieldCheck, UserRound } from "lucide-react";
+import { ArrowRight, Footprints, Landmark, Languages, Lock, MapPinned, Megaphone, ShieldCheck } from "lucide-react";
 import { api, API_BASE, fmtDate, type User } from "../api";
 import { homeFor, useAuth } from "../auth";
 import { PageState } from "../components/PageState";
@@ -12,6 +12,13 @@ import { BrandMark } from "../components/Brand";
 const TILE_Z = 12;
 const TILE_X = [2938, 2939, 2940, 2941, 2942];
 const TILE_Y = [1845, 1846, 1847, 1848];
+
+const ROLE_ICON: Record<string, ReactNode> = {
+  admin: <ShieldCheck />,
+  senior_official: <Landmark />,
+  district_officer: <MapPinned />,
+  field_officer: <Footprints />,
+};
 
 type Meta = { bounds?: number[]; scenes?: { acquired_at: string }[]; attribution?: string };
 
@@ -108,7 +115,7 @@ export function Login() {
           <div className="roles" role="group" aria-label={t("login.title")}>
             {users.map((u) => (
               <button key={u.id} type="button" data-role={u.role} disabled={busy !== null} onClick={() => void go(u.username)} data-testid={`login-${u.username}`}>
-                <span className="role-avatar" aria-hidden="true">{u.role === "admin" ? <ShieldCheck /> : <UserRound />}</span>
+                <span className="role-avatar" aria-hidden="true">{ROLE_ICON[u.role] ?? <Landmark />}</span>
                 <span className="role-name">{t(`role.${u.role}`)}<small>{u.name}</small></span>
                 <ArrowRight className="role-go" size={18} aria-hidden="true" />
                 <span className="role-desc">{busy === u.username ? t("login.signing_in") : t(`login.role.${u.role}`)}</span>

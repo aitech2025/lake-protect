@@ -83,8 +83,8 @@ test.describe("a report at a real lake", () => {
     await expect(page.getByTestId("report-done")).toContainText("Officials have opened a case");
     await page.screenshot({ path: shot("m18-02-reference"), fullPage: true });
 
-    // 2. An official opens the report's incident: the citizen's words, the satellite review waiting.
-    await login(page, "demo.viewer2");
+    // 2. The district officer opens the report's incident: the citizen's words, the satellite review waiting.
+    await login(page, "demo.district2");
     await openIncidentOf(page, ref);
     await expect(page.getByTestId("citizen-origin")).toContainText("Lorries tipping soil");
     await expect(page.getByTestId("satellite-review-result")).toHaveText("Waiting for the satellite review");
@@ -127,26 +127,31 @@ test.describe("a report at a real lake", () => {
     await page.getByTestId("doc-submit").click();
     await expect(page.getByTestId("doc-list")).toContainText("E2E/TEST/2026/1");
 
-    // A sharper image waits for the admin; the official approves the incident with a note.
+    // A sharper image waits for the senior official; the district officer recommends confirming, with a note (D-067).
     await page.getByTestId("sharper-note").fill("To see the extent of the fill");
     await page.getByTestId("sharper-submit").click();
-    await expect(page.getByTestId("sharper-list")).toContainText("Waiting for the admin");
-    await page.getByTestId("decide-approve").click();
-    await page.getByTestId("decide-note").fill("Browser check: approved on the looks of today and two months ago.");
-    await page.getByTestId("decide-submit").click();
-    await expect(pill).toHaveAttribute("data-state", "CONFIRMED");
+    await expect(page.getByTestId("sharper-list")).toContainText("Waiting for the senior official");
+    await page.getByTestId("action-recommend").click();
+    await page.getByTestId("rec-confirm").check();
+    await page.getByTestId("rec-note").fill("Browser check: a real change on the looks of today and two months ago.");
+    await page.getByTestId("rec-submit").click();
+    await expect(pill).toHaveAttribute("data-state", "RECOMMENDED");
     await page.getByTestId("officer-looks").scrollIntoViewIfNeeded();
     await page.screenshot({ path: shot("m18-03-official-actions"), fullPage: true });
     const incidentUrl = page.url();
 
-    // 4. The admin approves the sharper image and closes the incident with a note.
-    await login(page, "demo.admin");
+    // 4. The senior official approves the sharper image and the recommendation, then closes the incident.
+    await login(page, "demo.senior");
     await page.goto(incidentUrl);
     await page.locator('[data-testid^="sharper-approve-"]').click();
     await expect(page.getByTestId("sharper-list")).toContainText("Approved");
-    await page.getByTestId("decide-close").click();
-    await page.getByTestId("decide-note").fill("Browser check: closed.");
-    await page.getByTestId("decide-submit").click();
+    await page.getByTestId("action-CONFIRMED").click();
+    await page.getByTestId("input-note").fill("Browser check: approved.");
+    await page.getByTestId("submit-action").click();
+    await expect(pill).toHaveAttribute("data-state", "CONFIRMED");
+    await page.getByTestId("action-CLOSED").click();
+    await page.getByTestId("input-note").fill("Browser check: closed.");
+    await page.getByTestId("submit-action").click();
     await expect(pill).toHaveAttribute("data-state", "CLOSED");
 
     // 5. The citizen checks the reference, in Telugu: every step, and not the officials' notes.
@@ -168,7 +173,7 @@ test.describe("a place no one watches yet", () => {
 
   test("goes on the weekly watch from its incident", async ({ page }) => {
     const ref = await reportFromPortal(page, "construction", "A compound wall going up on open land.");
-    await login(page, "demo.admin");
+    await login(page, "demo.senior");
     await openIncidentOf(page, ref);
     await expect(page.getByTestId("officer-watch")).toContainText("Add this place to the weekly satellite watch");
     await page.getByTestId("watch-name").fill(`Browser check place (${ref})`);

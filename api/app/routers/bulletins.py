@@ -15,7 +15,7 @@ from app.security import require_roles
 from app.storage import store
 
 router = APIRouter(prefix="/bulletins", tags=["bulletins"])
-READERS = (Role.admin, Role.viewer)
+READERS = (Role.admin, Role.senior_official)
 
 
 def _check(month: str) -> None:

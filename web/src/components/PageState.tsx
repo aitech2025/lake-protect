@@ -18,7 +18,7 @@ export function PageState({ loading, error, status, onRetry }: Props) {
     if (status === 403 || status === 404) {
       return (
         <div className="page-state" role="alert" data-state-kind={status === 403 ? "forbidden" : "not-found"}>
-          <h2>{status === 403 ? t("error.forbidden") : t("error.not_found")}</h2>
+          <h2>{status === 403 ? (error.includes("outside your area") ? t("error.outside") : t("error.forbidden")) : t("error.not_found")}</h2>
           <Link to={home} className="btn secondary">{t("error.home")}</Link>
         </div>
       );

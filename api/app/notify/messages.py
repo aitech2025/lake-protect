@@ -86,7 +86,7 @@ TEXT = {
         "digest.no_changes": "No change found this week where the look was clear.",
         "digest.new": "New incidents this week: {count}.",
         "digest.waiting_viewer": "Waiting for your review: {count}.",
-        "digest.waiting_admin": "Waiting for your decision: {count}.",
+        "digest.waiting_admin": "Waiting for your approval: {count}.",
         "digest.waiting_item": "- {code} at {asset}, open {days} days",
         "digest.old": "Open for more than 14 days: {count}.",
         "digest.link": "Open the desk: {link}",
@@ -143,7 +143,7 @@ TEXT = {
         "digest.no_changes": "స్పష్టంగా కనిపించిన చోట్ల ఈ వారం మార్పు లేదు.",
         "digest.new": "ఈ వారం కొత్త సంఘటనలు: {count}.",
         "digest.waiting_viewer": "మీ పరిశీలన కోసం వేచి ఉన్నవి: {count}.",
-        "digest.waiting_admin": "మీ నిర్ణయం కోసం వేచి ఉన్నవి: {count}.",
+        "digest.waiting_admin": "మీ ఆమోదం కోసం వేచి ఉన్నవి: {count}.",
         "digest.waiting_item": "- {asset} వద్ద {code}, {days} రోజులుగా తెరిచి ఉంది",
         "digest.old": "14 రోజులకు పైగా తెరిచి ఉన్నవి: {count}.",
         "digest.link": "డెస్క్ తెరవండి: {link}",
@@ -364,10 +364,11 @@ def digest_message(language: str, d: dict) -> Message:
     else:
         lines.append(t(language, "digest.no_changes"))
     lines += ["", t(language, "digest.new", count=f["new_incidents"])]
-    lines.append(t(language, "digest.waiting_admin" if d["role"] == "senior_official" else "digest.waiting_viewer", count=f["waiting_for_you"]))
-    for w in d["waiting"][:10]:
-        asset = (w.get("asset_name_te") or w["asset_name"]) if language == "te" else w["asset_name"]
-        lines.append(t(language, "digest.waiting_item", code=w["code"], asset=asset, days=w["days_open"]))
+    if d["role"] != "admin":  # the admin takes no step on an incident (D-067)
+        lines.append(t(language, "digest.waiting_admin" if d["role"] == "senior_official" else "digest.waiting_viewer", count=f["waiting_for_you"]))
+        for w in d["waiting"][:10]:
+            asset = (w.get("asset_name_te") or w["asset_name"]) if language == "te" else w["asset_name"]
+            lines.append(t(language, "digest.waiting_item", code=w["code"], asset=asset, days=w["days_open"]))
     lines.append(t(language, "digest.old", count=f["open_over_14_days"]))
     lines += ["", t(language, "digest.link", link=d["link"])]
     subject = t(language, "weekly_digest.subject", week=d["week"], changed=f["changed"], new=f["new_incidents"], waiting=f["waiting_for_you"])

@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "../api";
-import { useAsync } from "../components/Bits";
+import { areaOptions, NO_AREA, type Area, type Placed } from "../components/AreaFilter";
 import { MapView } from "../components/MapView";
 
 export type Category = {
@@ -66,9 +66,11 @@ function fromKml(text: string): Poly {
 }
 
 /** Admin only (DECISIONS.md D-061): a new location with its outline, watched from the next weekly screen. */
-export function AddLocation({ cats, context, onAdded, onCancel, onOpen }: {
+export function AddLocation({ cats, context, places, onAdded, onCancel, onOpen }: {
   cats: Categories;
   context: GeoJSON.FeatureCollection;
+  /** The locations already recorded, for the district, mandal and village suggestions. */
+  places: Placed[];
   onAdded: (id: number, name: string) => void;
   onCancel: () => void;
   onOpen: (id: number) => void;
@@ -90,9 +92,12 @@ export function AddLocation({ cats, context, onAdded, onCancel, onOpen }: {
   const [check, setCheck] = useState<Check | null>(null);
   const [error, setError] = useState<{ text: string; assetId?: number } | null>(null);
   const [busy, setBusy] = useState(false);
-  const areas = useAsync(() => api<{ items: { district: string; mandals: { mandal: string }[] }[] }>("/areas"), []);
-  const districts = areas.data?.items ?? [];
-  const mandals = districts.find((d) => d.district.toLowerCase() === f.district.trim().toLowerCase())?.mandals ?? [];
+  // Suggestions from the places already watched, each list inside the one above it (D-069). The
+  // fields stay free text: a new location may lie in an area no location records yet.
+  const typed: Area = { district: f.district.trim(), mandal: f.mandal.trim(), village: "" };
+  const districts = areaOptions(places, "district", NO_AREA);
+  const mandals = areaOptions(places, "mandal", { ...NO_AREA, district: typed.district });
+  const villages = areaOptions(places, "village", typed);
 
   useEffect(() => {
     if (cat && !cat.types.some((x) => x.type === type)) setType(cat.types[0]?.type ?? "");
@@ -206,13 +211,16 @@ export function AddLocation({ cats, context, onAdded, onCancel, onOpen }: {
           <label className="field">{t("locations.name_te")}<input value={f.name_te} onChange={set("name_te")} lang="te" /></label>
           <label className="field">{t("locations.district")}
             <input value={f.district} onChange={set("district")} list="loc-districts" required data-testid="loc-district" />
-            <datalist id="loc-districts">{districts.map((d) => <option key={d.district} value={d.district} />)}</datalist>
+            <datalist id="loc-districts">{districts.map((d) => <option key={d} value={d} />)}</datalist>
           </label>
           <label className="field">{t("locations.mandal")}
             <input value={f.mandal} onChange={set("mandal")} list="loc-mandals" data-testid="loc-mandal" />
-            <datalist id="loc-mandals">{mandals.map((m) => <option key={m.mandal} value={m.mandal} />)}</datalist>
+            <datalist id="loc-mandals">{mandals.map((m) => <option key={m} value={m} />)}</datalist>
           </label>
-          <label className="field">{t("locations.village")}<input value={f.village} onChange={set("village")} /></label>
+          <label className="field">{t("locations.village")}
+            <input value={f.village} onChange={set("village")} list="loc-villages" data-testid="loc-village" />
+            <datalist id="loc-villages">{villages.map((v) => <option key={v} value={v} />)}</datalist>
+          </label>
           <label className="field">{t("locations.survey_numbers")}<input value={f.survey} onChange={set("survey")} placeholder="123, 124/A" /></label>
           <label className="field">{t("locations.custodian")}<input value={f.custodian} onChange={set("custodian")} placeholder={cat?.custodians} /></label>
           <label className="field">{t("locations.baseline")}

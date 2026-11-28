@@ -66,9 +66,10 @@ steps taken during the presentation are records.
   10 metres. Those need sharper images on a cue, or a field visit, which the design provides.
 - **"Is the certificate ready to file?"** No. It is a template marked "Draft for counsel review"
   until counsel settles the wording and who signs Part B.
-- **"Who uses it?"** Two roles: an admin who runs it and decides on each incident, and officials who
-  see everything and record their reviews. On citizens' incidents officials decide too. Field
-  visits and legal action happen outside the system.
+- **"Who uses it?"** Four personas (D-067): a district officer reviews incidents in their districts
+  and sends a field officer, who reports from the place with photos and GPS; the district officer
+  recommends, and a senior official approves and closes. The admin maintains the application and
+  takes no step on an incident. Legal action happens outside the system.
 - **"Who are these accounts?"** Role accounts, not people. Real officials' accounts come with the
   State's sign-in (not built yet).
 - **"Where are the Telugu screens checked?"** The Telugu text is a draft for a native speaker to review.

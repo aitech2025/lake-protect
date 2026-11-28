@@ -68,7 +68,7 @@ def test_run_is_recorded_with_coverage_and_shown_on_assets(client, db):
     resp = client.post("/pipeline/runs", json=_run([real.id]), headers=TOKEN)
     assert resp.status_code == 201, resp.text
     assert resp.json()["coverage"] == {"no_candidate": 1}
-    analyst = make_user(db, "viewer")
+    analyst = make_user(db, "senior_official")
     feats = client.get("/assets?dataset=real", headers=auth(analyst)).json()["features"]
     mine = next(f for f in feats if f["id"] == real.id)["properties"]
     assert mine["screen_status"] == "no_candidate"
@@ -106,7 +106,7 @@ def test_screening_tables_are_append_only(client, db):
 
 def test_the_desk_lists_real_locations_with_no_demo_switch(client, db):
     real = _real(db)
-    analyst = make_user(db, "viewer")
+    analyst = make_user(db, "senior_official")
     ids = {f["id"] for f in client.get("/assets", headers=auth(analyst)).json()["features"]}
     assert real.id in ids
     assert client.get("/tiles/demo/14/1/1.png").status_code == 404  # the drawn demo map is gone (D-065)
@@ -168,7 +168,7 @@ def test_weekly_record_keeps_the_image_and_names_the_change(client, db):
     body["assets"][0] |= {"status": "candidate_found", "image_png_b64": _png(), "image_date": "2026-11-18", "image_scene_id": "S2-TEST",
                           "changes": [{"candidate_id": out["candidate_id"], "alert_id": out["alert_id"], "outcome": out["outcome"]}]}
     assert client.post("/pipeline/runs", json=body, headers=TOKEN).status_code == 201
-    viewer = make_user(db, "viewer")
+    viewer = make_user(db, "senior_official")
     weeks = client.get(f"/assets/{real.id}/weeks", headers=auth(viewer)).json()["items"]
     assert len(weeks) == 1
     w = weeks[0]
@@ -188,7 +188,7 @@ def test_weekly_record_finds_changes_the_screen_did_not_list(client, db):
     body = _run([real.id])
     body["assets"][0]["status"] = "candidate_found"
     assert client.post("/pipeline/runs", json=body, headers=TOKEN).status_code == 201
-    weeks = client.get(f"/assets/{real.id}/weeks", headers=auth(make_user(db, "viewer"))).json()["items"]
+    weeks = client.get(f"/assets/{real.id}/weeks", headers=auth(make_user(db, "senior_official"))).json()["items"]
     assert [c["candidate_id"] for c in weeks[0]["changes"]] == [out["candidate_id"]]
 
 
@@ -210,14 +210,14 @@ def test_weekly_record_refuses_an_image_after_as_of_or_a_foreign_change(client, 
 def test_screening_runs_are_listed_per_dataset(client, db):
     real = _real(db)
     client.post("/pipeline/runs", json=_run([real.id]), headers=TOKEN)
-    viewer = make_user(db, "viewer")
+    viewer = make_user(db, "senior_official")
     assert len(client.get("/screening/runs?dataset=real", headers=auth(viewer)).json()["items"]) >= 1
     assert client.get("/screening/runs?dataset=demo", headers=auth(viewer)).json()["items"] == []
 
 
 def test_a_run_sends_the_weekly_digest_once_per_week(client, db):
     real = _real(db, district="Ranga Reddy", mandal="Gandipet")
-    official = make_user(db, "viewer")
+    official = make_user(db, "district_officer")
     cover(db, official, "Ranga Reddy")
     make_user(db, "admin")
     assert client.post("/pipeline/runs", json=_run([real.id]), headers=TOKEN).json()["digests"] == 2

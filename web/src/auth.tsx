@@ -66,12 +66,31 @@ export function useAuth(): AuthState {
   return useContext(AuthContext);
 }
 
-/** Everyone starts at the overview of their state, district and lakes (D-060). */
-export function homeFor(_role: string): string {
-  return "/dashboard";
+/** Officers start at the overview of what they may see (D-060); a field officer at their field visits (D-067). */
+export function homeFor(role: string): string {
+  return role === "field_officer" ? "/alerts" : "/dashboard";
 }
 
-/** Two roles (D-057): the admin runs the application, viewers are the officials. */
-export function isAdmin(user: { role: string } | null | undefined): boolean {
+type Who = { role: string } | null | undefined;
+
+/** Four personas (D-067). The server decides every step; these only shape the screens. */
+export function isAdmin(user: Who): boolean {
   return user?.role === "admin";
+}
+export function isSenior(user: Who): boolean {
+  return user?.role === "senior_official";
+}
+export function isDistrictOfficer(user: Who): boolean {
+  return user?.role === "district_officer";
+}
+export function isFieldOfficer(user: Who): boolean {
+  return user?.role === "field_officer";
+}
+/** The admin and senior officials see the whole State. */
+export function isStatewide(user: Who): boolean {
+  return isAdmin(user) || isSenior(user);
+}
+/** The officers who work incidents: never the admin. */
+export function isCasework(user: Who): boolean {
+  return isSenior(user) || isDistrictOfficer(user);
 }

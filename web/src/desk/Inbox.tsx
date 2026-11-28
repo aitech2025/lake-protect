@@ -16,6 +16,10 @@ const KIND_CLASS: Record<Note["kind"], string> = {
   not_acknowledged: "legal",
   incident_decided: "officer",
   weekly_digest: "field",
+  incident_assigned: "review",
+  field_reported: "field",
+  recommended: "watch",
+  returned: "legal",
 };
 
 /** Notifications to this person (DECISIONS.md D-059): what needs acknowledging first, then the rest. */
@@ -79,7 +83,7 @@ export function Inbox() {
             <h3>{n.subject}</h3>
             <p className="note-body" tabIndex={0}>{n.body}</p>
             <div className="note-foot">
-              {n.alert_id && <Link to={`/alerts/${n.alert_id}`} className="btn secondary" data-testid="note-open">{t("inbox.open_incident")}</Link>}
+              {n.alert_id && <Link to={`/alerts/${n.alert_id}`} className={n.kind === "incident_assigned" || n.kind === "recommended" || n.kind === "field_reported" ? "btn" : "btn secondary"} data-testid="note-open">{t("inbox.open_incident")}</Link>}
               {n.report_id && <Link to={`/reports/${n.report_id}`} className="btn secondary" data-testid="note-open-report">{t("inbox.open_report")}</Link>}
               {n.kind === "weekly_digest" && <Link to="/dashboard" className="btn secondary">{t("inbox.open_overview")}</Link>}
               {n.needs_ack && !n.acknowledged_at && (

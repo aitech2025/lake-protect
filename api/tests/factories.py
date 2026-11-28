@@ -18,6 +18,9 @@ TEST_LON, TEST_LAT = 81.50, 14.50
 # A point in Telangana, for tests of things the app takes only inside the State (citizen reports,
 # D-065). Rural land far from the watched lakes; the fixtures placed here exist in the test database only.
 TG_LON, TG_LAT = 79.20, 18.40
+# The district the test assets are in unless a test says otherwise; the Team's district and field
+# officers cover it (D-067).
+TEST_DISTRICT = "Test District"
 
 
 def square(lon: float = TEST_LON, lat: float = TEST_LAT, side_m: float = 300.0) -> dict:
@@ -98,12 +101,17 @@ def ingest(db, asset, *, at: dt.datetime | None = None, **kw):
 
 
 class Team:
-    """One fictional account per role (D-057): an admin and two viewers."""
+    """One fictional account per persona (D-067): the admin, a senior official, two district officers
+    and a field officer, the last three covering the test district."""
 
     def __init__(self, db):
         self.admin = make_user(db, "admin")
-        self.viewer = make_user(db, "viewer")
-        self.viewer2 = make_user(db, "viewer")
+        self.senior = make_user(db, "senior_official")
+        self.district = make_user(db, "district_officer")
+        self.district2 = make_user(db, "district_officer")
+        self.field = make_user(db, "field_officer")
+        for user in (self.district, self.district2, self.field):
+            cover(db, user, TEST_DISTRICT)
 
 
 def review(db, alert, user, outcome: str = "real_change", note: str = "Test review", at: dt.datetime | None = None):
@@ -112,14 +120,21 @@ def review(db, alert, user, outcome: str = "real_change", note: str = "Test revi
     return incidents.review(db, alert, user, outcome, note, at=at or dt.datetime(2025, 6, 21, 6, tzinfo=dt.timezone.utc))
 
 
-def decide(db, alert, admin, to: str = "CONFIRMED", note: str = "Test decision", at: dt.datetime | None = None):
-    """Admin decision, starting the review first if no viewer has."""
+def decide(db, alert, senior, to: str = "CONFIRMED", note: str = "Test decision", at: dt.datetime | None = None):
+    """The decision (D-067): where a district officer covers the place, they recommend and the senior
+    official approves; elsewhere the senior official decides directly."""
+    from app import access
     from app.workflow import incidents
 
     at = at or dt.datetime(2025, 6, 22, 6, tzinfo=dt.timezone.utc)
+    officers = access.district_officers_for(db, access.asset_of(db, alert))
+    if officers:
+        incidents.recommend(db, alert, officers[0], "confirm" if to == "CONFIRMED" else "dismiss", f"Recommended: {note}",
+                            at=at - dt.timedelta(minutes=5))
+        return incidents.transition(db, alert, to, actor=senior, note=note, at=at)
     if alert.state == "OPEN":
-        incidents.transition(db, alert, "UNDER_REVIEW", actor=admin, note="Review started", at=at - dt.timedelta(minutes=5))
-    return incidents.transition(db, alert, to, actor=admin, note=note, at=at)
+        incidents.transition(db, alert, "UNDER_REVIEW", actor=senior, note="Review started", at=at - dt.timedelta(minutes=5))
+    return incidents.transition(db, alert, to, actor=senior, note=note, at=at)
 
 
 def add_pack_row(db, alert, user):
@@ -162,7 +177,7 @@ def make_asset(
     baseline: dt.date = dt.date(2025, 1, 1),
     valid_from: dt.date = dt.date(2025, 1, 1),
     name: str | None = None,
-    district: str | None = None,
+    district: str | None = TEST_DISTRICT,
     mandal: str | None = None,
     village: str | None = None,
     is_demo: bool = False,

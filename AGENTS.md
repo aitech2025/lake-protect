@@ -18,9 +18,14 @@ demo world and demo maps (D-065), but kept the demo role accounts for sign-in. T
 until an official boundary is loaded. Do not imply that a real case has completed the field or legal
 workflow. The scored blind backtest (M3) has not been run; there is no accuracy result to claim.
 
-The current roles are **admin** and **viewer**. Both can review incidents and record actions; the
-admin also manages locations, data sources, users and configuration. The public citizen report page
-is available without sign-in. English and Telugu are the supported languages.
+There are four personas (D-067): the **admin** maintains the application (people and their areas,
+locations, sources, satellites, settings) and takes no step on an incident; the **senior official**
+sees the State and gives the final approval and closes; the **district officer** sees only their
+districts, reviews, sends field officers and recommends; the **field officer** sees only the
+incidents assigned to them and submits field reports with photos and GPS. Who may see what is
+enforced in `api/app/access.py`; who may take each step in `api/app/workflow/incidents.py`. The
+public citizen report page is available without sign-in. English and Telugu are the supported
+languages.
 
 ## Product and domain rules
 

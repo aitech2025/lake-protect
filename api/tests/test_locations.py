@@ -39,7 +39,7 @@ def body(**kw) -> dict:
 
 
 def test_every_asset_type_has_one_category_and_planned_ones_say_what_they_need(client, db):
-    viewer = make_user(db, "viewer")
+    viewer = make_user(db, "senior_official")
     items = {c["name"]: c for c in client.get("/categories", headers=auth(viewer)).json()["items"]}
     assert {k: v["status"] for k, v in items.items()} == {
         "water_body": "live", "government_land": "live", "endowment_land": "planned", "forest_land": "planned",
@@ -114,7 +114,7 @@ def test_what_cannot_be_added(client, db, change, code, says):
 
 
 def test_only_the_admin_adds_and_the_same_place_is_not_added_twice(client, db):
-    admin, viewer = make_user(db, "admin", is_demo=False), make_user(db, "viewer", is_demo=False)
+    admin, viewer = make_user(db, "admin", is_demo=False), make_user(db, "senior_official", is_demo=False)
     assert client.post("/assets", json=body(), headers=auth(viewer)).status_code == 403
     first = client.post("/assets", json=body(), headers=auth(admin)).json()
     again = client.post("/assets", json=body(name="Same place", geometry=square(IN_STATE[0] + 0.0002, IN_STATE[1], side_m=200)), headers=auth(admin))
@@ -131,7 +131,7 @@ def test_only_the_admin_adds_and_the_same_place_is_not_added_twice(client, db):
 
 
 def test_stopping_the_watch_keeps_everything_and_can_be_undone(client, db):
-    admin, viewer = make_user(db, "admin"), make_user(db, "viewer")
+    admin, viewer = make_user(db, "admin"), make_user(db, "senior_official")
     asset = make_asset(db, district="North")
     _, alert = ingest(db, asset)
     url = f"/assets/{asset.id}/monitoring"

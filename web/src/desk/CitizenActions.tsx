@@ -2,16 +2,14 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { api, fmtDate, fmtDateTime } from "../api";
-import { isAdmin, useAuth } from "../auth";
 import { AuthImage, useAsync } from "../components/Bits";
 import { notifyCountChanged } from "../components/Layout";
 
 /**
- * What officials and the admin do on an incident a citizen reported (DECISIONS.md D-064):
- * acknowledge, notes, satellite looks to compare, sharper images, legal records and documents,
- * approve or decline, close, and the weekly watch. The server checks every step.
+ * What officers do on an incident a citizen reported (DECISIONS.md D-064, D-067): acknowledge, notes,
+ * satellite looks to compare, sharper images, legal records and documents, and the weekly watch.
+ * Deciding follows the incident's lifecycle panel (recommend, approve, close). The server checks every step.
  */
-const DEPARTMENTS = ["revenue", "municipal", "irrigation", "hydraa", "forest", "endowments", "waqf"];
 const DOC_TYPES = ["notification", "survey_map", "land_record", "government_order", "court_order", "recovery_order", "other"];
 
 function useAct(onDone: () => void) {
@@ -45,17 +43,13 @@ function Block({ title, children, testId }: { title: string; children: ReactNode
   );
 }
 
-/** The side panel: acknowledge, decide, close, sharper images and the weekly watch. */
+/** The side panel: acknowledge, sharper images and the weekly watch. */
 export function CitizenSide({ a, onDone }: { a: any; onDone: () => void }) {
   const { t } = useTranslation();
-  const { user } = useAuth();
   const o = a.officer;
+  const can = a.can ?? {};
   const { error, busy, run } = useAct(onDone);
   const [ackNote, setAckNote] = useState("");
-  const [mode, setMode] = useState<"approve" | "decline" | "close" | null>(null);
-  const [note, setNote] = useState("");
-  const [dept, setDept] = useState("");
-  const [falseReport, setFalseReport] = useState(false);
   const sources = useAsync(() => api<{ items: any[] }>("/satellites?purpose=sharper&active=true"), []);
   const providers: any[] = sources.data?.items ?? [];
   const [chosen, setProvider] = useState("");
@@ -63,14 +57,7 @@ export function CitizenSide({ a, onDone }: { a: any; onDone: () => void }) {
   const [imgNote, setImgNote] = useState("");
   const [placeName, setPlaceName] = useState("");
   const [reason, setReason] = useState("");
-  const closed = a.state === "CLOSED";
-
-  const decide = (e: FormEvent) => {
-    e.preventDefault();
-    if (!mode) return;
-    const json = mode === "decline" ? { decision: mode, note, citizen_department: dept || null, citizen_false_report: falseReport } : { decision: mode, note };
-    void run(`/alerts/${a.id}/decision`, { json }, () => { setMode(null); setNote(""); setDept(""); setFalseReport(false); });
-  };
+  const closed = a.state === "CLOSED" || !can.act;
 
   return (
     <div className="officer-side" data-testid="officer-side">
@@ -85,38 +72,6 @@ export function CitizenSide({ a, onDone }: { a: any; onDone: () => void }) {
           </>
         )}
       </Block>
-
-      {(o.can_decide || o.can_close) && (
-        <Block title={t("act.decide_title")} testId="officer-decide">
-          <div className="officer-buttons">
-            {o.can_decide && <button type="button" className="btn" onClick={() => setMode("approve")} data-testid="decide-approve">{t("act.approve")}</button>}
-            {o.can_decide && <button type="button" className="btn danger" onClick={() => setMode("decline")} data-testid="decide-decline">{t("act.decline")}</button>}
-            {o.can_close && <button type="button" className="btn secondary" onClick={() => setMode("close")} data-testid="decide-close">{t("act.close")}</button>}
-          </div>
-          {mode && (
-            <form onSubmit={decide} className="officer-form" data-testid={`decide-form-${mode}`}>
-              <p className="small">{t(`act.means.${mode}`)}</p>
-              <label className="field">{t("act.note_required")}<textarea rows={3} value={note} onChange={(e) => setNote(e.target.value)} data-testid="decide-note" /></label>
-              {mode === "decline" && (
-                <>
-                  <label className="field">{t("citizen_incident.department")}
-                    <select value={dept} onChange={(e) => setDept(e.target.value)} data-testid="decide-department">
-                      <option value="">{t("citizen_incident.no_department")}</option>
-                      {DEPARTMENTS.map((d) => <option key={d} value={d}>{t(`reports.dept.${d}`)}</option>)}
-                    </select>
-                  </label>
-                  <label className="check"><input type="checkbox" checked={falseReport} onChange={(e) => setFalseReport(e.target.checked)} /> {t("reports.false_report")}</label>
-                </>
-              )}
-              <p className="small muted">{t("citizen_incident.told")}</p>
-              <div className="officer-buttons">
-                <button type="submit" className={`btn ${mode === "decline" ? "danger" : ""}`} disabled={busy || !note.trim()} data-testid="decide-submit">{t(`act.${mode}`)}</button>
-                <button type="button" className="btn secondary" onClick={() => setMode(null)}>{t("action.cancel")}</button>
-              </div>
-            </form>
-          )}
-        </Block>
-      )}
 
       <Block title={t("act.sharper_title")} testId="officer-sharper">
         {!closed && <>
@@ -138,7 +93,7 @@ export function CitizenSide({ a, onDone }: { a: any; onDone: () => void }) {
                 <span><b className={`delivery ${r.status === "approved" ? "sent" : r.status === "declined" ? "failed" : "queued"}`}>{t(`act.img_status.${r.status}`)}</b> {r.provider_name ?? r.provider}
                   {r.est_cost_usd !== null ? ` · ~US$ ${Math.round(r.est_cost_usd).toLocaleString("en-IN")}` : ""}</span>
                 <span className="small muted">{r.requested_by}{r.note ? `: ${r.note}` : ""}{r.decided_by && r.status !== "recorded" ? ` · ${r.decided_by}${r.decision_note ? `: ${r.decision_note}` : ""}` : ""}</span>
-                {r.status === "requested" && o.can_approve_imagery && (
+                {r.status === "requested" && can.approve_imagery && (
                   <span className="officer-buttons">
                     <button type="button" className="btn secondary" onClick={() => void run(`/alerts/${a.id}/imagery-requests/${r.id}/decision`, { json: { approve: true } })} data-testid={`sharper-approve-${r.id}`}>{t("act.approve_img")}</button>
                     <button type="button" className="btn secondary" onClick={() => void run(`/alerts/${a.id}/imagery-requests/${r.id}/decision`, { json: { approve: false } })}>{t("act.decline_img")}</button>
@@ -151,7 +106,7 @@ export function CitizenSide({ a, onDone }: { a: any; onDone: () => void }) {
       </Block>
 
       <Block title={t("act.watch_title")} testId="officer-watch">
-        {o.can_watch ? (
+        {o.can_watch && can.act ? (
           <>
             <p className="small muted">{t("act.watch_help")}</p>
             {a.watch.reported_place && <input value={placeName} onChange={(e) => setPlaceName(e.target.value)} placeholder={t("act.watch_name")} aria-label={t("act.watch_name")} data-testid="watch-name" />}
@@ -160,10 +115,10 @@ export function CitizenSide({ a, onDone }: { a: any; onDone: () => void }) {
               {t("act.watch_add")}
             </button>
           </>
-        ) : <p className="small ok" data-testid="watch-on">{t("act.watch_on", { name: a.watch.name })}</p>}
+        ) : o.can_watch ? <p className="small muted">{t("act.watch_not_yet")}</p> : <p className="small ok" data-testid="watch-on">{t("act.watch_on", { name: a.watch.name })}</p>}
       </Block>
       {error && <p className="banner stop" role="alert">{error}</p>}
-      {isAdmin(user) && <p className="small muted">{t("act.admin_told")}</p>}
+
     </div>
   );
 }
@@ -198,14 +153,14 @@ export function CitizenMain({ a, onDone }: { a: any; onDone: () => void }) {
       <section className="section panel" data-testid="officer-looks">
         <h2 className="title-s">{t("act.looks_title")}</h2>
         <p className="small muted">{t("act.looks_help")}</p>
-        <div className="officer-row">
+        {a.can?.act && <div className="officer-row">
           <label className="field">{t("act.look_date")}
             <input type="date" min="2017-01-01" max={today} value={lookDate} onChange={(e) => setLookDate(e.target.value)} data-testid="look-date" />
           </label>
           <button type="button" className="btn secondary" disabled={busy} onClick={() => void run(`/alerts/${a.id}/satellite-looks`, { json: { date: lookDate || null } })} data-testid="look-submit">
             {lookDate ? t("act.look_request_date") : t("act.look_request_latest")}
           </button>
-        </div>
+        </div>}
         <div className="look-grid" data-testid="look-list">
           {looks.map((x) => (
             <label key={x.id} className={`look-card${picked.includes(x.id) ? " picked" : ""}`}>
@@ -240,19 +195,19 @@ export function CitizenMain({ a, onDone }: { a: any; onDone: () => void }) {
             </li>
           ))}
         </ol>
-        <form className="officer-row" onSubmit={(e) => { e.preventDefault(); void run(`/alerts/${a.id}/notes`, { json: { text: note } }, () => setNote("")); }}>
+        {a.can?.note && <form className="officer-row" onSubmit={(e) => { e.preventDefault(); void run(`/alerts/${a.id}/notes`, { json: { text: note } }, () => setNote("")); }}>
           <textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("act.note_placeholder")} aria-label={t("act.note_placeholder")} data-testid="note-text" />
           <button type="submit" className="btn secondary" disabled={busy || !note.trim()} data-testid="note-submit">{t("act.note_add")}</button>
-        </form>
+        </form>}
         <p className="small muted">{t("act.notes_inside")}</p>
       </section>
 
       <section className="section panel" data-testid="officer-legal">
         <div className="person-head">
           <h2 className="title-s">{t("act.legal_title")}</h2>
-          <button type="button" className="btn secondary" disabled={busy} onClick={() => void run(`/alerts/${a.id}/legal-records`, { json: {} })} data-testid="legal-attach">
+          {a.can?.act && <button type="button" className="btn secondary" disabled={busy} onClick={() => void run(`/alerts/${a.id}/legal-records`, { json: {} })} data-testid="legal-attach">
             {records ? t("act.legal_refresh") : t("act.legal_attach")}
-          </button>
+          </button>}
         </div>
         {!records ? <p className="small muted">{t("act.legal_help")}</p> : (
           <div className="legal-snapshot" data-testid="legal-snapshot">
@@ -279,7 +234,7 @@ export function CitizenMain({ a, onDone }: { a: any; onDone: () => void }) {
             {a.documents_attached.map((d: any) => <li key={d.id}>{t(`docs.type.${d.doc_type}`, { defaultValue: d.doc_type })}: {d.title}{d.reference ? ` (${d.reference})` : ""} <span className="small muted">{d.added_by}</span></li>)}
           </ul>
         )}
-        <form className="officer-doc" onSubmit={addDoc} data-testid="doc-form">
+        {a.can?.note && <form className="officer-doc" onSubmit={addDoc} data-testid="doc-form">
           <select value={doc.doc_type} onChange={(e) => setDoc({ ...doc, doc_type: e.target.value })} aria-label={t("act.doc_type")}>
             {DOC_TYPES.map((d) => <option key={d} value={d}>{t(`docs.type.${d}`, { defaultValue: d })}</option>)}
           </select>
@@ -288,7 +243,7 @@ export function CitizenMain({ a, onDone }: { a: any; onDone: () => void }) {
           <input type="date" value={doc.issued_on} onChange={(e) => setDoc({ ...doc, issued_on: e.target.value })} aria-label={t("act.doc_date")} />
           <input type="file" accept="application/pdf,image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} aria-label={t("act.doc_file")} />
           <button type="submit" className="btn secondary" disabled={busy || !doc.title.trim() || (!doc.reference.trim() && !file)} data-testid="doc-submit">{t("act.doc_attach")}</button>
-        </form>
+        </form>}
       </section>
       {error && <p className="banner stop" role="alert">{error}</p>}
     </>

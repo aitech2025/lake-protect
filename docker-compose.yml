@@ -86,6 +86,8 @@ services:
   web:
     build:
       context: ./web
+      args:
+        LP_BASEMAP_STYLE: ${LP_BASEMAP_STYLE:-}  # D-068: empty = OpenFreeMap street map, "offline" = local files only
     image: lakeprotect-web:dev
     ports:
       - "127.0.0.1:${LP_WEB_PORT:-8180}:80"

@@ -23,18 +23,17 @@ from app.audit import chain
 from app.citizen import service
 from app.clock import utcnow
 from app.db import get_db
+from app import access
+from app.enums import Role
 from app.models import CitizenReport, User
-from app.security import current_user
+from app.security import current_user, require_roles
 from app.storage import store
 
 router = APIRouter(prefix="/reports", tags=["citizen reports"])
 
 
-def _get(db: Session, report_id: int) -> CitizenReport:
-    report = db.get(CitizenReport, report_id)
-    if report is None:
-        raise HTTPException(404, "Report not found")
-    return report
+def _get(db: Session, report_id: int, user: User) -> CitizenReport:
+    return access.require_report(db, user, report_id)
 
 
 def _fail(exc: service.CitizenError) -> HTTPException:
@@ -45,7 +44,11 @@ def _fail(exc: service.CitizenError) -> HTTPException:
 def list_reports(status: str | None = None, channel: str | None = None,
                  asset_id: int | None = None, alert_id: int | None = None, limit: int = Query(200, ge=1, le=500),
                  user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    from sqlalchemy import text as sql_text
+
     q = select(CitizenReport).where(CitizenReport.is_demo.is_(False))
+    if not access.statewide(user):
+        q = q.where(sql_text(access.report_sql(user, "citizen_reports")))
     if status == "open":
         q = q.where(CitizenReport.status != "CLOSED")
     elif status:
@@ -77,7 +80,8 @@ class IntakeIn(BaseModel):
 
 
 @router.post("/intake", status_code=201)
-async def intake(data: str = Form(...), photos: list[UploadFile] = File(default=[]), user: User = Depends(current_user),
+async def intake(data: str = Form(...), photos: list[UploadFile] = File(default=[]),
+                 user: User = Depends(require_roles(Role.admin, Role.senior_official, Role.district_officer)),
                  db: Session = Depends(get_db)) -> dict:
     """Staff type in what a caller or visitor said. The caller's number is kept only for updates."""
     try:
@@ -102,7 +106,7 @@ async def intake(data: str = Form(...), photos: list[UploadFile] = File(default=
 
 @router.get("/{report_id}")
 def get_report(report_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    report = _get(db, report_id)
+    report = _get(db, report_id, user)
     dups = db.scalars(select(CitizenReport).where(CitizenReport.duplicate_of == report.id).order_by(CitizenReport.id))
     out = {
         **service.desk_row(db, report),
@@ -118,7 +122,7 @@ def get_report(report_id: int, user: User = Depends(current_user), db: Session =
 
 @router.get("/{report_id}/photos/{n}")
 def photo(report_id: int, n: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> Response:
-    report = _get(db, report_id)
+    report = _get(db, report_id, user)
     photos = report.photos or []
     if not 1 <= n <= len(photos) or store.head_object(photos[n - 1]["key"]) is None:
         raise HTTPException(404, "No such photo")
@@ -134,9 +138,10 @@ class PlaceIn(BaseModel):
 
 
 @router.post("/{report_id}/place")
-def place(report_id: int, body: PlaceIn, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    """A report with no place: an official puts it on the map. Its incident and satellite review follow (D-063)."""
-    report = _get(db, report_id)
+def place(report_id: int, body: PlaceIn, user: User = Depends(require_roles(Role.senior_official, Role.district_officer)),
+          db: Session = Depends(get_db)) -> dict:
+    """A report with no place: an officer puts it on the map. Its incident and satellite review follow (D-063)."""
+    report = _get(db, report_id, user)
     try:
         with db.begin_nested():
             service.place_by_official(db, report, user, body.lon, body.lat, utcnow())

@@ -1,4 +1,5 @@
-"""Versioned statewide registry APIs. Department-level RLS is a follow-on hardening step."""
+"""Versioned statewide registry APIs. State-level: the admin changes them, senior officials read them (D-067).
+Department-level RLS is a follow-on hardening step."""
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import text
@@ -14,7 +15,7 @@ router = APIRouter(prefix="/api/v1/platform", tags=["platform-registry"])
 
 @router.get("/candidate-assets")
 def list_candidate_assets(limit: int = Query(100, ge=1, le=500), offset: int = Query(0, ge=0),
-                         actor: User = Depends(current_user), db: Session = Depends(get_db)):
+                         actor: User = Depends(require_roles("admin", "senior_official")), db: Session = Depends(get_db)):
     """Unverified reported locations, separate from the registered government asset registry."""
     rows = db.execute(text("""
       SELECT ca.id, ca.candidate_code, ca.display_name, ca.category_hint, ca.district, ca.mandal, ca.village,
@@ -32,7 +33,7 @@ def list_candidate_assets(limit: int = Query(100, ge=1, le=500), offset: int = Q
 
 @router.get("/assets")
 def list_assets(category: str | None = None, limit: int = Query(100, ge=1, le=500),
-                offset: int = Query(0, ge=0), _: User = Depends(current_user), db: Session = Depends(get_db)):
+                offset: int = Query(0, ge=0), _: User = Depends(require_roles("admin", "senior_official")), db: Session = Depends(get_db)):
     rows = db.execute(text("""
       SELECT id,asset_code,display_name,category_code,lifecycle_status,baseline_date,source_authority
       FROM public_assets WHERE category_code <> 'reported_place'
@@ -59,7 +60,7 @@ def create_asset(payload: AssetCreate, actor: User = Depends(require_roles("admi
         raise HTTPException(status_code=409,detail="Asset code already exists or registry constraint failed.") from exc
 
 @router.get("/assets/{asset_id}")
-def get_asset(asset_id: UUID, _: User = Depends(current_user), db: Session = Depends(get_db)):
+def get_asset(asset_id: UUID, _: User = Depends(require_roles("admin", "senior_official")), db: Session = Depends(get_db)):
     row = db.execute(text("""
       SELECT id,asset_code,display_name,category_code,lifecycle_status,baseline_date,source_authority,
              source_record_ref,ST_AsGeoJSON(footprint)::json AS footprint
@@ -93,7 +94,7 @@ def add_responsibility(asset_id: UUID,payload: ResponsibilityCreate,
         raise
 
 @router.get("/departments")
-def list_departments(_: User = Depends(current_user),db: Session = Depends(get_db)):
+def list_departments(_: User = Depends(require_roles("admin", "senior_official")),db: Session = Depends(get_db)):
     rows=db.execute(text("SELECT id,code,name,parent_id,is_active FROM departments WHERE is_active ORDER BY name")).mappings()
     return {"items":[dict(row) for row in rows]}
 
@@ -156,7 +157,7 @@ def revoke_department_access(department_id: UUID,user_id: int,actor: User = Depe
     return None
 
 @router.get("/assets/{asset_id}/responsibilities")
-def list_asset_responsibilities(asset_id: UUID, _: User = Depends(current_user), db: Session = Depends(get_db)):
+def list_asset_responsibilities(asset_id: UUID, _: User = Depends(require_roles("admin", "senior_official")), db: Session = Depends(get_db)):
     rows=db.execute(text("""
       SELECT id,department_id,relationship_type,valid_from,valid_to,source_authority,source_record_ref,recorded_at
       FROM asset_responsibilities
@@ -167,7 +168,7 @@ def list_asset_responsibilities(asset_id: UUID, _: User = Depends(current_user),
     return {"items":[dict(row) for row in rows]}
 
 @router.get("/candidates/{candidate_id}/predictions")
-def list_candidate_predictions(candidate_id: int, _: User = Depends(current_user), db: Session = Depends(get_db)):
+def list_candidate_predictions(candidate_id: int, _: User = Depends(require_roles("admin", "senior_official")), db: Session = Depends(get_db)):
     rows=db.execute(text("""
       SELECT id,candidate_id,score_type,score,model_name,model_version,feature_schema_version,
              features,factors,disclaimer,generated_at

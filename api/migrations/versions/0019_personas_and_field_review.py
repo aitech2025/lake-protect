@@ -23,12 +23,16 @@ depends_on = None
 
 UP = r"""
 -- Roles -----------------------------------------------------------------------------------------
-ALTER TYPE role RENAME TO role_v2;
-CREATE TYPE role AS ENUM ('admin', 'senior_official', 'district_officer', 'field_officer');
-ALTER TABLE users ALTER COLUMN role TYPE role USING (CASE
+-- The new role is worked out first: a column type change cannot look at another table.
+ALTER TABLE users ADD COLUMN role_next text;
+UPDATE users SET role_next = CASE
     WHEN role::text = 'admin' THEN 'admin'
     WHEN EXISTS (SELECT 1 FROM official_areas oa WHERE oa.user_id = users.id) THEN 'district_officer'
-    ELSE 'senior_official' END)::role;
+    ELSE 'senior_official' END;
+ALTER TYPE role RENAME TO role_v2;
+CREATE TYPE role AS ENUM ('admin', 'senior_official', 'district_officer', 'field_officer');
+ALTER TABLE users ALTER COLUMN role TYPE role USING role_next::role;
+ALTER TABLE users DROP COLUMN role_next;
 DROP TYPE role_v2;
 UPDATE users SET username = 'demo.district1', name = 'Demo District Officer 1'
     WHERE is_demo AND username = 'demo.viewer1' AND NOT EXISTS (SELECT 1 FROM users WHERE username = 'demo.district1');

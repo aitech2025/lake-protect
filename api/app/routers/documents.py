@@ -17,6 +17,7 @@ from app.enums import Role
 from app.models import Asset, AssetDocument, User
 from app.security import current_user, require_roles
 from app.services import documents as doc_svc
+from app import access
 from app.storage import store
 
 router = APIRouter(tags=["documents"])
@@ -24,8 +25,7 @@ router = APIRouter(tags=["documents"])
 
 @router.get("/assets/{asset_id}/documents")
 def list_documents(asset_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    if db.get(Asset, asset_id) is None:
-        raise HTTPException(404, "Asset not found")
+    access.require_asset(db, user, asset_id)
     items = doc_svc.list_for(db, asset_id)
     chain.record(db, actor_id=user.id, action="view.documents", entity="asset", entity_id=asset_id, details={"count": len(items)})
     db.commit()
@@ -72,6 +72,7 @@ def get_document_file(doc_id: int, user: User = Depends(current_user), db: Sessi
     doc = db.get(AssetDocument, doc_id)
     if doc is None or not doc.file_key or store.head_object(doc.file_key) is None:
         raise HTTPException(404, "No file is held for this document")
+    access.require_asset(db, user, doc.asset_id)
     data = store.get_object(doc.file_key)
     chain.record(db, actor_id=user.id, action="export.document", entity="asset", entity_id=doc.asset_id,
                  details={"document_id": doc.id, "sha256": doc.sha256})

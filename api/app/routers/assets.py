@@ -18,7 +18,7 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
-from app import categories
+from app import access, categories
 from app.audit import chain
 from app.clock import utcnow
 from app.db import db_guard, get_db
@@ -33,7 +33,7 @@ from app.storage import store
 
 router = APIRouter(tags=["assets"])
 
-_LIST_SQL = text(
+_LIST_SQL = (
     """
     SELECT a.id, a.asset_key, a.platform_asset_id, pa.asset_code, a.name, a.name_te, a.type::text AS type, a.cohort::text AS cohort,
            a.district, a.mandal, a.village, a.survey_numbers, a.area_acres, a.custodian_agency,
@@ -61,14 +61,17 @@ _LIST_SQL = text(
         FROM asset_screens s JOIN screen_runs r ON r.id = s.run_id
         WHERE s.asset_id = a.id ORDER BY r.as_of DESC, s.run_id DESC, s.id DESC LIMIT 1
     ) sc ON true
-    WHERE (CAST(:area_user AS bigint) IS NULL
-           OR ST_Intersects(b.geom, (SELECT u.area_geom FROM users u WHERE u.id = CAST(:area_user AS bigint))))
+    WHERE {scope}
       AND (CAST(:asset_id AS bigint) IS NULL OR a.id = CAST(:asset_id AS bigint))
       AND NOT a.is_demo
       AND a.type::text <> 'reported_place'
     ORDER BY a.name
     """
 )
+
+
+def _list_sql(user: User):
+    return text(_LIST_SQL.replace("{scope}", access.asset_sql(user, "a")))
 
 
 def _feature(row: dict) -> dict:
@@ -80,14 +83,9 @@ def _feature(row: dict) -> dict:
     return {"type": "Feature", "id": row["id"], "geometry": row["geometry"], "properties": props}
 
 
-def _area_user(user: User) -> int | None:
-    # Every role sees every asset since the roles were reduced to admin and viewer (D-057).
-    return None
-
-
 @router.get("/assets")
 def list_assets(user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    rows = db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": None}).mappings().all()
+    rows = db.execute(_list_sql(user), {"asset_id": None}).mappings().all()
     chain.record(db, actor_id=user.id, action="view.assets", entity="asset", details={"count": len(rows)})
     db.commit()
     return {"type": "FeatureCollection", "features": [_feature(dict(r)) for r in rows]}
@@ -95,7 +93,8 @@ def list_assets(user: User = Depends(current_user), db: Session = Depends(get_db
 
 @router.get("/assets/{asset_id}")
 def get_asset(asset_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    row = db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": asset_id}).mappings().first()
+    access.require_asset(db, user, asset_id)
+    row = db.execute(_list_sql(user), {"asset_id": asset_id}).mappings().first()
     if row is None:
         raise HTTPException(404, "Asset not found")
     chain.record(db, actor_id=user.id, action="view.asset", entity="asset", entity_id=asset_id)
@@ -105,7 +104,8 @@ def get_asset(asset_id: int, user: User = Depends(current_user), db: Session = D
 
 @router.get("/assets/{asset_id}/boundaries")
 def list_boundaries(asset_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    if db.execute(_LIST_SQL, {"area_user": _area_user(user), "asset_id": asset_id}).first() is None:
+    access.require_asset(db, user, asset_id)
+    if db.execute(_list_sql(user), {"asset_id": asset_id}).first() is None:
         raise HTTPException(404, "Asset not found")
     versions = bsvc.all_versions(db, asset_id)
     current = {r["id"] for r in bsvc.current_boundary_set(db, asset_id).values()}
@@ -174,7 +174,7 @@ def add_location(body: LocationIn, user: User = Depends(require_roles(Role.admin
             detail = {"message": str(exc), "asset_id": exc.asset_id} if isinstance(exc, loc_svc.SamePlace) else str(exc)
             raise HTTPException(exc.status_code, detail) from exc
         db.commit()
-    row = db.execute(_LIST_SQL, {"area_user": None, "asset_id": asset.id, "demo": None}).mappings().first()
+    row = db.execute(_list_sql(user), {"asset_id": asset.id}).mappings().first()
     return _feature(dict(row))
 
 
@@ -202,8 +202,7 @@ def set_monitoring(asset_id: int, body: MonitoringIn, user: User = Depends(requi
 
 @router.get("/assets/{asset_id}/monitoring")
 def monitoring_history(asset_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    if db.get(Asset, asset_id) is None:
-        raise HTTPException(404, "Asset not found")
+    access.require_asset(db, user, asset_id)
     items = loc_svc.history(db, asset_id)
     chain.record(db, actor_id=user.id, action="view.monitoring", entity="asset", entity_id=asset_id, details={"count": len(items)})
     db.commit()
@@ -253,7 +252,7 @@ def add_boundary(
 @router.get("/assets/{asset_id}/weeks")
 def asset_weeks(asset_id: int, limit: int = Query(26, ge=1, le=260), user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
     """The asset week by week: seen or not, the week's image, and what changed (D-057)."""
-    asset = db.get(Asset, asset_id)
+    asset = access.require_asset(db, user, asset_id)
     if asset is None:
         raise HTTPException(404, "Asset not found")
     items = weeks_svc.weeks_for_asset(db, asset_id, limit)
@@ -264,6 +263,7 @@ def asset_weeks(asset_id: int, limit: int = Query(26, ge=1, le=260), user: User 
 
 @router.get("/assets/{asset_id}/weeks/{screen_id}/image")
 def asset_week_image(asset_id: int, screen_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> Response:
+    access.require_asset(db, user, asset_id)
     key = weeks_svc.image_key(db, asset_id, screen_id)
     if not key or store.head_object(key) is None:
         raise HTTPException(404, "No image for this week")
@@ -274,8 +274,7 @@ def asset_week_image(asset_id: int, screen_id: int, user: User = Depends(current
 
 @router.get("/assets/{asset_id}/inspections")
 def list_asset_inspections(asset_id: int, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    if db.get(Asset, asset_id) is None:
-        raise HTTPException(404, "Asset not found")
+    access.require_asset(db, user, asset_id)
     rows = db.execute(text("""
         SELECT i.id, i.alert_id, a.code AS alert_code, i.inspector_id, u.name AS inspector,
                i.observed_at, i.lat, i.lon, i.outcome::text AS outcome, i.notes,
@@ -303,45 +302,21 @@ async def record_asset_inspection(
     user: User = Depends(current_user),
     db: Session = Depends(get_db),
 ) -> dict:
-    """Append a field visit with optional EXIF-stripped evidence photos."""
-    asset = db.get(Asset, asset_id)
-    if asset is None:
-        raise HTTPException(404, "Asset not found")
-    if not notes.strip():
-        raise HTTPException(422, "Inspection notes are required")
-    if (lat is None) != (lon is None):
-        raise HTTPException(422, "Give both GPS coordinates, or neither")
-    if len(photos) > 5:
-        raise HTTPException(422, "At most five inspection photos are allowed")
-    if alert_id is not None and db.scalar(select(Alert.id).join(Candidate, Candidate.id == Alert.candidate_id)
-                                         .where(Alert.id == alert_id, Candidate.asset_id == asset_id)) is None:
-        raise HTTPException(422, "The incident does not belong to this asset")
+    """Append a field visit with optional EXIF-stripped evidence photos. Field officers report on their
+    assigned incident from the incident page (D-067); this records a visit by an officer who covers the place."""
+    asset = access.require_asset(db, user, asset_id)
+    if user.role not in access.CASEWORK:
+        raise HTTPException(403, "Field officers submit their visit as the field report on their incident")
+    if user.role == Role.district_officer.value and not access.covers(db, user, asset):
+        raise HTTPException(403, access.OUTSIDE)
+    from app.services import inspections
 
-    from app.citizen.service import clean_photo
-
-    keys: list[str] = []
-    hashes: list[str] = []
-    inspection_key = uuid.uuid4().hex
-    for n, photo in enumerate(photos, 1):
-        raw = await photo.read(8 * 1024 * 1024 + 1)
-        try:
-            clean, _, _ = clean_photo(raw)
-        except Exception as exc:
-            raise HTTPException(422, str(exc)) from exc
-        key = f"field-inspections/{asset_id}/{inspection_key}/{n}.jpg"
-        digest = hashlib.sha256(clean).hexdigest()
-        store.put_object(key, clean)
-        keys.append(key)
-        hashes.append(digest)
-
-    row = AssetInspection(asset_id=asset_id, alert_id=alert_id, inspector_id=user.id,
-                          observed_at=observed_at, lat=lat, lon=lon, outcome=outcome,
-                          notes=notes.strip(), photo_paths=keys, photo_sha256=hashes)
-    db.add(row)
-    db.flush()
-    chain.record(db, actor_id=user.id, action="asset.inspection_recorded", entity="asset", entity_id=asset_id,
-                 details={"inspection_id": row.id, "alert_id": alert_id, "outcome": outcome,
-                          "observed_at": observed_at.isoformat(), "photos": len(keys)})
+    raw = [await p.read(inspections.MAX_PHOTO_BYTES + 1) for p in photos if p.filename]
+    try:
+        row = inspections.record(db, asset, user, outcome=outcome, notes=notes, observed_at=observed_at, lat=lat, lon=lon,
+                                 photos=raw, alert_id=alert_id)
+    except inspections.InspectionRefused as exc:
+        raise HTTPException(422, str(exc)) from exc
     db.commit()
     return {"id": row.id, "asset_id": asset_id, "alert_id": alert_id, "outcome": outcome}
 
@@ -349,6 +324,7 @@ async def record_asset_inspection(
 @router.get("/assets/{asset_id}/inspections/{inspection_id}/photos/{number}")
 def asset_inspection_photo(asset_id: int, inspection_id: int, number: int,
                            user: User = Depends(current_user), db: Session = Depends(get_db)) -> Response:
+    access.require_asset(db, user, asset_id)
     row = db.get(AssetInspection, inspection_id)
     if row is None or row.asset_id != asset_id or number < 1 or number > len(row.photo_paths):
         raise HTTPException(404, "Inspection photo not found")

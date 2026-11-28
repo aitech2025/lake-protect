@@ -4,7 +4,9 @@ import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { X } from "lucide-react";
 import { api, fmtDate, type AlertRow } from "../api";
+import { AREA_LEVELS, AreaFilter, NO_AREA, useAreaParams, type Placed } from "../components/AreaFilter";
 import { StatePill, useAsync, usePageTitle } from "../components/Bits";
+import { isFieldOfficer, useAuth } from "../auth";
 import { CHANGE_TYPES, GROUP_COLOUR, GROUP_OF, STATES } from "../components/labels";
 import { MapView, type Pin } from "../components/MapView";
 import { PageState } from "../components/PageState";
@@ -17,41 +19,46 @@ const FILTERS: Filter[] = ["active", ...STATES, "all"];
 /** Incidents (D-057): every change the weekly screen found, and where each one stands. */
 export function Queue() {
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
+  const field = isFieldOfficer(user);
+  const title = field ? t("nav.field_visits") : t("queue.title");
   const nav = useNavigate();
   // The dashboard opens this list with its area and rule in the address (D-060): the server applies
   // them, and the state chips start at "all" so they hide nothing the number counted.
   const [params, setParams] = useSearchParams();
   const linked = ["district", "mandal", "village", "state", "waiting", "week", "asset_id"].filter((k) => params.get(k) !== null);
   const linkedQuery = linked.map((k) => `&${k}=${encodeURIComponent(params.get(k) ?? "")}`).join("");
+  // The area is also what the District, Mandal and Village pickers show and set (D-069); the banner
+  // lists only the overview's other rules.
+  const rules = linked.filter((k) => !(AREA_LEVELS as readonly string[]).includes(k));
+  const [area, setArea] = useAreaParams();
   const [filter, setFilter] = useState<Filter>(linked.length ? "all" : "active");
   const [change, setChange] = useState("");
   const [cohort, setCohort] = useState("");
   const [landTab, setLandTab] = useState<"all" | "lakes" | "lands">("all");
-  const [district, setDistrict] = useState("");
-  const [mandal, setMandal] = useState("");
-  const [village, setVillage] = useState("");
   const areas = useAsync(() => api<{ features: any[] }>("/assets"), []);
   const { data, error, status, reload } = useAsync(() => api<{ items: AlertRow[] }>(`/alerts${linkedQuery.replace(/^&/, "?")}`), [linkedQuery]);
-  usePageTitle(t("queue.title"));
+  usePageTitle(title);
 
+  // The API applies the area; the page narrows by the rest.
   const items = useMemo(() => {
     let rows = data?.items ?? [];
-    const areaRows = areas.data?.features ?? [];
-    const allowedIds = new Set(areaRows.filter((a) => (!district || a.properties.district === district) && (!mandal || a.properties.mandal === mandal) && (!village || a.properties.village === village) && (landTab === "all" || (landTab === "lakes" ? a.properties.category === "water_body" : a.properties.category !== "water_body"))).map((a) => a.id));
-    rows = rows.filter((r) => allowedIds.has(r.asset_id) && (landTab === "all" || (landTab === "lakes" ? r.asset_type === "lake" : r.asset_type !== "lake")));
+    rows = rows.filter((r) => landTab === "all" || (landTab === "lakes" ? r.asset_type === "lake" : r.asset_type !== "lake"));
     if (filter === "active") rows = rows.filter((r) => r.state !== "CLOSED");
     else if (filter !== "all") rows = rows.filter((r) => r.state === filter);
     if (change) rows = rows.filter((r) => (change === "building" ? ["building", "small_structure"].includes(r.change_type) : r.change_type === change));
     if (cohort) rows = rows.filter((r) => r.cohort === cohort);
     return rows;
-  }, [data, areas.data, filter, change, cohort, landTab, district, mandal, village]);
+  }, [data, filter, change, cohort, landTab]);
 
-  const areaFeatures = areas.data?.features ?? [];
-  const matchesTab = (a: any) => landTab === "all" || (landTab === "lakes" ? a.properties.category === "water_body" : a.properties.category !== "water_body");
-  const districts = Array.from(new Set(areaFeatures.filter(matchesTab).map((a) => a.properties.district).filter(Boolean))).sort();
-  const mandals = Array.from(new Set(areaFeatures.filter((a) => (!district || a.properties.district === district) && matchesTab(a)).map((a) => a.properties.mandal).filter(Boolean))).sort();
-  const villages = Array.from(new Set(areaFeatures.filter((a) => (!district || a.properties.district === district) && (!mandal || a.properties.mandal === mandal) && matchesTab(a)).map((a) => a.properties.village).filter(Boolean))).sort();
-  const narrowed = !!(change || cohort || district || mandal || village || landTab !== "all");
+  // The areas offered: those of the locations this person can see, of the chosen kind of land.
+  const places: Placed[] = useMemo(
+    () => (areas.data?.features ?? [])
+      .filter((a) => landTab === "all" || (landTab === "lakes" ? a.properties.category === "water_body" : a.properties.category !== "water_body"))
+      .map((a) => a.properties),
+    [areas.data, landTab],
+  );
+  const narrowed = !!(change || cohort || area.district || area.mandal || area.village || landTab !== "all");
 
   const pins: Pin[] = useMemo(
     () =>
@@ -68,26 +75,34 @@ export function Queue() {
   );
   const name = (r: AlertRow) => (i18n.language === "te" && r.asset_name_te ? r.asset_name_te : r.asset_name);
   const zone = (r: AlertRow) => (r.zone ? t(r.asset_type === "recovered_parcel" && r.zone === "inside_ftl" ? "zone_parcel.inside_ftl" : `zone.${r.zone}`) : "");
-  const clearNarrowing = () => { setChange(""); setCohort(""); setDistrict(""); setMandal(""); setVillage(""); setLandTab("all"); };
+  const clearNarrowing = () => { setChange(""); setCohort(""); setArea(NO_AREA); setLandTab("all"); };
+  const clearRules = () => {
+    setParams((prev) => {
+      const q = new URLSearchParams(prev);
+      rules.forEach((k) => q.delete(k));
+      return q;
+    });
+    setFilter("active");
+  };
 
   return (
     <div className="page">
       <div className="page-head">
         <div>
-          <h1>{t("queue.title")}</h1>
-          <p className="muted" aria-hidden={!data}>{data ? `${t("queue.count", { count: items.length })}. ${t("queue.sorted")}.` : " "}</p>
+          <h1>{title}</h1>
+          <p className="muted" aria-hidden={!data}>{data ? (field ? t("queue.field_lede", { count: items.length }) : `${t("queue.count", { count: items.length })}. ${t("queue.sorted")}.`) : " "}</p>
         </div>
       </div>
-      {linked.length > 0 && (
+      {rules.length > 0 && (
         <p className="banner info linked-filter" data-testid="linked-filter">
           {t("queue.linked")}{" "}
-          {linked.map((k, i) => (
-            <b key={k}>{i > 0 ? ", " : ""}{k === "waiting" ? t("dashboard.figure.waiting") : k === "state" ? (params.get(k) ?? "").split(",").map((x) => t(`state.${x}`)).join(", ") : k === "week" ? t("queue.linked_week", { week: params.get(k) }) : k === "asset_id" ? t("queue.linked_asset") : params.get(k) === "-" ? t("dashboard.not_recorded") : params.get(k)}</b>
+          {rules.map((k, i) => (
+            <b key={k}>{i > 0 ? ", " : ""}{k === "waiting" ? t("dashboard.figure.waiting") : k === "state" ? (params.get(k) ?? "").split(",").map((x) => t(`state.${x}`)).join(", ") : k === "week" ? t("queue.linked_week", { week: params.get(k) }) : t("queue.linked_asset")}</b>
           ))}
-          <button className="btn quiet" onClick={() => { setParams({}); setFilter("active"); }} data-testid="linked-clear">{t("queue.linked_clear")}</button>
+          <button className="btn quiet" onClick={clearRules} data-testid="linked-clear">{t("queue.linked_clear")}</button>
         </p>
       )}
-      <ScreeningSummary />
+      {!field && <ScreeningSummary />}
       <div className="toolbar" role="search" aria-label={t("queue.filters")}>
         <div className="toolbar-row">
           <Segmented
@@ -100,14 +115,12 @@ export function Queue() {
             label={t("queue.land_group")}
             className="incident-tabs"
             value={landTab}
-            onChange={(k) => { setLandTab(k); setDistrict(""); setMandal(""); setVillage(""); }}
+            onChange={setLandTab}
             options={(["all", "lakes", "lands"] as const).map((k) => ({ value: k, label: t(k === "all" ? "group.all" : `assets.tab.${k}`) }))}
           />
         </div>
         <div className="toolbar-row">
-          <label className="field">{t("assets.filter_district")}<select value={district} onChange={(e) => { setDistrict(e.target.value); setMandal(""); setVillage(""); }}><option value="">{t("assets.all_districts")}</option>{districts.map((d) => <option key={d}>{d}</option>)}</select></label>
-          <label className="field">{t("assets.filter_mandal")}<select value={mandal} disabled={!mandals.length} onChange={(e) => { setMandal(e.target.value); setVillage(""); }}><option value="">{t("assets.all_mandals")}</option>{mandals.map((m) => <option key={m}>{m}</option>)}</select></label>
-          <label className="field">{t("assets.filter_village")}<select value={village} disabled={!villages.length} onChange={(e) => setVillage(e.target.value)}><option value="">{t("assets.all_villages")}</option>{villages.map((v) => <option key={v}>{v}</option>)}</select></label>
+          <AreaFilter places={places} value={area} onChange={setArea} testId="incident-area" />
           <label className="field">
             {t("queue.what_changed")}
             <select value={change} onChange={(e) => setChange(e.target.value)} data-testid="filter-change">
@@ -129,7 +142,7 @@ export function Queue() {
       <div className="queue">
         <div className="list" data-testid="alert-list">
           <PageState loading={!data && !error} />
-          {items.length === 0 && data && <p className="list-empty">{t("queue.empty_real")}</p>}
+          {items.length === 0 && data && <p className="list-empty">{field ? t("queue.field_empty") : t("queue.empty_real")}</p>}
           {items.map((r) => (
             <Link key={r.id} to={`/alerts/${r.id}`} className="row" data-testid={`alert-row-${r.code}`}>
               <span className="bar" style={{ background: GROUP_COLOUR[GROUP_OF[r.state]] }} />
@@ -139,6 +152,7 @@ export function Queue() {
                   <StatePill state={r.state} />
                   <b className="change-type">{t(`change.${r.change_type}`)}</b>
                   {r.origin === "citizen" && <span className="pill field" data-testid="origin-citizen">{t("queue.citizen")}</span>}
+                  {r.field_officer && r.state === "FIELD_VISIT" && <span>{t("case.assigned_to", { name: r.field_officer })}</span>}
                   <span>{t("queue.acres", { acres: r.area_acres })}</span>
                   {zone(r) && <span>{zone(r)}</span>}
                 </span>

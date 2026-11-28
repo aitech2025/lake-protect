@@ -28,6 +28,13 @@
    "overpass_endpoint": "https://overpass-api.de/api/interpreter",
    "retrieved_at": "2026-11-25T01:09:41+00:00",
    "raw_response_sha256": "460a306ab7e739a574dc3f8a04494a208e6f986fad4cae2d67f08f0930fe3764"
+  },
+  "villages": {
+   "description": "village of each lake: the nearest place in the mandal, not the revenue village (OSM village, town or suburb; smaller places only when none is near)",
+   "licence": "Open Database Licence (ODbL). Attribution: (c) OpenStreetMap contributors",
+   "overpass_endpoint": "https://overpass-api.de/api/interpreter",
+   "retrieved_at": "2026-11-28T11:37:16+00:00",
+   "raw_response_sha256": "ab7757a6d7e02851cd2ff6211ab201c031dd6572fd94d90e0aea4e676db09bef"
   }
  },
  "features": [
@@ -114,7 +121,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Bachupally",
-    "village": null,
+    "village": "Nizampet",
     "survey_numbers": [],
     "area_acres": 6.8,
     "custodian_agency": null,
@@ -137,7 +144,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/1428934703, 825 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -279,7 +287,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Bachupally",
-    "village": null,
+    "village": "Bachupally",
     "survey_numbers": [],
     "area_acres": 11.83,
     "custodian_agency": null,
@@ -302,7 +310,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2002214372, 1302 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -836,7 +845,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Quthbullapur",
-    "village": null,
+    "village": "Jeedimetla Village",
     "survey_numbers": [],
     "area_acres": 26.92,
     "custodian_agency": null,
@@ -859,7 +868,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2923086475, 685 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -1621,7 +1631,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Kukatpally",
-    "village": null,
+    "village": "Moosapet",
     "survey_numbers": [],
     "area_acres": 11.43,
     "custodian_agency": null,
@@ -1643,7 +1653,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2926310708, 1839 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -2165,7 +2176,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Kukatpally",
-    "village": null,
+    "village": "Moosapet",
     "survey_numbers": [],
     "area_acres": 14.07,
     "custodian_agency": null,
@@ -2193,7 +2204,8 @@
     "match_status": {
      "Sunnam Cheruvu": "unique_name_match"
     },
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2926310708, 2579 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -2499,7 +2511,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Ibrahimpatnam",
-    "village": null,
+    "village": "Karnam Guda",
     "survey_numbers": [],
     "area_acres": 403.72,
     "custodian_agency": null,
@@ -2522,7 +2534,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/5395682093, 1938 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -3000,7 +3013,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Sangareddy",
     "mandal": "Patancheruvu",
-    "village": null,
+    "village": "Patancheru",
     "survey_numbers": [],
     "area_acres": 120.63,
     "custodian_agency": null,
@@ -3023,7 +3036,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/571352294, 749 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -3257,7 +3271,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Sangareddy",
     "mandal": "Ameenpur",
-    "village": null,
+    "village": "Ameenapur",
     "survey_numbers": [],
     "area_acres": 313.11,
     "custodian_agency": null,
@@ -3281,7 +3295,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/5605051509, 800 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -3367,7 +3382,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Keesara",
-    "village": null,
+    "village": "Dammaiguda",
     "survey_numbers": [],
     "area_acres": 27.29,
     "custodian_agency": null,
@@ -3389,7 +3404,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/5390598298, 834 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -3547,7 +3563,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Uppal",
-    "village": null,
+    "village": "Habsiguda",
     "survey_numbers": [],
     "area_acres": 5.92,
     "custodian_agency": null,
@@ -3570,7 +3586,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/1361329778, 2466 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -3764,7 +3781,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Gowlidoddi",
     "survey_numbers": [],
     "area_acres": 7.33,
     "custodian_agency": null,
@@ -3787,7 +3804,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/7098530570, 1699 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -3889,7 +3907,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Saroornagar",
-    "village": null,
+    "village": "Mansoorabad",
     "survey_numbers": [],
     "area_acres": 14.49,
     "custodian_agency": null,
@@ -3911,7 +3929,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2948307784, 951 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -4037,7 +4056,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Madinaguda",
     "survey_numbers": [],
     "area_acres": 26.69,
     "custodian_agency": null,
@@ -4060,7 +4079,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2923222392, 702 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -5010,7 +5030,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Miyapur",
     "survey_numbers": [],
     "area_acres": 7.4,
     "custodian_agency": null,
@@ -5033,7 +5053,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/4711167390, 1486 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -5235,7 +5256,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Sangareddy",
     "mandal": "Ramachandrapuram",
-    "village": null,
+    "village": "Ramachandrapuram",
     "survey_numbers": [],
     "area_acres": 8.88,
     "custodian_agency": null,
@@ -5258,7 +5279,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/7132697310, 2553 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -5528,7 +5550,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Kukatpally",
-    "village": null,
+    "village": "Satavahana Nagar",
     "survey_numbers": [],
     "area_acres": 7.95,
     "custodian_agency": null,
@@ -5550,7 +5572,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2921521009, 130 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -5940,7 +5963,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Kukatpally",
-    "village": null,
+    "village": "Satavahana Nagar",
     "survey_numbers": [],
     "area_acres": 15.94,
     "custodian_agency": null,
@@ -5963,7 +5986,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2921521009, 719 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -6245,7 +6269,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Kukatpally",
-    "village": null,
+    "village": "Kukatpally",
     "survey_numbers": [],
     "area_acres": 15.17,
     "custodian_agency": null,
@@ -6273,7 +6297,8 @@
     "match_status": {
      "Nalla Cheruvu": "ambiguous_name (2 OSM polygons)"
     },
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/1184187429, 1476 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -6675,7 +6700,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Uppal",
-    "village": null,
+    "village": "Nacharam",
     "survey_numbers": [],
     "area_acres": 17.19,
     "custodian_agency": null,
@@ -6698,7 +6723,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/1939389683, 707 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -6796,7 +6822,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Bachupally",
-    "village": null,
+    "village": "Nizampet",
     "survey_numbers": [],
     "area_acres": 6.93,
     "custodian_agency": null,
@@ -6819,7 +6845,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/1428934703, 609 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -7033,7 +7060,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Hyderabad",
     "mandal": "Bahadurpura",
-    "village": null,
+    "village": "Kishan Bagh",
     "survey_numbers": [],
     "area_acres": 10.97,
     "custodian_agency": null,
@@ -7055,7 +7082,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2948244225, 874 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -7521,7 +7549,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Abdullapurmet",
-    "village": null,
+    "village": "Anajpur",
     "survey_numbers": [],
     "area_acres": 63.46,
     "custodian_agency": null,
@@ -7544,7 +7572,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/5515818504, 1455 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -7854,7 +7883,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Gandipet",
-    "village": null,
+    "village": "Ibrahim Bagh",
     "survey_numbers": [],
     "area_acres": 13.37,
     "custodian_agency": null,
@@ -7877,7 +7906,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/2942970347, 1249 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -7943,7 +7973,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Sangareddy",
     "mandal": "Ameenpur",
-    "village": null,
+    "village": "Ameenapur",
     "survey_numbers": [],
     "area_acres": 28.36,
     "custodian_agency": null,
@@ -7966,7 +7996,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/5605051509, 1292 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -8056,7 +8087,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Sangareddy",
     "mandal": "Ramachandrapuram",
-    "village": null,
+    "village": "Ramachandrapuram",
     "survey_numbers": [],
     "area_acres": 5.16,
     "custodian_agency": null,
@@ -8080,7 +8111,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/7132697310, 3346 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -9302,7 +9334,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Chandanagar",
     "survey_numbers": [],
     "area_acres": 88.39,
     "custodian_agency": null,
@@ -9325,7 +9357,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2923222381, 920 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -9511,7 +9544,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Masjid Banda",
     "survey_numbers": [],
     "area_acres": 7.02,
     "custodian_agency": null,
@@ -9534,7 +9567,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2926299112, 506 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -10904,7 +10938,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Gandipet",
-    "village": null,
+    "village": "Ibrahim Bagh",
     "survey_numbers": [],
     "area_acres": 70.02,
     "custodian_agency": null,
@@ -10931,7 +10965,8 @@
     "match_status": {
      "Pedda Cheruvu": "ambiguous_name (4 OSM polygons)"
     },
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/2942970347, 762 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -11045,7 +11080,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Masjid Banda",
     "survey_numbers": [],
     "area_acres": 7.7,
     "custodian_agency": null,
@@ -11068,7 +11103,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2926299112, 1388 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -12454,7 +12490,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Lingampally",
     "survey_numbers": [],
     "area_acres": 63.76,
     "custodian_agency": null,
@@ -12478,7 +12514,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2923222390, 1606 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -12568,7 +12605,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Kapra",
-    "village": null,
+    "village": "Sainikpuri",
     "survey_numbers": [],
     "area_acres": 64.44,
     "custodian_agency": null,
@@ -12592,7 +12629,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2924400682, 1258 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -13210,7 +13248,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Hyderabad",
     "mandal": "Bandlaguda",
-    "village": null,
+    "village": "Mustafa Hills",
     "survey_numbers": [],
     "area_acres": 28.51,
     "custodian_agency": null,
@@ -13233,7 +13271,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2949115614, 1797 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -13491,7 +13530,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Hyderabad",
     "mandal": "Bandlaguda",
-    "village": null,
+    "village": "Mustafa Hills",
     "survey_numbers": [],
     "area_acres": 27.71,
     "custodian_agency": null,
@@ -13514,7 +13553,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2949115614, 2342 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -14380,7 +14420,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Rajendranagar",
-    "village": null,
+    "village": "Katedan",
     "survey_numbers": [],
     "area_acres": 15.74,
     "custodian_agency": null,
@@ -14403,7 +14443,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2949095757, 490 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -14545,7 +14586,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Rajendranagar",
-    "village": null,
+    "village": "Upperpally",
     "survey_numbers": [],
     "area_acres": 5.02,
     "custodian_agency": null,
@@ -14568,7 +14609,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/4463807890, 935 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -15030,7 +15072,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Sangareddy",
     "mandal": "Ramachandrapuram",
-    "village": null,
+    "village": "BHEL Township",
     "survey_numbers": [],
     "area_acres": 116.76,
     "custodian_agency": null,
@@ -15053,7 +15095,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2923222380, 2002 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -15331,7 +15374,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Miyapur",
     "survey_numbers": [],
     "area_acres": 16.97,
     "custodian_agency": null,
@@ -15360,7 +15403,8 @@
     "match_status": {
      "Miyapur water body": "unique_name_match"
     },
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/4711167390, 437 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -15602,7 +15646,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Miyapur",
     "survey_numbers": [],
     "area_acres": 18.65,
     "custodian_agency": null,
@@ -15625,7 +15669,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/4711167390, 2170 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -16751,7 +16796,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Alwal",
-    "village": null,
+    "village": "Alwal",
     "survey_numbers": [],
     "area_acres": 17.1,
     "custodian_agency": null,
@@ -16775,7 +16820,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2923174834, 503 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -17685,7 +17731,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Bachupally",
-    "village": null,
+    "village": "Nizampet",
     "survey_numbers": [],
     "area_acres": 36.12,
     "custodian_agency": null,
@@ -17708,7 +17754,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/1428934703, 1102 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -18086,7 +18133,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Dundigal",
-    "village": null,
+    "village": "Mallampet",
     "survey_numbers": [],
     "area_acres": 100.35,
     "custodian_agency": null,
@@ -18114,7 +18161,8 @@
     "match_status": {
      "Mallampet Cheruvu": "ambiguous_name (2 OSM polygons)"
     },
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/5605051506, 1476 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -18312,7 +18360,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Sangareddy",
     "mandal": "Patancheruvu",
-    "village": null,
+    "village": "Patancheru",
     "survey_numbers": [],
     "area_acres": 27.97,
     "custodian_agency": null,
@@ -18335,7 +18383,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/571352294, 844 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -18469,7 +18518,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Balapur",
-    "village": null,
+    "village": "Kurmalguda",
     "survey_numbers": [],
     "area_acres": 55.42,
     "custodian_agency": null,
@@ -18492,7 +18541,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/5377082794, 1359 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -19042,7 +19092,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Saroornagar",
-    "village": null,
+    "village": "Saroor Nagar",
     "survey_numbers": [],
     "area_acres": 91.27,
     "custodian_agency": null,
@@ -19066,7 +19116,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2948307789, 445 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -20492,7 +20543,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Madhapur",
     "survey_numbers": [],
     "area_acres": 91.59,
     "custodian_agency": null,
@@ -20522,7 +20573,8 @@
     "match_status": {
      "Durgam Cheruvu": "unique_name_match"
     },
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/349267516, 1106 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -20836,7 +20888,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Medipally",
-    "village": null,
+    "village": "Boduppal",
     "survey_numbers": [],
     "area_acres": 39.41,
     "custodian_agency": null,
@@ -20859,7 +20911,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2935016447, 1401 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -21097,7 +21150,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Hyderabad",
     "mandal": "Shaikpet",
-    "village": null,
+    "village": "Tolichowki",
     "survey_numbers": [],
     "area_acres": 35.53,
     "custodian_agency": null,
@@ -21120,7 +21173,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/317758182, 762 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -21246,7 +21300,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Hyderabad",
     "mandal": "Saidabad",
-    "village": null,
+    "village": "Saidabad",
     "survey_numbers": [],
     "area_acres": 6.41,
     "custodian_agency": null,
@@ -21268,7 +21322,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2461524530, 933 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -21426,7 +21481,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Uppal",
-    "village": null,
+    "village": "Uppal",
     "survey_numbers": [],
     "area_acres": 50.01,
     "custodian_agency": null,
@@ -21454,7 +21509,8 @@
     "match_status": {
      "Nalla Cheruvu": "ambiguous_name (2 OSM polygons)"
     },
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2942958218, 1842 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -21656,7 +21712,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Uppal",
-    "village": null,
+    "village": "Nacharam",
     "survey_numbers": [],
     "area_acres": 78.46,
     "custodian_agency": null,
@@ -21684,7 +21740,8 @@
     "match_status": {
      "Pedda Cheruvu": "ambiguous_name (4 OSM polygons)"
     },
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/1939389683, 838 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -21842,7 +21899,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Gandipet",
-    "village": null,
+    "village": "Himayath Sagar",
     "survey_numbers": [],
     "area_acres": 30.87,
     "custodian_agency": null,
@@ -21864,7 +21921,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/7392859728, 1630 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -22434,7 +22492,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Kukatpally",
-    "village": null,
+    "village": "KPHB Colony",
     "survey_numbers": [],
     "area_acres": 16.11,
     "custodian_agency": null,
@@ -22457,7 +22515,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/1428945589, 2938 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -22619,7 +22678,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Medipally",
-    "village": null,
+    "village": "Peerzadiguda",
     "survey_numbers": [],
     "area_acres": 28.12,
     "custodian_agency": null,
@@ -22642,7 +22701,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2942962635, 418 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -22880,7 +22940,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Rajendranagar",
-    "village": null,
+    "village": "Shivrampalli",
     "survey_numbers": [],
     "area_acres": 15.82,
     "custodian_agency": null,
@@ -22903,7 +22963,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/9234919838, 527 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -23197,7 +23258,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Hyderabad",
     "mandal": "Shaikpet",
-    "village": null,
+    "village": "Banjara Hills",
     "survey_numbers": [],
     "area_acres": 8.11,
     "custodian_agency": null,
@@ -23221,7 +23282,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/1986351715, 1199 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -23999,7 +24061,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Balapur",
-    "village": null,
+    "village": "Jillelaguda",
     "survey_numbers": [],
     "area_acres": 31.65,
     "custodian_agency": null,
@@ -24022,7 +24084,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2949073337, 930 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -24208,7 +24271,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Hayathnagar",
-    "village": null,
+    "village": "Anmagal Hayathnagar",
     "survey_numbers": [],
     "area_acres": 19.89,
     "custodian_agency": null,
@@ -24231,7 +24294,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/4496471890, 475 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -24605,7 +24669,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Rajendranagar",
-    "village": null,
+    "village": "Gagan Pahad",
     "survey_numbers": [],
     "area_acres": 77.36,
     "custodian_agency": null,
@@ -24628,7 +24692,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2949089152, 965 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -24694,7 +24759,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Balapur",
-    "village": null,
+    "village": "Almasguda",
     "survey_numbers": [],
     "area_acres": 49.04,
     "custodian_agency": null,
@@ -24717,7 +24782,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2949103095, 919 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -26111,7 +26177,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Kukatpally",
-    "village": null,
+    "village": "Moosapet",
     "survey_numbers": [],
     "area_acres": 41.2,
     "custodian_agency": null,
@@ -26134,7 +26200,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2926310708, 1435 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -26236,7 +26303,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Uppal",
-    "village": null,
+    "village": "Habsiguda",
     "survey_numbers": [],
     "area_acres": 15.64,
     "custodian_agency": null,
@@ -26258,7 +26325,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/1361329778, 1549 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -26616,7 +26684,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Hyderabad",
     "mandal": "Shaikpet",
-    "village": null,
+    "village": "Shaikpet",
     "survey_numbers": [],
     "area_acres": 10.74,
     "custodian_agency": null,
@@ -26638,7 +26706,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2935018020, 647 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -27332,7 +27401,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Gachibowli",
     "survey_numbers": [],
     "area_acres": 16.6,
     "custodian_agency": null,
@@ -27355,7 +27424,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/701232038, 1996 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -27521,7 +27591,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Bachupally",
-    "village": null,
+    "village": "Bachupally",
     "survey_numbers": [],
     "area_acres": 25.39,
     "custodian_agency": null,
@@ -27544,7 +27614,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2002214372, 591 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -27958,7 +28029,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Hyderabad",
     "mandal": "Shaikpet",
-    "village": null,
+    "village": "Navirman Nagar",
     "survey_numbers": [],
     "area_acres": 6.29,
     "custodian_agency": null,
@@ -27981,7 +28052,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/7105419002, 287 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -28139,7 +28211,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Dundigal",
-    "village": null,
+    "village": "Mallampet",
     "survey_numbers": [],
     "area_acres": 7.49,
     "custodian_agency": null,
@@ -28166,7 +28238,8 @@
     "match_status": {
      "Mallampet Cheruvu": "ambiguous_name (2 OSM polygons)"
     },
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/5605051506, 476 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -28252,7 +28325,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Hayathnagar",
-    "village": null,
+    "village": "Vanasthalipuram",
     "survey_numbers": [],
     "area_acres": 11.05,
     "custodian_agency": null,
@@ -28275,7 +28348,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2949077691, 1727 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -28621,7 +28695,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Hayathnagar",
-    "village": null,
+    "village": "Anmagal Hayathnagar",
     "survey_numbers": [],
     "area_acres": 12.16,
     "custodian_agency": null,
@@ -28644,7 +28718,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/4496471890, 993 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -29706,7 +29781,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Shamirpet",
-    "village": null,
+    "village": "Mazidpur",
     "survey_numbers": [],
     "area_acres": 479.73,
     "custodian_agency": null,
@@ -29729,7 +29804,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/5390598585, 1871 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -30235,7 +30311,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Abdullapurmet",
-    "village": null,
+    "village": "Kuntloor",
     "survey_numbers": [],
     "area_acres": 61.91,
     "custodian_agency": null,
@@ -30258,7 +30334,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/981868945, 1191 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -30492,7 +30569,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Balapur",
-    "village": null,
+    "village": "Balapur",
     "survey_numbers": [],
     "area_acres": 38.79,
     "custodian_agency": null,
@@ -30519,7 +30596,8 @@
     "match_status": {
      "Pedda Cheruvu": "ambiguous_name (4 OSM polygons)"
     },
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/2949103096, 1205 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -30921,7 +30999,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Balapur",
-    "village": null,
+    "village": "Quba Colony",
     "survey_numbers": [],
     "area_acres": 40.46,
     "custodian_agency": null,
@@ -30943,7 +31021,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2949115616, 1649 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -31217,7 +31296,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Kukatpally",
-    "village": null,
+    "village": "Moosapet",
     "survey_numbers": [],
     "area_acres": 43.99,
     "custodian_agency": null,
@@ -31239,7 +31318,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2926310708, 755 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -31877,7 +31957,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Quthbullapur",
-    "village": null,
+    "village": "Jeedimetla Village",
     "survey_numbers": [],
     "area_acres": 310.46,
     "custodian_agency": null,
@@ -31901,7 +31981,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2923086475, 2061 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -32235,7 +32316,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Malkajgiri",
-    "village": null,
+    "village": "Neredmet",
     "survey_numbers": [],
     "area_acres": 51.41,
     "custodian_agency": null,
@@ -32259,7 +32340,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2926905024, 658 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -32397,7 +32479,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Balapur",
-    "village": null,
+    "village": "Kurmalguda",
     "survey_numbers": [],
     "area_acres": 10.71,
     "custodian_agency": null,
@@ -32420,7 +32502,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/5377082794, 300 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -32990,7 +33073,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Abdullapurmet",
-    "village": null,
+    "village": "Abdullapur",
     "survey_numbers": [],
     "area_acres": 26.83,
     "custodian_agency": null,
@@ -33013,7 +33096,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/5515818511, 919 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -33303,7 +33387,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Gandipet",
-    "village": null,
+    "village": "Manikonda",
     "survey_numbers": [],
     "area_acres": 47.13,
     "custodian_agency": null,
@@ -33327,7 +33411,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2935018014, 2016 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -33829,7 +33914,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Gandipet",
-    "village": null,
+    "village": "Kokapet",
     "survey_numbers": [],
     "area_acres": 61.25,
     "custodian_agency": null,
@@ -33852,7 +33937,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/5401127313, 1416 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -33938,7 +34024,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Medipally",
-    "village": null,
+    "village": "Chengicherla",
     "survey_numbers": [],
     "area_acres": 35.91,
     "custodian_agency": null,
@@ -33961,7 +34047,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/5390598303, 1066 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -34055,7 +34142,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Sangareddy",
     "mandal": "Ameenpur",
-    "village": null,
+    "village": "Ilapur",
     "survey_numbers": [],
     "area_acres": 23.43,
     "custodian_agency": null,
@@ -34078,7 +34165,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/5605051959, 1860 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -34308,7 +34396,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Kothaguda",
     "survey_numbers": [],
     "area_acres": 5.97,
     "custodian_agency": null,
@@ -34331,7 +34419,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2926299111, 464 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -34565,7 +34654,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Gachibowli",
     "survey_numbers": [],
     "area_acres": 7.83,
     "custodian_agency": null,
@@ -34587,7 +34676,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/701232038, 1597 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -34749,7 +34839,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Abdullapurmet",
-    "village": null,
+    "village": "Kawadipally",
     "survey_numbers": [],
     "area_acres": 5.72,
     "custodian_agency": null,
@@ -34777,7 +34867,8 @@
     "match_status": {
      "Pedda Cheruvu": "ambiguous_name (4 OSM polygons)"
     },
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/5515818509, 744 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -35475,7 +35566,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Abdullapurmet",
-    "village": null,
+    "village": "Balijaguda",
     "survey_numbers": [],
     "area_acres": 86.36,
     "custodian_agency": null,
@@ -35498,7 +35589,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/5515818506, 990 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -35776,7 +35868,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Abdullapurmet",
-    "village": null,
+    "village": "Laskerguda",
     "survey_numbers": [],
     "area_acres": 27.87,
     "custodian_agency": null,
@@ -35799,7 +35891,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/5515818518, 940 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -35845,7 +35938,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Masjid Banda",
     "survey_numbers": [],
     "area_acres": 8.91,
     "custodian_agency": null,
@@ -35868,7 +35961,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2926299112, 1108 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -36018,7 +36112,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Abdullapurmet",
-    "village": null,
+    "village": "Injapur",
     "survey_numbers": [],
     "area_acres": 137.37,
     "custodian_agency": null,
@@ -36041,7 +36135,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2949112471, 1173 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -36399,7 +36494,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Miyapur",
     "survey_numbers": [],
     "area_acres": 39.91,
     "custodian_agency": null,
@@ -36423,7 +36518,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/4711167390, 642 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -36661,7 +36757,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Miyapur",
     "survey_numbers": [],
     "area_acres": 14.49,
     "custodian_agency": null,
@@ -36684,7 +36780,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/4711167390, 969 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -36878,7 +36975,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Gandipet",
-    "village": null,
+    "village": "Manchirevula",
     "survey_numbers": [],
     "area_acres": 19.22,
     "custodian_agency": null,
@@ -36901,7 +36998,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/7390620713, 633 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -36999,7 +37097,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Gandipet",
-    "village": null,
+    "village": "Bairagiguda",
     "survey_numbers": [],
     "area_acres": 17.33,
     "custodian_agency": null,
@@ -37022,7 +37120,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/7392766953, 759 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -38212,7 +38311,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Medchal–Malkajgiri",
     "mandal": "Balanagar",
-    "village": null,
+    "village": "Idpl",
     "survey_numbers": [],
     "area_acres": 39.31,
     "custodian_agency": null,
@@ -38235,7 +38334,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2924213339, 4416 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -38401,7 +38501,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Abdullapurmet",
-    "village": null,
+    "village": "Kuntloor",
     "survey_numbers": [],
     "area_acres": 62.88,
     "custodian_agency": null,
@@ -38424,7 +38524,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/981868945, 3593 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -38842,7 +38943,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "HITEC City",
     "survey_numbers": [],
     "area_acres": 16.38,
     "custodian_agency": null,
@@ -38865,7 +38966,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2926946739, 749 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -38983,7 +39085,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Kondapur",
     "survey_numbers": [],
     "area_acres": 9.24,
     "custodian_agency": null,
@@ -39005,7 +39107,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2237665097, 1340 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -39359,7 +39462,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Masjid Banda",
     "survey_numbers": [],
     "area_acres": 15.54,
     "custodian_agency": null,
@@ -39382,7 +39485,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2926299112, 2281 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -39556,7 +39660,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Gowlidoddi",
     "survey_numbers": [],
     "area_acres": 9.42,
     "custodian_agency": null,
@@ -39579,7 +39683,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap village node/7098530570, 1883 m away: nearest place in the mandal, not the revenue village"
    }
   },
   {
@@ -39793,7 +39898,7 @@
     "cohort": "D_UNNOTIFIED",
     "district": "Ranga Reddy",
     "mandal": "Serilingampalle",
-    "village": null,
+    "village": "Masjid Banda",
     "survey_numbers": [],
     "area_acres": 6.31,
     "custodian_agency": null,
@@ -39816,7 +39921,8 @@
     },
     "matched_case_names": [],
     "notes": "OSM water outline used as a stand-in boundary. Not a certified FTL.",
-    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)"
+    "area_source": "OpenStreetMap administrative boundaries (not the revenue record)",
+    "village_source": "OpenStreetMap suburb node/2926299112, 2408 m away: nearest place in the mandal, not the revenue village"
    }
   }
  ]

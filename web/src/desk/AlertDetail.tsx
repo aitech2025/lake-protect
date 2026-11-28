@@ -11,6 +11,7 @@ import { PageState } from "../components/PageState";
 import { AckBanner } from "./Inbox";
 import { notifyCountChanged } from "../components/Layout";
 import { CitizenMain, CitizenSide } from "./CitizenActions";
+import { CaseworkSteps, FieldWork } from "./Casework";
 
 const OUTCOMES = ["real_change", "not_real", "needs_site_visit"] as const;
 
@@ -93,6 +94,7 @@ export function AlertDetail() {
             <span className="change-type" data-testid="change-type">{t(`change.${cand.change_type}`)}</span>
             <span>{t("queue.acres", { acres: a.area_acres })}</span>
             {cand.stage_estimate && <span>{t(`stage.${cand.stage_estimate}`)}</span>}
+            {a.assignment?.open && <span data-testid="assigned-to">{t("case.assigned_to", { name: a.assignment.field_officer })}</span>}
           </div>
         </div>
         <BoundarySeal status={a.boundary.status} version={a.boundary.version} />
@@ -110,7 +112,8 @@ export function AlertDetail() {
       <div className="detail">
         <section className="panel detail-decision" aria-labelledby="next-step-title">
           <h2 id="next-step-title" className="title-s">{t("detail.actions_title")}</h2>
-          {a.officer ? <CitizenSide a={a} onDone={reload} /> : <Actions alert={a} onDone={reload} />}
+          <Actions alert={a} onDone={reload} />
+          {a.officer && <CitizenSide a={a} onDone={reload} />}
           {a.satellite_review && <SatelliteReviewPanel a={a} />}
         </section>
 
@@ -144,6 +147,7 @@ export function AlertDetail() {
             </div>
           ) : null}
 
+          <FieldWork a={a} />
           {a.officer && <CitizenMain a={a} onDone={reload} />}
 
           <section className="section">
@@ -277,24 +281,18 @@ function Actions({ alert, onDone }: { alert: any; onDone: () => void }) {
 
   const actions: any[] = alert.allowed_actions;
   const review = actions.find((x) => x.action === "review");
-  const steps = actions.filter((x) => x.action === "transition");
-  const admin = isAdmin(user);
-  const open = !["CLOSED"].includes(alert.state);
+  const steps = actions.filter((x) => x.action !== "review" && x.action !== "evidence_pack");
+  const waiting = alert.state === "RECOMMENDED" ? "action.wait_senior" : alert.state === "FIELD_VISIT" ? "action.wait_field" : alert.state === "FIELD_REPORTED" ? "action.wait_district" : null;
 
   return (
     <div className="actions" style={{ marginTop: "0.75rem" }} data-testid="actions">
-      {actions.length === 0 && (
-        <p className="muted small">{alert.state === "CLOSED" ? t("action.closed") : admin ? t("action.wait_review") : t("action.none")}</p>
+      {review == null && steps.length === 0 && (
+        <p className="muted small">
+          {alert.state === "CLOSED" ? t("action.closed") : isAdmin(user) ? t("action.admin_maintains") : waiting ? t(waiting, { name: alert.assignment?.field_officer ?? "" }) : t("action.none")}
+        </p>
       )}
+      <CaseworkSteps alert={alert} steps={steps} onDone={(msg) => { show(msg); onDone(); }} />
       {review && <ReviewForm alertId={alert.id} already={review.already_reviewed} onDone={(msg) => { show(msg); onDone(); }} />}
-      {steps.map((x) => (
-        <DecisionForm key={x.to} alertId={alert.id} to={x.to} citizen={alert.citizen_reports > 0} onDone={(msg) => { show(msg); onDone(); }} />
-      ))}
-      {admin && open && (
-        <button className="btn quiet" onClick={() => api(`/alerts/${alert.id}/imagery-request`, { json: {} }).then(() => show(t("detail.imagery_done")))}>
-          {t("detail.imagery")}
-        </button>
-      )}
       {message && <p className="banner info" role="status" tabIndex={-1} ref={messageRef}>{message.text}</p>}
     </div>
   );
@@ -336,74 +334,13 @@ function ReviewForm({ alertId, already, onDone }: { alertId: number; already: bo
   );
 }
 
-const DEPARTMENTS = ["revenue", "municipal", "irrigation", "hydraa", "forest", "endowments", "waqf"];
-
-function DecisionForm({ alertId, to, citizen, onDone }: { alertId: number; to: string; citizen: boolean; onDone: (msg: string) => void }) {
-  const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const [note, setNote] = useState("");
-  const [department, setDepartment] = useState("");
-  const [falseReport, setFalseReport] = useState(false);
-  const forCitizen = citizen && to === "DISMISSED";
-  const [error, setError] = useState<string | null>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
-  useEffect(() => {
-    if (open) headingRef.current?.focus();
-  }, [open]);
-  const danger = to === "DISMISSED";
-  if (!open) {
-    return (
-      <button className={`btn ${danger ? "danger" : to === "CLOSED" ? "secondary" : ""}`} onClick={() => setOpen(true)} data-testid={`action-${to}`}>
-        {t(`action.${to}`)}
-      </button>
-    );
-  }
-  const submit = async () => {
-    setError(null);
-    try {
-      await api(`/alerts/${alertId}/transitions`, {
-        json: forCitizen ? { to, note, citizen_department: department || null, citizen_false_report: falseReport } : { to, note },
-      });
-      setOpen(false);
-      setNote("");
-      onDone(t("action.done"));
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  };
-  return (
-    <div className="action" data-testid={`form-${to}`}>
-      <h3 className="title-xs" tabIndex={-1} ref={headingRef}>{t(`action.${to}`)}</h3>
-      <label className="field">{t("action.note")}<textarea rows={3} value={note} onChange={(e) => setNote(e.target.value)} data-testid="input-note" /></label>
-      {forCitizen && (
-        <>
-          <label className="field">{t("citizen_incident.department")}
-            <select value={department} onChange={(e) => setDepartment(e.target.value)} data-testid="input-department">
-              <option value="">{t("citizen_incident.no_department")}</option>
-              {DEPARTMENTS.map((d) => <option key={d} value={d}>{t(`reports.dept.${d}`)}</option>)}
-            </select>
-          </label>
-          <label className="check"><input type="checkbox" checked={falseReport} onChange={(e) => setFalseReport(e.target.checked)} /> {t("reports.false_report")}</label>
-          <p className="small muted">{t("citizen_incident.told")}</p>
-        </>
-      )}
-      {error && <p className="error" role="alert">{error}</p>}
-      <div style={{ display: "flex", gap: "0.5rem" }}>
-        <button className={`btn ${danger ? "danger" : ""}`} disabled={!note.trim()} onClick={() => void submit()} data-testid="submit-action">{t("action.submit")}</button>
-        <button className="btn secondary" onClick={() => setOpen(false)}>{t("action.cancel")}</button>
-      </div>
-    </div>
-  );
-}
-
 function EvidencePanel({ alert, onChange }: { alert: any; onChange: () => void }) {
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const packs: any[] = alert.evidence_packs;
   const latest = packs[packs.length - 1];
-  const canMake = isAdmin(user) && alert.resolution === "confirmed";
+  const canMake = alert.allowed_actions.some((x: any) => x.action === "evidence_pack");
   if (!latest && !canMake) return null;
   const make = async () => {
     setBusy(true);

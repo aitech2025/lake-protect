@@ -276,7 +276,7 @@ def _officer_blocks(db: Session, alert: Alert, asset: Asset, users: dict, user: 
         "officer": None if not citizen else {
             "acknowledged_by_me": any(n["kind"] == "acknowledged" and n["author"] == user.name for n in notes),
             "acknowledged_by": [n["author"] for n in notes if n["kind"] == "acknowledged"],
-            "can_decide": alert.state in lifecycle.REVIEWABLE,
+            "can_decide": alert.state in lifecycle.RECOMMENDABLE,
             "can_close": alert.state in (lifecycle.S.CONFIRMED.value, lifecycle.S.DISMISSED.value),
             "can_approve_imagery": user.role == "senior_official",
             "can_watch": not asset.monitored,
@@ -319,6 +319,18 @@ def _casework_block(db: Session, alert: Alert, users: dict) -> dict:
         },
         "recommendations": len(recs),
         "district_officer_covers": not access.uncovered(db, asset),
+    }
+
+
+def _can(db: Session, alert: Alert, user: User) -> dict:
+    """What this person may do around the lifecycle steps (D-067): the screens follow it; the server checks it."""
+    who = lifecycle.Actor(db, alert, user)
+    open_ = alert.state != lifecycle.S.CLOSED.value
+    return {
+        "act": who.officer,  # acknowledge, satellite looks, sharper images, legal records, the weekly watch
+        "note": open_ and (who.officer or who.assigned),  # notes and documents: the officers and the field officer on the visit
+        "approve_imagery": user.role == "senior_official",
+        "field_report": who.assigned and alert.state == lifecycle.S.FIELD_VISIT.value,
     }
 
 
@@ -411,6 +423,7 @@ def detail(db: Session, alert: Alert, user: User) -> dict:
             for t in timeline
         ],
         "allowed_actions": lifecycle.allowed_actions(db, alert, user),
+        "can": _can(db, alert, user),
         # What this person was sent about the incident and has not acknowledged yet, while it is
         # still open or under review (D-059).
         "my_notifications": [] if alert.state not in lifecycle.UNDECIDED else [

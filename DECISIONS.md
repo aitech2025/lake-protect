@@ -531,6 +531,62 @@ Built as M21 (migration 0019, `app/workflow/incidents.py`, `app/access.py`):
   to `senior_official`. The role accounts become demo.admin, demo.senior, demo.district1 and
   demo.district2 (the old viewers, renamed), demo.field1 and demo.field2 (`data/accounts.yml`).
 
+### D-068: The Map page and the Overview open on a world map fitted to Hyderabad (owner, 28 Nov 2026)
+The owner found the map page "looking like an image, not a map" and asked for a map like Google
+Earth on the Map page and the Overview: Hyderabad first, zooming out to Telangana, India and the
+globe, always opening fitted to Hyderabad inside its box.
+- **Base map.** OpenFreeMap's OpenStreetMap street style (no key, no account) on MapLibre's globe.
+  - **Labels:** Latin script only; the map renderer cannot join Telugu letters.
+  - **Borders:** country borders from India's point of view (Natural Earth 1:10m,
+    `ne_10m_admin_0_countries_ind`, public domain). The tiles' own national and disputed lines are
+    hidden.
+  - **Telangana:** the State's outline (OpenStreetMap relation 3250963, simplified to about 100 m)
+    is drawn on top.
+  - **Files:** these outlines are `web/public/context/*.geojson`. They are map context, not legal
+    boundaries.
+- **Satellite.** A Map/Satellite switch lays the Sentinel-2 tiles of the ORR area (D-047) over the
+  street map. Each browser remembers the choice.
+- **Fit.** Each map opens fitted to its locations, or the ORR box when there are none.
+  - **Panels:** the fit keeps the locations clear of the heading, legend and note drawn over the map.
+  - **Resizing:** the map fits again when its box changes size, until the viewer moves it.
+  - **Fit button:** puts the map back on the locations at any time.
+- **Internet.** For these two maps this reverses D-047's "the real-lake maps need no internet".
+  - **What leaves:** the street map comes from tiles.openfreemap.org, which sees the part of the
+    map being viewed. No user or case data is sent.
+  - **Offline:** with no internet, or with `LP_BASEMAP_STYLE=offline` at build time, the maps fall
+    back to local files: country shapes, borders, Telangana and the Sentinel-2 tiles.
+    `LP_BASEMAP_STYLE` can also name another style URL.
+  - **Other maps:** the incident, location and report maps are unchanged.
+  - **Offline check:** M9 allows only the base-map host and checks that the Overview map still
+    draws without it.
+
+### D-069: Every real lake has a village, and one area picker serves every list (owner, 28 Nov 2026)
+The owner asked that every lake carry its village, mandal and district, and that the district and
+mandal dropdowns work everywhere in the app.
+- **Village.** OpenStreetMap has no revenue-village boundaries around Hyderabad. `lp assets-areas`
+  therefore names each lake's village after the nearest OpenStreetMap place inside its mandal:
+  1. a village, town or suburb within 5 km;
+  2. otherwise a hamlet, locality or neighbourhood within 3 km;
+  3. otherwise any village, town or suburb within 8 km, in any mandal.
+
+  All 99 lakes have one: 70 are named after suburbs and 29 after villages, the farthest 4.4 km away.
+  - **Source:** each lake's `village_source` gives the OpenStreetMap node and its distance, and says
+    "not the revenue village". The loader copies it into the audit entry.
+  - **Saved response:** `data/sources/overpass_places_orr.json`.
+  - **Replaced later:** government records replace these villages when they are loaded.
+- **Overview.** A mandal now lists its villages and a village its lakes. D-060's skipped village
+  level no longer applies to the real lakes. A village view has "Back to mandal".
+- **Area picker.** Locations and Incidents share one District → Mandal → Village picker
+  (`web/src/components/AreaFilter.tsx`).
+  - **Lists:** each list holds only the areas inside the one picked above it. Picking a lower level
+    first fills in the levels above.
+  - **Address:** the area is kept in the address, so a narrowed list can be refreshed and shared,
+    and the Overview's links open with the area shown in the picker.
+  - **Incidents:** the API applies the area.
+  - **Add location:** suggests districts, mandals and villages from the locations already recorded.
+  - **Officials:** area assignment stays district and mandal, as notifications are routed by those
+    (D-059).
+
 ## Errors and gaps found in CONTEXT.md
 
 ### E-001: `boundaries` is append-only but has `valid_to` (section 7, invariant 12)

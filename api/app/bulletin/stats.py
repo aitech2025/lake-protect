@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 from app.clock import as_utc
 
 WAIT_DAYS = 14
-WAITING_STATES = ("OPEN", "UNDER_REVIEW")
+WAITING_STATES = ("OPEN", "UNDER_REVIEW", "FIELD_VISIT", "FIELD_REPORTED", "RECOMMENDED")  # not decided yet (D-067)
 
 
 @dataclass(frozen=True)

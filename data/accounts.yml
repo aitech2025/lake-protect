@@ -1,25 +1,50 @@
-# Role accounts (DECISIONS.md D-065). GeoGuard holds no real people's accounts yet: these are the
-# sign-in accounts the owner kept when the demo world was removed. They work on real data only.
+# Role accounts (DECISIONS.md D-065, D-067). GeoGuard holds no real people's accounts yet: these are
+# the sign-in accounts for the four personas. They work on real data only.
 # Contact details are placeholders (.invalid addresses, 0000 numbers): nothing is ever delivered.
-# Areas are real districts; officials are notified of incidents in them.
+# Areas are real districts: district and field officers see and are told about incidents in them.
 users:
   - {username: demo.admin, name: Demo Admin, role: admin, email: demo.admin@geoguard.invalid, channels: [in_app, email]}
-  - username: demo.viewer1
-    name: Demo Official 1
-    role: viewer
+  - username: demo.senior
+    name: Demo Senior Official
+    role: senior_official
+    email: demo.senior@geoguard.invalid
+    phone: "+910000000003"
+    channels: [in_app, email]
+  - username: demo.district1
+    name: Demo District Officer 1
+    role: district_officer
     language: te
-    email: demo.viewer1@geoguard.invalid
+    email: demo.district1@geoguard.invalid
     phone: "+910000000001"
     channels: [in_app, email, sms]
     areas:
       - {district: Hyderabad}
       - {district: Ranga Reddy}
-  - username: demo.viewer2
-    name: Demo Official 2
-    role: viewer
-    email: demo.viewer2@geoguard.invalid
+  - username: demo.district2
+    name: Demo District Officer 2
+    role: district_officer
+    email: demo.district2@geoguard.invalid
     phone: "+910000000002"
     channels: [in_app, email, whatsapp]
+    areas:
+      - {district: Medchal–Malkajgiri}
+      - {district: Sangareddy}
+  - username: demo.field1
+    name: Demo Field Officer 1
+    role: field_officer
+    language: te
+    email: demo.field1@geoguard.invalid
+    phone: "+910000000004"
+    channels: [in_app, sms]
+    areas:
+      - {district: Hyderabad}
+      - {district: Ranga Reddy}
+  - username: demo.field2
+    name: Demo Field Officer 2
+    role: field_officer
+    email: demo.field2@geoguard.invalid
+    phone: "+910000000005"
+    channels: [in_app, email]
     areas:
       - {district: Medchal–Malkajgiri}
       - {district: Sangareddy}

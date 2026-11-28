@@ -31,6 +31,6 @@ def test_processing_runs_list_with_and_without_filter(client, db):
 
 
 def test_intelligence_lists_are_admin_only(client, db):
-    viewer = make_user(db, "viewer")
+    viewer = make_user(db, "senior_official")
     for path in ("/api/v1/intelligence/evaluations", "/api/v1/intelligence/processing-runs"):
         assert client.get(path, headers=auth(viewer)).status_code == 403

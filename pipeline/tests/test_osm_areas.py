@@ -1,5 +1,5 @@
 """Placing real lakes in their district and mandal from OpenStreetMap boundaries (D-060)."""
-from lake_protect.osm_areas import AREA_SOURCE, areas, clean_name, place
+from lake_protect.osm_areas import AREA_SOURCE, areas, clean_name, place, places
 
 
 def _square_relation(rel_id: int, level: str, name: str, w: float, s: float, e: float, n: float) -> dict:
@@ -42,3 +42,36 @@ def test_each_lake_takes_the_boundaries_holding_a_point_on_it():
     assert (east["district"], east["mandal"], east["area_source"]) == ("Test District", "East", AREA_SOURCE)
     assert west["mandal"] == "West"
     assert "district" not in away and away["area_source"] is None
+
+
+def _node(node_id: int, place: str, name: str, lon: float, lat: float) -> dict:
+    return {"type": "node", "id": node_id, "lon": lon, "lat": lat, "tags": {"place": place, "name": name}}
+
+
+def test_each_lake_takes_the_nearest_settlement_in_its_mandal_as_its_village():
+    found = areas(PAYLOAD)
+    named = places({"response": {"elements": [
+        _node(10, "village", "Eastpur", 1.03, 1.0),        # in East mandal: 1.1 km from the east lake, 2.8 km from the edge lake
+        _node(11, "suburb", "Acrossline", 0.997, 1.0),     # 0.9 km from the edge lake, but in West mandal
+        _node(12, "neighbourhood", "Colony", 1.021, 1.0),  # 0.1 km from the east lake, but only a neighbourhood
+        _node(13, "hamlet", "Smallpalle", 1.05, 1.5),      # the only place near the north lake
+        _node(14, "village", "Far", 9.0, 9.0),
+        {"type": "node", "id": 15, "lon": 1.5, "lat": 1.0, "tags": {"place": "village"}},  # no name: ignored
+    ]}})
+    assert [p["name"] for p in named] == ["Eastpur", "Acrossline", "Colony", "Smallpalle", "Far"]
+    features = [_lake("east", 1.02, 1.0), _lake("edge", 1.005, 1.0), _lake("north", 1.04, 1.5), _lake("away", 5.0, 5.0)]
+    out = place(features, found, named)
+    assert out["village"] == 3
+    east, edge, north, away = (f["properties"] for f in features)
+    assert east["village"] == "Eastpur" and "node/10" in east["village_source"] and "not the revenue village" in east["village_source"]
+    # The suburb across the mandal line is nearer, but a lake's village lies in its own mandal.
+    assert edge["village"] == "Eastpur"
+    assert north["village"] == "Smallpalle"
+    assert away["village"] is None and away["village_source"] is None
+
+
+def test_without_places_the_village_is_left_alone():
+    features = [_lake("east", 1.5, 1.0)]
+    features[0]["properties"]["village"] = "Kept"
+    out = place(features, areas(PAYLOAD))
+    assert "village" not in out and features[0]["properties"]["village"] == "Kept"

@@ -57,6 +57,29 @@ def alert_sql(user: User, alert_alias: str = "al", asset_alias: str = "a") -> st
     return "FALSE"
 
 
+def report_sql(user: User, report_alias: str = "cr") -> str:
+    """SQL condition on a `citizen_reports` alias. A report with no place yet is State-level until it is placed."""
+    if statewide(user):
+        return "TRUE"
+    if user.role == Role.district_officer.value:
+        return (f"EXISTS (SELECT 1 FROM assets ra WHERE ra.id = {report_alias}.asset_id "
+                f"AND {COVERS.format(user=int(user.id), asset='ra')})")
+    if user.role == Role.field_officer.value:
+        return _ASSIGNED.format(alert=f"{report_alias}.alert_id", user=int(user.id))
+    return "FALSE"
+
+
+def require_report(db: Session, user: User, report_id: int):
+    from app.models import CitizenReport
+
+    report = db.get(CitizenReport, report_id)
+    if report is None:
+        raise HTTPException(404, "Report not found")
+    if not statewide(user) and not db.scalar(text(f"SELECT {report_sql(user, 'cr')} FROM citizen_reports cr WHERE cr.id = :i"), {"i": report_id}):
+        raise HTTPException(403, OUTSIDE)
+    return report
+
+
 def covers(db: Session, user: User, asset: Asset) -> bool:
     """Is this district officer's area where the asset is?"""
     if user.role != Role.district_officer.value or not (asset.district or "").strip():

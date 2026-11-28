@@ -148,7 +148,7 @@ def test_hydraa_upgrades_a_preliminary_lake_and_adds_recovered_land(db, client, 
     assert (parcel.type, parcel.cohort) == ("recovered_parcel", "A_RECOVERED")
     assert parcel.survey_numbers == ["41", "42"]
 
-    analyst = make_user(db, "viewer")
+    analyst = make_user(db, "senior_official")
     # Imported connector samples are explicitly demo records (D-056/D-065). They remain
     # inspectable in the import report and database, but must not leak into the real-asset API.
     listed = {f["properties"]["asset_key"] for f in client.get("/assets", headers=auth(analyst)).json()["features"]}
@@ -181,7 +181,7 @@ def test_land_records_load_without_owner_names_and_fill_survey_numbers(db, clien
     assert len(a.survey_numbers) > 3
 
     team = Team(db)
-    reg = client.get(f"/assets/{a.id}/register", headers=auth(team.viewer))
+    reg = client.get(f"/assets/{a.id}/register", headers=auth(team.senior))
     assert reg.status_code == 200, reg.text
     body = reg.json()
     assert body["core_area_sq_m"] > 0 and any(p["core"] for p in body["parcels"])
@@ -272,7 +272,8 @@ def test_api_transport_needs_an_agreement_and_refuses_web_pages(db, client, monk
 
 def test_sources_api_roles_and_listing(db, client, isolated_storage):
     team = Team(db)
-    listing = client.get("/sources", headers=auth(team.viewer))
+    assert client.get("/sources", headers=auth(team.district)).status_code == 403  # State-level (D-067)
+    listing = client.get("/sources", headers=auth(team.senior))
     assert listing.status_code == 200
     by_name = {s["name"]: s for s in listing.json()["items"]}
     assert set(by_name) == {"hmda_lpc", "irrigation", "bhu_bharati", "hydraa"}
@@ -281,7 +282,7 @@ def test_sources_api_roles_and_listing(db, client, isolated_storage):
     assert client.get("/sources").status_code == 401
 
     body = {"transport": "sample", "dry_run": True}
-    assert client.post("/sources/hmda_lpc/runs", json=body, headers=auth(team.viewer)).status_code == 403
+    assert client.post("/sources/hmda_lpc/runs", json=body, headers=auth(team.senior)).status_code == 403
     assert client.post("/sources/nowhere/runs", json=body, headers=auth(team.admin)).status_code == 404
     preview = client.post("/sources/hmda_lpc/runs", json=body, headers=auth(team.admin))
     assert preview.status_code == 200 and preview.json()["counts"]["assets_created"] == 3
@@ -289,7 +290,7 @@ def test_sources_api_roles_and_listing(db, client, isolated_storage):
     # GeoGuard holds real data only (D-065): the app never writes the fictional sample register.
     applied = client.post("/sources/hmda_lpc/runs", json={"transport": "sample", "dry_run": False}, headers=auth(team.admin))
     assert applied.status_code == 422 and "preview only" in applied.json()["detail"]
-    assert client.get("/sources/runs", headers=auth(team.viewer)).json()["items"] == []  # a preview writes nothing
+    assert client.get("/sources/runs", headers=auth(team.senior)).json()["items"] == []  # a preview writes nothing
 
 
 @pytest.mark.parametrize("statement", [

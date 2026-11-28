@@ -52,8 +52,8 @@ test("the admin adds, changes, turns off and deletes a satellite source", async 
   await expect(history).toContainText("Changed");
   await expect(history).toContainText("Added");
 
-  // An official sees the sources, with no way to change them.
-  await login(page, "demo.viewer1");
+  // A senior official sees the sources, with no way to change them.
+  await login(page, "demo.senior");
   await page.goto("/satellites");
   await expect(page.getByTestId("sat-row-sentinel-2-l2a")).toBeVisible();
   await expect(page.getByTestId("sat-add")).toHaveCount(0);

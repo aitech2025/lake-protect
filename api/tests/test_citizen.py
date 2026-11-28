@@ -77,10 +77,11 @@ def _token(monkeypatch):
 @pytest.fixture()
 def w(db):
     admin = make_user(db, "admin")
-    north = make_user(db, "viewer")
+    senior = make_user(db, "senior_official")
+    north = make_user(db, "district_officer")
     cover(db, north, "North")
     lake = make_asset(db, district="North", mandal="Mandal A", name="Test Cheruvu North", geometry=square(TG_LON, TG_LAT))
-    return type("W", (), {"admin": admin, "north": north, "lake": lake})
+    return type("W", (), {"admin": admin, "senior": senior, "north": north, "lake": lake})
 
 
 def test_a_report_opens_a_citizen_incident_waiting_for_its_satellite_review_and_officials_are_told(client, db, w):
@@ -101,7 +102,7 @@ def test_a_report_opens_a_citizen_incident_waiting_for_its_satellite_review_and_
     assert (rv.status, rv.source) == ("pending", "sentinel-2")  # the screener answers it; there is no demo sensor
     # The area's official and the admin are told.
     notes = db.scalars(select(Notification).where(Notification.alert_id == alert.id, Notification.kind == "incident_opened")).all()
-    assert {n.user_id for n in notes} == {w.north.id, w.admin.id} and all(n.needs_ack for n in notes)
+    assert {n.user_id for n in notes} == {w.north.id, w.senior.id} and all(n.needs_ack for n in notes)  # the admin only where no one covers it
     body = next(n.body for n in notes if n.user_id == w.north.id)
     assert "Reported by a citizen (web portal), reference " + view["ref"] in body and "reported by a citizen on" in body
     # The incident page carries the report and the pending review; never the reporter.
@@ -192,21 +193,22 @@ def test_the_regular_flow_is_passed_on_to_the_citizen(client, db, w):
     report = report_of(db, view["ref"])
     aid = report.alert_id
     assert client.post(f"/alerts/{aid}/reviews", json={"outcome": "needs_site_visit", "note": "Too small for 10 m pixels"}, headers=auth(w.north)).status_code == 201
-    assert client.post(f"/alerts/{aid}/imagery-request", json={"provider": "commercial_archive"}, headers=auth(w.admin)).status_code == 201
+    assert client.post(f"/alerts/{aid}/imagery-request", json={"provider": "commercial_archive"}, headers=auth(w.north)).status_code == 201
     assert db.scalar(select(ImageryRequest).where(ImageryRequest.alert_id == aid)) is not None
     kinds = [e["kind"] for e in client.get(f"/citizen/reports/{view['ref']}").json()["events"]]
     assert kinds[-2:] == ["under_review", "sharper_images"]
-    # A department goes only with a dismissal.
-    assert client.post(f"/alerts/{aid}/transitions", json={"to": "CONFIRMED", "note": "x", "citizen_department": "revenue"}, headers=auth(w.admin)).status_code == 422
-    assert client.post(f"/alerts/{aid}/transitions", json={"to": "DISMISSED", "note": "x", "citizen_department": "nobody"}, headers=auth(w.admin)).status_code == 422
-    out = client.post(f"/alerts/{aid}/transitions", json={"to": "DISMISSED", "note": "Patta land; sent to the Tahsildar", "citizen_department": "revenue"},
-                      headers=auth(w.admin))
+    # A department goes only with a dismissal. The district officer recommends; the senior official approves (D-067).
+    rec = lambda body: client.post(f"/alerts/{aid}/recommendation", json=body, headers=auth(w.north))  # noqa: E731
+    assert rec({"recommendation": "confirm", "note": "x", "citizen_department": "revenue"}).status_code == 422
+    assert rec({"recommendation": "dismiss", "note": "x", "citizen_department": "nobody"}).status_code == 422
+    assert rec({"recommendation": "dismiss", "note": "Patta land; sent to the Tahsildar", "citizen_department": "revenue"}).status_code == 201
+    out = client.post(f"/alerts/{aid}/transitions", json={"to": "DISMISSED", "note": "Agreed"}, headers=auth(w.senior))
     assert out.status_code == 200, out.text
     public = client.get(f"/citizen/reports/{view['ref']}").json()
     assert (public["status"], public["closed_reason"]) == ("CLOSED", "passed_on")
     assert "Revenue Department" in public["events"][-1]["note"]["en"] and "రెవెన్యూ శాఖ" in public["events"][-1]["note"]["te"]
-    assert "Patta land" not in json.dumps(public)  # the admin's note stays inside
-    assert client.post(f"/alerts/{aid}/transitions", json={"to": "CLOSED", "note": "Closed with the dismissal"}, headers=auth(w.admin)).status_code == 200
+    assert "Patta land" not in json.dumps(public)  # the officers' notes stay inside
+    assert client.post(f"/alerts/{aid}/transitions", json={"to": "CLOSED", "note": "Closed with the dismissal"}, headers=auth(w.senior)).status_code == 200
 
 
 def test_a_report_by_an_open_incident_joins_it_and_a_second_report_follows_the_first(client, db, w):
@@ -220,7 +222,7 @@ def test_a_report_by_an_open_incident_joins_it_and_a_second_report_follows_the_f
     assert r1.alert_id == r2.alert_id == alert.id and r2.duplicate_of == r1.id
     assert db.scalar(select(Alert).where(Alert.origin == "citizen")) is None  # no second incident
     assert all(not n.needs_ack for n in db.scalars(select(Notification).where(Notification.report_id == r1.id)))
-    decide(db, alert, w.admin, to="CONFIRMED", at=utcnow())
+    decide(db, alert, w.senior, to="CONFIRMED", at=utcnow())
     for ref in (first["ref"], second["ref"]):
         assert client.get(f"/citizen/reports/{ref}").json()["closed_reason"] == "incident_confirmed"
 
@@ -235,14 +237,16 @@ def test_words_that_name_a_location_place_the_report_and_others_wait_for_an_offi
     vague = client.post("/reports/intake", data={"data": json.dumps({**form, "location_text": "somewhere near the highway"})}, headers=auth(w.north)).json()
     r2 = db.get(CitizenReport, vague["id"])
     assert r2.alert_id is None and [e["kind"] for e in vague["events"]][-1] == "no_place"
-    asks = db.scalars(select(Notification).where(Notification.report_id == r2.id)).all()
-    assert [n.user_id for n in asks] == [w.admin.id] and asks[0].needs_ack
-    assert client.post(f"/reports/{r2.id}/place", json={"lon": TEST_LON, "lat": TEST_LAT}, headers=auth(w.admin)).status_code == 422  # not Telangana
+    asks = {n.user_id: n for n in db.scalars(select(Notification).where(Notification.report_id == r2.id))}
+    assert set(asks) == {w.senior.id, w.admin.id} and asks[w.senior.id].needs_ack  # no place yet: State-level
+    assert client.post(f"/reports/{r2.id}/place", json={"lon": TG_LON, "lat": TG_LAT}, headers=auth(w.admin)).status_code == 403  # the admin takes no step
+    assert client.post(f"/reports/{r2.id}/place", json={"lon": TEST_LON, "lat": TEST_LAT}, headers=auth(w.senior)).status_code == 422  # not Telangana
     lon, lat = offset(TG_LON, TG_LAT, east_m=2500)
-    placed = client.post(f"/reports/{r2.id}/place", json={"lon": lon, "lat": lat}, headers=auth(w.admin)).json()
+    placed = client.post(f"/reports/{r2.id}/place", json={"lon": lon, "lat": lat}, headers=auth(w.senior)).json()
     assert placed["alert_id"] and placed["status"] == "CHECKING"
-    assert asks[0].acknowledged_at is not None
-    assert client.post(f"/reports/{r2.id}/place", json={"lon": lon, "lat": lat}, headers=auth(w.admin)).status_code == 422
+    db.refresh(asks[w.senior.id])
+    assert asks[w.senior.id].acknowledged_at is not None
+    assert client.post(f"/reports/{r2.id}/place", json={"lon": lon, "lat": lat}, headers=auth(w.senior)).status_code == 422
 
 
 def test_reports_are_refused_outside_the_state_without_a_place_or_in_urdu(client, db, w):
@@ -279,8 +283,9 @@ def test_updates_go_only_to_a_verified_phone(client, db, w, monkeypatch):
     assert len(queued) == 1 and queued[0].text.startswith(f"GeoGuard {report.ref}: Being checked.")  # one update for the first steps
     assert notify.tick(db, utcnow())["citizen_messages"] == {"held": 1}
     aid = report.alert_id
-    client.post(f"/alerts/{aid}/transitions", json={"to": "UNDER_REVIEW", "note": "Looking"}, headers=auth(w.admin))
-    client.post(f"/alerts/{aid}/transitions", json={"to": "DISMISSED", "note": "Nothing there", "citizen_false_report": True}, headers=auth(w.admin))
+    client.post(f"/alerts/{aid}/recommendation", json={"recommendation": "dismiss", "note": "Nothing there", "citizen_false_report": True},
+                headers=auth(w.north))
+    client.post(f"/alerts/{aid}/transitions", json={"to": "DISMISSED", "note": "Agreed"}, headers=auth(w.senior))
     db.refresh(report)
     assert report.false_report is True and report.status == "CLOSED"
     assert service.purge_contacts(db, utcnow() + dt.timedelta(days=91)) == 1

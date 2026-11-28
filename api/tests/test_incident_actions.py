@@ -1,4 +1,5 @@
-"""What officials and the admin do on an incident a citizen reported (DECISIONS.md D-064).
+"""What officers do on an incident a citizen reported (DECISIONS.md D-064, D-067): the district officer of
+the area and the senior official act; the admin maintains the application and takes no step.
 
 Fictional reports and fixtures at a Telangana test point (factories.TG_LON, TG_LAT) or a real
 Hyderabad point, in the test database only. The tests post the screener's answers to satellite looks.
@@ -41,11 +42,13 @@ def _token(monkeypatch):
 @pytest.fixture()
 def w(db):
     admin = make_user(db, "admin")
-    north = make_user(db, "viewer")
-    other = make_user(db, "viewer")
+    senior = make_user(db, "senior_official")
+    north = make_user(db, "district_officer")
+    other = make_user(db, "district_officer")  # another district's officer
     cover(db, north, "North")
+    cover(db, other, "South")
     lake = make_asset(db, district="North", mandal="Mandal A", name="Test Cheruvu North", geometry=square(TG_LON, TG_LAT))
-    return type("W", (), {"admin": admin, "north": north, "other": other, "lake": lake})
+    return type("W", (), {"admin": admin, "senior": senior, "north": north, "other": other, "lake": lake})
 
 
 def test_officials_acknowledge_and_add_notes_and_the_first_acknowledgement_starts_the_review(client, db, w):
@@ -54,17 +57,20 @@ def test_officials_acknowledge_and_add_notes_and_the_first_acknowledgement_start
     out = client.post(f"/alerts/{alert.id}/acknowledge", json={"note": "Seen. Checking the images."}, headers=auth(w.north))
     assert out.status_code == 201 and out.json()["state"] == "UNDER_REVIEW"
     assert client.post(f"/alerts/{alert.id}/acknowledge", json={}, headers=auth(w.north)).status_code == 409  # once each
-    assert client.post(f"/alerts/{alert.id}/acknowledge", json={}, headers=auth(w.admin)).status_code == 201
+    assert client.post(f"/alerts/{alert.id}/acknowledge", json={}, headers=auth(w.admin)).status_code == 403  # the admin takes no step
+    assert client.post(f"/alerts/{alert.id}/acknowledge", json={}, headers=auth(w.senior)).status_code == 201
     assert public(client, db, alert)["events"][-1]["kind"] == "under_review"
     mine = db.scalar(select(Notification).where(Notification.alert_id == alert.id, Notification.user_id == w.north.id, Notification.kind == "incident_opened"))
     assert mine.acknowledged_at is not None
     assert client.post(f"/alerts/{alert.id}/notes", json={"text": "Lorry tracks on the bund in the photo."}, headers=auth(w.north)).status_code == 201
-    assert client.post(f"/alerts/{alert.id}/notes", json={"text": "Asked the AE to look on Friday."}, headers=auth(w.admin)).status_code == 201
-    assert client.post(f"/alerts/{alert.id}/notes", json={"text": "  "}, headers=auth(w.admin)).status_code == 422
-    detail = client.get(f"/alerts/{alert.id}", headers=auth(w.other)).json()
+    assert client.post(f"/alerts/{alert.id}/notes", json={"text": "Asked the AE to look on Friday."}, headers=auth(w.senior)).status_code == 201
+    assert client.post(f"/alerts/{alert.id}/notes", json={"text": "  "}, headers=auth(w.senior)).status_code == 422
+    assert client.post(f"/alerts/{alert.id}/notes", json={"text": "x"}, headers=auth(w.admin)).status_code == 403
+    assert client.get(f"/alerts/{alert.id}", headers=auth(w.other)).status_code == 403  # another district
+    detail = client.get(f"/alerts/{alert.id}", headers=auth(w.admin)).json()
     assert [(n["kind"], n["author"]) for n in detail["notes"]] == [
-        ("acknowledged", w.north.name), ("acknowledged", w.admin.name), ("note", w.north.name), ("note", w.admin.name)]
-    assert detail["officer"]["acknowledged_by"] == [w.north.name, w.admin.name] and not detail["officer"]["acknowledged_by_me"]
+        ("acknowledged", w.north.name), ("acknowledged", w.senior.name), ("note", w.north.name), ("note", w.senior.name)]
+    assert detail["officer"]["acknowledged_by"] == [w.north.name, w.senior.name] and not detail["officer"]["acknowledged_by_me"]
     assert "Lorry tracks" not in json.dumps(public(client, db, alert))  # notes stay inside
     with pytest.raises(DBAPIError, match="append-only"):
         with db.begin_nested():
@@ -92,7 +98,7 @@ def test_satellite_looks_latest_and_by_date_compare_without_replacing_the_eviden
     db.refresh(cand)
     evidence = (cand.before_chip, cand.after_chip)
     latest = client.post(f"/alerts/{alert.id}/satellite-looks", json={}, headers=auth(w.north)).json()
-    earlier = client.post(f"/alerts/{alert.id}/satellite-looks", json={"date": past.isoformat()}, headers=auth(w.admin)).json()
+    earlier = client.post(f"/alerts/{alert.id}/satellite-looks", json={"date": past.isoformat()}, headers=auth(w.senior)).json()
     assert latest["status"] == earlier["status"] == "pending"  # the screener answers each look
     items = {r["id"]: r for r in client.get("/pipeline/reviews", headers=TOKEN).json()["reviews"]}
     assert (items[latest["id"]]["look_date"], items[earlier["id"]]["look_date"]) == (None, past.isoformat())
@@ -115,7 +121,7 @@ def test_satellite_looks_latest_and_by_date_compare_without_replacing_the_eviden
 
 
 def test_a_real_look_waits_for_the_screener_and_comes_back_to_whoever_asked(client, db):
-    official = make_user(db, "viewer", is_demo=False)
+    official = make_user(db, "senior_official", is_demo=False)
     alert = report(client, db, lon=78.4740, lat=17.3850)
     asked = client.post(f"/alerts/{alert.id}/satellite-looks", json={"date": "2025-01-15"}, headers=auth(official)).json()
     assert asked["status"] == "pending"
@@ -128,24 +134,26 @@ def test_a_real_look_waits_for_the_screener_and_comes_back_to_whoever_asked(clie
     assert [n.user_id for n in told] == [official.id]
 
 
-def test_a_sharper_image_an_official_asks_for_waits_for_the_admin(client, db, w):
+def test_a_sharper_image_a_district_officer_asks_for_waits_for_the_senior_official(client, db, w):
     alert = report(client, db)
     req = client.post(f"/alerts/{alert.id}/imagery-request", json={"provider": "commercial_tasking", "note": "Need to see the posts"},
                       headers=auth(w.north)).json()
     assert req["status"] == "requested" and req["est_cost_usd"] > 0
     url = f"/alerts/{alert.id}/imagery-requests/{req['id']}/decision"
     assert client.post(url, json={"approve": True}, headers=auth(w.north)).status_code == 403
-    assert client.post(url, json={"approve": True, "note": "Within budget"}, headers=auth(w.admin)).json()["status"] == "approved"
-    assert client.post(url, json={"approve": False}, headers=auth(w.admin)).status_code == 409
-    own = client.post(f"/alerts/{alert.id}/imagery-request", json={"provider": "isro_nrsc"}, headers=auth(w.admin)).json()
+    assert client.post(url, json={"approve": True}, headers=auth(w.admin)).status_code == 403
+    assert client.post(url, json={"approve": True, "note": "Within budget"}, headers=auth(w.senior)).json()["status"] == "approved"
+    assert client.post(url, json={"approve": False}, headers=auth(w.senior)).status_code == 409
+    own = client.post(f"/alerts/{alert.id}/imagery-request", json={"provider": "isro_nrsc"}, headers=auth(w.senior)).json()
     assert own["status"] == "approved"
     detail = client.get(f"/alerts/{alert.id}", headers=auth(w.north)).json()
     first = detail["imagery_requests"][0]
-    assert (first["requested_by"], first["decided_by"], first["decision_note"], first["note"]) == (w.north.name, w.admin.name, "Within budget", "Need to see the posts")
+    assert (first["requested_by"], first["decided_by"], first["decision_note"], first["note"]) == (w.north.name, w.senior.name, "Within budget", "Need to see the posts")
     assert public(client, db, alert)["events"][-1]["kind"] == "sharper_images"
     far_lake = make_asset(db, district="North", geometry=square(*offset(TG_LON, TG_LAT, east_m=5000)))
     _, satellite = ingest(db, far_lake, geometry=square(*offset(TG_LON, TG_LAT, east_m=5000), side_m=60))
-    assert client.post(f"/alerts/{satellite.id}/imagery-request", json={"provider": "isro_nrsc"}, headers=auth(w.north)).status_code == 403
+    assert client.post(f"/alerts/{satellite.id}/imagery-request", json={"provider": "isro_nrsc"}, headers=auth(w.north)).status_code == 201
+    assert client.post(f"/alerts/{satellite.id}/imagery-request", json={"provider": "isro_nrsc"}, headers=auth(w.admin)).status_code == 403
 
 
 def test_legal_records_and_documents_are_attached_to_the_incident(client, db, w):
@@ -163,9 +171,10 @@ def test_legal_records_and_documents_are_attached_to_the_incident(client, db, w)
     assert [d["reference"] for d in snap["documents"]] == ["TEST/SWN/2026/7"]
     assert [(k["case_no"], k["status"]) for k in snap["court_cases"]] == [("WP 1/2026", "pending")]
     assert snap["legal_check"]["verdict"] and any("22A" in x for x in snap["not_connected"])
-    client.post(f"/alerts/{alert.id}/legal-records", headers=auth(w.admin))
+    assert client.post(f"/alerts/{alert.id}/legal-records", headers=auth(w.admin)).status_code == 403
+    client.post(f"/alerts/{alert.id}/legal-records", headers=auth(w.senior))
     detail = client.get(f"/alerts/{alert.id}", headers=auth(w.north)).json()
-    assert detail["legal_records"]["snapshots"] == 2 and detail["legal_records"]["by"] == w.admin.name
+    assert detail["legal_records"]["snapshots"] == 2 and detail["legal_records"]["by"] == w.senior.name
     assert [d["title"] for d in detail["documents_attached"]] == ["Test stop-work notice"]
     # The document is the location's too.
     assert any(d["reference"] == "TEST/SWN/2026/7" for d in client.get(f"/assets/{w.lake.id}/documents", headers=auth(w.admin)).json()["items"])
@@ -174,33 +183,44 @@ def test_legal_records_and_documents_are_attached_to_the_incident(client, db, w)
             db.execute(text("DELETE FROM incident_legal_records WHERE alert_id = :a"), {"a": alert.id})
 
 
-def test_officials_approve_or_decline_with_notes_then_close(client, db, w):
+def test_the_district_officer_recommends_and_the_senior_official_approves_then_closes(client, db, w):
     approved = report(client, db)
-    out = client.post(f"/alerts/{approved.id}/decision", json={"decision": "approve", "note": "Fill confirmed on the look of today"},
+    rec = client.post(f"/alerts/{approved.id}/recommendation", json={"recommendation": "confirm", "note": "Fill confirmed on the look of today"},
                       headers=auth(w.north))
-    assert out.status_code == 200 and out.json()["state"] == "CONFIRMED"
+    assert rec.status_code == 201 and rec.json()["state"] == "RECOMMENDED"
+    asked = db.scalars(select(Notification.user_id).where(Notification.alert_id == approved.id, Notification.kind == "recommended")).all()
+    assert asked == [w.senior.id]
+    ok = client.post(f"/alerts/{approved.id}/transitions", json={"to": "CONFIRMED", "note": "Approved"}, headers=auth(w.senior))
+    assert ok.status_code == 200 and ok.json()["state"] == "CONFIRMED"
     told = db.scalars(select(Notification.user_id).where(Notification.alert_id == approved.id, Notification.kind == "incident_decided")).all()
-    assert w.admin.id in told  # the admin hears every official's decision
+    assert w.north.id in told
     assert public(client, db, approved)["closed_reason"] == "incident_confirmed"
-    assert client.post(f"/alerts/{approved.id}/decision", json={"decision": "close", "note": ""}, headers=auth(w.north)).status_code == 422
-    assert client.post(f"/alerts/{approved.id}/decision", json={"decision": "close", "note": "Sent to Irrigation"}, headers=auth(w.north)).json()["state"] == "CLOSED"
+    assert client.post(f"/alerts/{approved.id}/transitions", json={"to": "CLOSED", "note": ""}, headers=auth(w.senior)).status_code == 422
+    assert client.post(f"/alerts/{approved.id}/transitions", json={"to": "CLOSED", "note": "Sent to Irrigation"}, headers=auth(w.north)).status_code == 403
+    assert client.post(f"/alerts/{approved.id}/transitions", json={"to": "CLOSED", "note": "Sent to Irrigation"}, headers=auth(w.senior)).json()["state"] == "CLOSED"
 
-    lon, lat = offset(TG_LON, TG_LAT, east_m=3000)
-    declined = report(client, db, lon=lon, lat=lat)
-    out = client.post(f"/alerts/{declined.id}/decision", json={"decision": "decline", "note": "Patta land", "citizen_department": "revenue",
-                                                               "citizen_false_report": True}, headers=auth(w.admin))
+    # A dismissal passed to a department is set in the recommendation and applied on approval.
+    again = report(client, db)
+    assert again.id != approved.id
+    client.post(f"/alerts/{again.id}/recommendation", json={"recommendation": "dismiss", "note": "Patta land", "citizen_department": "revenue",
+                                                          "citizen_false_report": True}, headers=auth(w.north))
+    out = client.post(f"/alerts/{again.id}/transitions", json={"to": "DISMISSED", "note": "Agreed"}, headers=auth(w.senior))
     assert out.json()["state"] == "DISMISSED"
-    view = public(client, db, declined)
+    view = public(client, db, again)
     assert view["closed_reason"] == "passed_on" and "Revenue" in view["events"][-1]["note"]["en"]
-    assert db.get(CitizenReport, declined.report_id).false_report is True
-    # Incidents the satellite found keep the admin's decision (D-057).
-    _, satellite = ingest(db, w.lake, at=utcnow(), geometry=square(TG_LON, TG_LAT, side_m=60))
-    assert client.post(f"/alerts/{satellite.id}/decision", json={"decision": "approve", "note": "x"}, headers=auth(w.admin)).status_code == 422
-    assert client.post(f"/alerts/{satellite.id}/transitions", json={"to": "UNDER_REVIEW", "note": "x"}, headers=auth(w.north)).status_code == 403
+    assert db.get(CitizenReport, again.report_id).false_report is True
+
+    # Where no district officer covers the place, the senior official decides in one step.
+    lon, lat = offset(TG_LON, TG_LAT, east_m=3000)
+    elsewhere = report(client, db, lon=lon, lat=lat)
+    out = client.post(f"/alerts/{elsewhere.id}/transitions", json={"to": "DISMISSED", "note": "Not a change", "citizen_department": "irrigation"},
+                      headers=auth(w.senior))
+    assert out.json()["state"] == "DISMISSED"
+    assert client.post(f"/alerts/{elsewhere.id}/transitions", json={"to": "CLOSED", "note": "x"}, headers=auth(w.admin)).status_code == 403
 
 
 def test_the_place_goes_on_the_weekly_watch(client, db):
-    official = make_user(db, "viewer", is_demo=False)
+    official = make_user(db, "senior_official", is_demo=False)
     alert = report(client, db, lon=78.4740, lat=17.3850)
     place = db.get(Asset, db.get(Candidate, alert.candidate_id).asset_id)
     assert place.monitored is False

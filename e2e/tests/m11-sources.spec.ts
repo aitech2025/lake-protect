@@ -32,8 +32,8 @@ test("the admin previews the fictional lake register without writing anything", 
   expect(runsAfter).toBe(runsBefore);
 });
 
-test("a viewer sees the sources but cannot load them", async ({ page }) => {
-  await login(page, "demo.viewer1");
+test("a senior official sees the sources but cannot load them", async ({ page }) => {
+  await login(page, "demo.senior");
   await page.goto("/sources");
   await expect(page.getByTestId("source-hydraa")).toBeVisible();
   await expect(page.locator('[data-testid^="run-"]')).toHaveCount(0);

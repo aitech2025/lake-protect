@@ -41,14 +41,17 @@
     "citizen_ops": "Citizen operations",
     "account": "Account menu for {{name}}",
     "breadcrumb": "Current page",
-    "switch_language": "Switch language"
+    "switch_language": "Switch language",
+    "field_visits": "My field visits"
   },
   "login": {
     "title": "Sign in with a demo account",
-    "intro": "Each account is a role account, not a person. The admin runs the application; officials see everything and record reviews. Everything shown is real data.",
+    "intro": "Each account is a persona, not a person. Choose one to see the application as that role sees it. Everything shown is real data.",
     "role": {
-      "admin": "Runs the application: sources, documents and decisions on incidents",
-      "viewer": "Sees every location, week and incident, and records reviews"
+      "admin": "Maintains the application: people, locations, sources and settings",
+      "senior_official": "Sees the whole State; approves recommendations and closes incidents",
+      "district_officer": "Sees their districts; sends field officers and recommends decisions",
+      "field_officer": "Visits the places assigned and reports with photos and GPS"
     },
     "citizen": "Are you a citizen? Report a problem on public land",
     "kicker": "Land and asset protection",
@@ -63,15 +66,20 @@
   },
   "role": {
     "admin": "Admin",
-    "viewer": "Official (viewer)",
-    "system": "System"
+    "system": "System",
+    "senior_official": "Senior official",
+    "district_officer": "District officer",
+    "field_officer": "Field officer"
   },
   "state": {
     "OPEN": "Open",
     "UNDER_REVIEW": "Under review",
     "CONFIRMED": "Confirmed",
     "DISMISSED": "Dismissed",
-    "CLOSED": "Closed"
+    "CLOSED": "Closed",
+    "FIELD_VISIT": "Field visit",
+    "FIELD_REPORTED": "Field report in",
+    "RECOMMENDED": "Awaiting approval"
   },
   "group": {
     "active": "Not closed",
@@ -102,7 +110,11 @@
     "CLOSED": "Close the incident",
     "note": "Note (required)",
     "closed": "This incident is closed.",
-    "wait_review": "Waiting for an official's review. You can also start the review yourself."
+    "wait_review": "Waiting for an official's review. You can also start the review yourself.",
+    "admin_maintains": "The admin maintains the application and takes no step on an incident.",
+    "wait_senior": "Waiting for the senior official's approval.",
+    "wait_field": "Waiting for {{name}}'s field report.",
+    "wait_district": "Waiting for the district officer to review the field report."
   },
   "form": {
     "reason": "Reason",
@@ -217,7 +229,9 @@
     "citizen_reports": "{{count}} citizen report(s)",
     "land_group": "Incident category",
     "filters": "Filter incidents",
-    "clear_filters": "Clear filters"
+    "clear_filters": "Clear filters",
+    "field_lede": "{{count}} incidents assigned to you, the open visits first.",
+    "field_empty": "No field visit is assigned to you. A district officer assigns them."
   },
   "detail": {
     "back": "All incidents",
@@ -279,7 +293,7 @@
     "by": "by {{name}}",
     "incident.reviewed": "Reviewed: {{outcome}}",
     "document.added": "Document added",
-    "notify.incident_opened": "Officials notified",
+    "notify.incident_opened": "District officers and senior officials notified",
     "notify.incident_decided": "Officials told of the decision",
     "notification.acknowledged": "Notification acknowledged",
     "incident.acknowledged": "Acknowledged",
@@ -289,7 +303,14 @@
     "imagery.approved": "Sharper image approved",
     "imagery.declined": "Sharper image declined",
     "incident.legal_records_attached": "Legal records attached",
-    "incident.document_attached": "Legal document attached"
+    "incident.document_attached": "Legal document attached",
+    "incident.assigned": "Field officer assigned",
+    "incident.field_reported": "Field report submitted",
+    "incident.recommended": "Decision recommended",
+    "notify.incident_assigned": "Field officer notified",
+    "notify.field_reported": "District officers told of the field report",
+    "notify.recommended": "Senior officials asked to approve",
+    "notify.returned": "Returned with a note"
   },
   "notify": {
     "reviewer": "reviewer",
@@ -421,7 +442,8 @@
     "not_found": "This page could not be found.",
     "home": "Go to your start page",
     "image_loading": "Loading image…",
-    "image_failed": "This image could not be loaded."
+    "image_failed": "This image could not be loaded.",
+    "outside": "This is outside your area."
   },
   "field": {
     "my_alerts": "My alerts",
@@ -754,7 +776,7 @@
     "my_area": "My area",
     "path": "Where you are",
     "not_recorded": "Area not recorded",
-    "area_source": "Districts and mandals of the OpenStreetMap lakes come from OpenStreetMap boundaries, not the revenue record.",
+    "area_source": "Districts and mandals of the OpenStreetMap lakes come from OpenStreetMap boundaries, and villages from the nearest OpenStreetMap place: not the revenue record.",
     "boundary": "{{n}} of {{total}} with a confirmed boundary",
     "no_clear_look": "{{n}} without a clear look",
     "ack_none": "No notifications to officials in the last 30 days",
@@ -775,7 +797,8 @@
       "under_review": "under review",
       "waiting": "waiting over 14 days",
       "confirmed": "confirmed, being acted on",
-      "ack": "notifications acknowledged within 24 hours"
+      "ack": "notifications acknowledged within 24 hours",
+      "awaiting_approval": "awaiting the senior official's approval"
     },
     "tone": {
       "waiting": "Waiting over 14 days",
@@ -806,12 +829,14 @@
       "under_review": "Under review",
       "waiting": "Over 14 days",
       "confirmed": "Confirmed",
-      "week": "Week"
+      "week": "Week",
+      "awaiting_approval": "Awaiting approval"
     },
     "by_category": "Watched, by kind of land",
     "planned": "planned",
     "not_watched": "no longer watched",
     "back_district": "Back to {{district}} district",
+    "back_mandal": "Back to {{mandal}} mandal",
     "back_overview": "Back to state overview",
     "group": {
       "week": "This week's satellite look",
@@ -820,7 +845,8 @@
     },
     "legend": "Map legend",
     "as_chart": "Show as chart",
-    "table_hint": "Numbers open the incidents behind them"
+    "table_hint": "Numbers open the incidents behind them",
+    "on_field_visit": "{{n}} on a field visit"
   },
   "inbox": {
     "title": "Inbox",
@@ -838,7 +864,11 @@
       "not_acknowledged": "Not acknowledged",
       "weekly_digest": "Weekly digest",
       "citizen_report": "Citizen report",
-      "satellite_review": "Satellite review"
+      "satellite_review": "Satellite review",
+      "incident_assigned": "Field visit",
+      "field_reported": "Field report",
+      "recommended": "For approval",
+      "returned": "Returned"
     },
     "open_incident": "Open the incident",
     "open_overview": "Open the overview",
@@ -864,14 +894,14 @@
     },
     "banner": "You were notified about this incident on {{date}}.",
     "banner_reminded": "A reminder followed.",
-    "banner_viewer": "Recording your review acknowledges it.",
-    "banner_admin": "Your next step on it acknowledges it.",
+    "banner_viewer": "Your next step on it acknowledges it.",
+    "banner_admin": "Acknowledge it here once you have seen it.",
     "open_report": "Open report",
     "show_all": "Show all notifications"
   },
   "officials": {
     "title": "Officials",
-    "lede": "Who covers which area, and how each is told. An incident notifies the officials whose area holds it, and the admin.",
+    "lede": "Each person’s persona, the area each district and field officer covers, and how each is told. A new incident notifies the district officers of its area and the senior officials; the admin too where no district officer covers it.",
     "run": "Send queued now",
     "digest": "Send this week’s digest",
     "digest_sent": "Digest for {{week}}: {{n}} sent.",
@@ -905,7 +935,10 @@
       "detail": "Detail",
       "ack": "Acknowledged"
     },
-    "digest_already": "Digest for {{week}}: already sent to everyone."
+    "digest_already": "Digest for {{week}}: already sent to everyone.",
+    "persona": "Persona",
+    "persona_self": "You cannot change your own persona.",
+    "statewide": "Sees the whole State: no areas to set."
   },
   "locations": {
     "count": "{{n}} watched",
@@ -1143,7 +1176,8 @@
     "place_help": "Click where it is. An incident opens there with a satellite review, as for any report.",
     "place": "Place it here",
     "incident_flow": "Officials work this report on its incident: reviews, sharper images, decision and closing.",
-    "photo_count": "{{count}} photos attached"
+    "photo_count": "{{count}} photos attached",
+    "place_officers": "A district officer or a senior official puts a report with no place on the map."
   },
   "citizen_incident": {
     "title": "Reported by a citizen",
@@ -1194,12 +1228,12 @@
     },
     "note_required": "Note (required)",
     "sharper_title": "Sharper image",
-    "sharper_help": "Ask for a sharper paid image of the place. The admin approves it first. Nothing is ordered in the prototype.",
+    "sharper_help": "Ask for a sharper paid image of the place. A senior official approves it first. Nothing is ordered in the prototype.",
     "provider": "Source",
     "why_sharper": "Why it is needed",
     "sharper_request": "Request a sharper image",
     "img_status": {
-      "requested": "Waiting for the admin",
+      "requested": "Waiting for the senior official",
       "approved": "Approved",
       "declined": "Declined",
       "recorded": "Recorded"
@@ -1256,7 +1290,8 @@
     "doc_ref": "Reference number",
     "doc_date": "Issued on",
     "doc_file": "File",
-    "doc_attach": "Attach"
+    "doc_attach": "Attach",
+    "watch_not_yet": "Not on the weekly watch yet. An officer working the incident can add it."
   },
   "sat": {
     "title": "Satellites",
@@ -1398,7 +1433,11 @@
     "hint": "Select a pin to open the location's record.",
     "legend_lake": "Lake or water body",
     "legend_land": "Government land",
-    "legend_stopped": "Not watched"
+    "legend_stopped": "Not watched",
+    "fit": "Fit the map to the locations",
+    "base": "Base map",
+    "base_map": "Map",
+    "base_satellite": "Satellite"
   },
   "inspection": {
     "title": "Field inspections",
@@ -1689,5 +1728,90 @@
     "runs": "Processing runs",
     "no_runs": "No processing runs recorded",
     "no_runs_help": "Runs reported by the pipeline appear here with their status and any error."
+  },
+  "role_help": {
+    "admin": "Maintains the application: people, locations, sources, satellites and settings. Takes no step on an incident.",
+    "senior_official": "Sees the whole State. Approves or returns recommendations and closes incidents.",
+    "district_officer": "Sees only their districts. Reviews incidents, sends field officers and recommends a decision.",
+    "field_officer": "Sees only the incidents assigned to them. Visits the place and submits the field report."
+  },
+  "case": {
+    "start": "Start the review",
+    "start_help": "Tells the citizen, where there is one, that an official is reviewing it.",
+    "assign": "Assign a field officer",
+    "reassign": "Assign another field officer",
+    "assign_help": "The field officer visits the place, records what they find with photos and GPS, and reports back to you.",
+    "withdraw": "Withdraw the field visit",
+    "withdraw_help": "The incident goes back to review. The field officer is no longer asked to visit.",
+    "report": "Submit the field report",
+    "report_help": "Record what you saw at the place. The district officer reviews it and may send it back for another visit.",
+    "return_report": "Return the field report",
+    "return_report_help": "The same field officer is asked to visit again or add evidence. Say what is missing.",
+    "recommend": "Recommend a decision",
+    "recommend_help": "Your recommendation goes to the senior official, who approves it or returns it to you.",
+    "approve_confirm": "Approve: confirm as a real change",
+    "approve_dismiss": "Approve: dismiss as not a real change",
+    "approve_confirm_help": "The incident is confirmed as recommended. You close it afterwards.",
+    "approve_dismiss_help": "The incident is dismissed as recommended. You close it afterwards.",
+    "return_recommendation": "Return to the district officer",
+    "return_recommendation_help": "The incident goes back to review with your note.",
+    "decide_confirm": "Confirm: a real change",
+    "decide_dismiss": "Dismiss: not a real change",
+    "decide_confirm_help": "No district officer covers this place, so you decide it directly.",
+    "decide_dismiss_help": "No district officer covers this place, so you decide it directly.",
+    "close": "Close the incident",
+    "close_help": "Closing records that nothing more is to be done in GeoGuard.",
+    "field_officer": "Field officer",
+    "open_visits": "{{count}} open visits",
+    "no_field_officers": "No field officer covers this place. The admin sets field officers' areas on the Officials page.",
+    "assign_note": "What to check on the visit",
+    "assign_note_hint": "For example: photograph the east bund and the new fill",
+    "assign_submit": "Assign the visit",
+    "assigned": "Field visit assigned.",
+    "assignment_note": "{{name}} asked:",
+    "what_found": "What did you find?",
+    "outcome": {
+      "confirmed": "The change is there on the ground",
+      "false_alarm": "No change on the ground",
+      "cannot_access": "Could not reach the place"
+    },
+    "findings": "Your findings",
+    "findings_hint": "What you saw, where, and anything that explains it",
+    "visited_at": "When you visited",
+    "use_gps": "Use my position",
+    "lat": "Latitude",
+    "lon": "Longitude",
+    "gps_unavailable": "This device cannot give a position.",
+    "gps_finding": "Finding your position…",
+    "gps_found": "Position found, accurate to about {{m}} m.",
+    "gps_failed": "Could not get your position. Enter it, or leave it empty.",
+    "add_photos": "Add photos",
+    "photos_count": "{{count}} photos",
+    "clear_photos": "Remove photos",
+    "photos_private": "Location and camera details are removed from photos before they are kept. Up to five photos.",
+    "sending": "Sending…",
+    "report_submit": "Submit the field report",
+    "reported": "Field report submitted.",
+    "recommendation": "Your recommendation",
+    "rec": {
+      "confirm": "Confirm as a real change",
+      "dismiss": "Dismiss as not a real change"
+    },
+    "recommend_submit": "Send to the senior official",
+    "recommended": "Recommendation sent to the senior official.",
+    "based_on": "Field report by {{name}}:",
+    "fieldwork_title": "Field work and recommendation",
+    "assigned_to": "Field visit: {{name}}",
+    "was_assigned_to": "Visited by {{name}}",
+    "assigned_by": "Assigned by {{name}}, {{date}}",
+    "assignments": "{{count}} assignments",
+    "report_by": "{{name}}, visited {{date}}",
+    "no_gps": "No GPS position",
+    "photo_alt": "Field photo {{n}} by {{name}}",
+    "recommended_to": "Recommended: {{what}}",
+    "rec_by": "{{name}}, {{date}}",
+    "awaiting_senior": "awaiting the senior official",
+    "rec_department": "Passed to: {{dept}}",
+    "no_district_officer": "No district officer covers this place: the senior official takes the district officer's steps."
   }
 }

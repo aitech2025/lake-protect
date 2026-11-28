@@ -31,12 +31,15 @@ C:\lp-cache\venv\Scripts\lp replay reports\screen\2026-11-22                # th
 | Citizen portal | http://localhost:8180/report |
 | API | http://localhost:8100/health (also under `/api` on the app's address) |
 | Database | localhost:5544, bound to this machine only |
-| Notifier | Reminders, escalations to the admin and the email outbox, every minute (`docker compose logs notifier`) |
+| Notifier | Reminders, escalations to the senior officials and the email outbox, every minute (`docker compose logs notifier`) |
 
-Two roles (DECISIONS.md D-057): **admin**, who runs the application and decides on incidents, and
-**viewer**, the officials, who see everything and record reviews. The role accounts are
-`demo.admin`, `demo.viewer1` (Telugu; Hyderabad, Ranga Reddy) and `demo.viewer2` (Medchal–Malkajgiri,
-Sangareddy), listed in `data/accounts.yml`; they sign in with one click. How the weekly record, incidents and
+Four personas (DECISIONS.md D-067): the **admin** maintains the application and takes no step on an
+incident; the **senior official** sees the State, approves recommendations and closes incidents; the
+**district officer** sees their districts, sends field officers and recommends a decision; the
+**field officer** sees the incidents assigned to them and reports from the place. The persona
+accounts are `demo.admin`, `demo.senior`, `demo.district1` (Telugu; Hyderabad, Ranga Reddy),
+`demo.district2` (Medchal–Malkajgiri, Sangareddy), `demo.field1` (Telugu; Hyderabad, Ranga Reddy) and
+`demo.field2` (Medchal–Malkajgiri, Sangareddy), listed in `data/accounts.yml`; they sign in with one click. How the weekly record, incidents and
 legal documents work: [docs/weekly-processing.md](docs/weekly-processing.md).
 
 The desk opens on the **Overview**, which drills down from State to district, mandal, village and
@@ -84,6 +87,9 @@ thresholds stay in `pipeline/lake_protect/detect_rules.yaml`.
 
 The presentation script is in [docs/DEMO.md](docs/DEMO.md). After the first build the desk needs no
 internet: tiles, image pairs, fonts and the app are all local. Satellite reviews and looks need it.
+The Map page and the Overview show an online street map on a globe when there is internet, and fall
+back to local outlines and the Sentinel-2 tiles when there is not (D-068). To keep them fully local,
+build the web image with `$env:LP_BASEMAP_STYLE="offline"; docker compose build web`.
 
 ## Real data: the screen from space
 
@@ -97,7 +103,7 @@ C:\lp-cache\venv\Scripts\lp screen                       # weekly screen: watch 
 C:\lp-cache\venv\Scripts\lp basemap --upload             # offline Sentinel-2 base map for the real-lake maps
 C:\lp-cache\venv\Scripts\lp replay reports\screen\<date>  # after a reset: resend a saved screen, no internet
 C:\lp-cache\venv\Scripts\lp detect --asset <asset_key>   # one or more lakes from data/assets.geojson, report only
-C:\lp-cache\venv\Scripts\lp assets-areas                 # district and mandal of each real lake (OpenStreetMap boundaries)
+C:\lp-cache\venv\Scripts\lp assets-areas                 # district, mandal and village of each real lake (OpenStreetMap)
 ```
 
 Government sources (asset creation engine, `docs/asset-engine.md`). No data-sharing agreement exists yet, so they read files:

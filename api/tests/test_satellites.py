@@ -22,7 +22,7 @@ def _token(monkeypatch):
 
 @pytest.fixture()
 def people(db):
-    return type("P", (), {"admin": make_user(db, "admin"), "official": make_user(db, "viewer")})
+    return type("P", (), {"admin": make_user(db, "admin"), "official": make_user(db, "senior_official")})
 
 
 def by_key(client, user) -> dict:
@@ -100,18 +100,19 @@ def test_one_screening_source_is_on_and_the_screen_always_has_an_optical_one(cli
 
 def test_a_sharper_image_is_priced_from_its_source_and_a_source_that_is_off_is_refused(client, db, people):
     admin = make_user(db, "admin", is_demo=False)
+    senior = make_user(db, "senior_official", is_demo=False)  # officers ask for sharper images; the admin maintains sources (D-067)
     data = {"language": "en", "what": "dumping", "lon": TG_LON, "lat": TG_LAT}
     ref = client.post("/citizen/reports", data={"data": json.dumps(data)}).json()["ref"]
     aid = db.scalar(select(CitizenReport).where(CitizenReport.ref == ref)).alert_id
     added = client.post("/satellites", json=PLANET, headers=auth(admin)).json()
-    out = client.post(f"/alerts/{aid}/imagery-request", json={"provider": PLANET["key"]}, headers=auth(admin)).json()
+    out = client.post(f"/alerts/{aid}/imagery-request", json={"provider": PLANET["key"]}, headers=auth(senior)).json()
     assert out["provider"] == PLANET["key"] and out["est_cost_usd"] == 25 * 40  # the smallest order, 25 sq km
-    first_on = client.post(f"/alerts/{aid}/imagery-request", json={}, headers=auth(admin)).json()
+    first_on = client.post(f"/alerts/{aid}/imagery-request", json={}, headers=auth(senior)).json()
     assert first_on["provider"] == "isro_nrsc" and first_on["est_cost_usd"] is None  # price on request
     detail = client.get(f"/alerts/{aid}", headers=auth(admin)).json()
     assert detail["imagery_requests"][0]["provider_name"] == PLANET["name"]
     client.patch(f"/satellites/{added['id']}", json={"active": False}, headers=auth(admin))
-    off = client.post(f"/alerts/{aid}/imagery-request", json={"provider": PLANET["key"]}, headers=auth(admin))
+    off = client.post(f"/alerts/{aid}/imagery-request", json={"provider": PLANET["key"]}, headers=auth(senior))
     assert off.status_code == 422 and "is on" in off.text
     client.delete(f"/satellites/{added['id']}?reason=Test over", headers=auth(admin))
     kept = db.scalar(select(ImageryRequest).where(ImageryRequest.alert_id == aid, ImageryRequest.provider == PLANET["key"]))

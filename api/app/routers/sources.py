@@ -26,9 +26,9 @@ from app.sources.transports import SampleTransport
 
 router = APIRouter(tags=["sources"])
 
-READ_ROLES = (Role.admin, Role.viewer)
+READ_ROLES = (Role.admin, Role.senior_official)
 RUN_ROLES = (Role.admin,)
-REGISTER_ROLES = (Role.admin, Role.viewer)
+REGISTER_ROLES = (Role.admin, Role.senior_official, Role.district_officer)
 
 
 def _run_summary(run: ImportRun | None, with_items: bool = False) -> dict | None:
@@ -191,9 +191,9 @@ def asset_register(asset_id: int, user: User = Depends(require_roles(*REGISTER_R
 
     Parcels carry land category and extent only. No owner name is held anywhere (CONTEXT.md 17.10).
     """
-    asset = db.get(Asset, asset_id)
-    if asset is None:
-        raise HTTPException(404, "Asset not found")
+    from app import access
+
+    asset = access.require_asset(db, user, asset_id)
     links = [dict(r) for r in db.execute(_LINKS_SQL, {"a": asset_id}).mappings()]
     primary = db.execute(_PRIMARY_SOURCE_SQL, {"a": asset_id}).mappings().first()
     parcels = []

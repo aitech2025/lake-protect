@@ -3,7 +3,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { API_BASE, api, authHeaders, fmtDate, fmtDateTime } from "../api";
-import { isAdmin, useAuth } from "../auth";
+import { isAdmin, isCasework, useAuth } from "../auth";
 import { AuthImage, StatePill, useAsync } from "../components/Bits";
 import { TableRegion } from "../components/PageState";
 
@@ -124,6 +124,7 @@ export function Documents({ assetId }: { assetId: number }) {
 /** Append-only field visit history and evidence for Asset 360. */
 export function Inspections({ assetId }: { assetId: number }) {
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -150,7 +151,7 @@ export function Inspections({ assetId }: { assetId: number }) {
   return (
     <section className="section panel" data-testid="asset-inspections">
       <div className="person-head"><div><h2 className="title-s">{t("inspection.title")}</h2><p className="small muted">{t("inspection.lede")}</p></div>
-        {!open && <button type="button" className="btn secondary" onClick={() => setOpen(true)}>{t("inspection.add")}</button>}
+        {!open && isCasework(user) && <button type="button" className="btn secondary" onClick={() => setOpen(true)}>{t("inspection.add")}</button>}
       </div>
       {message && <p className="banner info" role="status">{message}</p>}
       {open && <form className="action inspection-form" onSubmit={(e) => void submit(e)}>
